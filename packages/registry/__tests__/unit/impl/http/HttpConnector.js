@@ -8,6 +8,7 @@ const {
 } = _core.dogma.use(require("@akromio/doubles"));
 const axios = _core.dogma.use(require("axios"));
 const path = _core.dogma.use(require("path"));
+const os = _core.dogma.use(require("os"));
 const {
   HttpConnector
 } = _core.dogma.use(require("../../../.."));
@@ -48,7 +49,7 @@ suite(__filename, () => {
                   ["headers"]: {
                     ["content-type"]: "text/yaml"
                   },
-                  ["data"]: "spec: v1.0\ncty: yaml"
+                  ["data"]: `spec: v1.0${os.EOL}cty: yaml`
                 }
               })
             });
@@ -57,7 +58,7 @@ suite(__filename, () => {
             expected(out).toBeMap().equalTo({
               'name': "/jobs.yaml",
               'cty': "text/yaml",
-              'value': "spec: v1.0\ncty: yaml"
+              'value': `spec: v1.0${os.EOL}cty: yaml`
             });
           }
         });

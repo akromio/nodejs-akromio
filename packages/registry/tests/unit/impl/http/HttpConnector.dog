@@ -3,6 +3,7 @@ use (
   {interceptor, method} = alias://doubles
   dep://axios
   dep://path
+  dep://os
   {HttpConnector} = ~
 )
 
@@ -39,7 +40,7 @@ suite(__filename, proc()
             returns = {
               status = 200
               headers = {'content-type' = "text/yaml"}
-              data = "spec: v1.0\ncty: yaml"
+              data = $"spec: v1.0${os.EOL}cty: yaml"
             }
           )
         )
@@ -51,7 +52,7 @@ suite(__filename, proc()
       expected(out).toBeMap().equalTo(
         name = "/jobs.yaml"
         cty = "text/yaml"
-        value = "spec: v1.0\ncty: yaml"
+        value = $"spec: v1.0${os.EOL}cty: yaml"
       )
     end)
   end)
