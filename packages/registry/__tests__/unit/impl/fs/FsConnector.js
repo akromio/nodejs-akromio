@@ -3,6 +3,7 @@
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
 const path = _core.dogma.use(require("path"));
+const os = _core.dogma.use(require("os"));
 const {
   FsConnector: Connector
 } = _core.dogma.use(require("../../../.."));
@@ -63,7 +64,7 @@ suite(__filename, () => {
             const out = (0, await conn.getItem("/catalogs/jobs.yaml"));
             expected(out).toBeMap().toHave({
               'cty': "text/yaml",
-              'value': "spec: v1.0\ncty: yaml"
+              'value': `spec: v1.0${os.EOL}cty: yaml`
             }).member("name").toContain("catalogs").toContain("jobs.yaml");
           }
         });
@@ -72,7 +73,7 @@ suite(__filename, () => {
             const out = (0, await conn.getItem("/catalogs/jobs.json"));
             expected(out).toBeMap().toHave({
               'cty': "application/json",
-              'value': "{\n  \"spec\": \"v1.0\",\n  \"cty\": \"json\"\n}"
+              'value': `{${os.EOL}  "spec": "v1.0",${os.EOL}  "cty": "json"${os.EOL}}`
             }).member("name").toContain("catalogs").toContain("jobs.json");
           }
         });

@@ -1,6 +1,7 @@
 use (
   alias://expected
   dep://path
+  dep://os
   {FsConnector as Connector} = ~
 )
 
@@ -73,7 +74,7 @@ suite(__filename, proc()
       # (2) assessment
       expected(out).toBeMap().toHave(
         cty = "text/yaml"
-        value = "spec: v1.0\ncty: yaml"
+        value = $"spec: v1.0${os.EOL}cty: yaml"
       ).member("name").toContain("catalogs").toContain("jobs.yaml")
     end)
 
@@ -84,7 +85,7 @@ suite(__filename, proc()
       # (2) assessment
       expected(out).toBeMap().toHave(
         cty = "application/json"
-        value = "{\n  \"spec\": \"v1.0\",\n  \"cty\": \"json\"\n}"
+        value = $"{${os.EOL}  \"spec\": \"v1.0\",${os.EOL}  \"cty\": \"json\"${os.EOL}}"
       ).member("name").toContain("catalogs").toContain("jobs.json")
     end)
   end)
