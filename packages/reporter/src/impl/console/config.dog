@@ -1,0 +1,32 @@
+use (
+  color = dep://chalk
+)
+
+/**
+ * The default configuration to use with the console reporters.
+ */
+export {
+  echo = echo
+  print = print
+  
+  indent = "  "
+
+  simple =
+    prefix = "-"
+
+  composite =
+    prefix = ">"
+    title =
+      color = color.yellow
+
+  log =
+    startSymbol = "⬎"
+    endSymbol = "↳"
+    color = color.italic.gray
+
+  ok =
+    color = color.green
+    
+  failed =
+    color = color.red
+}

@@ -1,0 +1,36 @@
+use (
+  fs = dep://fs/promises
+  dep://path
+  dep://yaml
+  ../../Repository
+)
+
+/**
+ * A repository associated to a directory of the local disk.
+ */
+export struct LocalRepository: Repository
+  /**
+   * The base directory path.
+   */
+  pub const basePath: text
+
+  /**
+   * The valid extensions for the files.
+   */
+  pub const extensions: (".yaml" | ".yml" | ".json")[] = [".yaml", ".yml", ".json"]
+
+  @override @hidden
+  pub async fn getDatum(name: text) -> datum
+    for each ext in self.extensions do
+      const loc = path.join(self.basePath, name + ext)
+
+      if [ok, content] ::= pawait(fs.readFile(loc, "utf8")); ok then
+        #!cov ignore else
+        with ext do
+          if ".yaml", ".yml" then
+            datum = yaml.parse(content)
+            
+          if ".json" then
+            datum = json.decode(content)
+        
+        break

@@ -1,0 +1,401 @@
+use (
+  dep://path
+  dep://os
+  alias://expected
+  {monitor, simulator, method, field} = alias://doubles
+  {Registries, Registry, RegistryState, FsConnector, Item} = ~
+)
+
+suite(__filename, proc()
+  fn createRegistry(name := "test") = Registry(
+    name=,
+    client = FsConnector(basePath = path.join(__dirname, "../data/connector/fs"))
+  )
+
+  fn createEmptyRegistry() = Registry(
+    name = "empty"
+    client = FsConnector(basePath = __dirname)
+  )
+
+  teardown(proc()
+    monitor.clearAll()
+  end)
+
+  suite("connect()", proc()
+    test("when currently disconnected, connect() must be called", async proc()
+      # (1) act
+      const (
+        reg1 = monitor(createRegistry("one"), methods = ["connect"])
+        reg2 = monitor(createRegistry("two"), methods = ["connect"])
+        regs = Registries().appendRegistry(reg1).appendRegistry(reg2)
+        out = await(regs.connect())
+      )
+
+      # (2) assessment
+      expected(out).sameAs(regs).toHave(
+        state = RegistryState.connected
+      )
+
+      for each reg in [reg1, reg2] do
+        expected(monitor.log(reg).calls).equalTo(1)
+    end)
+
+    test("when currently connected, no connect() must be performed", async proc()
+      # (1) act
+      const (
+        reg = monitor(createRegistry(), methods = ["connect"])
+        regs = await(Registries().appendRegistry(reg).connect())
+        out = await(regs.connect())
+      )
+
+      # (2) assessment
+      expected(out).sameAs(regs)
+      expected(monitor.log(reg).calls).equalTo(1)
+    end)
+  end)
+
+  suite("disconnect()", proc()
+    test("when currently connected, disconnect() must be called", async proc()
+      # (1) act
+      const (
+        reg1 = monitor(createRegistry("one"), methods = ["disconnect"])
+        reg2 = monitor(createRegistry("two"), methods = ["disconnect"])
+        regs = await(Registries().appendRegistry(reg1).appendRegistry(reg2).connect())
+        out = await(regs.disconnect())
+      )
+
+      # (2) assessment
+      expected(out).sameAs(regs)
+
+      for each reg in [reg1, reg2] do
+        expected(monitor.log(reg).calls).equalTo(1)
+    end)
+
+    test("when currently disconnected, no disconnect() must be performed", async proc()
+      # (1) act
+      const (
+        reg = monitor(createRegistry(), methods = ["disconnect"])
+        regs = Registries().appendRegistry(reg)
+        out = await(regs.disconnect())
+      )
+
+      # (2) assessment
+      expected(out).sameAs(regs)
+      expected(monitor.log(reg).calls).equalTo(0)
+    end)
+  end)
+
+  suite("appendRegistry()", proc()
+    test("when disconnected, the registry must be added", proc()
+      # (1) act
+      const (
+        reg = createRegistry()
+        regs = Registries()
+        out = regs.appendRegistry(reg)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(regs).toHaveLen(1)
+    end)
+
+    test("when connected, error must be raised", async proc()
+      # (1) act
+      const (
+        reg = createRegistry()
+        regs = await(Registries().connect())
+        out = peval(regs.appendRegistry(reg))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(TypeError("New registries can only be appended when disconnected."))
+    end)
+  end)
+
+  suite("getRegistry()", proc()
+    test("when existing, registry must be returned", proc()
+      # (1) act
+      const (
+        reg = createRegistry()
+        regs = Registries().appendRegistry(reg)
+        out = regs.getRegistry("test")
+      )
+
+      # (2) assessment
+      expected(out).sameAs(reg)
+    end)
+
+    test("when not existing, nil must be returned", proc()
+      # (1) act
+      const (
+        regs = Registries()
+        out = regs.getRegistry("one")
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+  end)
+
+  suite("registryNames", proc()
+    test("a list must be returned with the registry names", proc()
+      # (1) act
+      const (
+        reg1 = createEmptyRegistry()
+        reg2 = createRegistry()
+        regs = Registries().appendRegistry(reg1).appendRegistry(reg2)
+        out = regs.registryNames
+      )
+
+      # (2) assessment
+      expected(out).equalTo(["empty", "test"])
+    end)
+  end)
+
+  suite("getItem()", proc()
+    test("when not connected, error must be raised", async proc()
+      # (1) act
+      const (
+        reg = createRegistry()
+        regs = Registries().appendRegistry(reg)
+        out = pawait(regs.getItem("jobs.yaml"))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(TypeError("The registries must be connected for performing the op."))
+    end)
+
+    suite("when registryName not passed, getItemFromRegistries() used", proc()
+      test("when not existing, nil must be returned", async proc()
+        # (1) act
+        const (
+          regs = await(Registries().connect())
+          out = await(regs.getItem("/catalogs/jobs.yaml"))
+        )
+
+        # (2) assessment
+        expected(out).toBeNil()
+      end)
+
+      test("when existing in the 1st registry, item must be returned", async proc()
+        # (1) act
+        const (
+          reg = createRegistry()
+          regs = await(Registries().appendRegistry(reg).connect())
+          out = await(regs.getItem("/catalogs/jobs.yaml"))
+        )
+
+        # (2) assessment
+        expected(out).toBe(Item).toHave(
+          registryName = "test"
+          name = "/catalogs/jobs.yaml"
+          cty = "text/yaml"
+          value = "spec: v1.0\ncty: yaml"
+        )
+      end)
+
+      test("when existing in the 2nd registry, item must be returned", async proc()
+        # (1) act
+        const (
+          reg1 = createEmptyRegistry()
+          reg2 = createRegistry()
+          regs = await(Registries().appendRegistry(reg1).appendRegistry(reg2).connect())
+          out = await(regs.getItem("/catalogs/jobs.yaml"))
+        )
+
+        # (2) assessment
+        expected(out).toBe(Item).toHave(
+          registryName = "test"
+          name = "/catalogs/jobs.yaml"
+          cty = "text/yaml"
+          value = "spec: v1.0\ncty: yaml"
+        )
+      end)
+    end)
+
+    suite("when registryName passed, getItemFromRegistry() used", proc()
+      const registryName = "test"
+
+      test("when registry not found, nil must be returned", async proc()
+        # (1) act
+        const (
+          regs = await(Registries().connect())
+          out = await(regs.getItem("/catalogs/jobs.yaml", registryName=))
+        )
+
+        # (2) assessment
+        expected(out).toBeNil()
+      end)
+
+      test("when existing, item must be returned", async proc()
+        # (1) act
+        const (
+          reg = createRegistry()
+          regs = await(Registries().appendRegistry(reg).connect())
+          out = await(regs.getItem("/catalogs/jobs.yaml", registryName=))
+        )
+
+        # (2) assessment
+        expected(out).toBe(Item).toHave(
+          registryName = "test"
+          name = "/catalogs/jobs.yaml"
+          cty = "text/yaml"
+          value = "spec: v1.0\ncty: yaml"
+        )
+      end)
+
+      test("when not existing, item must be returned", async proc()
+        # (1) act
+        const (
+          reg = createRegistry()
+          regs = await(Registries().appendRegistry(reg).connect())
+          out = await(regs.getItem("/unknown.yaml", registryName=))
+        )
+
+        # (2) assessment
+        expected(out).toBeNil()
+      end)
+    end)
+  end)
+
+  suite("downloadItem()", proc()
+    suite("when registryName passed, downloadItemFromRegistry() used", proc()
+      const (
+        registryName = "test"
+        localPath = path.join(os.tmpdir(), ".apm/jobs/catalogs")
+      )
+
+      test("when registry not found, false must be returned", async proc()
+        # (1) act
+        const (
+          registries = monitor(
+            await(Registries().connect())
+            methods = ["downloadItemFromRegistry"]
+          )
+          itemPath = "/jobs/catalogs/jobs.yaml"
+          opts = {registryName}
+          out = await(registries.downloadItem(itemPath, localPath, opts))
+        )
+
+        # (2) assessment
+        expected(out).equalTo(false)
+
+        const log = monitor.log(registries)
+        expected(log.calls).equalTo(1)
+        expected(log.calledWith([
+          itemPath
+          localPath
+          registryName
+          opts
+        ])).equalTo(1)
+      end)
+
+      test("when registry found, homonym method must be called", async proc()
+        # (1) act
+        const (
+          registry = monitor(
+            simulator(
+              Registry
+              name = field(returns = registryName)
+              connect = method()
+              downloadItem = method.resolves(true)
+            )
+            methods = ["downloadItem"]
+          )
+          registries = await(Registries().appendRegistry(registry).connect())
+          itemPath = "/jobs/catalogs/jobs.yaml"
+          opts = {registryName}
+          out = await(registries.downloadItem(itemPath, localPath, opts))
+        )
+
+        # (2) assessment
+        expected(out).equalTo(true)
+
+        const log = monitor.log(registry)
+        expected(log.calls).equalTo(1)
+        expected(log.calledWith([
+          itemPath
+          localPath
+          opts
+        ])).equalTo(1)
+      end)
+    end)
+
+    suite("when registryName not passed, downloadItemFromRegistries() used", proc()
+      const localPath = path.join(os.tmpdir(), ".apm/jobs/catalogs")
+
+      test("when item not found, false must be returned", async proc()
+        # (1) act
+        const (
+          registry = monitor(
+            simulator(
+              Registry
+              connect = method()
+              downloadItem = method.resolves(false)
+            )
+            methods = ["downloadItem"]
+          )
+
+          registries = monitor(
+            await(Registries().appendRegistry(registry).connect())
+            methods = ["downloadItemFromRegistries"]
+          )
+
+          itemPath = "/jobs/catalogs/jobs.yaml"
+          out = await(registries.downloadItem(itemPath, localPath))
+        )
+
+        # (2) assessment
+        expected(out).equalTo(false)
+
+        # registries.downloadItemFromRegistries()
+        var log = monitor.log(registries)
+        expected(log.calls).equalTo(1)
+        expected(log.calledWith([itemPath, localPath, undefined])).equalTo(1)
+
+        # registry.downloadItem()
+        log = monitor.log(registry)
+        expected(log.calls).equalTo(1)
+        expected(log.calledWith([itemPath, localPath, undefined])).equalTo(1)
+      end)
+
+      test("when item downloaded, true must be returned", async proc()
+        # (1) act
+        const (
+          registry = monitor(
+            simulator(
+              Registry
+              connect = method()
+              downloadItem = method.resolves(true)
+            )
+            methods = ["downloadItem"]
+          )
+
+          registries = monitor(
+            await(Registries().appendRegistry(registry).connect())
+            methods = ["downloadItemFromRegistries"]
+          )
+
+          itemPath = "/jobs/catalogs/jobs.yaml"
+          out = await(registries.downloadItem(itemPath, localPath))
+        )
+
+        # (2) assessment
+        expected(out).equalTo(true)
+
+        # registries.downloadItemFromRegistries()
+        var log = monitor.log(registries)
+        expected(log.calls).equalTo(1)
+        expected(log.calledWith([itemPath, localPath, undefined])).equalTo(1)
+
+        # registry.downloadItem()
+        log = monitor.log(registry)
+        expected(log.calls).equalTo(1)
+        expected(log.calledWith([itemPath, localPath, undefined])).equalTo(1)
+      end)
+    end)
+  end)
+end)

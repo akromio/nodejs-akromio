@@ -1,0 +1,43 @@
+use (
+  alias://expected
+  {HttpConnector} = ~
+)
+
+suite(__filename, proc()
+  const (
+    host = "siasky.net"
+    base = "/0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"
+  )
+
+  fn createConnector() = HttpConnector(host=, base)
+
+  suite("getItem()", proc()
+    test("when item unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        conn = createConnector()
+        out = await(conn.getItem("/jobs/catalogs/unknown"))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when item exists, item must be returned", async proc()
+      # (1) act
+      const (
+        conn = createConnector()
+        itemPath = "/jobs/catalogs/empty.yaml"
+        out = await(conn.getItem(itemPath))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = itemPath
+        cty = "text/yaml"
+      )
+
+      expected(out.value.toString()).toInclude("spec: v1.0")
+    end)
+  end)
+end)

@@ -1,0 +1,93 @@
+use (
+  alias://expected
+  dep://path
+  {FsConnector as Connector} = ~
+)
+
+suite(__filename, proc()
+  const (
+    basePath = path.join(__dirname, "../../../data/connector/fs")
+  )
+
+  fn createConnector() = Connector(basePath=)
+
+  suite("connect()", proc()
+    test("when called, nothing to do", proc()
+      # (1) act
+      const (
+        conn = createConnector()
+        out = conn.connect()
+      )
+
+      # (2) assessment
+      expected(out).sameAs(out)
+    end)
+  end)
+
+  suite("disconnect()", proc()
+    test("when called, nothing to do", proc()
+      # (1) act
+      const (
+        conn = createConnector().connect()
+        out = conn.disconnect()
+      )
+
+      # (2) assessment
+      expected(out).sameAs(out)
+    end)
+  end)
+
+  suite("InternalConnector.buildItemPath()", proc()
+    const (
+      conn = createConnector().connect()
+    )
+
+    test("when relative path, error must be raised", async proc()
+      # (1) act
+      const out = pawait(conn.getItem("relative"))
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(Error).like("Path must be absolute and start with slash").like("Got: relative.")
+    end)
+  end)
+
+  suite("getItem()", proc()
+    const (
+      conn = createConnector().connect()
+    )
+
+    test("when item unexists, nil must be returned", async proc()
+      # (1) act
+      const out = await(conn.getItem("/jobs.yaml"))
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when item is a yaml file, value and mime must be returned", async proc()
+      # (1) act
+      const out = await(conn.getItem("/catalogs/jobs.yaml"))
+
+      # (2) assessment
+      expected(out).toBeMap().equalTo(
+        name = "/catalogs/jobs.yaml"
+        cty = "text/yaml"
+        value = "spec: v1.0\ncty: yaml"
+      )
+    end)
+
+    test("when item is a json file, value and mime must be returned", async proc()
+      # (1) act
+      const out = await(conn.getItem("/catalogs/jobs.json"))
+
+      # (2) assessment
+      expected(out).toBeMap().equalTo(
+        name = "/catalogs/jobs.json"
+        cty = "application/json"
+        value = "{\n  \"spec\": \"v1.0\",\n  \"cty\": \"json\"\n}"
+      )
+    end)
+  end)
+end)

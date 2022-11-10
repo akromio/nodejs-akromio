@@ -1,0 +1,8 @@
+use (
+  DatumContainer
+)
+
+/**
+ * A container with a variable datum.
+ */
+export struct VarDatum: DatumContainer

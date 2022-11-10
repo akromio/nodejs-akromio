@@ -1,0 +1,59 @@
+use (
+  ../errors/NotFoundError
+  Op
+)
+
+/**
+ * A collection of operations.
+ */
+export struct Ops
+  /**
+   * The operations.
+   */
+  pub const ops = {}
+
+  /**
+   * The number of operations in the collection.
+   */
+  pub fn len = len(self.ops)
+
+  /**
+   * Appends an operation to this collection.
+   */
+  pub fn appendOp(op: Op) -> self
+    self.ops[op.name] = op
+  
+  /**
+   * Appends several operations to this collection.
+   */
+  pub fn appendOps(...ops) -> self
+    for each op in ops do
+      self.appendOp(op)
+  
+  /**
+   * Appends the operations defined into a plugin.
+   *
+   * The final operation name is pluginName.operationName.
+   */
+  @noParamCheck
+  pub fn appendPlugin(pi: Plugin) -> self
+    for each _, op in pi.ops.ops do
+      self.ops[$"${pi.name}.${op.name}"] = op
+    
+    if pi.hasDefaultOp() then
+      self.ops[pi.name] = pi.ops.ops[pi.defaultOpName]
+  
+  /**
+   * Appends the given plugins.
+   */
+  pub fn appendPlugins(...plugins) -> self
+    for each plugin in plugins do
+      self.appendPlugin(plugin)
+  
+  /**
+   * Returns an operation by name.
+   * When the operation unexists, nil returned.
+   */
+  pub fn getOp(name: text, opts?: {raiseIfNotFound?: bool}) -> op
+    if not (op = self.ops[name]) and opts?raiseIfNotFound then
+      throw(NotFoundError($"Operation '${name}' not found."))

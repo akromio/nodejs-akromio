@@ -1,0 +1,102 @@
+use (
+  alias://expected
+  {GlobalDataset, LocalDataset, DatasetDescriber} = ~
+  {VarDatum, ConstDatum, DatumFn, Constraints, EnumConstraint} = ~
+)
+
+suite(__filename, proc()
+  suite("describeData()", proc()
+    const (
+      globalDataset = GlobalDataset(name = "global")
+      localDataset = LocalDataset(name = "local", parent = globalDataset)
+      desc = DatasetDescriber()
+    )
+
+    globalDataset.setDatum(
+      VarDatum(
+        name = "v"
+        desc = "A variable."
+        value = "xyz"
+      )
+    ).setDatum(
+      ConstDatum(
+        name = "c"
+        desc = "A constant."
+        value = "zyx"
+      )
+    ).setDatum(
+      ConstDatum(
+        name = "e"
+        value = "one"
+        constraints = Constraints().appendConstraint(
+          EnumConstraint(options = ["one", "two", "three"])
+        ),
+        tags = ["enum"]
+      )
+    ).setDatum(
+      DatumFn(
+        name = "f"
+        value = fn() = "hello!" end
+      )
+    ).setDatum(
+      ConstDatum(
+        name = "p"
+        desc = "A password."
+        value = "my pass"
+        tags = ["password"]
+      )
+    ).setDatum(
+      ConstDatum(
+        name = "h"
+        desc = "A hidden datum."
+        tags = ["hidden"]
+      )
+    )
+
+    localDataset.setDatum(
+      VarDatum(
+        name = "v"
+        desc = "Local var."
+        value = "XYZ"
+      )
+    )
+
+    test("when global dataset, the repr of its data must be returned", proc()
+      # (1) act
+      const out = desc.describeData(globalDataset)
+
+      # (2) assessment
+      expected(out).equalTo(
+       v = {kind = "var",  value = "xyz", desc = "A variable."}
+       c = {kind = "const", value = "zyx", desc = "A constant."}
+       e = {kind = "const", value = "one", desc = "", options = ["one", "two", "three"]}
+       f = {kind = "fn", value = "hello!", desc = "" }
+       p = {kind = "const", value = "*****", desc = "A password."}
+      )
+    end)
+
+    test("when local dataset, the local data must override global data", proc()
+      # (1) act
+      const out = desc.describeData(localDataset, showPasswordValues = true)
+
+      # (2) assessment
+      expected(out).equalTo(
+       v = {kind = "var",  value = "XYZ", desc = "Local var."}
+       c = {kind = "const", value = "zyx", desc = "A constant."}
+       e = {kind = "const", value = "one", desc = "", options = ["one", "two", "three"]}
+       f = {kind = "fn", value = "hello!", desc = "" }
+       p = {kind = "const", value = "my pass", desc = "A password."}
+      )
+    end)
+
+    test("when tag set, only data with this tag must be returned", proc()
+      # (1) act
+      const out = desc.describeData(localDataset, tag = "enum")
+
+      # (2) assessment
+      expected(out).equalTo(
+       e = {kind = "const", value = "one", desc = "", options = ["one", "two", "three"]}
+      )
+    end)
+  end)
+end)

@@ -1,0 +1,13 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, its api must be exported", proc()
+    expected(pkg).members(
+      "Inquirer"
+      "QuestionDescriber"
+    ).toBeCallable()
+  end)
+end)

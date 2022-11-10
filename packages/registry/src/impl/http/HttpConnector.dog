@@ -1,0 +1,44 @@
+use (
+  dep://axios
+  ../InternalConnector
+)
+
+/**
+ * A registry connector to download files from
+ * a HTTP server.
+ */
+@impl(Connector)
+export struct HttpConnector: InternalConnector
+  /**
+   * The HTTP client to use, compatible with Axios.
+   */
+  pub const client = axios
+
+  /**
+   * The host.
+   */
+  pub const host: text
+
+  /**
+   * The base where to serve.
+   */
+  pub const base: text
+
+  @override
+  pub async fn _getItem(itemPath: text) -> item
+    const (
+      axios = self.client
+      url = $"https://${self.host}${self.base}${itemPath}"
+    )
+
+    if [ok, resp] ::= pawait(axios.get(url)); ok and resp.status == 200 then
+      var cty = resp.headers["content-type"]
+
+      #!cov ignore
+      if cty == "application/x-yaml" then cty = "text/yaml"
+
+      item = {
+        name = itemPath
+        value = resp.data
+        cty
+      }

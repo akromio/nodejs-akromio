@@ -1,0 +1,11 @@
+use (
+  Datum
+)
+
+/**
+ * A container of a datum.
+ */
+@abstract
+export struct DatumContainer: Datum
+  @override
+  pub fn getValue() = self.value

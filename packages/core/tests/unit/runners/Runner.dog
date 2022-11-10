@@ -1,0 +1,46 @@
+use (
+  alias://expected
+  {monitor, simulator} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {Runner, StaticAction, ActionOperator, Result} = ~
+)
+
+suite(__filename, proc()
+  const log = simulator.stream.duplex()
+
+  suite("run()", proc()
+    test("when called, op.runWith() is called and its result must be returned", async proc()
+      # (1) act
+      const (
+        action = StaticAction(name = "test", fun = nop, operator = ActionOperator())
+        dataset = GlobalDataset(name = "global")
+        runner = Runner(log=)
+        out = await(runner.run(action, nil, dataset=, onError = "carryOn"))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Result)
+    end)
+
+    test("when called w/ args, op.runWith() is called w/ args and its result must be returned", async proc()
+      # (1) act
+      const (
+        action = monitor(
+          StaticAction(name = "test", fun = nop, operator = ActionOperator())
+          method = "runWith"
+        )
+        dataset = GlobalDataset(name = "global")
+        runner = Runner(log=)
+        args = ["one", "two", "three"]
+        out = await(runner.run(action, args, dataset=, onError = "carryOn"))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Result)
+
+      const mlog = monitor.log(action, clear = true)
+      expected(mlog.calls).equalTo(1)
+      expected(mlog.call.args).it(0).equalTo(args)
+    end)
+  end)
+end)

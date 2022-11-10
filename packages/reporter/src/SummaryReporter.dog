@@ -1,0 +1,31 @@
+use (
+  Reporter
+)
+
+/**
+ * A reporter to notify the summary of the op runs.
+ */
+@abstract
+export struct SummaryReporter: Reporter
+  /**
+   * The oks.
+   */
+  @hidden @strict
+  pub var ok = 0
+
+  /**
+   * The failed.
+   */
+  @hidden @strict
+  pub var failed = 0
+
+  @override @hidden
+  pub proc _handleOpStart(e)
+    nop
+  
+  @override @hidden
+  pub proc _handleOpEnd(e)
+    if e.opType == "simple" then
+      with e.result.kind do
+        if "ok" then self.ok += 1
+        if "failed" then self.failed += 1

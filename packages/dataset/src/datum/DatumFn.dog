@@ -1,0 +1,16 @@
+use (
+  Datum
+  DatumError
+)
+
+/**
+ * A read-only datum whose value is got from a function call.
+ */
+export struct DatumFn: Datum
+  @post
+  pvt proc post()
+    expect(self.value, func)
+    self.tags.push("const")
+
+  @override
+  pub fn getValue() = self.value()

@@ -1,0 +1,18 @@
+use (
+  Constraint
+  ConstraintError
+)
+
+/**
+ * A constraint to set the possible values for a value.
+ */
+export struct EnumConstraint: Constraint
+  /**
+   * The possible values.
+   */
+  pub const options: list
+
+  @override
+  pub fn validateValue(value?: any) -> value
+    if values ::= self.options; not values.includes(value) then
+      throw(ConstraintError($"Invalid value. Got: ${value}. Expected: ${values}."))

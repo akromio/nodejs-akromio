@@ -1,0 +1,63 @@
+use (
+  alias://expected
+  {simulator, monitor, method} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {Op} = ~
+)
+
+struct TestOp: Op
+
+suite(__filename, proc()
+  const (
+    globalDataset = GlobalDataset(name = "global")
+    logStream = simulator.stream.duplex()
+  )
+
+  suite("runWith()", proc()
+    test("when called, operator must run the action and return its returned value", proc()
+      # (1) act
+      const (
+        operator = monitor(
+          simulator(run = method({resolves = 321}))
+          onlyCalls = true
+        )
+
+        op = TestOp(name = "test", operator)
+        opts = {title = "the title", dataset = globalDataset, log = logStream}
+        out = op.runWith(123, opts)
+        log = monitor.log(operator)
+      )
+
+      # (2) assessment
+      do
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([op, 123, opts])).equalTo(1)
+      finally
+        monitor.clearAll()
+    end)
+  end)
+
+  suite("run()", proc()
+    test("when called, runWith() called with args to nil", proc()
+      # (1) act
+      const (
+        operator = monitor(
+          simulator(run = method({resolves = 321}))
+          onlyCalls = true
+        )
+
+        op = TestOp(name = "test", operator)
+        opts = {title = "the title", dataset = globalDataset, log = logStream}
+        out = op.run(opts)
+        log = monitor.log(operator)
+      )
+
+      # (2) assessment
+      do
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([op, nil, opts])).equalTo(1)
+      finally
+        monitor.clearAll()
+    end)
+  end)
+end)

@@ -1,0 +1,25 @@
+use (
+  ../CompositeOperator
+  ../../Call
+  Co
+)
+
+/**
+ * An operator to run concurrent operations.
+ */
+export struct CoOperator: CompositeOperator
+  @override @hidden
+  pub async fn performWorks(call: Call) -> results: list
+    # (1) run promises
+    const (
+      {dataset} = call
+      cncr = expect(call.op, Co)
+    )
+
+    results = await(Promise.allSettled([
+      for each step in await(cncr.getSteps(call)) do
+        self.performStep(step, call)
+    ]))
+
+    # (2) format results
+    results = [for each result in results do result.value]

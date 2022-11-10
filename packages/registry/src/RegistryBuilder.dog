@@ -1,0 +1,66 @@
+use (
+  Registry
+)
+
+/**
+ * A factory to create registry instances from
+ * the components returned by a registry string parser.
+ */
+export struct RegistryBuilder
+  /**
+   * Creates a registry from a registry string parsed.
+   */
+  pub fn create(decl: map) -> registry: Registry
+    # (1) get the connector to use
+    var conn
+
+    #!cov ignore else
+    with kind ::= decl.impl do
+      if "fs" then conn = createFsConnector(decl)
+      if "git" then conn = createGitConnector(decl)
+      if "http" then conn = createHttpConnector(decl)
+      if "skynet" then conn = createSkynetConnector(decl)
+      if "sns" then conn = createSnsConnector(decl)
+      else throw(TypeError($"Unknown connector: ${kind}."))
+    
+    # (2) create registry to return
+    registry = Registry(decl{*, client = conn})
+
+/**
+ * Creates a FS connector.
+ */
+fn createFsConnector(decl: map) = use("./impl/fs/FsConnector")(decl)
+
+/**
+ * Creates a Git connector.
+ */
+fn createGitConnector(decl: map) = use("./impl/git/GitConnector")(decl)
+
+/**
+ * Creates a HTTP connector.
+ */
+fn createHttpConnector(decl: map) = use("./impl/http/HttpConnector")(decl)
+
+/**
+ * Creates a Skynet connector.
+ */
+fn createSkynetConnector(decl: map) -> conn
+  const (
+    {SkynetClient} = use("@skynetlabs/skynet-nodejs")
+    portal = $"https://${decl.portal}"
+    client = native("new SkynetClient(portal)")
+  )
+
+  conn = use("./impl/skynet/SkynetConnector")(decl{*, client})
+
+/**
+ * Creates an SNS connector.
+ */
+fn createSnsConnector(decl: map) -> conn
+  const (
+    {SkynetClient} = use("@skynetlabs/skynet-nodejs")
+    portal = $"https://${decl.portal}"
+    client = native("new SkynetClient(portal)")
+  )
+
+  conn = use("./impl/sns/SnsConnector")(decl{*, client})

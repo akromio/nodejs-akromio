@@ -1,0 +1,15 @@
+use (
+  ../CompositeOp
+)
+
+/**
+ * A loop, that is, an operation composed of a sequence
+ * of steps to run one by one for each item in a collection.
+ */
+@abstract
+export struct Loop: CompositeOp
+  /**
+   * Returns the collection to iterate.
+   */
+  @abstract
+  pub fn getCollection(call: Call): Collection

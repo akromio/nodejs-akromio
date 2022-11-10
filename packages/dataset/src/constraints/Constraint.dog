@@ -1,0 +1,14 @@
+/**
+ * A constraint for data values.
+ */
+@abstract
+export struct Constraint
+  /**
+   * Checks whether a value passes the constraint.
+   * When this isn't so, a [ConstraintError] is raised.
+   *
+   * It must return the value, allowing, so, change the
+   * value if needed such as, for example, a cast.
+   */
+  @abstract
+  pub fn validateValue(value?: any)

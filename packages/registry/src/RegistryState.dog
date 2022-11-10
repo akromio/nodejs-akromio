@@ -1,0 +1,6 @@
+/**
+ * The possible states for the registries.
+ */
+export enum RegistryState
+  connected
+  disconnected

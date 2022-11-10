@@ -1,0 +1,72 @@
+use (
+  alias://expected
+  {DatasetParser, GlobalDataset, VarDatum, ConstDatum} = ~
+)
+
+suite(__filename, proc()
+  const (
+    inheritedDatum = ConstDatum(
+      name = "inherited"
+      value = "xyz"
+    )
+    ds = GlobalDataset(name = "global").setDatum(inheritedDatum)
+    parser = DatasetParser()
+  )
+
+  suite("parse()", proc()
+    test("when declaration contains valid declarations, a dataset must be returned with these", proc()
+      # (1) act
+      const out = parser.parse(
+        [
+          {var = "v", value = 123, dataType = "num", desc = "A description."}
+          {const = "c", value = "$(v) 321", required = true}
+          {fn = "f", value = fn() = 123 end}
+          {var = "d", value = "$(unknown)", defaultValue = "this is the default"}
+          {var = "e", value = "one", options = ["one", "two", "three"]}
+        ]
+        name = "local"
+        parent = ds
+      )
+
+      # (2) assessment
+      expected(out).toBe("LocalDataset").toHave(name = "local")
+      expected(out.data).toHaveLen(5)
+      expected(out.data.v).toBe("VarDatum").toHave(value = 123, desc = "A description.")
+      expected(out.data.c).toBe("ConstDatum").toHave(value = "123 321")
+      expected(out.data.f).toBe("DatumFn").member("value").toBeFn()
+      expected(out.data.d).toBe("VarDatum").toHave(value = "this is the default")
+      expected(out.data.e).toBe("VarDatum").toHave(value = "one")
+    end)
+
+    test("when local declaration collides with inherited data, the datum is set in local", proc()
+      # (1) act
+      const out = parser.parse(
+        [
+          {var = "inherited", value = "zyx"}
+        ]
+        name = "local"
+        parent = ds
+      )
+
+      # (2) assessment
+      expected(out.data.inherited).toBe(VarDatum).notSameAs(inheritedDatum)
+      expected(out.parent.data.inherited).sameAs(inheritedDatum)
+    end)
+
+    test("when declaration constains invalid item, an error must be raised", proc()
+      # (1) act
+      const out = peval(parser.parse(
+        [
+          {value = 123}
+        ]
+        name = "local"
+        parent = ds
+      ))
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(TypeError).like("Item of dataset declaration must contain var, const or fn.")
+    end)
+  end)
+end)

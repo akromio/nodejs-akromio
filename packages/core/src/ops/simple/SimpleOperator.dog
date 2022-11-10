@@ -1,0 +1,73 @@
+use (
+  SimpleOp
+  ../{Operator, CallOpts, Call, Context, Result}
+)
+
+/**
+ * An operator to run a simple operation.
+ */
+@abstract
+export struct SimpleOperator: Operator
+  @override @hidden
+  pub fn createCall(op: SimpleOp, args?, opts: CallOpts) -> call: Call
+    # (1) create initial data
+    const (
+      params = op.buildParams(args, opts.dataset)
+      title = op.buildTitle(params)
+    )
+
+    # (2) create call
+    call = Call(
+      onError = opts.onError or "carryOn"
+      dataset = opts.dataset
+      op
+      title
+      ctx = Context(
+        params=,
+        state = op.state
+        log = proc(...msg)
+          self.emitOpLog(call, msg.join(" "))
+        end
+      )
+      log = opts.log
+      resultLog = opts.resultLog
+      quiet = opts.quiet
+    )
+
+  @override @hidden
+  pub async fn perform(call: Call) -> result: Result
+    # (1) run
+    var (
+      start ::= timestamp()
+      {quiet, resultLog} ::= call
+      now, value, kind, duration
+    )
+
+    do
+      if not quiet then self.emitOpStart(call)
+      value = await(self.performWork(call))
+      now = timestamp()
+      kind = "ok"
+    catch e
+      now = timestamp()
+      value = e
+      kind = "failed"
+    
+    # (2) create result
+    result = Result(
+      callId = call.id
+      title = call.title
+      onError = call.onError
+      duration = now - start
+      kind
+      value
+    )
+    
+    if resultLog then self.emitOpLog(call, result.value)
+    if not quiet then self.emitOpEnd(call, result)
+  
+  /**
+   * Performs the work associated to a given operation.
+   */
+  @abstract @hidden
+  pub async fn performWork(call: Call): any

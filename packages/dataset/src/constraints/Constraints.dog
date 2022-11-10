@@ -1,0 +1,41 @@
+use (
+  Constraint
+)
+
+/**
+ * A collection of constraints associated to, for example,
+ * a datum.
+ */
+export struct Constraints
+  /**
+   * The constraints.
+   */
+  @hidden @strict
+  pub const constraints = []
+
+  /**
+   * Searches and returns the constraint whose type is a given one.
+   */
+  pub fn findConstraintByType(Constraint) -> c: Constraint
+    for each item in self.constraints do
+      if item is Constraint then
+        c = item
+        break
+
+  /**
+   * Adds a [c]onstraint to this collection.
+   */
+  pub fn appendConstraint(c: Constraint) -> self
+    self.constraints.push(c)
+  
+  /**
+   * Checks whether a [value] passes all the constraints
+   * of this collection, returning the final value.
+   *
+   * @remarks
+   * Remember that a constraint can change a value,
+   * such as, for example, the data type constraints.
+   */
+  pub fn validateValue(value?: any) -> value
+    for each c in self.constraints do
+      value = c.validateValue(value)

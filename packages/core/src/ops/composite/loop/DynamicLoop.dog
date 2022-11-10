@@ -1,0 +1,10 @@
+use (
+  Loop
+)
+
+/**
+ * A dynamic loop, that is, a loop whose steps are
+ * determined in runtime.
+ */
+@abstract
+export struct DynamicLoop: Loop

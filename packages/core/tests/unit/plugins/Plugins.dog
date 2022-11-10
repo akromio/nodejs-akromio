@@ -1,0 +1,110 @@
+use (
+  alias://expected
+  {Plugins, Plugin, NotFoundError} = ~
+)
+
+suite(__filename, proc()
+  suite("appendPlugin()", proc()
+    test("when plugin to add, this must be added to items", proc()
+      # (1) act
+      const (
+        plugins = Plugins()
+        plugin1 = Plugin(name = "plugin1")
+        out = plugins.appendPlugin(plugin1)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(plugins)
+      expected(plugins.items).toHaveLen(1).toHave("plugin1")
+    end)
+  end)
+
+  suite("appendPlugins()", proc()
+    test("when plugins to add, these must be added to items", proc()
+      # (1) act
+      const (
+        plugins = Plugins()
+        plugin1 = Plugin(name = "plugin1")
+        plugin2 = Plugin(name = "plugin2")
+        out = plugins.appendPlugins(plugin1, plugin2)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(plugins)
+      expected(plugins.items).toHaveLen(2).toHave("plugin1", "plugin2")
+    end)
+  end)
+
+  suite("getPlugin()", proc()
+    test("when plugin exists, this must be returned", proc()
+      # (1) act
+      const (
+        plugins = Plugins()
+        plugin = Plugin(name = "plugin")
+        out = plugins.appendPlugin(plugin).getPlugin("plugin")
+      )
+
+      # (2) assessment
+      expected(out).sameAs(plugin)
+    end)
+
+    test("when plugin not exists, nil must be returned", proc()
+      # (1) act
+      const (
+        plugins = Plugins()
+        out = plugins.getPlugin("plugin")
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when plugin not exists and raise option, error must be raised", proc()
+      # (1) act
+      const (
+        plugins = Plugins()
+        out = peval(plugins.getPlugin("pi", raiseIfNotFound = true))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(NotFoundError("Plugin 'pi' not found."))
+    end)
+  end)
+
+  suite("len", proc()
+    test("when called, the length must be returned", proc()
+      # (1) act
+      const (
+        plugins = Plugins().appendPlugin(
+          Plugin(name = "one")
+        ).appendPlugin(
+          Plugin(name = "two")
+        )
+
+        out = len(plugins)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(2)
+    end)
+  end)
+
+  suite("finalize()", proc()
+    test("when called, the plugins finalize() must be called", async proc()
+      # (1) act
+      const (
+        plugins = Plugins().appendPlugin(
+          Plugin(name = "one")
+        ).appendPlugin(
+          Plugin(name = "two")
+        )
+        out = await(plugins.finalize())
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+  end)
+end)

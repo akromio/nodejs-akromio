@@ -1,0 +1,53 @@
+use (
+  alias://expected
+  dep://path
+  {LocalRepository as Repository} = ~
+)
+
+suite(__filename, proc()
+  const basePath = path.join(
+    __dirname
+    "../../../data/local"
+  )
+
+  suite("getDatum()", proc()
+    test("when datum unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        repository = Repository(name = "local", basePath)
+        out = await(repository.get("unknown"))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when datum is a yaml file, this must be read and parsed", async proc()
+      # (1) act
+      const (
+        repository = Repository(name = "local", basePath, extensions = [".yaml"])
+        out = await(repository.get("y"))
+      )
+
+      # (2) assessment
+      expected(out).toBeMap().equalTo(
+        spec = "v1.0"
+        cty = "yaml"
+      )
+    end)
+
+    test("when datum is a json file, this must be read and parsed", async proc()
+      # (1) act
+      const (
+        repository = Repository(name = "local", basePath, extensions = [".json"])
+        out = await(repository.get("j"))
+      )
+
+      # (2) assessment
+      expected(out).toBeMap().equalTo(
+        spec = "v1.0"
+        cty = "json"
+      )
+    end)
+  end)
+end)

@@ -1,0 +1,14 @@
+use (
+  ../../Call
+  ../SimpleOperator
+  Action
+)
+
+/**
+ * Operator to run actions.
+ */
+export struct ActionOperator: SimpleOperator
+  @override @hidden @async
+  pub fn performWork(call: Call)
+    const action = expect(call.op, Action)
+    return action.getFn()(call.ctx)

@@ -1,0 +1,161 @@
+use (
+  Registry
+  RegistryState
+)
+
+/**
+ * A collection of registries in order of use.
+ */
+export struct Registries
+  /**
+   * The registries appended to this collection.
+   */
+  @hidden @strict
+  pub const registries = []
+
+  /**
+   * Returns a list with the registry names.
+   */
+  pub fn registryNames = self.registries.map(fn(reg) = reg.name end)
+
+  /**
+   * The state associated to this collection.
+   */
+  @hidden @strict
+  pub var state = RegistryState.disconnected
+
+  /**
+   * The number of registries registered in the collection.
+   */
+  pub fn len = len(self.registries)
+
+  /**
+   * Connects the registries to their data sources.
+   *
+   * If the collection is already connected, nothing done.
+   */
+  pub async fn connect() -> self
+    if self.state ==~ disconnected then
+      self.state =~ connected
+
+      for each registry in self.registries do
+        await(registry.connect())
+  
+  /** 
+   * Disconnects the registries.
+   *
+   * If the collection is already disconnected, nothing done.
+   */
+  pub async fn disconnect() -> self
+    if self.state !=~ disconnected then
+      self.state =~ disconnected
+
+      for each registry in self.registries do
+        await(registry.disconnect())
+  
+  /**
+   * Appends a new registry to this collection.
+   *
+   * New registries can be appended only when the
+   * collection is disconnected.
+   */
+  pub fn appendRegistry(reg: Registry) -> self
+    # (1) pre
+    if self.state ==~ connected then
+      throw(TypeError("New registries can only be appended when disconnected."))
+
+    # (2) add registry
+    self.registries.push(reg)
+  
+  /**
+   * Returns a registry by its name.
+   *
+   * If it unexists, nil returned.
+   */
+  pub fn getRegistry(name: text) = self.registries.find(fn(reg) = reg.name == name end)
+  
+  /**
+   * Checks whether the state is connected,
+   * raising an error if not.
+   */
+  @hidden
+  pub proc checkConnectedState()
+    if self.state !=~ connected then
+      throw(TypeError("The registries must be connected for performing the op."))
+  
+  /**
+   * Searches and returns an item by its [itemPath],
+   * searching in order or in a given registry indicate by [opts.registryName].
+   *
+   * If item unexists, nil returned.
+   */
+  @async
+  pub fn getItem(itemPath: text, opts?:> {registryName?: text}): Item
+    # (1) pre
+    self.checkConnectedState()
+
+    # (2) get item
+    return if registryName then
+      self.getItemFromRegistry(itemPath, registryName)
+    else
+      self.getItemFromRegistries(itemPath)
+    end
+  
+  /**
+   * Searches and returns an [itemPath], querying the registries in order.
+   */
+  @hidden
+  pub async fn getItemFromRegistries(itemPath: text) -> item: Item
+    for each registry in self.registries do
+      if (item = await(registry.getItem(itemPath))) then
+        break
+  
+  /**
+   * Gets and returns an [itemPath] from a given [registry].
+   */
+  @hidden @async
+  pub fn getItemFromRegistry(itemPath: text, registry: text) -> item: Item
+    if (registry = self.getRegistry(registry)) then
+      item = registry.getItem(itemPath)
+  
+  /**
+   * Searches and downloads an item by its [itemPath]
+   * and downloads it in [localPath].
+   *
+   * If item unexists, false returned.
+   */
+  @async
+  pub fn downloadItem(itemPath: text, localPath: text, opts?:> {registryName?: text}): bool
+    # (1) pre
+    self.checkConnectedState()
+
+    # (2) get item
+    return if registryName then
+      self.downloadItemFromRegistry(itemPath, localPath, registryName, opts)
+    else
+      self.downloadItemFromRegistries(itemPath, localPath, opts)
+    end
+
+  /**
+   * Saves an [itemPath] in a [localPath],
+   * returning if downloaded.
+   *
+   * The [opts] can set the [registry] to use and [name] to use
+   * instead of the catalog original name.
+   *
+   * @remarks
+   * Only the registries with a download-enabled connectors are used.
+   */
+  @hidden
+  pub async fn downloadItemFromRegistries(itemPath: text, localPath: text, opts?: map) -> downloaded: bool
+    for each registry in self.registries do
+      if (downloaded = await(registry.downloadItem(itemPath, localPath, opts))) then
+        break
+
+  /**
+   * Downloads an item from a given registry.
+   */
+  @hidden @async
+  pub fn downloadItemFromRegistry(itemPath: text, localPath: text, registryName: text, opts?: map) -> downloaded: bool
+    if registry ::= self.getRegistry(registryName) then
+      return registry.downloadItem(itemPath, localPath, opts)

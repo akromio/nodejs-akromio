@@ -1,0 +1,23 @@
+use (
+  {getEntryLink} = alias://skynet
+  ../InternalSkynetConnector
+)
+
+/**
+ * A registry connector to download files using
+ * the Sia Name System on the Skynet registry.
+ */
+@impl(Connector)
+export struct SnsConnector: InternalSkynetConnector
+  /**
+   * The public key to use.
+   */
+  pub const publicKey: text
+
+  /**
+   * The data key using a name.
+   */
+  pub const name: text
+
+  @override
+  pub fn skylink = getEntryLink(self.publicKey, self.name)

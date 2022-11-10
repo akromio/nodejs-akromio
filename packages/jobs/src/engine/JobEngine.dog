@@ -1,0 +1,8 @@
+use (
+  {SingleRunnerEngine, PluginParser} = alias://core
+)
+
+/**
+ * An engine for running jobs.
+ */
+export struct JobEngine: SingleRunnerEngine

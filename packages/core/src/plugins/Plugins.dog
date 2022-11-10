@@ -1,0 +1,53 @@
+use (
+  ../errors/NotFoundError
+  Plugin
+)
+
+/**
+ * A collection of plugins.
+ */
+export struct Plugins
+  /**
+   * The plugins.
+   */
+  @hidden @strict
+  pub const items = {}
+
+  /**
+   * The plugins.
+   */
+  pub fn plugins = values(self.items)
+
+  /**
+   * The number of plugins in the collection.
+   */
+  pub fn len = len(self.items)
+
+  /**
+   * Appends a plugin to this collection.
+   */
+  pub fn appendPlugin(pi: Plugin) -> self
+    self.items[pi.name] = pi
+  
+  /**
+   * Appends several plugins to this collection.
+   */
+  pub fn appendPlugins(...pis) -> self
+    for each pi in pis do
+      self.appendPlugin(pi)
+  
+  /**
+   * Returns a plugin by its name.
+   * When the plugin unexists, nil returned.
+   */
+  pub fn getPlugin(name: text, opts?: {raiseIfNotFound?: bool}) -> plugin
+    if not (plugin = self.items[name]) and opts?raiseIfNotFound then
+      throw(NotFoundError($"Plugin '${name}' not found."))
+  
+  /**
+   * Finalizes the plugins associated to this collections,
+   * that is, calls the finalize() method for each plugin.
+   */
+  pub async proc finalize()
+    for each pi in self.plugins do
+      await(pi.finalize())

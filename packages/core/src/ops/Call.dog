@@ -1,0 +1,61 @@
+use (
+  {Writable} = dep://stream
+  {v4 as uuid} = dep://uuid
+  {Dataset} = alias://dataset
+  Op
+  Context
+)
+
+/**
+ * The specific data of a call/run.
+ */
+export struct Call
+  /**
+   * The call identifier.
+   */
+  pub const id: text = uuid()
+
+  /**
+   * The parent call.
+   */
+  pub const parentCall?: Call
+
+  /**
+   * The operation associated to this call.
+   */
+  pub const op #[: Op]
+
+  /**
+   * The title to show for this call.
+   */
+  pub const title: text
+
+  /**
+   * What to do on error.
+   */
+  pub const onError: ("carryOn" | "finish")
+
+  /**
+   * The dataset to use with the call.
+   */
+  pub const dataset: Dataset
+
+  /**
+   * The log stream to report the run events.
+   */
+  pub const log: Writable
+
+  /**
+   * Logs the result value when run.
+   */
+  pub const resultLog?: bool
+
+  /**
+   * Run siently.
+   */
+  pub const quiet?: bool
+
+  /**
+   * The operation context.
+   */
+  pub const ctx: Context

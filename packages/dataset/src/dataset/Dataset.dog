@@ -1,0 +1,104 @@
+use (
+  ../datum/{Datum, VarDatum, DatumError}
+)
+
+/**
+ * A collection of data referred by name.
+ */
+@abstract
+export struct Dataset
+  /**
+   * The dataset name.
+   */
+  pub const name: text
+
+  /**
+   * The data saved into this dataset.
+   */
+  @hidden @strict
+  pub const data = {}
+
+  /**
+   * The map to access the data from expressions.
+   */
+  pub fn repr = proxy(
+    {}
+
+    get = fn(target, member, receiver)
+      return self.getDatumValue(member)
+    end
+  )
+
+  /**
+   * A map with the data.
+   */
+  pub fn reprMap -> obj: map
+    for each key, datum in self.data do
+      obj[key] = datum.getValue()
+
+  /**
+   * Returns a datum from its [name].
+   * If it unexists, nil returned.
+   */
+  pub fn getDatum(name: text) = self.data[name]
+
+  /**
+   * Returns all the data or these with a given tag.
+   */
+  pub fn getData(filter?:> {tag?: text}) -> data: list
+    for each datum in values(self.data) do
+      if not tag or (tag and datum.hasTag(tag)) then
+        data.push(datum)
+
+  /**
+   * Saves a [datum] into this dataset.
+   */
+  pub fn setDatum(datum: Datum) -> self
+    # (1) get datum if this exists
+    const curDatum = self.getDatum(datum.name)
+
+    if curDatum and not curDatum.isUpdatable() then
+      throw(DatumError($"Datum ${curDatum.name} is not updatable."))
+    
+    # (2) set datum
+    self.data[datum.name] = datum
+  
+  /**
+   * Removes a datum from its [name].
+   */
+  pub fn removeDatum(name: text) -> self
+    if datum ::= self.getDatum(name) then
+      if not datum.isRemovable() then
+        throw(DatumError($"Datum ${name} is not removable."))
+
+      remove(name, self.data)
+  
+  /**
+   * Returns the value of a datum.
+   * nil returned when datum unexists.
+   */
+  pub fn getDatumValue(name: text) -> value
+    if datum ::= self.getDatum(name) then
+      value = datum.getValue()
+  
+  /**
+   * Sets the value of a datum.
+   *
+   * If this can't be updatable, a [DatumError] returned.
+   * If this unexists, a container is created as variable.
+   */
+  pub fn setDatumValue(name: text, value?: any) -> self
+    if datum ::= self.getDatum(name) then
+      datum.setValue(value)
+    else
+      self.data[name] = VarDatum(
+        name = name
+        value
+        tags = []
+      )
+  
+  /**
+   * Evaluates an [exp]ression with the data saved into this dataset.
+   */
+  pub fn eval(exp?)
+    return use("./DatasetEval")().eval(exp, self)

@@ -1,0 +1,76 @@
+use (
+  dep://inquirer
+)
+
+/**
+ * An object to perform inline questions to the user.
+ */
+export struct Inquirer
+  /**
+   * Inquires the given questions, returning an object with the answers.
+   * When [answers] passed, these are the answers, requestiong only these
+   * not passed.
+   */
+  pub async fn prompt(questions: map[], answers: map = {}) -> answers
+    for each q in questions do
+      if "input" in q then await(self.performInput(q, answers))
+      else if "confirm" in q then await(self.performConfirm(q, answers))
+      else if "select" in q then await(self.performSelect(q, answers))
+      else throw(Error($"Unknown question type: ${fmt(q)}."))
+  
+  /**
+   * Performs a data input, updating the answers passed.
+   */
+  @hidden
+  pub async proc performInput(q: map, answers: map)
+    if name ::= q.input; name not in answers then
+      if q.type == "password" then
+        answers[name] = await(inquirer.prompt(
+          'type' = "password"
+          message = q.title
+          default = q.defaultValue
+          name
+        ))[name]
+      else
+        answers[name] = await(inquirer.prompt(
+          'type' = "input"
+          message = q.title
+          default = q.defaultValue
+          name
+        ))[name]
+  
+  /**
+   * Performs a confirm, updating the answers passed.
+   */
+  @hidden
+  pub async proc performConfirm(q: map, answers: map)
+    if name ::= q.confirm; name not in answers then
+      answers[name] = await(inquirer.prompt(
+        'type' = "confirm"
+        message = q.title
+        default = q.defaultValue
+        name
+      ))[name]
+    
+  /**
+   * Performs a select, updating the answers passed.
+   */
+  @hidden
+  pub async proc performSelect(q: map, answers: map)
+    if name ::= q.select; name not in answers then
+      if q.multiple then
+        answers[name] = await(inquirer.prompt(
+          'type' = "checkbox"
+          message = q.title
+          choices = q.options
+          default = q.selected ?? q.defaultValue
+          name
+        ))[name]
+      else
+        answers[name] = await(inquirer.prompt(
+          'type' = "list"
+          message = q.title
+          choices = q.options
+          default = q.selected ?? q.defaultValue
+          name
+        ))[name]

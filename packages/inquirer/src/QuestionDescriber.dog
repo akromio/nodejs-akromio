@@ -1,0 +1,29 @@
+/**
+ * A formater of questions to the command line.
+ */
+export struct QuestionDescriber
+  /**
+   * Lists the questions.
+   */
+  pub fn describe(questions: map[]) -> data: map
+    for each q in questions do
+      #!cov ignore else
+      if "input" in q then
+        data[q.input] = {
+          'type' = "input"
+          title = q.title
+          defaultValue = q.defaultValue
+        }
+      else if "select" in q then
+        data[q.select] = {
+          'type' = "select" + if q.multiple then "[]" else "" end
+          title = q.title
+          defaultValue = q.selected ?? q.defaultValue
+          options = q.options
+        }
+      else if "confirm" in q then
+        data[q.confirm] = {
+          'type' = "confirm"
+          title = q.title
+          defaultValue = q.defaultValue
+        }

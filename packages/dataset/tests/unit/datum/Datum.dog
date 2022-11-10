@@ -1,0 +1,32 @@
+use (
+  alias://expected
+  {Datum} = ~
+)
+
+struct TestDatum: Datum
+
+suite(__filename, proc()
+  suite("hasTag()", proc()
+    test("when datum has tag, true must be returned", proc()
+      # (1) act
+      const (
+        datum = TestDatum(name = "test", tags = ["password"])
+        out = datum.hasTag("password")
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+    end)
+
+    test("when datum hasn't tag, false must be returned", proc()
+      # (1) act
+      const (
+        datum = TestDatum(name = "test")
+        out = datum.hasTag("password")
+      )
+
+      # (2) assessment
+      expected(out).equalTo(false)
+    end)
+  end)
+end)

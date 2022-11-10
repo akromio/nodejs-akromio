@@ -1,0 +1,108 @@
+use (
+  alias://expected
+  dep://path
+  fs = dep://fs/promises
+  {monitor} = alias://doubles
+  {PluginLoader} = ~
+)
+
+suite(__filename, proc()
+  const (
+    piPath = path.join(__dirname, "../../data/plugins")
+    presetPath = path.join(__dirname, "../../data/presets")
+  )
+
+  suite("loadDefault()", proc()
+    test("when plugin exists, its declaration must be returned", async proc()
+      # (1) pre
+      const (
+        src = path.join(piPath, "node_modules", "pi-npm-example")
+        dst = path.join(ps.workDir, "node_modules", "pi-npm-example")
+      )
+
+      await(fs.cp(src, dst, recursive = true))
+
+      # (2) act
+      const (
+        loader = PluginLoader()
+        out = loader.loadPlugin("pi-npm-example")
+      )
+
+      # (3) assessment
+      expected(out).toHave(name = "npm-example")
+
+      # (4) post
+      await(fs.rm(dst, recursive = true))
+    end)
+
+    test("when plugin not exists, nil must be returned", proc()
+      # (1) act
+      const (
+        loader = PluginLoader()
+        out = peval(loader.loadPlugin("pi-unknown"))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).like("Cannot find module 'pi-unknown'")
+    end)
+  end)
+
+  suite("loadFromPaths()", proc()
+    test("when plugin exists, its declaration must be returned", proc()
+      # (1) act
+      const (
+        loader = PluginLoader(paths = [__dirname, piPath])
+        out = loader.loadPlugin("pi-example")
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = "example"
+        desc = "Example plugin for load testing."
+      )
+    end)
+
+    test("when plugin not exists, error must be raised", proc()
+      # (1) act
+      const (
+        loader = PluginLoader(paths = [__dirname])
+        out = peval(loader.loadPlugin("pi-example"))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).like("Cannot find module 'pi-example'")
+    end)
+  end)
+
+  suite("loadPreset()", proc()
+    test("when preset exists, declaration must be read and returned", proc()
+      # (1) act
+      const (
+        loader = PluginLoader(paths = [__dirname, presetPath])
+        out = loader.loadPreset("preset-example")
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = "preset-example"
+      )
+    end)
+
+    test("when preset not exists, error must be raised", proc()
+      # (1) act
+      const (
+        loader = PluginLoader(paths = [__dirname, presetPath])
+        out = peval(loader.loadPreset("preset-unknown"))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(Error).like("Cannot find module 'preset-unknown'")
+    end)
+  end)
+end)

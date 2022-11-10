@@ -1,0 +1,71 @@
+use (
+  {Call, Ops} = alias://core
+  ../StepParser
+)
+
+/**
+ * The parser to use with the steps.
+ */
+const stepParser = StepParser()
+
+/**
+ * A stepped operation.
+ */
+@mixable @abstract
+export struct CatalogSteppedOp
+  /**
+   * The ops catalog to use with its steps.
+   */
+  @hidden
+  pub const ops: Ops
+
+  /**
+   * The declaration of the steps associated to this loop.
+   */
+  @hidden
+  pub const steps: any[]
+
+  @override @noParamCheck
+  pub fn getSteps(call: Call) = self.buildSteps(self.steps, call)
+
+  /**
+   * Builds a step from its name, arguments and specific configuration.
+   */
+  @hidden
+  pub fn buildStep(decl: (text | list | map), call: Call, defaultResultVarName: text) -> step: Step
+    # (1) parse declaration
+    var (
+      opName, args, onError, condition
+      resultVarName = nil, resultLog = false, quiet = false
+    )
+
+    if decl.log then
+      decl = decl.log
+      resultLog = true
+    else if decl.quiet then
+      decl = decl.quiet
+      quiet = true
+
+    {condition, resultVarName, opName, args, onError} = stepParser.parseStep(
+      decl
+      self.onError
+    )
+
+    # (2) build step
+    step = {
+      op = self.ops.getOp(opName, raiseIfNotFound = true)
+      args
+      onError
+      quiet
+      condition
+      resultVarName = resultVarName or defaultResultVarName
+      resultLog
+    }
+  
+  /**
+   * Builds the steps using the list declaration passed.
+   */
+  @hidden @noParamCheck
+  pub fn buildSteps(decls: any[], call: Call) -> steps: list
+    for each decl in decls do
+      steps.push(self.buildStep(decl, call, "last"))

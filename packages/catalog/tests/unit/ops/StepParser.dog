@@ -1,0 +1,202 @@
+use (
+  alias://expected
+  ~/dist/cjs/ops/StepParser
+)
+
+suite(__filename, proc()
+  const parser = StepParser()
+
+  suite("parseOpName()", proc()
+    test("when only op name, it must return op {opName = name, onError = default}", proc()
+      # (1) act
+      const out = parser.parseStep("hbs.render", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        opName = "hbs.render"
+        onError = "continue"
+      )
+    end)
+
+    test("when <opName, {opName, onError = finish} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("<hbs.render", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        opName = "hbs.render"
+        onError = "finish"
+      )
+    end)
+  end)
+
+  suite("parseOpArgs()", proc()
+    test("when no argument passed, nil must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("op", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        args = nil
+      )
+    end)
+
+    test("when only one argument passed, this must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("op one", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        args = "one"
+      )
+    end)
+
+    test("when more than argument passed, these must be returned in list", proc()
+      # (1) act
+      const out = parser.parseStep("op one two", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        args = ["one", "two"]
+      )
+    end)
+  end)
+
+  suite("parseCondition()", proc()
+    test("when condition?, datum name must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("xyz? op", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        condition = "xyz"
+      )
+    end)
+
+    test("when no condition, nil must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("op", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        condition = nil
+      )
+    end)
+  end)
+
+  suite("parseResult()", proc()
+    test("when $varName, datum name must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("$xyz = op", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        resultVarName = "xyz"
+      )
+    end)
+
+    test("when no var name, nil must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("op", "continue")
+
+      # (2) assessment
+      expected(out).toHave(
+        resultVarName = nil
+      )
+    end)
+  end)
+
+  suite("parseTextStep()", proc()
+    test("when 'opName arg', {opName, args = arg, onError = finish} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("banner $(i.slug)", "finish")
+
+      # (2) assessment
+      expected(out).toHave(
+        condition = nil
+        resultVarName = nil
+        opName = "banner"
+        args = "$(i.slug)"
+        onError = "finish"
+      )
+    end)
+
+    test("when '$result = opName ...args', {resultVarName, opName, args, onError = finish} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("$xyz = op one two three", "finish")
+
+      # (2) assessment
+      expected(out).toHave(
+        condition = nil
+        resultVarName = "xyz"
+        opName = "op"
+        args = ["one", "two", "three"]
+        onError = "finish"
+      )
+    end)
+
+    test("when '$result opName ...args', error must be raised", proc()
+      # (1) act
+      const out = peval(parser.parseStep("$result op arg1 arg2", "continue"))
+
+      # (2) assessment
+      expected(out)\
+        .item(0).equalTo(false)\
+        .item(1).equalTo(TypeError("'=' expected after $resultVarName."))
+    end)
+
+    test("when 'cond? opName ...args', {condition, opName, args, onError = finish} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep("xyz? op one two three", "finish")
+
+      # (2) assessment
+      expected(out).toHave(
+        condition = "xyz"
+        resultVarName = nil
+        opName = "op"
+        args = ["one", "two", "three"]
+        onError = "finish"
+      )
+    end)
+  end)
+
+  suite("parseListStep()", proc()
+    test("when [cond?, $result, opName], {condition, resultVarName, opName, args=nil, onError} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep(["xyz?", "$zyx", "op"], "finish")
+
+      # (2) assessment
+      expected(out).toHave(
+        condition = "xyz"
+        resultVarName = "zyx"
+        opName = "op"
+        args = nil
+        onError = "finish"
+      )
+    end)
+
+    test("when [opName, arg], {opName, args = arg, onError = finish} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep(["banner", "$(i.slug)"], "finish")
+
+      # (2) assessment
+      expected(out).toHave(
+        opName = "banner"
+        args = "$(i.slug)"
+        onError = "finish"
+      )
+    end)
+
+    test("when [opName, ...args], {opName, args, onError = finish} must be returned", proc()
+      # (1) act
+      const out = parser.parseStep(["concat", "one", "two", "three"], "finish")
+
+      # (2) assessment
+      expected(out).toHave(
+        opName = "concat"
+        args = ["one", "two", "three"]
+        onError = "finish"
+      )
+    end)
+  end)
+end)

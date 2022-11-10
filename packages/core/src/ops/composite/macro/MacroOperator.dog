@@ -1,0 +1,8 @@
+use (
+  ../CompositeOperator
+)
+
+/**
+ * An operator to run macros.
+ */
+export struct MacroOperator: CompositeOperator

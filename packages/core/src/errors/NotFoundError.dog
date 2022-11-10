@@ -1,0 +1,4 @@
+/**
+ * An error to represent that thing not found.
+ */
+export Error

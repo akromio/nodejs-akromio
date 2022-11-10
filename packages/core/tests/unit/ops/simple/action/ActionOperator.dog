@@ -1,0 +1,32 @@
+use (
+  alias://expected
+  {simulator} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {StaticAction, ActionOperator} = ~
+)
+
+suite(__filename, proc()
+  const (
+    dataset = GlobalDataset(name = "global").setDatumValue("x", 123)
+    log = simulator.stream.duplex()
+  )
+
+  suite("performWork()", proc()
+    test("when called, fun must be called and its return must be returned into Result.value", async proc()
+      # (1) act
+      const (
+        fun = fn() = "ciao!" end
+        operator = ActionOperator()
+        action = StaticAction(name = "test", title = "the title", fun, operator)
+        out = await(action.runWith("$(x)", dataset=, log))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .toBe("Result")\
+        .toHave(title = "the title", kind = "ok", value = "ciao!", onError = "carryOn")\
+        .member("callId").toBeUuid()\
+        .member("duration").toBeNum()
+    end)
+  end)
+end)

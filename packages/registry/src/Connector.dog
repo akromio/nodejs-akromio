@@ -1,0 +1,29 @@
+/**
+ * A registry connector, that is, the object to use
+ * work with a registry data source.
+ */
+export intf Connector
+  /**
+   * Connects the connector to its data source.
+   */
+  connect: func
+
+  /**
+   * Disconnects the connector from its data source.
+   */
+  disconnect: func
+
+  /**
+   * Gets and returns an item from its data source.
+   */
+  getItem: func
+
+  /**
+   * Downloads an item in the local filesystem.
+   */
+  downloadItem?: func
+
+  /**
+   * Lists the available items in a path.
+   */
+  listItems?: func

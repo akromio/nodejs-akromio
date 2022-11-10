@@ -1,0 +1,58 @@
+use (
+  alias://expected
+  {Registry, RegistryBuilder, RegistryStringParser} = ~
+)
+
+suite(__filename, proc()
+  const (
+    builder = RegistryBuilder()
+    parser = RegistryStringParser()
+    defaults = {
+      git =
+        user = "akromio"
+        branch = "master"
+      http =
+        host = "siasky.net"
+        base = "/0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"
+      skynet =
+        portal = "siasky.net"
+    }
+  )
+
+  suite("create()", proc()
+    test("when fs, a FsConnector must be used", proc()
+      # (1) act
+      const out = builder.create(parser.parse("test=fs:///my/dir", defaults))
+
+      # (2) assessment
+      expected(out).toBe(Registry).toHave(name = "test").member("client").toBe("FsConnector")
+    end)
+
+    test("when git, a GitConnector must be used", proc()
+      # (1) act
+      const out = builder.create(parser.parse("test=git://repo", defaults))
+
+      # (2) assessment
+      expected(out).toBe(Registry).toHave(name = "test").member("client").toBe("GitConnector")
+    end)
+
+    test("when http, a HttpConnector must be used", proc()
+      # (1) act
+      const out = builder.create(parser.parse("test=http://siasky.net", defaults))
+
+      # (2) assessment
+      expected(out).toBe(Registry).toHave(name = "test").member("client").toBe("HttpConnector")
+    end)
+
+    test("when skynet, a SkynetConnector must be used", proc()
+      # (1) act
+      const (
+        skylink = "XABvi7JtJbQSMAcDwnUnmp2FKDPjg8_tTTFP4BwMSxVdEg"
+        out = builder.create(parser.parse($"test=skynet://${skylink}", defaults))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Registry).toHave(name = "test").member("client").toBe("SkynetConnector")
+    end)
+  end)
+end)

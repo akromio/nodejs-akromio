@@ -1,0 +1,21 @@
+use (
+  ../runners/Runner
+  ../ops/Op
+  Engine
+)
+
+/**
+ * An engine composed of only one runner.
+ */
+@abstract
+export struct SingleRunnerEngine: Engine
+  /**
+   * The runner to use.
+   */
+  pub const runner: Runner
+
+  @override @hidden
+  pub async fn runOp(op: Op, args?: any, opts: map) -> result: Result
+    const {runner} = self
+    result = await(runner.run(op, args, opts))
+    runner.log.push(json.encode({type = "end"}))

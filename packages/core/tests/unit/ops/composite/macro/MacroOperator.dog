@@ -1,0 +1,128 @@
+use (
+  alias://expected
+  {simulator} = alias://doubles
+  {GlobalDataset, LocalDataset} = alias://dataset
+  {monitor} = alias://doubles
+  {DynamicMacro, MacroOperator, StaticAction, ActionOperator} = ~
+)
+
+suite(__filename, proc()
+  const (
+    globalDataset = GlobalDataset(name = "global")
+    log = simulator.stream.duplex()
+  )
+
+  suite("performWorks()", proc()
+    struct TestMacro: DynamicMacro
+      @override
+      pub fn getSteps() = [
+        {
+          title = "1st step"
+          op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
+          args = 123
+          onError = "carryOn"
+        }
+
+        {
+          title = "2nd step"
+          op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+          args = 321
+          resultVarName = "2nd"
+          onError = "carryOn"
+        }
+
+        {
+          title = "3rd step"
+          op = StaticAction(name = "3rd", fun = fn() = "action #3" end, operator = ActionOperator())
+          args = 135
+          resultVarName = "3rd"
+          onError = "carryOn"
+          quiet = true
+        }
+
+        {
+          title = "4th step"
+          op = StaticAction(name = "4th", fun = fn() = "action #4" end, operator = ActionOperator())
+          args = 531
+          resultVarName = "4th"
+          onError = "carryOn"
+          conditionDatumName = "condition"
+        }
+      ]
+
+    test("when called and everything is alright, a result for every step must be returned as value", async proc()
+      # (1) act
+      const (
+        localDataset = LocalDataset(name = "local", parent = globalDataset).setDatumValue("condition", true)
+        macro = TestMacro(name = "macro", operator = MacroOperator())
+        out = await(macro.run(dataset = localDataset, log))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .toBe("Result")\
+        .toHave(title = "macro", kind = "ok", onError = "carryOn")
+
+      expected(out.value)\
+        .toBeList().toHaveLen(3)\
+        .it(0).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
+        .it(1).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action #2")\
+        .it(2).toBe("Result").toHave(title = "4th", kind = "ok", value = "action #4")
+    end)
+
+    test("when called with dataset and ok, the step results must be returned and dataset must be updated", async proc()
+      # (1) act
+      const (
+        macro = TestMacro(name = "macro", operator = MacroOperator())
+        out = await(macro.run(dataset = globalDataset, log))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .toBe("Result")\
+        .toHave(title = "macro", kind = "ok", onError = "carryOn")
+
+      expected(out.value)\
+        .toBeList().toHaveLen(3)\
+        .it(0).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
+        .it(1).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action #2")\
+        .it(2).toBe("Result").toHave(title = "4th", kind = "ok", value = "action #4")
+    end)
+
+    test("when onError is finish and error, break must be performed and value contains the results", async proc()
+      struct TestMacro: DynamicMacro
+        @override
+        pub fn getSteps() = [
+          {
+            title = "1st step"
+            op = StaticAction(name = "1st", fun = fn() throw(Error("error!")) end, operator = ActionOperator())
+            args = 123
+            onError = "finish"
+          }
+
+          {
+            title = "2nd step"
+            op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+            args = 321
+            resultVarName = "2nd"
+            onError = "carryOn"
+          }
+        ]
+      
+      # (1) act
+      const (
+        macro = TestMacro(name = "macro", operator = MacroOperator())
+        out = await(macro.run(dataset = globalDataset, log))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .toBe("Result")\
+        .toHave(title = "macro", kind = "failed", onError = "carryOn")
+
+      expected(out.value)\
+        .toBeList().toHaveLen(1)\
+        .item(0).toBe("Result").toHave(title = "1st", kind = "failed", value = Error("error!"))
+    end)
+  end)
+end)

@@ -1,0 +1,25 @@
+/**
+ * A container of data, for example, for unit tests.
+ */
+@abstract
+export struct Repository
+  /**
+   * The repository name.
+   */
+  pub const name: text
+  
+  /**
+   * Returns a datum by name.
+   *
+   * If this unexists, nil returned.
+   */
+  @async
+  pub fn get(name: text): map = self.getDatum(name)
+
+  /**
+   * Returns a datum.
+   *
+   * If the datum unexists, nil returned.
+   */
+  @abstract @hidden
+  pub async fn getDatum(name: text): map

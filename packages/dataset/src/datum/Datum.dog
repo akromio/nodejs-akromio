@@ -1,0 +1,86 @@
+use (
+  ../constraints/Constraints
+  DatumError
+)
+
+/**
+ * A piece of data saved into a dataset.
+ */
+@abstract
+export struct Datum
+  /**
+   * The datum name, used for identifying from the rest.
+   */
+  pub const name: text
+
+  /**
+   * The value stored into this container.
+   */
+  @hidden
+  pub var value?: any
+
+  /**
+   * The datum description, if wanted.
+   */
+  pub const desc?: text
+
+  /**
+   * The tags associated to this datum.
+   */
+  pub const tags: list = []
+
+  /**
+   * The constraints set to this datum.
+   */
+  pub const constraints = Constraints()
+
+  @post
+  pvt proc post()
+    self.setValueWithoutUpdatableCheck(self.value)
+
+  /**
+   * Returns the current value.
+   */
+  @abstract
+  pub fn getValue(): any
+
+  /**
+   * Sets the value without checking the updatable tag.
+   */
+  @hidden
+  pub proc setValueWithoutUpdatableCheck(value?)
+    value = self.constraints.validateValue(value)
+    self.{value}
+
+  /**
+   * Sets the current [value] if possible.
+   *
+   * This raises a DatumError when the value can't be modified.
+   */
+  pub fn setValue(value?) -> self
+    # (1) pre
+    if not self.isUpdatable() then
+      throw(DatumError($"The datum '${self.name}' is not updatable."))
+    
+    # (2) set value
+    self.setValueWithoutUpdatableCheck(value)
+  
+  /**
+   * Checks whther this is removable.
+   *
+   * A datum is removable when this contains the removable tag.
+   */
+  pub fn isRemovable() = "removable" in self.tags
+  
+  /**
+   * Checks whether this is updatable.
+   *
+   * A datum is updatable when this doesn't contain the const tag.
+   */
+  pub fn isUpdatable() = "const" not in self.tags
+  
+  /**
+   * Checks whether the datum has a given tag.
+   */
+  pub fn hasTag(tag) = self.tags.includes(tag)
+    

@@ -1,0 +1,19 @@
+/**
+ * An activity, that is, a thing that can do task, work or operation.
+ */
+@abstract
+export struct Activity
+  /**
+   * The activity name.
+   */
+  pub const name: text
+
+  /**
+   * The activity description when needed.
+   */
+  pub const desc := ""
+
+  /**
+   * The tags associated to this activity.
+   */
+  pub const tags = []

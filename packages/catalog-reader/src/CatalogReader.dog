@@ -1,0 +1,108 @@
+use (
+  dep://path
+  dep://yaml
+  {Registries} = alias://registry
+)
+
+/**
+ * The implicit extensions to concat when needed.
+ */
+const extensions = [".yaml", ".yml", ".json"]
+
+/**
+ * A reader for reading catalog declarations.
+ */
+@abstract
+export struct CatalogReader
+  /**
+   * The catalog merger to use.
+   */
+  @abstract
+  pub const merger: CatalogMerger
+
+  /**
+   * Reads and returns a catalog declaration
+   * from a given registry or a collection of registries.
+   *
+   * When catalog unexists, nil returned.
+   */
+  pub async fn readCatalogDecl(catalogName: text, registries: Registries, registryName?: text) -> decl: map
+    # (1) get registry if explicit in catalog name
+    const uriPattern = re("^(.+):\/\/(.+)$")
+
+    if uriPattern.test(catalogName) then
+      [_, registryName, catalogName] = uriPattern.exec(catalogName)
+    
+    # (2) get the catalog declaration item
+    var item
+
+    if path.extname(catalogName) then
+      item = await(registries.getItem(catalogName, registryName=))
+    else
+      for each ext in extensions do
+        const itemPath = catalogName + ext
+
+        if (item = await(registries.getItem(itemPath, registryName=))) then
+          break
+    
+    # (3) parse catalog if needed
+    if (decl = item?value) then
+      if decl is Buffer then
+        decl = text(decl)
+
+      if decl is text then
+        with cty ::= item.cty do
+          if "text/yaml" then decl = yaml.parse(decl)
+          if "application/json" then decl = json.decode(decl)
+          else throw(TypeError($"Invalid content-type for catalog: ${cty}."))
+    
+    # (4) set registry data
+    if decl then
+      decl.{
+        registryName = item.registryName
+        name = catalogName
+        loc = item.uri
+        cty = item.cty
+      }
+
+    # (5) extend if needed
+    if "extends" in decl then
+      decl = await(self.extendCatalogDecl(decl, registries))
+    
+  /**
+   * Extends a given catalog when extends field appears.
+   *
+   * @dev
+   * We have to remember the following about the extends field:
+   *
+   * - This field can be a text or a text[].
+   *
+   * - Every text must be:
+   *
+   *   - An absolute path when starting with /.
+   *   - A relative path when not starting with /.
+   *   - A uri when registryName://absolutePath is indicated.
+   *
+   * When only relative or absolute path indicated, the registry to use
+   * is the same as this used to read the catalog.
+   */
+  @hidden @noParamCheck
+  pub async fn extendCatalogDecl(decl: map, registries: Registries) -> decl
+    # (1) get the catalogs to extend
+    var (
+      catalogNames = list(decl.extends)
+      {registryName} ::= decl
+      basePath ::= path.dirname(decl.name)
+      extend = []
+    )
+
+    for each catalogName := catalogNames do
+      catalogName = path.join(basePath, catalogName)
+
+      if baseDecl ::= await(self.readCatalogDecl(catalogName, registries, registryName)) then
+        extend.push(baseDecl)
+      else
+        throw(Error($"Catalog to extend not found: ${catalogName}."))
+
+    # (2) extend the catalogs
+    decl = self.merger.merge(decl, ...extend)

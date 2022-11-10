@@ -1,0 +1,44 @@
+/**
+ * A loader of plugins, that is, an object to get the plugin declarations
+ * from Node modules.
+ */
+export struct PluginLoader
+  /**
+   * The paths where the plugins can be when these
+   * aren't in the default location.
+   */
+  pub const paths: text[] = []
+
+  /**
+   * Gets and returns a plugin declaration.
+   */
+  pub fn loadPlugin(name: text) = self.loadDefault(name) ?? self.loadFromPaths(self.paths, name)
+
+  /**
+   * Gets and returns a preset declaration.
+   */
+  pub fn loadPreset(name: text) = self.loadPlugin(name)
+  
+  /**
+   * Gets a plugin declaration from the default Node paths.
+   *
+   * If this is not found, nil returned.
+   * But if this found but some error found, an error is raised.
+   */
+  @hidden
+  pub fn loadDefault(name: text) -> decl: map
+    #!cov ignore else
+    if [ok, value] ::= peval(use(name)); ok then
+      decl = value
+    else if value.code == "MODULE_NOT_FOUND" then
+      decl = nil
+    else
+      throw(value)
+  
+  /**
+   * Gets a plugin declaration from the user-set paths.
+   *
+   * If this is not found, an error is raised.
+   */
+  @hidden
+  pub fn loadFromPaths(paths: text[], name: text) = use(require.resolve(name, paths=))

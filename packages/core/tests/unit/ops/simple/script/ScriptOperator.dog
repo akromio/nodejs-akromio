@@ -1,0 +1,88 @@
+use (
+  alias://expected
+  {simulator} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {Script, ScriptOperator, Result} = ~
+)
+
+suite(__filename, proc()
+  const (
+    dataset = GlobalDataset(name = "global").setDatumValue("x", 123)
+    log = simulator.stream.duplex()
+  )
+
+  suite("performWork()", proc()
+    suite("sync code", proc()
+      test("when called w/o params, default params must be used", async proc()
+        # (1) act
+        const (
+          code = "params.join(':')"
+          operator = ScriptOperator()
+          script = Script(name = "test", title = "the title", code, operator, params = [1, 2, 3, 4])
+          out = await(script.runWith(undefined, dataset=, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe(Result)\
+          .toHave(
+            title = "the title"
+            kind = "ok"
+            value = "1:2:3:4"
+            onError = "carryOn"
+          )\
+          .member("callId").toBeUuid()\
+          .member("duration").toBeNum()
+      end)
+
+      test("when called w/ params, these must be used", async proc()
+        # (1) act
+        const (
+          code = "params.join(':')"
+          operator = ScriptOperator()
+          script = Script(name = "test", title = "the title", code, operator, params = [1, 2, 3, 4])
+          out = await(script.runWith([12, 34], dataset=, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe(Result)\
+          .toHave(
+            title = "the title"
+            kind = "ok"
+            value = "12:34"
+            onError = "carryOn"
+          )\
+          .member("callId").toBeUuid()\
+          .member("duration").toBeNum()
+      end)
+    end)
+
+    suite("async code", proc()
+      test("when call as async, async run must be performed", async proc()
+        # (1) act
+        const (
+          code = """
+          new Promise(function(resolve, reject) {
+            setTimeout(() => resolve(1234), 250);
+          });
+          """
+          operator = ScriptOperator()
+          script = Script(name = "test", kind = "async", code, operator)
+          out = await(script.runWith(undefined, dataset=, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe(Result).toHave(
+            title = "test"
+            value = 1234
+            kind = "ok"
+            onError = "carryOn"
+          )\
+          .member("callId").toBeUuid()\
+          .member("duration").toBeNum().greaterThanOrEqualTo(250)
+      end)
+    end)
+  end)
+end)

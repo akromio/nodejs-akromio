@@ -1,0 +1,58 @@
+use (
+  {Dataset} = alias://dataset
+  ../Op
+)
+
+/**
+ * A simple operation, that is, an operation that isn't 
+ * made up of other.
+ */
+@abstract
+export struct SimpleOp: Op
+  /**
+   * The parent plugin.
+   */
+  @hidden
+  pub var parentPlugin?
+
+  /**
+   * Its state.
+   */
+  pub fn state = self.parentPlugin?state
+
+  /**
+   * The title, this can be a text or a function to call
+   * with the call parameters for getting the title.
+   *
+   * When title unset, the name is used.
+   */
+  pub const title?: (text | func)
+
+  @override
+  pub fn buildTitle(params?) -> title: text
+    if self.title is text then
+      {title} = self
+    else if self.title is func then
+      title = self.title(params)
+    else
+      title = self.name
+
+  /**
+   * A function to transform the arguments in parameters.
+   */
+  pub const parameterizer?: func
+
+  /**
+   * Transforms the arguments in parameters.
+   * A dataset is used to transform the expressions $().
+   *
+   * When no parameterizer set, the arguments will be considered as parameters.
+   */
+  @noParamCheck
+  pub fn buildParams(args?: any, ds?: Dataset) -> params
+    # (1) transform dataset expressions if needed
+    if ds then
+      args = ds.eval(args)
+    
+    # (2) transform arguments to params
+    params = if self.parameterizer then self.parameterizer(args) else args end

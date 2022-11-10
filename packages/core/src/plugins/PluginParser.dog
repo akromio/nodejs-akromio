@@ -1,0 +1,36 @@
+use (
+  Plugin
+  ../ops/simple/action/{StaticAction, ActionOperator}
+)
+
+const actionOperator = ActionOperator()
+
+/**
+ * A parser for parsing plugin declarations.
+ */
+export struct PluginParser
+  /**
+   * Parses a plugin declaration, returning its corresponding plugin instance.
+   */
+  pub async fn parsePlugin(decl: map, iniArgs?: any) -> plugin: Plugin
+    # (1) create plugin
+    const (
+      name = decl.plugin
+      initializer = decl.ini
+      finalizer = decl.fin
+      state = if initializer then await(initializer(iniArgs)) end
+    )
+
+    plugin = Plugin(decl{*, -ops, name, state, finalizer})
+
+    # (2) add its operations
+    for each name, opDecl in decl.ops do
+      plugin.appendOp(StaticAction(opDecl{*, name, operator = actionOperator}))
+  
+  /**
+   * Parses a preset declaration, returning its corresponding plugin
+   * instances.
+   */
+  pub async fn parsePreset(preset: map) -> plugins: list
+    for each def in preset.plugins do
+      plugins.push(await(self.parsePlugin(def.impl, def.iniArgs)))

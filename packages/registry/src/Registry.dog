@@ -1,0 +1,59 @@
+use (
+  Connector
+  Item
+)
+
+/**
+ * A container of thing declarations such as, for example, jobs catalogs.
+ */
+export struct Registry
+  /**
+   * The registry name.
+   */
+  pub const name: text
+
+  /**
+   * The connector to use for this regitry.
+   */
+  pub const client: Connector
+
+  /**
+   * Opens a connection with the registry.
+   */
+  pub async fn connect() -> self
+    await(self.client.connect())
+  
+  /** 
+   * Closes the connection with the registry.
+   */
+  pub async fn disconnect() -> self
+    await(self.client.disconnect())
+  
+  /**
+   * Gets and returns an [itemPath].
+   *
+   * If item unexists, nil returned.
+   */
+  pub async fn getItem(itemPath: text) -> item: Item
+    if (item = await(self.client.getItem(itemPath))) then
+      item = Item(item{*, registryName = self.name})
+    
+  /**
+   * Saves an [itemPath] in a [localPath],
+   * returning if the item has been downloaded.
+   *
+   * If the connector doesn't support the item download,
+   * false will be returned.
+   */
+  @async
+  pub fn downloadItem(itemPath: text, localPath: text, opts?: map) -> downloaded: bool
+    if self.client.downloadItem then
+      return self.client.downloadItem(itemPath, localPath, opts)
+
+  /**
+   * Lists the items available in an item path.
+   */
+  @async
+  pub fn listItems(itemPath: text) -> children: list
+    if self.client.listItems then
+      return self.client.listItems(itemPath)

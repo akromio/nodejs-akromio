@@ -1,0 +1,182 @@
+/**
+ * A parser for declaration strings, that is,
+ * a parser to return registries attending to a
+ * declaration string such as, for example,
+ * git=git://user/repo/branch.
+ */
+export struct RegistryStringParser
+  /**
+   * Parses a declaration string returning its components.
+   *
+   * @remarks
+   * When name unset, the protocol is used as name.
+   */
+  pub fn parse(decl: text, defaults: map) -> parsed: map
+    # (1) extract segments: name and definition
+    var (
+      segments ::= decl.split("=")
+      name, def
+    )
+    
+    with len(segments) do
+      if 1 then def = segments[0]
+      if 2 then [name, def] = segments
+      else throw(TypeError($"Invalid registry string: ${decl}."))
+
+    # (2) extract type and configuration of definition
+    const [proto, conf] = def.split("://")
+
+    # (3) create parsed registry to return
+    with proto do
+      if "fs" then parsed = parseFsString(name or "fs", conf)
+      if "git" then parsed = parseGitString(name or "git", conf, defaults.git)
+      if "http" then parsed = parseHttpString(name or "http", conf, defaults.http)
+      if "skynet" then parsed = parseSkynetString(name or "skynet", conf, defaults.skynet)
+      if "sns" then parsed = parseSnsString(name or "sns", conf, defaults.sns)
+      else throw(TypeError($"Unknown registry implementation: ${proto}."))
+
+/**
+ * Parses a fs configuration string.
+ *
+ * @dev
+ * The path specified in the configuration string must be always absolute.
+ */
+fn parseFsString(name: text, conf: text) -> parsed: map
+  # (1) pre
+  if not conf.startsWith("/") then
+    throw(TypeError($"FS registry expecting an absolute base path: ${conf}."))
+
+  # (2) create parsed result
+  parsed = {name, impl = "fs", basePath = conf}
+
+/**
+ * Parses a git configuration string.
+ *
+ * @dev
+ * The possibilities are:
+ * - repo
+ * - user/repo
+ * - user/repo/branch
+ */
+fn parseGitString(name: text, conf: text, defaults: map) -> parsed: map
+  # (1) extract components
+  var (
+    segments ::= conf.split("/")
+    user, repo, branch
+  )
+
+  with len(segments) do
+    if 1 then
+      user = defaults.user
+      repo = segments[0]
+      branch = defaults.branch
+
+    if 2 then
+      [user, repo] = segments
+      branch = defaults.branch
+
+    if 3 then
+      [user, repo, branch] = segments
+    
+    else
+      throw(TypeError($"Invalid git configuration: ${conf}."))
+  
+  # (2) create parsed result
+  parsed = {name, impl = "git", user, repo, branch}
+
+/**
+ * Parses a Skynet configuration string.
+ *
+ * @dev
+ * The possibilities are:
+ * - skylink
+ * - portal/skylink
+ */
+fn parseSkynetString(name: text, conf: text, defaults: map) -> parsed: map
+  # (1) determine components
+  var (
+    segments = conf.split("/")
+    portal, skylink
+  )
+
+  with len(segments) do
+    if 1 then
+      portal = defaults.portal
+      skylink = segments[0] or defaults.skylink
+    
+    if 2 then
+      [portal, skylink] = segments
+    
+    else
+      throw(TypeError($"Invalid skynet configuration: ${conf}."))
+
+  # (2) create parsed result
+  parsed = {name, impl = "skynet", portal, skylink}
+
+/**
+ * Parses an SNS configuration string.
+ *
+ * @dev
+ * The possibilities are:
+ * - name
+ * - publicKey/name
+ * - portal/name
+ * - portal/publicKey/name
+ */
+fn parseSnsString(name: text, conf: text, defaults: map) -> parsed: map
+  # (1) determine components
+  var (
+    segments = conf.split("/")
+    portal, publicKey, name
+  )
+
+  with len(segments) do
+    if 1 then
+      {portal, publicKey} = defaults
+      name = segments[0] or defaults.name
+    
+    if 2 then
+      const [first, second] = segments
+
+      if first.includes(".") then
+        portal = first
+        {publicKey} = defaults
+      else
+        {portal} = defaults
+        publicKey = first
+
+      name = second
+    
+    if 3 then
+      [portal, publicKey, name] = segments
+    
+    else
+      throw(TypeError($"Invalid SNS configuration: ${conf}."))
+
+  # (2) create parsed result
+  parsed = {name, impl = "sns", portal, publicKey, name}
+
+/**
+ * Parses a HTTP configuration string.
+ *
+ * @dev
+ * The possibilities are:
+ * - host
+ * - host/base
+ */
+fn parseHttpString(name: text, conf: text, defaults: map) -> parsed: map
+  # (1) extract components
+  var (
+    segments ::= conf.split("/")
+    host, base
+  )
+
+  if size ::= len(segments); size == 1 then
+    host = segments[0] or defaults.host
+    base = defaults.base
+  else
+    host = segments[0]
+    base = "/" + segments[1, -1].join("/")
+  
+  # (2) create parsed result
+  parsed = {name, impl = "http", host, base}

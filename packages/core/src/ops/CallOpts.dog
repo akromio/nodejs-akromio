@@ -1,0 +1,34 @@
+use (
+  {Writable} = dep://stream
+  {Dataset} = alias://dataset
+  Call
+)
+
+/**
+ * The run options.
+ */
+export intf CallOpts
+  /**
+   * The parent call.
+   */
+  parentCall?: Call
+
+  /**
+   * The title to use.
+   */
+  title?: text
+
+  /**
+   * The dataset to use for transforming the arguments.
+   */
+  dataset: Dataset
+
+  /**
+   * The log stream to report the run events.
+   */
+  log: Writable
+
+  /**
+   * What to do on error.
+   */
+  onError?: ("finish" | "carryOn")

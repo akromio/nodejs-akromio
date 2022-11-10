@@ -1,0 +1,133 @@
+use (
+  alias://expected
+  {DataTypeConstraint, ConstraintError} = ~
+)
+
+suite(__filename, proc()
+  suite("validateValue()", proc()
+    suite("any as data type", proc()
+      const constraint = DataTypeConstraint(dataType = "any")
+
+      test("when nil not received, no error must be raised", proc()
+        expected(proc() constraint.validateValue(true) end).notToRaise()
+      end)
+
+      test("when nil received, constraint error must be raised", proc()
+        # (1) act
+        const out = peval(constraint.validateValue(nil))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).toBe(false)\
+          .it(1).toBe(ConstraintError).like("Any value expected. Got: nil.")
+      end)
+    end)
+
+    suite("text as data type", proc()
+      const constraint = DataTypeConstraint(dataType = "text")
+
+      test("when text received, text must be returned", proc()
+        # (1) act
+        const (
+          value = "hello!"
+          out = constraint.validateValue(value)
+        )
+
+        # (2) assessment
+        expected(out).equalTo(value)
+      end)
+
+      test("when text not received, constraint error must be raised", proc()
+        # (1) act
+        const out = peval(constraint.validateValue(123))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).toBe(false)\
+          .it(1).toBe(ConstraintError).like("Text expected. Got: num.")
+      end)
+    end)
+
+    suite("num as data type", proc()
+      const constraint = DataTypeConstraint(dataType = "num")
+
+      test("when num received, num must be returned", proc()
+        # (1) act
+        const (
+          value = 123
+          out = constraint.validateValue(value)
+        )
+
+        # (2) assessment
+        expected(out).equalTo(value)
+      end)
+
+      test("when text received, num must be returned", proc()
+        # (1) act
+        const (
+          value = "123"
+          out = constraint.validateValue(value)
+        )
+
+        # (2) assessment
+        expected(out).equalTo(123)
+      end)
+
+      test("when neither num nor text, constraint error must be raised", proc()
+        # (1) act
+        const out = peval(constraint.validateValue(true))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).toBe(false)\
+          .it(1).toBe(ConstraintError).like("Number expected. Got: bool.")
+      end)
+    end)
+
+    suite("bool as data type", proc()
+      const constraint = DataTypeConstraint(dataType = "bool")
+
+      test("when bool received, no error must be raised", proc()
+        expected(proc() constraint.validateValue(true) end).notToRaise()
+      end)
+
+      test("when value is text and this is true, true is returned", proc()
+        for each value in [true, "t", "true", "y", "yes"] do
+          expected(constraint.validateValue(value)).equalTo(true)
+      end)
+
+      test("when value is text and this is false, false is returned", proc()
+        for each value in [false, "f", "false", "n", "no"] do
+          expected(constraint.validateValue(value)).equalTo(false)
+      end)
+
+      test("when bool not received, constraint error must be raised", proc()
+        # (1) act
+        const out = peval(constraint.validateValue("hello!"))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).toBe(false)\
+          .it(1).toBe(ConstraintError).like("Boolean expected. Got: text.")
+      end)
+    end)
+
+    suite("list as data type", proc()
+      const constraint = DataTypeConstraint(dataType = "list")
+
+      test("when list received, no error must be raised", proc()
+        expected(proc() constraint.validateValue([]) end).notToRaise()
+      end)
+
+      test("when list not received, constraint error must be raised", proc()
+        # (1) act
+        const out = peval(constraint.validateValue("hello!"))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).toBe(false)\
+          .it(1).toBe(ConstraintError).like("List expected. Got: text.")
+      end)
+    end)
+  end)
+end)

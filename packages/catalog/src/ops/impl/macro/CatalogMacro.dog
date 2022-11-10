@@ -1,0 +1,26 @@
+use (
+  {Call, DynamicMacro} = alias://core
+  ../CatalogSteppedOp
+)
+
+/**
+ * A macro saved into a jobs catalog.
+ *
+ * Its steps can do reference to other catalog operations by their names.
+ */
+export struct CatalogMacro: DynamicMacro:: CatalogSteppedOp
+  /**
+   * The initializer steps.
+   */
+  pub const initializers := []
+
+  @override @hidden
+  pub fn getInitializerSteps(call: Call) = self.buildSteps(self.initializers, call)
+
+  /**
+   * The finalizer steps.
+   */
+  pub const finalizers := []
+  
+  @override @hidden
+  pub fn getFinalizerSteps(call: Call) = self.buildSteps(self.finalizers, call)

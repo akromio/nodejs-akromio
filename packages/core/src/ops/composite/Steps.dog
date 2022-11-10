@@ -1,0 +1,8 @@
+use (
+  Step
+)
+
+/**
+ * A list of steps.
+ */
+export type Steps = Step[]

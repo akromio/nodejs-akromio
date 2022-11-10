@@ -1,0 +1,12 @@
+uses:
+  doubles:
+    js: "@akromio/doubles"
+    
+  expected:
+    js: "@akromio/expected"
+  
+  fmtDuration:
+    js: humanize-duration
+  
+  indent:
+    js: indent-string

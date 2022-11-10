@@ -1,0 +1,52 @@
+use (
+  ../{Op, Call}
+)
+
+/**
+ * A composite operation, that is, an operation composed
+ * of other.
+ */
+@abstract
+export struct CompositeOp: Op
+  /**
+   * The operation title.
+   *
+   * @remarks
+   * Right now, the composite operation can only have a text
+   * as title, unlike the simple operations that can have
+   * a text or a function to build the title.
+   */
+  pub const title?: text
+
+  @override
+  pub fn buildTitle() -> title: text
+    {title} = self
+    
+    if not title then
+      title = self.name
+  
+  /**
+   * What to do on error.
+   */
+  pub const onError: ("carryOn" | "finish") = "carryOn"
+
+  /**
+   * The local data declarations to create locally
+   * in the dataset for each run.
+   */
+  pub const local: map[] = []
+
+  /**
+   * Returns the initializer steps.
+   */
+  pub fn getInitializerSteps(call: Call): Steps = []
+
+  /**
+   * Returns the steps associated to the operation body.
+   */
+  pub fn getSteps(call: Call): Steps = []
+  
+  /**
+   * Returns the finalizer steps.
+   */
+  pub fn getFinalizerSteps(call: Call): Steps = []

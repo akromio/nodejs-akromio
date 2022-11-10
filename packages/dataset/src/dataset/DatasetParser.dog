@@ -1,0 +1,75 @@
+use (
+  ../datum/{VarDatum, ConstDatum, DatumFn}
+  ../constraints/{Constraints, RequiredConstraint, DataTypeConstraint, EnumConstraint}
+  ../dataset/{Dataset, LocalDataset}
+)
+
+/**
+ * The parse options.
+ */
+intf DatasetParseOpts
+  /**
+   * The name for the new dataset to create.
+   */
+  name: text
+
+  /**
+   * The parent dataset.
+   */
+  parent: Dataset
+
+/**
+ * An object for parsing a dataset from its declaration in map format.
+ */
+export struct DatasetParser
+  /**
+   * Parses a dataset [decl]aration, returning a local dataset.
+   */
+  @noParamCheck
+  pub fn parse(decl: list, opts: DatasetParseOpts) -> ds
+    # (1) create dataset
+    ds = LocalDataset(name = opts.name, parent = opts.parent)
+
+    # (2) add the datum to the dataset
+    for each datum in decl do
+      ds.setLocalDatum(self.parseDatumDecl(datum, ds))
+  
+  /**
+   * Parses a datum [decl]aration, returning its datum object if correct.
+   */
+  @hidden
+  pub fn parseDatumDecl(decl: map, ds: Dataset) -> datum
+    # (1) determine kind of datum
+    var Datum, name
+
+    if "var" in decl then
+      Datum = VarDatum
+      name = decl.var
+    else if "const" in decl then
+      Datum = ConstDatum
+      name = decl.const
+    else if "fn" in decl then
+      Datum = DatumFn
+      name = decl.fn
+    else
+      throw(TypeError($"Item of dataset declaration must contain var, const or fn. Got: ${fmt(decl)}."))
+    
+    # (2) create constraints
+    const constraints = Constraints()
+
+    if decl.required == true then
+      constraints.appendConstraint(RequiredConstraint())
+    
+    if decl.options is list then
+      constraints.appendConstraint(EnumConstraint(options = decl.options))
+
+    if decl.dataType then
+      constraints.appendConstraint(DataTypeConstraint(dataType = decl.dataType))
+    
+    # (3) parse value because it can contain an expression to evaluate
+    var value = ds.eval(decl.value)
+    if value == nil and "defaultValue" in decl then value = decl.defaultValue
+    constraints.validateValue(value)
+    
+    # (4) create and add datum to datatset
+    datum = Datum(decl{*, name, value, constraints})

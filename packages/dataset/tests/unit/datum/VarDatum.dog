@@ -1,0 +1,35 @@
+use (
+  alias://expected
+  {VarDatum, Constraints, DataTypeConstraint, ConstraintError} = ~
+)
+
+suite(__filename, proc()
+  suite("setValue()", proc()
+    test("when setValue called, its value can be updated", proc()
+      # (1) act
+      const (
+        datum = VarDatum(name = "v", value = 123)
+        out = peval(datum.setValue(321))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(true)\
+        .it(1).sameAs(datum)
+    end)
+
+    test("when setValue called and some constraint is not passed, error must be raised", proc()
+      # (1) act
+      const (
+        constraints = Constraints().appendConstraint(DataTypeConstraint(dataType = "num"))
+        datum = VarDatum(name = "v", value = 123, constraints)
+        out = peval(datum.setValue(true))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(ConstraintError).like("Number expected")
+    end)
+  end)
+end)

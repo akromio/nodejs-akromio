@@ -1,0 +1,33 @@
+use (
+  Activity
+  CallOpts
+)
+
+/**
+ * An activity to represent an operation.
+ */
+@abstract
+export struct Op: Activity
+  /**
+   * The operator to use to run the operation when called.
+   */
+  pub const operator
+
+  /**
+   * Returns the title to show when run.
+   * The [params] can be used to customize the title when needed.
+   */
+  @abstract
+  pub fn buildTitle(params: any): text
+
+  /**
+   * Runs the operation with the given arguments.
+   */
+  @async
+  pub fn runWith(args?, opts: CallOpts): Result = self.operator.run(self, args, opts)
+  
+  /**
+   * Runs the operation without arguments.
+   */
+  @async
+  pub fn run(opts: CallOpts): Result = self.runWith(nil, opts)

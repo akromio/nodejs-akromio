@@ -1,0 +1,119 @@
+use (
+  alias://expected
+  {simulator, method} = alias://doubles
+  {SimpleOp} = ~
+)
+
+struct TestOp: SimpleOp
+
+suite(__filename, proc()
+  suite("state", proc()
+    test("when plugin op, the plugin state must be returned", proc()
+      # (1) act
+      const (
+        op = TestOp(name = "op", parentPlugin = {state = "hello"}, operator = {})
+        out = op.state
+      )
+
+      # (2) assessment
+      expected(out).equalTo("hello")
+    end)
+
+    test("when standalone op, nil must be returned", proc()
+      # (1) act
+      const (
+        op = TestOp(name = "op", operator = {})
+        out = op.state
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+  end)
+
+  suite("buildParams()", proc()
+    test("when parameterizer set, this is run and its return must be returned", proc()
+      # (1) act
+      const (
+        args = {}
+        out = TestOp(
+          name = "the name"
+          parameterizer = fn(args?) = [] end
+          operator = {}
+        ).buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo([])
+    end)
+
+    test("when parameterizer set and datasource passed, args must be evaluated", proc()
+      # (1) act
+      const (
+        args = "$(hello)"
+        ds = simulator(eval = method.returns("hola"))
+        out = TestOp(
+          name = "the name"
+          parameterizer = fn(args) = [args] end
+          operator = {}
+        ).buildParams(args, ds)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(["hola"])
+    end)
+
+    test("when parameterizer unset, the args must be returned", proc()
+      # (1) act
+      const (
+        args = {x = 1}
+        out = TestOp(
+          name = "the name"
+          operator = {}
+        ).buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTest()", proc()
+    suite("when title set", proc()
+      test("when title is text, this must be returned", proc()
+        # (1) act
+        const out = TestOp(
+          name = "the name"
+          title = "the title"
+          operator = {}
+        ).buildTitle()
+
+        # (2) assessment
+        expected(out).equalTo("the title")
+      end)
+
+      test("when title is fn, the function is run and its return must be returned", proc()
+        # (1) act
+        const out = TestOp(
+          name = "the name"
+          title = fn() = "the title" end
+          operator = {}
+        ).buildTitle()
+
+        # (2) assessment
+        expected(out).equalTo("the title")
+      end)
+    end)
+
+    test("when title unset, the op name must be returned", proc()
+      # (1) act
+      const out = TestOp(
+        name = "the name"
+        operator = {}
+      ).buildTitle()
+
+      # (2) assessment
+      expected(out).equalTo("the name")
+    end)
+  end)
+end)

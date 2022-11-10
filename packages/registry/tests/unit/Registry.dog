@@ -1,0 +1,125 @@
+use (
+  dep://path
+  dep://os
+  alias://expected
+  {monitor, interceptor, method} = alias://doubles
+  {Registry, FsConnector} = ~
+)
+
+suite(__filename, proc()
+  const (
+    name = "test"
+    basePath = path.join(__dirname, "../data/connector/fs")
+  )
+
+  fn createConnector() = FsConnector(basePath=)
+
+  suite("connect()", proc()
+    test("when called, client.connect() muest be called", async proc()
+      # (1) act
+      const (
+        client = monitor(createConnector(), methods = ["connect"])
+        registry = Registry(name=, client)
+        out = await(registry.connect())
+      )
+
+      # (2) assessment
+      expected(out).sameAs(registry)
+
+      const log = monitor.log(client)
+      expected(log.calls).equalTo(1)
+    end)
+  end)
+
+  suite("disconnect()", proc()
+    test("when called, client.connect() muest be called", async proc()
+      # (1) act
+      const (
+        client = monitor(createConnector(), methods = ["disconnect"])
+        registry = await(Registry(name=, client).connect())
+        out = await(registry.disconnect())
+      )
+
+      # (2) assessment
+      expected(out).sameAs(registry)
+
+      const log = monitor.log(client)
+      expected(log.calls).equalTo(1)
+    end)
+  end)
+
+  suite("getItem()", proc()
+    test("when item exists, this must be returned", async proc()
+      # (1) act
+      const (
+        client = monitor(createConnector(), methods = ["getItem"])
+        registry = await(Registry(name=, client).connect())
+        out = await(registry.getItem("/catalogs/jobs.yaml"))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        registryName = name
+        name = "/catalogs/jobs.yaml"
+        uri = "test:///catalogs/jobs.yaml"
+        cty = "text/yaml"
+        value = "spec: v1.0\ncty: yaml"
+      )
+
+      const log = monitor.log(client)
+      expected(log.calls).equalTo(1)
+    end)
+
+    test("when item unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        client = monitor(createConnector(), methods = ["getItem"])
+        registry = await(Registry(name=, client).connect())
+        out = await(registry.getItem("/unknown"))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+
+      const log = monitor.log(client)
+      expected(log.calls).equalTo(1)
+    end)
+  end)
+
+  suite("downloadItem()", proc()
+    test("when conn has downloadItem, its homonym must be called", async proc()
+      # (1) act
+      const (
+        client = monitor(
+          interceptor(createConnector(), downloadItem = method.resolves(true))
+          methods = ["downloadItem"]
+        )
+        registry = await(Registry(name=, client).connect())
+        itemPath = "/jobs/catalogs/test.yaml"
+        localPath = path.join(os.tmpdir(), ".apm/jobs/catalogs")
+        out = await(registry.downloadItem(itemPath, localPath))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+
+      const log = monitor.log(client)
+      expected(log.calls).equalTo(1)
+      expected(log.calledWith([itemPath, localPath, undefined])).equalTo(1)
+    end)
+
+    test("when conn hasn't downloadItem, false must be called", async proc()
+      # (1) act
+      const (
+        client = createConnector()
+        registry = await(Registry(name=, client).connect())
+        itemPath = "/jobs/catalogs/test.yaml"
+        localPath = path.join(os.tmpdir(), ".apm/jobs/catalogs")
+        out = await(registry.downloadItem(itemPath, localPath))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(false)
+    end)
+  end)
+end)

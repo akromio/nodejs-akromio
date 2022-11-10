@@ -1,0 +1,83 @@
+use (
+  alias://expected
+  {interceptor, method} = alias://doubles
+  dep://axios
+  dep://path
+  {GitConnector} = ~
+)
+
+suite(__filename, proc()
+  const (
+    user = "akromio"
+    repo = "test"
+  )
+
+  fn createConnector(client) = GitConnector(client=, user, repo)
+
+  suite("getItem()", proc()
+    test("when item unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        client = interceptor(
+          axios
+          get = method.returns(status = 204)
+        )
+        conn = createConnector(client)
+        out = await(conn.getItem("/unknown"))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when item is a yaml file, value and mime must be returned", async proc()
+      # (1) act
+      const (
+        client = interceptor(
+          axios
+          get = method(
+            returns = {
+              status = 200
+              headers = {'content-type' = "text/plain"}
+              data = "spec: v1.0\ncty: yaml"
+            }
+          )
+        )
+        conn = createConnector(client)
+        out = await(conn.getItem("/jobs.yaml"))
+      )
+
+      # (2) assessment
+      expected(out).toBeMap().equalTo(
+        name = "/jobs.yaml"
+        cty = "text/yaml"
+        value = "spec: v1.0\ncty: yaml"
+      )
+    end)
+
+    test("when item w/o extension, value and content-type must be returned", async proc()
+      # (1) act
+      const (
+        client = interceptor(
+          axios
+          get = method(
+            returns = {
+              status = 200
+              headers = {'content-type' = "text/plain"}
+              data = "FROM golang:1.17-alpine as build"
+            }
+          )
+        )
+        conn = createConnector(client)
+        out = await(conn.getItem("/Dockerfile"))
+      )
+
+      # (2) assessment
+      expected(out).toBeMap().equalTo(
+        name = "/Dockerfile"
+        cty = "text/plain"
+        value = "FROM golang:1.17-alpine as build"
+      )
+    end)
+  end)
+end)

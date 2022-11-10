@@ -1,0 +1,49 @@
+use (
+  alias://expected
+  {v4 as uuid} = dep://uuid
+  {Result} = ~
+)
+
+suite(__filename, proc()
+  suite("returned", proc()
+    test("when called, this must return value", proc()
+      # (1) act
+      const (
+        result = Result(
+          callId = uuid()
+          title = "the title"
+          duration = 1
+          kind = "ok"
+          value = "simple"
+          onError = "carryOn"
+        )
+
+        out = result.returned
+      )
+
+      # (2) assessment
+      expected(out).equalTo("simple")
+    end)
+  end)
+
+  suite("raised", proc()
+    test("when called, this must return value", proc()
+      # (1) act
+      const (
+        result = Result(
+          callId = uuid()
+          title = "the title"
+          duration = 1
+          kind = "failed"
+          value = Error("mind")
+          onError = "carryOn"
+        )
+
+        out = result.raised
+      )
+
+      # (2) assessment
+      expected(out).equalTo(Error("mind"))
+    end)
+  end)
+end)

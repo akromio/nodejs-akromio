@@ -1,0 +1,10 @@
+use (
+  Macro
+)
+
+/**
+ * A dynamic macro, that is, a macro whose steps are
+ * determined in runtime.
+ */
+@abstract
+export struct DynamicMacro: Macro

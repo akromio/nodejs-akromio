@@ -1,0 +1,28 @@
+/**
+ * An item.
+ */
+export struct Item
+  /**
+   * Registry item.
+   */
+  pub const registryName: text
+  
+  /**
+   * The item name.
+   */
+  pub const name: text
+
+  /**
+   * The content-type of the item value.
+   */
+  pub const cty: text
+
+  /**
+   * The item value.
+   */
+  pub const value: any
+
+  /**
+   * The item URI.
+   */
+  pub fn uri = $"${self.registryName}://${self.name}"

@@ -1,0 +1,35 @@
+use (
+  alias://expected
+  {DatumFn, DatumError} = ~
+)
+
+suite(__filename, proc()
+  suite("getValue()", proc()
+    test("when getValue called, function must be called and its value returned", proc()
+      # (1) act
+      const (
+        datum = DatumFn(name = "f", value = fn() = 123 end)
+        out = datum.getValue()
+      )
+
+      # (2) assessment
+      expected(out).equalTo(123)
+    end)
+
+  end)
+
+  suite("setValue()", proc()
+    test("when setValue called, error must be raised", proc()
+      # (1) act
+      const (
+        datum = DatumFn(name = "f", value = fn() = 123 end)
+        out = peval(datum.setValue(321))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(DatumError).like("The datum 'f' is not updatable.")
+    end)
+  end)
+end)

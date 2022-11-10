@@ -1,0 +1,92 @@
+use (
+  alias://expected
+  {monitor, simulator, field, method} = alias://doubles
+  {Call, SimpleOp} = ~
+  OperatorBase = ~/dist/cjs/ops/Operator
+)
+
+# The operator type to use with the tests.
+@concrete
+struct Operator: OperatorBase
+
+suite(__filename, proc()
+  suite("emitOpLog()", proc()
+    const optor = Operator()
+
+    teardown(proc()
+      monitor.clearAll()
+    end)
+
+    test("when content is text, serialization already performed", proc()
+      # (1) act
+      const (
+        content = "this is the content"
+        log = monitor(simulator(push = method.returns()), methods = ["push"])
+        call = simulator(
+          Call
+          id = field.uuid()
+          op = field(returns = simulator(SimpleOp, {}))
+          log
+        )
+        out = optor.emitOpLog(call, content)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        'type' = "opLog"
+        opType = "simple"
+        content
+      ).member("id").toBeUuid().member("ts").toBeTimestamp()
+
+      expected(monitor.log(log).calls).equalTo(1)
+    end)
+
+    test("when content is buffer, its string representation must be used", proc()
+      # (1) act
+      const (
+        content = Buffer.from("this is the content")
+        log = monitor(simulator(push = method.returns()), methods = ["push"])
+        call = simulator(
+          Call
+          id = field.uuid()
+          op = field(returns = simulator(SimpleOp, {}))
+          log
+        )
+        out = optor.emitOpLog(call, content)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        'type' = "opLog"
+        opType = "simple"
+        content = "this is the content"
+      ).member("id").toBeUuid().member("ts").toBeTimestamp()
+
+      expected(monitor.log(log).calls).equalTo(1)
+    end)
+
+    test("when content is other, its string representation must be used", proc()
+      # (1) act
+      const (
+        content = {x = 12, y = 34, z = 56}
+        log = monitor(simulator(push = method.returns()), methods = ["push"])
+        call = simulator(
+          Call
+          id = field.uuid()
+          op = field(returns = simulator(SimpleOp, {}))
+          log
+        )
+        out = optor.emitOpLog(call, content)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        'type' = "opLog"
+        opType = "simple"
+        content = "{ x: 12, y: 34, z: 56 }"
+      ).member("id").toBeUuid().member("ts").toBeTimestamp()
+
+      expected(monitor.log(log).calls).equalTo(1)
+    end)
+  end)
+end)

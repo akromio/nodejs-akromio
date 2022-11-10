@@ -1,0 +1,57 @@
+use (
+  alias://expected
+  {JobCatalogMerger} = ~
+)
+
+suite(__filename, proc()
+  const (
+    merger = JobCatalogMerger()
+  )
+
+  suite("merge()", proc()
+    test("when called, mix must be performed and returned", proc()
+      # (1) act
+      const (
+        extended = {
+
+        }
+
+        extensor = {
+          spec = "v1.0"
+          dataset = [
+            {const = "myconst"}
+            {fn = "myfn"}
+          ]
+          plugins = [
+            {plugin = "myplugin", impl = "plugin"}
+          ]
+          jobs = [
+            {loop = "myloop", steps = []}
+            {co = "myco", steps = []}
+          ]
+        }
+
+        out = merger.merge(extensor, extended)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        spec = "v1.0"
+
+        dataset = [
+          {const = "myconst"}
+          {fn = "myfn"}
+        ]
+
+        plugins = [
+          {plugin = "myplugin", impl = "plugin"}
+        ]
+
+        jobs = [
+          {loop = "myloop", steps = []}
+          {co = "myco", steps = []}
+        ]
+      )
+    end)
+  end)
+end)

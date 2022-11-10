@@ -1,0 +1,5 @@
+build/
+coverage/
+node_modules/
+!tests/data/node/node_modules/
+.nyc_output/

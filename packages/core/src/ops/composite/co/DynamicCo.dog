@@ -1,0 +1,10 @@
+use (
+  Co
+)
+
+/**
+ * A dynamic concurrent, that is, a concurrent
+ * whose ops are determined in runtime.
+ */
+@abstract
+export struct DynamicCo: Co

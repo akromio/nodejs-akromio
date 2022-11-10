@@ -1,0 +1,7 @@
+/**
+ * The reporter status.
+ */
+export enum ReporterStatus
+  initialized
+  started
+  ended

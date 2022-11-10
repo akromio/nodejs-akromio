@@ -1,0 +1,126 @@
+/**
+ * An object to parse the steps of the composite ops.
+ */
+export struct StepParser
+  /**
+   * Parses a step, returning a map with its definition:
+   * {condition, resultVarName, opName, args, onError}
+   *
+   * args will be list only when 2 or more arguments passed.
+   */
+  pub fn parseStep(decl: (text | list | map), onError: text) -> def: map
+    #!cov ignore else
+    with type(decl) do
+      if text then def = parseTextStep(decl, onError)
+      if list then def = parseListStep(decl, onError)
+
+/**
+ * Parses a condition: datumName?.
+ * If not exists, nil returned.
+ */
+fn parseCondition(cond: text) = if cond.endsWith("?") then
+  cond[0, -2]
+end
+
+/**
+ * Parses a result: $datumName.
+ * If not exists, nil returned.
+ */
+fn parseResult(result: text) = if re("^\\$[^)]").test(result) then
+  result[1, -1]
+end
+
+/**
+ * Parses a step name decomposing in {opName, onError}.
+ *
+ * Formats:
+ * - opName: Op name using the default onError.
+ * - <opName: Like the previous one, but using finish for onError.
+ */
+fn parseOpName(name: text, onError: text) -> decomposition: map
+  # (1) determine onError
+  if name.startsWith("<") then
+    name = name[1, -1].trim()
+    decomposition.onError = "finish"
+  else
+    decomposition.{onError}
+  
+  # (2) determine name
+  decomposition.opName = name
+
+/**
+ * Parses the arguments to the operation.
+ */
+fn parseOpArgs(args?: any) -> args
+  with len(args) do
+    if 0 then args = nil
+    if 1 then args = args[0]
+  
+/**
+  * Parses a text step.
+  *
+  * Format:
+  * - opName
+  * - opName ...args
+  */
+fn parseTextStep(decl: text, defaultOnError: text): map
+  # (1) split declaration
+  decl = decl.split(re(" +"))
+
+  # (2) extract condition and result names
+  var condition, resultVarName
+
+  if (condition = parseCondition(decl[0])) then
+    decl = decl[1, -1]
+
+  if (resultVarName = parseResult(decl[0])) then
+    if decl[1] != "=" then
+      throw(TypeError("'=' expected after $resultVarName."))
+
+    decl = decl[2, -1]
+
+  # (3) parse op and args
+  const (
+    {opName, onError} = parseOpName(decl[0], defaultOnError)
+    args = parseOpArgs(decl[1, -1])
+  )
+
+  # (4) return
+  return {
+    condition
+    resultVarName
+    opName
+    args
+    onError
+  }
+
+/**
+ * Parses a list step.
+ *
+ * Formats:
+ * - [condition?, $result, opName, ...args]
+ */
+fn parseListStep(decl: list, defaultOnError: text): map
+  # (1) extract condition and result names
+  var condition, resultVarName
+
+  if (condition = parseCondition(decl[0])) then
+    decl = decl[1, -1]
+
+  if (resultVarName = parseResult(decl[0])) then
+    decl = decl[1, -1]
+
+  # (2) parse op and args
+  const (
+    {opName, onError} = parseOpName(decl[0], defaultOnError)
+    args = parseOpArgs(decl[1, -1])
+  )
+
+  # (3) return
+  return {
+    condition
+    resultVarName
+    opName
+    args
+    onError
+  }

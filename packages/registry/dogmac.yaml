@@ -1,0 +1,19 @@
+uses:
+  doubles:
+    js: "@akromio/doubles"
+  
+  expected:
+    js: "@akromio/expected"
+  
+  fileType:
+    js: file-type
+  
+  fsx:
+    js: fs-extra
+  
+  mime:
+    js: mime-types
+  
+  skynet:
+    js: "@skynetlabs/skynet-nodejs"
+  

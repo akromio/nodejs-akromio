@@ -1,0 +1,10 @@
+use (
+  ../CompositeOp
+)
+
+/**
+ * A macro, that is, an operation composed of a sequence
+ * of steps to run one by one.
+ */
+@abstract
+export struct Macro: CompositeOp

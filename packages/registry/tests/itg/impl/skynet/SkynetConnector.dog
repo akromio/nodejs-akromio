@@ -1,0 +1,83 @@
+use (
+  dep://path
+  dep://os
+  alias://fsx
+  alias://expected
+  {SkynetClient} = alias://skynet
+  {SkynetConnector} = ~
+)
+
+suite(__filename, proc()
+  fn createConnector(client) = SkynetConnector(client=, skylink)
+
+  const (
+    portal = "https://siasky.net"
+    skylink = "0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"
+    conn = createConnector(native("new SkynetClient(portal)"))
+  )
+
+  suite("getItem()", proc()
+    test("when item unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        out = await(conn.getItem("/jobs/catalogs/unknown"))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when item exists, item must be returned", async proc()
+      # (1) act
+      const (
+        itemPath = "/jobs/catalogs/empty.yaml"
+        out = await(conn.getItem(itemPath))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = itemPath
+        cty = "text/yaml"
+      )
+
+      expected(out.value.toString()).toInclude("spec: v1.0")
+    end)
+  end)
+
+  suite("downloadItem()", proc()
+    const (
+      apmPath = path.join(os.tmpdir(), ".apm")
+      catalogPath = "/jobs/catalogs"
+    )
+
+    setup(async proc()
+      await(fsx.remove(apmPath))
+    end)
+
+    test("when dir item exists, this dir is saved in the local fs", async proc()
+      # (1) act
+      const (
+        itemPath = path.join(catalogPath)
+        localPath = path.join(apmPath, itemPath)
+        out = await(conn.downloadItem(itemPath, localPath, unzip = true, overwrite = true))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+      expected.file(localPath, "empty.yaml").toExist()
+    end)
+
+    test("when file item exists, this file is saved in the local fs", async proc()
+      # (1) act
+      const (
+        itemPath = path.join(catalogPath, "empty.yaml")
+        localPath = path.join(apmPath, itemPath)
+        out = await(conn.downloadItem(itemPath, localPath, unzip = true, overwrite = true))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+      expected.file(localPath).toExist()
+    end)
+  end)
+end)

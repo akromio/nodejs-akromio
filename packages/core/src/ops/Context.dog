@@ -1,0 +1,18 @@
+/**
+ * A context, that is, the data accessible for a simple operation.
+ */
+export struct Context
+  /**
+   * The parameters passed to the call.
+   */
+  pub const params?
+
+  /**
+   * The state associated to the operation when available.
+   */
+  pub const state?
+
+  /**
+   * The log to use.
+   */
+  pub const log: func

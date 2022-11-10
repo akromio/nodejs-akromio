@@ -1,0 +1,191 @@
+use (
+  alias://expected
+  {simulator, method} = alias://doubles
+  {JobCatalog, JobCatalogParser} = ~
+  {Dataset, GlobalDataset, LocalDataset} = alias://dataset
+  {Ops, PluginParser, PluginLoader, Plugins, Plugin, CatalogParser} = alias://core
+)
+
+suite(__filename, proc()
+  const (
+    ops = Ops()
+    catalogOpt = {
+      name = "test"
+      loc = "file:///my/file.yaml"
+      cty = "text/yaml"
+    }
+    pluginParser = PluginParser()
+    pluginLoader = simulator(PluginLoader, {})
+    parser = JobCatalogParser(pluginParser=, pluginLoader)
+  )
+
+  suite("parse()", proc()
+    const (
+      catalogDecl = {
+        name = "test"
+        loc = "test:///test.yaml"
+        cty = "text/yaml"
+        spec = "v1.0"
+        desc = "A catalog to perform the unit tests."
+        defaultJobName = "build"
+        jobs = []
+      }
+    )
+
+    test("when invalid decl of a step, an error must be raised", async proc()
+      # (1) act
+      const (
+        globalDataset = GlobalDataset(name = "global")
+        out = pawait(parser.parse(
+          catalogDecl{
+            *
+            jobs = [
+              {
+                macrox = "mymacro"
+                steps = []
+              }
+            ]
+          }
+          catalog = catalogOpt
+          parentDataset = globalDataset
+          ops
+        ))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(Error).like("Invalid job declaration")
+    end)
+
+    test("when valid decl w/o dataset, a jobs catalog must be returned", async proc()
+      # (1) act
+      const (
+        globalDataset = GlobalDataset(name = "global")
+        out = await(parser.parse(
+          catalogDecl{
+            *
+            jobs = [
+              {
+                macro = "mymacro"
+                steps = []
+              }
+              {
+                loop = "myloop"
+                forEach = ["list", 1, 2, 3, 4]
+                steps = []
+              }
+              {
+                co = "myco"
+                steps = []
+              }
+            ]
+          }
+          catalog = catalogOpt
+          parentDataset = globalDataset
+          ops
+        )
+      ))
+
+      # (2) assessment
+      expected(out).toBe(JobCatalog).toHave(
+        spec = "v1.0"
+        loc = "test:///test.yaml"
+        cty = "text/yaml"
+        desc = "A catalog to perform the unit tests."
+        plugins = Plugins()
+        defaultJobName = "build"
+      ).member("dataset").toBe(LocalDataset)\
+       .member("dataset.parent").sameAs(globalDataset)
+      
+      expected(out.jobs).toBeMap()
+    end)
+
+    test("when valid decl w/ dataset, a jobs catalog must be returned", async proc()
+      # (1) act
+      const (
+        globalDataset = GlobalDataset(name = "global")
+        out = await(parser.parse(
+          catalogDecl{
+            *
+            dataset = [
+              {
+                var = "mydatum"
+                value = "my value"
+              }
+            ]
+          }
+          catalog = catalogOpt
+          parentDataset = globalDataset
+          ops
+        ))
+      )
+
+      # (2) assessment
+      expected(out).toBe(JobCatalog).toHave(
+        spec = "v1.0"
+        loc = "test:///test.yaml"
+        cty = "text/yaml"
+        desc = "A catalog to perform the unit tests."
+        plugins = Plugins()
+        defaultJobName = "build"
+        jobs = {}
+      ).member("dataset").toBe(LocalDataset)
+    end)
+
+    test("when valid decl w/ plugins, a jobs catalog must be returned", async proc()
+      # (1) act
+      const (
+        piWoi = {
+          name = "pi-without-ini"
+          ops = {}
+        }
+
+        piWini = {
+          name = "pi-with-ini"
+          ops = {}
+          ini = fn() = "value" end
+        }
+
+        pluginLoader = simulator(
+          PluginLoader
+          loadPlugin = method([
+            {args = ["pi-without-ini"], returns = piWoi}
+            {args = ["pi-with-ini"], returns = piWini}
+          ])
+        )
+
+        parser = JobCatalogParser(pluginLoader=, pluginParser)
+
+        globalDataset = GlobalDataset(name = "global")
+        out = await(parser.parse(
+          catalogDecl{
+            *
+            plugins = [
+              {plugin = "woi", impl = "pi-without-ini"}
+              {plugin = "wi", impl = "pi-with-ini"}
+            ]
+          }
+          catalog = catalogOpt
+          parentDataset = globalDataset
+          ops
+        ))
+      )
+
+      # (2) assessment
+      expected(out).toBe(JobCatalog).toHave(
+        spec = "v1.0"
+        loc = "test:///test.yaml"
+        cty = "text/yaml"
+        desc = "A catalog to perform the unit tests."
+        defaultJobName = "build"
+        jobs = {}
+      ).member("dataset").toBe(LocalDataset)\
+       .member("dataset.parent").sameAs(globalDataset)
+
+      expected(out.plugins).toBe(Plugins).toHaveLen(2)\
+        .get("items.woi").toBe(Plugin).toHave(name = "woi", state = nil)\
+        .get("items.wi").toBe(Plugin).toHave(name = "wi", state = "value")
+    end)
+  end)
+end)

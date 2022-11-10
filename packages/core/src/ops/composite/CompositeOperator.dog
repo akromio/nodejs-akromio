@@ -1,0 +1,175 @@
+use (
+  {DatasetParser, ConstDatum} = alias://dataset
+  ../{Operator, Call, CallOpts, Context, Result}
+  CompositeOp
+  Step
+)
+
+/**
+ * An operator to run composite operations.
+ */
+@abstract
+export struct CompositeOperator: Operator
+  @override @hidden
+  pub fn createCall(op: CompositeOp, args?, opts: CallOpts) -> call: Call
+    # (1) create params object
+    const params = opts.dataset.eval(args)
+
+    # (2) create local dataset
+    const (
+      local = [{
+        const = "params"
+        value = params
+        desc = "The arguments passed to the operation."
+      }].concat(op.local)
+      dataset = DatasetParser().parse(local, name = "local", parent = opts.dataset)
+    )
+
+    # (3) create call
+    call = Call(
+      onError = opts.onError or op.onError
+      dataset
+      op
+      title = op.buildTitle()
+      ctx = Context(log = nop, params)
+      log = opts.log
+    )
+
+  @override @hidden
+  pub async fn perform(call: Call) -> result: Result
+    # (1) run
+    var (
+      start ::= timestamp()
+      now
+      value
+      kind
+      duration
+    )
+
+    self.emitOpStart(call)
+    value = await(self.performWorks(call))
+    now = timestamp()
+
+    if len(value) > 0 and value[0] is not Result then
+      value = value[1]
+      kind = "failed"
+    else
+      kind = "ok"
+    
+    # (2) create result
+    result = Result(
+      callId = call.id
+      title = call.title
+      onError = call.onError
+      duration = now - start
+      kind
+      value
+    )
+
+    self.emitOpEnd(call, result)
+  
+  /**
+   * Performs the works associated to a given operation.
+   *
+   * @remarks
+   * If some step failed and onError is finish, the returned result
+   * must contain false as index 0 and the step results as index 1.
+   */
+  @override @hidden
+  pub async fn performWorks(call: Call): Results
+    expect(call.op, CompositeOp)
+
+    # (1) run steps
+    var (
+      failed = false
+      results = []
+    )
+
+    await(self.performInitializerSteps(call, results))
+
+    if [ok] ::= await(self.performSteps(call, results)); ok === false then
+      failed = true
+
+    await(self.performFinalizerSteps(call, results))
+
+    # (2) return
+    if failed then results = [false, results]
+    return results
+
+  /**
+   * Runs a given step.
+   */
+  @hidden @async @noParamCheck
+  pub fn performStep(step: Step, call: Call): Result = step.op.runWith(
+    step.args
+    parentCall = call
+    title = step.title
+    dataset = call.dataset
+    log = call.log
+    resultLog = step.resultLog
+    onError = step.onError
+    quiet = step.quiet
+  )
+
+  /**
+   * Performs the initializer steps.
+   */
+  @hidden @async
+  pub fn performInitializerSteps(call: Call, results: list) = self._performSteps(
+    call.op.getInitializerSteps(call)
+    call
+    results
+  )
+
+  /**
+   * Performs the finalizer steps.
+   */
+  @hidden @async
+  pub fn performFinalizerSteps(call: Call, results: list) = self._performSteps(
+    call.op.getFinalizerSteps(call)
+    call
+    results
+  )
+
+  /**
+   * Runs the steps associated to the operation under running.
+   */
+  @hidden
+  pub async fn performSteps(call: Call, results: list) = self._performSteps(
+    await(call.op.getSteps(call))
+    call
+    results
+  )
+
+  /**
+   * Runs the given steps.
+   *
+   * @remarks
+   * For each step, its result is found in the results.
+   * But if finish on error, the first result will be false and
+   * the rest will be the step results.
+   */
+  @hidden @noParamCheck
+  pub async fn _performSteps(steps: Steps, call: Call, results: list) -> results
+    const {dataset} = call
+
+    for each step: Step in steps do
+      #pre
+      if cond := step.condition then
+        cond = "$(" + cond + ")"
+        
+        if dataset.eval(cond) not in [true, "true", "y", "yes", "Y"] then
+          next
+
+      #run step
+      const result = await(self.performStep(step, call))
+      
+      if not step.quiet then
+        results.push(result)
+
+      #break if needed
+      if result.kind == "failed" and step.onError == "finish" then
+        return [false, results]
+      
+      #add result value to call dataset
+      dataset.setDatumValue(step.resultVarName ?? "last", result.value)

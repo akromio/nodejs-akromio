@@ -1,0 +1,108 @@
+use (
+  {Readable} = dep://stream
+  ReporterStatus
+)
+
+/**
+ * A reporter, that is, an object that consumes a log stream
+ * for notifying its events.
+ */
+@abstract
+export struct Reporter
+  /**
+   * The current status.
+   */
+  @hidden @strict
+  pub var status = ReporterStatus.initialized
+
+  /**
+   * The log stream to consume.
+   */
+  pub const log: Readable
+
+  /**
+   * The call stack.
+   */
+  @hidden @strict
+  pub const callStack = []
+
+  /**
+   * Starts to consume.
+   */
+  pub fn start()
+    # (1) pre
+    if self.status !=~ initialized then
+      throw(Error($"Status expected to be initialized. Got: ${self.status}."))
+    
+    # (2) configure consume
+    self.status =~ started
+
+    self.log.on("data", proc(e)
+      self.handleEvent(json.decode(e))
+    end)
+  
+  /**
+   * Processes an event consumed from the log stream.
+   */
+  @hidden
+  pub proc handleEvent(e: map)
+    #!cov ignore else
+    with e.type do
+      if "opStart" then self.handleOpStart(e)
+      if "opEnd" then self.handleOpEnd(e)
+      if "opLog" then self.handleOpLog(e)
+      if "end" then self.handleEnd(e)
+      else print(e)
+
+  /**
+   * Processes an op start event consumed from the log stream.
+   */
+  @hidden
+  pub proc handleOpStart(e)
+    self.callStack.push(e)
+    self._handleOpStart(e{*, level = len(self.callStack) - 1})
+  
+  /**
+   * Processes an op end event consumed from the log stream.
+   */
+  @hidden
+  pub proc handleOpEnd(e)
+    # (1) check stack
+    self.checkCallStack(e.id)
+    self.callStack.pop()
+    
+    # (2) handle
+    self._handleOpEnd(e{*, level = len(self.callStack)})
+  
+  /**
+   * Processes an log event during an op run from the log stream.
+   */
+  @hidden
+  pub proc handleOpLog(e)
+    self.checkCallStack(e.id)
+    self._handleOpLog(e{*, level = len(self.callStack)})
+  
+  @hidden
+  pub proc _handleOpLog(e)
+    nop
+  
+  /**
+   * Checks whether the top call stack is a given call,
+   * raising error if not so.
+   */
+  @hidden
+  pub proc checkCallStack(id: text)
+    if top ::= self.callStack[-1]; top.id != id then
+      throw(Error($"Call id expected: ${top.id}. Got: ${id}."))
+  
+  /**
+   * Processes the end event.
+   */
+  @hidden
+  pub proc handleEnd(e)
+    # (1) pre: check call stack
+    if len(self.callStack) > 0 then
+      throw(Error("Call stack should be empty when end reached."))
+
+    # (2) handle event
+    self._handleEnd(e)

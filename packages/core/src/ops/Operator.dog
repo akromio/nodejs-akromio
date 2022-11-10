@@ -1,0 +1,102 @@
+use (
+  {Writable} = dep://stream
+  Call
+  CallOpts
+  Op
+  simple/SimpleOp
+)
+
+/**
+ * An operator, that is, an object to run a specific kind
+ * of operation.
+ */
+@abstract
+export struct Operator
+  /**
+   * Runs a given operation with the given arguments.
+   */
+  pub async fn run(op: Op, args?, opts: CallOpts) -> result: Result
+    result = await(self.perform(self.createCall(op, args, opts)))
+    
+  /**
+   * Creates the call for an operation and arguments.
+   */
+  @abstract @hidden
+  pub fn createCall(op: Op, args?, opts: CallOpts): Call
+
+  /**
+   * Performs the task associated to an operation.
+   */
+  @abstract @hidden
+  pub async fn perform(call: Call): Result
+
+  /**
+   * Emits an event to notify the op run start,
+   * returning the event emitted.
+   */
+  @hidden
+  pub fn emitOpStart(call: Call) -> e
+    e = {
+      type = "opStart"
+      opType = getOpTypeOf(call.op)
+      id = call.id
+      title = call.title
+      ts = timestamp()
+    }
+
+    call.log.push(json.encode(e))
+  
+  /**
+   * Emits an event to notify the op run end,
+   * returning the event emitted.
+   */
+  @hidden
+  pub fn emitOpEnd(call: Call, result) -> e
+    e = {
+      type = "opEnd"
+      opType = getOpTypeOf(call.op)
+      id = call.id
+      ts = timestamp()
+      result = {
+        kind = result.kind
+        duration = result.duration
+        if result.kind == "failed" then raised = result.value.toString()
+      }
+    }
+
+    call.log.push(json.encode(e))
+  
+  /**
+   * Emits a log event during an op run,
+   * returning the event emitted.
+   *
+   * @remarks
+   * The event content is serialized to string.
+   */
+  @hidden
+  pub fn emitOpLog(call: Call, content?) -> e
+    # (1) format content if needed
+    with type(content) do
+      if text then nop
+      if Buffer then content = content.toString()
+      else content = fmt(content)
+
+    # (2) emit event
+    e = {
+      type = "opLog"
+      opType = getOpTypeOf(call.op)
+      id = call.id
+      ts = timestamp()
+      content
+    }
+
+    call.log.push(json.encode(e))
+
+/**
+ * Returns the op type of an op.
+ */
+fn getOpTypeOf(op: Op) = if op is SimpleOp then
+  "simple"
+else
+  "composite"
+end

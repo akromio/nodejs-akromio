@@ -1,0 +1,117 @@
+use (
+  dep://lodash.merge
+  alias://indent
+  durationFmt = alias://fmtDuration
+  config
+  ../../Reporter
+)
+
+const fmtDuration = durationFmt.humanizer({
+  language = "short"
+  languages =
+    short =
+      m = fn() = "m" end
+      s = fn() = "s" end
+      ms = fn() = "ms" end
+})
+
+/**
+ * A reporter to notify using the console.
+ */
+export struct ConsoleReporter: Reporter
+  /**
+   * The reporter configuration to use.
+   */
+  @strict
+  pub const config = merge(config, _.config)
+
+  /**
+   * The echo function to use.
+   */
+  pub fn echo = self.config.echo
+  
+  /**
+   * The print function to use.
+   */
+  pub fn print = self.config.print
+
+  /**
+   * Indicates if the current simple op has been logged something.
+   */
+  @hidden
+  pub var logged = false
+
+  @override @hidden
+  pub proc _handleOpStart(e)
+    var (
+      {config, print, echo} = self
+      indent ::= config.indent.repeat(e.level)
+      {title} = e
+    )
+
+    self.logged = false
+
+    if e.opType == "simple" then
+      echo($"${indent}${config.simple.prefix} ${title}")
+    else
+      title = config.composite.title.color(title)
+      print($"${indent}${config.composite.prefix} ${title}")
+  
+  @override @hidden
+  pub proc _handleOpEnd(e)
+    if e.opType == "simple" then
+      const (
+        {config, echo, print} = self
+        {log} = config
+        {result} = e
+        level = e.level + 1
+      )
+
+      if self.logged then
+        echo(indent(log.color(log.endSymbol), level, indent = config.indent))
+      
+      print($" ${self.getResultText(result.kind)} (${getDurationText(result.duration)})")
+
+    self.logged = false
+      
+  @override @hidden
+  pub proc _handleEnd()
+    nop
+  
+  @override @hidden
+  pub proc _handleOpLog(e)
+    var (
+      {config, print, echo} ::= self
+      {log} ::= config
+      level ::= e.level
+      {content} = e
+      show = print
+    )
+
+    if not self.logged then
+      show(log.color("", log.startSymbol))
+      self.logged = true
+
+    if content[-1] == "\n" then show = echo
+    show(log.color(indent(content, level, indent = config.indent)))
+
+  /**
+   * Returns the result text.
+   */
+  @hidden
+  pub fn getResultText(result) -> result
+    const {config} = self
+
+    if result == "ok" then
+      result = config.ok.color("ok")
+    else
+      result = config.failed.color("failed")
+
+/**
+ * Formats the duration.
+ */
+fn getDurationText(duration) -> duration
+  if duration < 1000 then
+    duration = duration + " ms"
+  else
+    duration = fmtDuration(duration)

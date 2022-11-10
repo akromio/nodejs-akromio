@@ -1,0 +1,52 @@
+use (
+  dep://vm
+  ../../Call
+  ../SimpleOperator
+  Script
+)
+
+/**
+ * Operator to run scripts.
+ */
+export struct ScriptOperator: SimpleOperator
+  @override @hidden
+  pub async fn performWork(call: Call) -> returned
+    const (
+      script = expect(call.op, Script)
+      {code, params} = script
+      ctx = call.ctx{*}
+      opts = {ctx}
+    )
+
+    ctx.params ?= params
+
+    if script.kind == "sync" then
+      returned = runSyncCode(code, opts)
+    else
+      returned = await(runAsyncCode(code, opts))
+
+/**
+ * Creates a VM context.
+ */
+fn createContext(ctxObject) = vm.createContext(
+  ctxObject{
+    *
+    setTimeout
+    setImmediate
+    setInterval
+  }
+)
+
+/**
+ * Runs a sync code.
+ */
+fn runSyncCode(code: text, opts: map) -> result
+  const ctx = createContext(opts.ctx)
+  result = vm.runInContext(code, ctx, opts{*})
+
+/**
+ * Runs an async code.
+ */
+async fn runAsyncCode(code: text, opts: map) -> result
+  const ctx = createContext(opts.ctx)
+  result = await(vm.runInContext(code, ctx, opts{*, microtaskMode = "afterEvaluate"}))

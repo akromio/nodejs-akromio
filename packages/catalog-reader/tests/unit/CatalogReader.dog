@@ -1,0 +1,307 @@
+use (
+  alias://expected
+  {monitor, simulator, interceptor, method} = alias://doubles
+  {Registries, Item} = alias://registry
+  {CatalogReader as CatalogReaderBase} = ~
+)
+
+#The reader to use for testing.
+struct CatalogReader: CatalogReaderBase
+  pub const merger
+
+suite(__filename, proc()
+  suite("readCatalogDecl()", proc()
+    const (
+      merger = {}
+      reader = CatalogReader(merger=)
+    )
+
+    test("when catalog unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        regs = simulator(Registries, getItem = method.returns())
+        out = await(reader.readCatalogDecl("unknown.yaml", regs))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when catalog with nonsupported cty, error must be raised", async proc()
+      # (1) act
+      const (
+        item = Item(
+          registryName = "test"
+          name = "jobs.txt"
+          cty = "text/plain"
+          value = Buffer.from("spec: v1.0\njobs: []")
+        )
+        regs = simulator(Registries, getItem = method.returns(item))
+        out = pawait(reader.readCatalogDecl("jobs.txt", regs))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(TypeError("Invalid content-type for catalog: text/plain."))
+    end)
+
+    test("when cty is yaml, parsed decl must be returned", async proc()
+      # (1) act
+      const (
+        item = Item(
+          registryName = "test"
+          name = "jobs.yaml"
+          cty = "text/yaml"
+          value = """
+          spec: v1.0
+          jobs: []
+          """
+        )
+        regs = simulator(Registries, getItem = method.returns(item))
+        out = await(reader.readCatalogDecl("jobs.yaml", regs))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        spec = "v1.0"
+        jobs = []
+        registryName = "test"
+        name = "jobs.yaml"
+        loc = "test://jobs.yaml"
+        cty = "text/yaml"
+      )
+    end)
+
+    test("when cty is json, parsed decl must be returned", async proc()
+      # (1) act
+      const (
+        item = Item(
+          registryName = "test"
+          name = "jobs.json"
+          cty = "application/json"
+          value = """
+          {
+            "spec": "v1.0",
+            "jobs": []
+          }
+          """
+        )
+        regs = simulator(Registries, getItem = method.returns(item))
+        out = await(reader.readCatalogDecl("jobs.json", regs))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        spec = "v1.0"
+        jobs = []
+        registryName = "test"
+        name = "jobs.json"
+        loc = "test://jobs.json"
+        cty = "application/json"
+      )
+    end)
+
+    test("when decl is got as object, decl must be returned", async proc()
+      # (1) act
+      const (
+        item = Item(
+          registryName = "test"
+          name = "jobs.json"
+          cty = "application/json"
+          value = {
+            spec = "v1.0"
+            jobs = []
+          }
+        )
+        regs = simulator(Registries, getItem = method.returns(item))
+        out = await(reader.readCatalogDecl("test://jobs.json", regs))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        spec = "v1.0"
+        jobs = []
+        registryName = "test"
+        name = "jobs.json"
+        loc = "test://jobs.json"
+        cty = "application/json"
+      )
+    end)
+
+    test("when search in several registries and found, decl must be returned", async proc()
+      # (1) act
+      const (
+        item = Item(
+          registryName = "test"
+          name = "jobs"
+          cty = "application/json"
+          value = {
+            spec = "v1.0"
+            jobs = []
+          }
+        )
+        regs = simulator(
+          Registries
+          getItem = method([
+            {args = ["jobs.yaml", {registryName = undefined}], returns = nil}
+            {args = ["jobs.yml", {registryName = undefined}], returns = nil}
+            {args = ["jobs.json", {registryName = undefined}], returns = item}
+          ])
+        )
+        out = await(reader.readCatalogDecl("jobs", regs))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        spec = "v1.0"
+        jobs = []
+        registryName = "test"
+        name = "jobs"
+        loc = "test://jobs"
+        cty = "application/json"
+      )
+    end)
+
+    test("when search in several registries and not found, nil must be returned", async proc()
+      # (1) act
+      const (
+        regs = simulator(
+          Registries
+          getItem = method([
+            {args = ["jobs.yaml", {registryName = undefined}], returns = nil}
+            {args = ["jobs.yml", {registryName = undefined}], returns = nil}
+            {args = ["jobs.json", {registryName = undefined}], returns = nil}
+          ])
+        )
+        out = await(reader.readCatalogDecl("jobs", regs))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+  end)
+
+  suite("extendCatalogDecl()", proc()
+    const (
+      merger = {}
+      reader = CatalogReader(merger=)
+    )
+
+    teardown(proc()
+      monitor.clearAll()
+    end)
+
+    test("when extends, readCatalogDecl() must call extendCatalogDecl()", async proc()
+      # (1) act
+      const (
+        rdr = monitor(
+          interceptor(
+            reader
+            extendCatalogDecl = method.invokes(fn(decl) = decl end)
+          )
+          
+          methods = ["extendCatalogDecl"]
+        )
+
+        item = Item(
+          registryName = "test"
+          name = "jobs.json"
+          cty = "text/json"
+          value = {
+            spec = "v1.0"
+            extends = ["base1", "base2"]
+            jobs = []
+          }
+        )
+        regs = simulator(Registries, getItem = method.returns(item))
+        out = await(rdr.readCatalogDecl("jobs.json", regs))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        spec = "v1.0"
+        extends = ["base1", "base2"]
+        jobs = []
+        registryName = "test"
+        name = "jobs.json"
+        loc = "test://jobs.json"
+        cty = "text/json"
+      )
+
+      expected(monitor.log(rdr).calls).equalTo(1)
+    end)
+
+    test("when base existing, merge must be performed", async proc()
+      # (1) act
+      const (
+        merger = simulator(merge = method.returns(merged = true))
+        reader = CatalogReader(merger=)
+
+        jobsItem = Item(
+          registryName = "test"
+          name = "jobs.json"
+          cty = "text/json"
+          value = {
+            spec = "v1.0"
+            extends = ["extended1"]
+            jobs = []
+          }
+        )
+
+        extended1Item = Item(
+          registryName = "test"
+          name = "extended1.json"
+          cty = "text/json"
+          value = {
+            spec = "v1.0"
+            jobs = []
+          }
+        )
+
+        getItem = method([
+          {args = ["jobs.json", {registryName = undefined}], returns = jobsItem}
+          {args = ["extended1.json", {registryName = "test"}], returns = extended1Item}
+          {default = true, returns = nil}
+        ])
+
+        regs = simulator(Registries, getItem=)
+        out = await(reader.readCatalogDecl("jobs", regs))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        merged = true
+      )
+    end)
+
+    test("when base not existing, error must be raised", async proc()
+      # (1) act
+      const (
+        jobsItem = Item(
+          registryName = "test"
+          name = "jobs.json"
+          cty = "text/json"
+          value = {
+            spec = "v1.0"
+            extends = ["unknown"]
+            jobs = []
+          }
+        )
+
+        getItem = method([
+          {args = ["jobs.json", {registryName = undefined}], returns = jobsItem}
+          {default = true, returns = nil}
+        ])
+
+        regs = simulator(Registries, getItem=)
+        out = pawait(reader.readCatalogDecl("jobs", regs))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(Error("Catalog to extend not found: unknown."))
+    end)
+  end)
+end)

@@ -1,0 +1,15 @@
+use (
+  ../SimpleOp
+)
+
+/**
+ * An action, that is, a function to run to perform
+ * the operation, activity or task.
+ */
+@abstract
+export struct Action: SimpleOp
+  /**
+   * Returns the function to run.
+   */
+  @abstract
+  pub fn getFn(): func

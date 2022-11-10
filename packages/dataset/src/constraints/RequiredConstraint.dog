@@ -1,0 +1,13 @@
+use (
+  Constraint
+  ConstraintError
+)
+
+/**
+ * A constraint to require a value different from nil.
+ */
+export struct RequiredConstraint: Constraint
+  @override
+  pub fn validateValue(value?: any) -> value
+    if value == nil then
+      throw(ConstraintError($"A value is required."))

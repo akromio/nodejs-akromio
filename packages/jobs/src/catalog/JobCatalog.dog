@@ -1,0 +1,8 @@
+use (
+  {Catalog} = alias://catalog
+)
+
+/**
+ * A catalog of jobs.
+ */
+export struct JobCatalog: Catalog

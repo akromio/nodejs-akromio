@@ -1,0 +1,48 @@
+use (
+  fs = dep://fs/promises
+  alias://expected
+  {simulator, method} = alias://doubles
+  {SkynetClient} = alias://skynet
+  {SkynetConnector} = ~
+)
+
+suite(__filename, proc()
+  const (
+    skylink = "0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"
+  )
+
+  fn createConnector(client, fs) = SkynetConnector(client=, skylink, fs)
+
+  suite("getItem()", proc()
+    test("when item unexists, nil must be returned", async proc()
+      # (1) act
+      const (
+        skynet = simulator(SkynetClient, downloadData = method.rejects())
+        conn = createConnector(skynet, fs)
+        out = await(conn.getItem("/jobs/catalogs/unknown"))
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when item exists, item must be returned", async proc()
+      # (1) act
+      const (
+        content = Buffer.from("spec: v1.0\njobs: []")
+        client = simulator(SkynetClient, downloadData = method.resolves(content))
+        conn = createConnector(client, fs)
+        itemPath = "/jobs/catalogs/empty.yaml"
+        out = await(conn.getItem(itemPath))
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = itemPath
+        cty = "text/yaml"
+      )
+
+      expected(out.value.toString()).toInclude("spec: v1.0")
+    end)
+  end)
+end)

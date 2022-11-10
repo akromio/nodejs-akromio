@@ -1,0 +1,67 @@
+use (
+  dep://lodash.get
+  Dataset
+)
+
+/**
+ * An object to evaluate text expressions with references to
+ * data associated to a dataset.
+ */
+export struct DatasetEval
+  /**
+   * Evaluates an [exp]ression with a given [ds], returning the result.
+   */
+  pub fn eval(exp?: any, ds: Dataset) -> value
+    with type(exp) do
+      if bool, num, nil, func then value = exp
+      if text then value = self.evalExp(exp, ds)
+      if list then value = self.evalList(exp, ds)
+      if map then value = self.evalMap(exp, ds)
+
+  /**
+   * Evaluates an [exp]ression with a given [ds], returning the result.
+   *
+   * When [exp] is $(*), the datasource's data object is returned.
+   * When [exp] is $(ref), the ref value is returned.
+   * When [exp] contains text and one or more refs, a text is returned with
+   * the refs replaced with their values.
+   */
+  @hidden @noParamCheck
+  pub fn evalExp(exp: text, ds: Dataset) -> value
+    const (
+      onlyVarPattern = re("^\\$\\(([^(]+)\\)$")
+      multiVarsPattern = re("\\$\\(([^(]+)\\)")
+    )
+
+    if exp == "$(*)" then
+      value = ds.reprMap
+    else if onlyVarPattern.test(exp) then
+      value = self.parseRef(onlyVarPattern.exec(exp)[1], ds)
+    else if multiVarsPattern.test(exp) then
+      value = exp
+
+      while match ::= multiVarsPattern.exec(value) do
+        const [_, ref] = match
+        value = value.replace("$(" + ref + ")", self.parseRef(ref, ds))
+    else
+      value = exp
+  
+  /**
+   * Parse a [ref], without $(), using the given [ds] to replace its data.
+   */
+  pub fn parseRef(ref: text, ds: Dataset) = get(ds.repr, ref)
+
+  /**
+   * Evaluates an [array] with a given [ds], evaluating every item.
+   */
+  pub fn evalList(array: list, ds: Dataset) -> value: list
+    for each i in array do
+      value.push(self.eval(i, ds))
+  
+  /**
+   * Evaluates an [object] with a given [ds], evaluating every value.
+   */
+  pub fn evalMap(object: map, ds: Dataset) -> value: map
+    for each k, v in object do
+      value[k] = self.eval(v, ds)
+  

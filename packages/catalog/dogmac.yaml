@@ -1,0 +1,12 @@
+uses:
+  core:
+    js: "@akromio/core"
+    
+  dataset:
+    js: "@akromio/dataset"
+  
+  doubles:
+    js: "@akromio/doubles"
+    
+  expected:
+    js: "@akromio/expected"

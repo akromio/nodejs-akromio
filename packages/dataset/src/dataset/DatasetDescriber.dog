@@ -1,0 +1,78 @@
+use (
+  Dataset
+  ../datum/{VarDatum, ConstDatum, DatumFn}
+  ../constraints/EnumConstraint
+)
+
+/**
+ * An object to get a representation of a dataset
+ * to its print in the console if needed.
+ *
+ * The map returned contains a field for each data.
+ * Every value is a map as follows: {kind, value, desc}.
+ */
+export struct DatasetDescriber
+  /**
+   * Returns an object with a basic representation
+   * of the data of a given dataset.
+   *
+   * @remarks
+   * If the datum has the 'password' tag, its value will be always *****.
+   */
+  pub fn describeData(dataset: Dataset, opts?: ListDataOpts) -> data: map
+    # (1) get the dataset to show
+    const datasets = []
+    if dataset.parent then datasets.push(dataset.parent)
+    datasets.push(dataset)
+
+    # (2) get the data reprs
+    for each ds in datasets do
+      for each key, datum in ds.data do
+        if tag ::= opts?tag; not tag or datum.hasTag(tag) then
+          if not datum.hasTag("hidden") then
+            var (
+              {name} ::= datum
+              kind, value, options
+            )
+
+            #!cov ignore else
+            with type(datum) do
+              if VarDatum then
+                kind = "var"
+                value = datum.getValue()
+
+              if ConstDatum then
+                kind = "const"
+                value = datum.getValue()
+
+              if DatumFn then
+                kind = "fn"
+                value = datum.getValue()
+            
+            if value != nil and not opts?showPasswordValues and datum.hasTag("password") then
+              value = "*****"
+
+            if constraint ::= datum.constraints.findConstraintByType(EnumConstraint) then
+              {options} = constraint
+
+            data[name] = {
+              kind
+              value
+              desc = datum.desc ?? ""
+              if options then options
+            }
+
+/**
+ * The list data options.
+ */
+intf ListDataOpts
+  /**
+   * If set, the password values will be returned;
+   * otherwise, ***** must be used.
+   */
+  showPasswordValues?: bool
+
+  /**
+   * If set, filter the data with that tag.
+   */
+  tag?: text

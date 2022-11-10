@@ -1,0 +1,182 @@
+use (
+  alias://expected
+  {Dataset, VarDatum, ConstDatum, DatumError} = ~
+)
+
+struct TestDataset: Dataset
+
+suite(__filename, proc()
+  suite("get datum", proc()
+    const (
+      v = VarDatum(name = "v", value = 123, tags = ["var"])
+      c = ConstDatum(name = "c", value = 321)
+      ds = TestDataset(name = "test").setDatum(c).setDatum(v)
+    )
+
+    suite("getData()", proc()
+      test("when no tag passed, all the data must be returned", proc()
+        # (1) act
+        const out = ds.getData()
+
+        # (2) assessment
+        expected(out).similarTo([v, c])
+      end)
+
+      test("when a tag passed, the data with that tag must be returned", proc()
+        # (1) act
+        const out = ds.getData(tag = "var")
+
+        # (2) assessment
+        expected(out).equalTo([v])
+      end)
+    end)
+
+    suite("getDatum()", proc()
+      test("when datum exists, this must be returned", proc()
+        # (1) act
+        const out = ds.getDatum("c")
+
+        # (2) assessment
+        expected(out).toBe(ConstDatum).sameAs(c)
+      end)
+
+      test("when datum unexists, nil must be returned", proc()
+        # (1) act
+        const out = ds.getDatum("unknown")
+
+        # (2) assessment
+        expected(out).toBeNil()
+      end)
+    end)
+
+    suite("getDatumValue()", proc()
+      test("when datum exists, its value must be returned", proc()
+        # (1) act
+        const out = ds.getDatumValue("c")
+
+        # (2) assessment
+        expected(out).notToBe(ConstDatum).equalTo(321)
+      end)
+
+      test("when datum unexists, nil must be returned", proc()
+        # (1) act
+        const out = ds.getDatumValue("unknown")
+
+        # (2) assessment
+        expected(out).toBeNil()
+      end)
+    end)
+  end)
+
+  suite("set datum", proc()
+    var c, v, ds
+
+    setup(proc()
+      v = VarDatum(name = "v", value = 123)
+      c = ConstDatum(name = "c", value = 321)
+      ds = TestDataset(name = "test").setDatum(c).setDatum(v)
+    end)
+      
+    suite("setDatum()", proc()
+      test("when a datum with the same name already exists, this must be replaced", proc()
+        # (1) act
+        const (
+          datum = VarDatum(name = "v", value = "ole!")
+          out = ds.setDatum(datum)
+        )
+
+        # (2) assessment
+        expected(out).sameAs(ds)
+        expected(out.data.v).sameAs(datum)
+      end)
+
+      test("when a datum with the same name already exists and const tag, error must be raised", proc()
+        # (1) act
+        const (
+          datum = VarDatum(name = "c", value = "ole!")
+          out = peval(ds.setDatum(datum))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .it(0).equalTo(false)\
+          .it(1).toBe(DatumError).like("Datum c is not updatable.")
+      end)
+
+      test("when datum unexists, this must be appended", proc()
+        # (1) act
+        const (
+          datum = VarDatum(name = "z", value = "ole!")
+          out = ds.setDatum(datum)
+        )
+
+        # (2) assessment
+        expected(out).sameAs(ds)
+        expected(out.data.c).sameAs(c)
+        expected(out.data.v).sameAs(v)
+        expected(out.data.z).sameAs(datum)
+      end)
+    end)
+
+    suite("setDatumValue()", proc()
+      test("when datum with the same name already exists, its value must be replaced", proc()
+        # (1) act
+        const out = ds.setDatumValue("v", "simple minds")
+
+        # (2) assessment
+        expected(out).sameAs(ds)
+        expected(out.data).toHaveLen(2)
+        expected(out.data.v).sameAs(v).member("value").equalTo("simple minds")
+      end)
+
+      test("when datum unexists, a var datum must be created", proc()
+        # (1) act
+        const out = ds.setDatumValue("z", "alive and kicking")
+
+        # (2) assessment
+        expected(out).sameAs(ds)
+        expected(out.data).toHaveLen(3)
+        expected(out.data.z).toBe(VarDatum).toHave(value = "alive and kicking")
+      end)
+    end)
+  end)
+
+  suite("removeDatum()", proc()
+    var c, v, ds
+
+    setup(proc()
+      v = VarDatum(name = "v", value = 123, tags = ["removable"])
+      c = ConstDatum(name = "c", value = 321)
+      ds = TestDataset(name = "test").setDatum(c).setDatum(v)
+    end)
+
+    test("when datum exists, this must be removed", proc()
+      # (1) act
+      const out = ds.removeDatum("v")
+
+      # (2) assessment
+      expected(out).sameAs(ds)
+      expected(out.data).toHaveLen(1)
+      expected(out.data.c).sameAs(c)
+    end)
+
+    test("when datum exists w/o remoable tag, error must be raised", proc()
+      # (1) act
+      const out = peval(ds.removeDatum("c"))
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(DatumError).like("Datum c is not removable.")
+    end)
+
+    test("when datum unexists, nothing must be updated", proc()
+      # (1) act
+      const out = ds.removeDatum("unknown")
+
+      # (2) assessment
+      expected(out).sameAs(ds)
+      expected(out.data).toHaveLen(2)
+    end)
+  end)
+end)

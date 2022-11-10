@@ -1,0 +1,36 @@
+use (
+  {Call, DynamicLoop} = alias://core
+  ../CatalogSteppedOp
+)
+
+/**
+ * A loop saved into a jobs catalog.
+ *
+ * Its steps can do reference to other catalog operations by their names.
+ */
+export struct CatalogLoop: DynamicLoop:: CatalogSteppedOp
+  /**
+   * The initializer steps.
+   */
+  pub const initializers := []
+
+  @override @hidden
+  pub fn getInitializerSteps(call: Call) = self.buildSteps(self.initializers, call)
+
+  /**
+   * The finalizer steps.
+   */
+  pub const finalizers := []
+  
+  @override @hidden
+  pub fn getFinalizerSteps(call: Call) = self.buildSteps(self.finalizers, call)
+
+  /**
+   * The collection to iterate.
+   * It must be a declaration of a simple operation.
+   */
+  @hidden
+  pub const forEach: (list | text)
+
+  @override @noParamCheck
+  pub fn getCollection(call: call) = self.buildStep(self.forEach, call, "i")

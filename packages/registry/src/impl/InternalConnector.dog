@@ -1,0 +1,48 @@
+use (
+  dep://path
+)
+
+/**
+ * A base for the internal connectors.
+ */
+@abstract
+export struct InternalConnect
+  /**
+   * Connects to the file system.
+   */
+  @async
+  pub fn connect() -> self
+  
+  /**
+   * Disconnects from the file system.
+   */
+  @async
+  pub fn disconnect() -> self
+
+  /**
+   * Builds the location for an item path.
+   *
+   * When this is relative, the path is prefixed with the defaultDir.
+   */
+  @hidden
+  pub fn buildItemPath(itemPath: text) -> itemPath
+    if not itemPath.startsWith("/") then
+      throw(Error($"Path must be absolute and start with slash (/). Got: ${itemPath}."))
+  
+  /**
+   * Gets and returns an item by its name.
+   * If the item unexists, nil returned.
+   */
+  @async
+  pub fn getItem(...name: text) = self._getItem(
+    self.buildItemPath(path.join(...name))
+  )
+
+  /**
+   * Requests an item to the connector.
+   *
+   * @dev
+   * This method is only called from the real getItem() method.
+   */
+  @abstract @hidden
+  pub async fn _getItem(itemPath: text): map

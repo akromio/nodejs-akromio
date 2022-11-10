@@ -1,0 +1,50 @@
+use (
+  dep://axios
+  alias://mime
+  ../InternalConnector
+)
+
+/**
+ * A registry connector to download files from
+ * a Git repository.
+ */
+@impl(Connector)
+export struct GitConnector: InternalConnector
+  /**
+   * The HTTP client to use, compatible with Axios.
+   */
+  pub const client = axios
+
+  /**
+   * The host.
+   */
+  pub const host := "raw.githubusercontent.com"
+
+  /**
+   * The user account name where the repository is.
+   */
+  pub const user: text
+
+  /**
+   * The repository name.
+   */
+  pub const repo: text
+
+  /**
+   * The branch name.
+   */
+  pub const branch := "master"
+
+  @override
+  pub async fn _getItem(itemPath: text) -> item
+    const (
+      axios = self.client
+      url = $"https://${self.host}/${self.user}/${self.repo}/${self.branch}/${itemPath}"
+    )
+    
+    if [ok, resp] ::= pawait(axios.get(url)); ok and resp.status == 200 then
+      item = {
+        name = itemPath
+        value = resp.data
+        cty = mime.lookup(itemPath) or resp.headers["content-type"]
+      }

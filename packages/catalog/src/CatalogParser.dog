@@ -1,0 +1,148 @@
+use (
+  {DatasetParser, Dataset} = alias://dataset
+  {Plugin, Plugins, PluginParser, PluginLoader} = alias://core
+  {Ops} = alias://core
+)
+
+/**
+ * The dataset parser to use.
+ */
+const datasetParser = DatasetParser()
+
+/**
+ * A parser of catalogs.
+ */
+@abstract
+export struct CatalogParser
+  /**
+   * The job parser to use.
+   */
+  @abstract
+  pub const jobParser: JobParser
+
+  /**
+   * The plugin loader to use.
+   */
+  pub const pluginLoader: PluginLoader
+
+  /**
+   * The plugin parser to use.
+   */
+  pub const pluginParser: PluginParser
+
+  /**
+   * Creates a catalog with the data passed.
+   */
+  @abstract
+  pub fn createCatalog(decl: map): Catalog
+
+  /**
+   * Parses a catalog declaration and returns a catalog object
+   * if everything is alright. Otherwise, it raises an error.
+   */
+  pub async fn parse(decl: map, opts: ParseOpts) -> catalog: Catalog
+    # (1) parse base components
+    const (
+      dataset = self.parseDataset(decl.dataset ?? [], opts{*, name = decl.name})
+      triggers = self.parseTriggers(decl.triggers ?? [], dataset)
+    )
+
+    # (2) parse plugins
+    const (
+      {ops} = opts
+      pluginsDecl = dataset.eval(decl.plugins ?? [])
+      plugins = await(self.parsePlugins(pluginsDecl))
+    )
+
+    for each pi: Plugin in plugins.plugins do
+      ops.appendPlugin(pi)
+
+    # (3) parse jobs
+    const jobs = self.parseJobs(decl.jobs, opts)
+
+    # (4) build catalog
+    catalog = self.createCatalog(decl{
+      *
+      dataset
+      plugins
+      jobs
+      triggers
+    })
+
+   /**
+   * Parses the dataset declarations,
+   * returning its corresponding dataset
+   * with the data already evaluated.
+   */
+  @hidden
+  pub fn parseDataset(decl: map[], opts: map) = datasetParser.parse(
+    decl
+    name = opts.name
+    parent = opts.parentDataset
+  )
+
+  /**
+   * Parses the plugin declarations,
+   * returning the instances for these declarations.
+   */
+  @hidden
+  pub async fn parsePlugins(decl: map[]) -> plugins: Plugins
+    const (
+      loader = self.pluginLoader
+      parser = self.pluginParser
+    )
+
+    plugins = Plugins()
+
+    for each def in decl do
+      if "preset" in def then
+        #get preset declaration
+        const psDecl = loader.loadPreset(def.preset)
+
+        #create plugin instances from preset
+        for each plugin: Plugin in await(parser.parsePreset(psDecl)) do
+          plugins.appendPlugin(plugin)
+      else if "plugin" in def then
+        #get plugin declaration
+        const piDecl = loader.loadPlugin(def.impl)
+
+        #create new plugin instance
+        const name = def.name ?? def.plugin
+        plugins.appendPlugin(await(parser.parsePlugin(piDecl{*, plugin = name}, def.ini)))
+      else
+        throw(TypeError($"Unknown plugin declaration: ${fmt(def)}."))
+  
+  /**
+   * Parses the trigger declarations,
+   * returning a map with these declarations
+   * with the data already evaluated.
+   */
+  @hidden
+  pub fn parseTriggers(decl: map[], ds: Dataset) -> triggers: map
+    for each trgDecl in ds.eval(decl) do
+      triggers[trgDecl.trigger] = trgDecl
+  
+  /**
+   * Parses the job declarations,
+   * returning a list with the job instances.
+   */
+  @hidden
+  pub fn parseJobs(decl: map[], opts: ParseOpts) = self.jobParser.parseJobs(
+    decl
+    opts
+  )
+
+/**
+ * The parse options.
+ */
+intf ParseOpts
+  /**
+   * The dataset parent.
+   */
+  parentDataset: Dataset
+
+  /**
+   * The ops registry to use with the cataloged ops such as, for example,
+   * the macros.
+   */
+  ops: Ops

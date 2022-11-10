@@ -1,0 +1,43 @@
+/**
+ * A result to an operation run.
+ */
+export struct Result
+  /**
+   * The call identifier.
+   */
+  pub const callId: text
+
+  /**
+   * The title to use with the call.
+   */
+  pub const title: text
+
+  /**
+   * The duration in milliseconds.
+   */
+  pub const duration: num
+
+  /**
+   * The kind of result.
+   */
+  pub const kind: ("ok" | "failed")
+
+  /**
+   * The value returned or raised.
+   */
+  pub const value?
+
+  /**
+   * The returned value when ok.
+   */
+  pub fn returned = self.value
+
+  /**
+   * The raised value when failed.
+   */
+  pub fn raised = self.value
+
+  /**
+   * What to do on error.
+   */
+  pub const onError: ("carryOn" | "finish")

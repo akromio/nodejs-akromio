@@ -1,0 +1,21 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(pkg).members(
+      "FsConnector"
+      "GitConnector"
+      "HttpConnector"
+      "Item"
+      "Registry"
+      "RegistryBuilder"
+      "RegistryState"
+      "RegistryStringParser"
+      "Registries"
+      "SkynetConnector"
+    ).toBeCallable()
+  end)
+end)

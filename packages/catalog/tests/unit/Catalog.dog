@@ -1,0 +1,67 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {Plugins} = alias://core
+  {Catalog as CatalogBase} = ~
+)
+
+struct Catalog: CatalogBase
+
+suite(__filename, proc()
+  const (
+    globalDataset = GlobalDataset(name = "global")
+  )
+
+  suite("constructor", proc()
+    test("when called, initialization must be performed", proc()
+      # (1) act
+      const (
+        plugins = Plugins()
+        out = Catalog(
+          spec = "v1.0"
+          loc = "file:///my/catalog.yaml"
+          cty = "text/yaml"
+          desc = "A test catalog."
+          dataset = globalDataset
+          plugins
+        )
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        spec = "v1.0"
+        loc = "file:///my/catalog.yaml"
+        cty = "text/yaml"
+        desc = "A test catalog."
+        dataset = globalDataset
+        plugins
+      )
+    end)
+  end)
+
+  suite("finalize()", proc()
+    teardown(proc()
+      monitor.clearAll()
+    end)
+
+    test("when called, plugins.finalize() must be called", async proc()
+      # (1) act
+      const (
+        plugins = monitor(Plugins(), methods = ["finalize"])
+        catalog = Catalog(
+          spec = "v1.0"
+          loc = "file:///my/catalog.yaml"
+          cty = "text/yaml"
+          desc = "A test catalog."
+          dataset = globalDataset
+          plugins
+        )
+        out = await(catalog.finalize())
+      )
+
+      # (2) assessment
+      expected(monitor.log(plugins).calls).equalTo(1)
+    end)
+  end)
+end)

@@ -1,0 +1,26 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, the exported items must be accessible", proc()
+    expected(pkg)\
+      .toHave("Datum")\
+      .members(
+        "Dataset"
+        "GlobalDataset"
+        "LocalDataset"
+        "DatasetParser"
+        "DatasetDescriber"
+        "ConstDatum"
+        "VarDatum"
+        "DatumFn"
+        "DatumError"
+        "Constraints"
+        "ConstraintError"
+        "DataTypeConstraint"
+        "RequiredConstraint"
+      ).toBeCallable()
+  end)
+end)

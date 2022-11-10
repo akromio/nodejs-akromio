@@ -1,0 +1,28 @@
+use (
+  alias://expected
+  {EnumConstraint, ConstraintError} = ~
+)
+
+suite(__filename, proc()
+  suite("validateValue()", proc()
+    const constraint = EnumConstraint(options = ["one", "two", "three"])
+
+    test("when valid value, value must be returned", proc()
+      # (1) act
+      const out = constraint.validateValue("two")
+
+      # (2) assessment
+      expected(out).equalTo("two")
+    end)
+
+    test("when invlaid value, error must be raised", proc()
+      # (1) act
+      const out = peval(constraint.validateValue("four"))
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(ConstraintError).like("Invalid value. Got: four. Expected: one,two,three.")
+    end)
+  end)
+end)

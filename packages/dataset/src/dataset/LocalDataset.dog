@@ -1,0 +1,29 @@
+use (
+  Dataset
+  ../datum/{Datum, ConstDatum}
+)
+
+/**
+ * A dataset with local data.
+ * This can have a parent dataset, being global or local as needed.
+ *
+ * A local dataset can have its own data and inherits from its parent.
+ * On the other hand, a "local" datum is created for the local data.
+ */
+export struct LocalDataset: Dataset
+  /**
+   * The parent dataset.
+   */
+  pub const parent: Dataset
+
+  /**
+   * Sets a datum in its own data.
+   */
+  @hidden
+  pub fn setLocalDatum(datum: Datum) -> self
+    self.data[datum.name] = datum
+
+  @override
+  pub fn getDatum(name: text) -> datum
+    if not (datum = super.getDatum(name)) then
+      datum = self.parent.getDatum(name)

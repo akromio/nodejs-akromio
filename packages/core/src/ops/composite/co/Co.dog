@@ -1,0 +1,11 @@
+use (
+  ../CompositeOp
+)
+
+/**
+ * An operation to run several operations concurrently.
+ * The operation is considered finished, when all of them
+ * have been finished.
+ */
+@abstract
+export struct Co: CompositeOp

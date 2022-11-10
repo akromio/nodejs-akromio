@@ -1,0 +1,4 @@
+/**
+ * An error due to thing on a constraint.
+ */
+export Error

@@ -1,0 +1,60 @@
+use (
+  alias://mime
+  dep://path
+  {SkynetClient, uriSkynetPrefix} = alias://skynet
+  InternalConnector
+)
+
+/**
+ * An internal connector to Skynet.
+ */
+@abstract
+export struct InternalSkynetConnector: InternalConnector
+  /**
+   * The Skynet client to use.
+   */
+  pub const client: SkynetClient
+
+  /**
+   * The skylink associated to this connector.
+   */
+  @abstract
+  pub const skylink: text
+
+  /**
+   * @dev
+   * When skylink returned by substruct contains Skynet prefix,
+   * this must be removed or the request will return an error.
+   */
+  @override
+  pub async fn _getItem(itemPath: text) -> item
+    const (
+      skynetPrefix = uriSkynetPrefix[0, uriSkynetPrefix.indexOf("/")]
+      skynetPrefixPattern = re("^" + skynetPrefix)
+      skylink = path.join(self.skylink, itemPath).replace(skynetPrefixPattern, "")
+      skynet = self.client
+    )
+
+    if [ok, aux] ::= pawait(skynet.downloadData(skylink)); ok then
+      item = {
+        name = itemPath
+        cty = mime.lookup(itemPath) or "application/octet-stream"
+        value = aux
+      }
+
+  /**
+   * List the items in a path.
+   */
+  pub async fn listItems(dirPath: text) -> items: list
+    # (1) get metadata
+    const (
+      skynet = self.client
+      {metadata} = await(skynet.getMetadata(self.skylink))
+    )
+
+    # (2) select items
+    const dirRelativePath = dirPath[1, -1]
+
+    for each entry := values(metadata.subfiles) do
+      if ep ::= entry.filename.replace(dirRelativePath, ""); not ep.includes("/") then
+        items.push(ep)

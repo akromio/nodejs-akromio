@@ -1,0 +1,38 @@
+/**
+ * A component to describe a job, for example,
+ * to show some info on the command line.
+ */
+export struct JobDescriber
+  /**
+   * Returns a description object of a job.
+   */
+  pub fn describeJob(job: map) -> descObj: map
+    # (1) get components
+    var (
+      {name, desc} ::= job
+      tags ::= copy(job.tags)
+      opType
+    )
+
+    #!cov ignore else
+    with type(job) do
+      if "Macro" then opType = "macro"
+      if "Loop" then opType = "loop"
+      if "Co" then opType = "co"
+      if "Script" then opType = "script" 
+
+    # (2) set object to return
+    descObj = {
+      name
+      opType
+      tags
+      desc
+    }
+  
+  /**
+   * Returns an object with the description objects.
+   */
+  pub fn describe(jobs: list) -> descs: map
+    for each job in jobs do
+      const desc = self.describeJob(job)
+      descs[desc.name] = desc

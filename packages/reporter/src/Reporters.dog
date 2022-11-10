@@ -1,0 +1,29 @@
+/**
+ * A group of reporters managed together.
+ */
+export struct Reporters
+  /**
+   * The reporters.
+   */
+  @strict
+  pub const reporters = []
+
+  /**
+   * Appends a reporter to this collection.
+   */
+  pub fn append(reporter) -> self
+    self.reporters.push(reporter)
+
+  /**
+   * Performs a connection call to all the reporters.
+   */
+  pub fn connect() -> self
+    for each reporter in self.reporters do
+      peval(reporter.start())
+  
+  /**
+   * Performs a disconnection call to all the reporters.
+   */
+  pub fn disconnect() -> self
+    for each reporter in self.reporters do
+      peval(reporter.stop())

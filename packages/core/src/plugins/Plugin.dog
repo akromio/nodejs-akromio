@@ -1,0 +1,57 @@
+use (
+  ../ops/{Activity, Ops}
+  ../ops/simple/SimpleOp
+)
+
+/**
+ * A collection of simple operations.
+ */
+export struct Plugin: Activity
+  /**
+   * The default operation name for when called without operation.
+   */
+  pub const defaultOpName?: text
+
+  /**
+   * Checks whether the plugin has default job.
+   */
+  pub fn hasDefaultOp() = bool(self.defaultOpName)
+
+  /**
+   * The operations.
+   */
+  @hidden
+  pub const ops: Ops = Ops()
+
+  /**
+   * Appends an operation.
+   */
+  pub fn appendOp(op: SimpleOp) -> self
+    self.ops.appendOp(op)
+    op.parentPlugin = self
+
+  /**
+   * The state shared by all its operations.
+   *
+   * When an operation is called, this state is passed
+   * into the context.
+   */
+  @hidden
+  pub const state?
+
+  /**
+   * The function to run when the plugin must be finished.
+   * This function can be sync or async.
+   *
+   * @remarks
+   * This function can be used to close sockets or connections.
+   */
+  pub const finalizer?: func
+
+  /**
+   * Performs the finilizer tasks when the plugin
+   * will not be used anymore.
+   */
+  pub async proc finalize()
+    if self.finalizer then
+      await(self.finalizer(self.state))

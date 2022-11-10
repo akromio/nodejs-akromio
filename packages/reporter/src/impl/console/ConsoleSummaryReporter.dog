@@ -1,0 +1,24 @@
+use (
+  dep://lodash.merge
+  config
+  ../../SummaryReporter
+)
+
+/**
+ * A reporter to notify a summary using the console.
+ */
+export struct ConsoleSummaryReporter: SummaryReporter
+  /**
+   * The reporter configuration to use.
+   */
+  @strict
+  pub const config = merge(config, _.config)
+
+  @override @hidden
+  pub proc _handleEnd()
+    const {config} = self
+
+    print()
+    print("Summary:")
+    print(" -", config.ok.color("ok"), self.ok)
+    print(" -", config.failed.color("failed"), self.failed)

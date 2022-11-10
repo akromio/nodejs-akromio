@@ -1,0 +1,257 @@
+use (
+  alias://expected
+  {RegistryStringParser} = ~
+)
+
+suite(__filename, proc()
+  const (
+    parser = RegistryStringParser()
+    skylink = "0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"
+    skyportal = "siasky.net"
+    defaults = {
+      git =
+        user = "akromio"
+        repo = "docker"
+        branch = "master"
+      http =
+        host = "skynet.apm.akromio.com"
+        base = "/"
+      skynet =
+        portal = skyportal
+    }
+  )
+
+  suite("parse()", proc()
+    suite("fs", proc()
+      test("when name=fs://absoluteBasePath, {name, impl, basePath} must be returned", proc()
+        # (1) act
+        const out = parser.parse("test=fs:///my/dir", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "test"
+          'impl' = "fs"
+          basePath = "/my/dir"
+        )
+      end)
+
+      test("when fs://absoluteBasePath, {name = fs, impl, basePath} must be returned", proc()
+        # (1) act
+        const out = parser.parse("fs:///my/dir", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "fs"
+          'impl' = "fs"
+          basePath = "/my/dir"
+        )
+      end)
+
+      test("when name=fs://relativeBasePath, error must be raised", proc()
+        # (1) act
+        const out = peval(parser.parse("test=fs://my/dir", defaults))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).equalTo(false)\
+          .it(1).equalTo(TypeError("FS registry expecting an absolute base path: my/dir."))
+      end)
+    end)
+
+    suite("git", proc()
+      test("when name=git://repo, default user and branch must be used", proc()
+        # (1) act
+        const out = parser.parse("test=git://mydocker", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "test"
+          'impl' = "git"
+          user = defaults.git.user
+          repo = "mydocker"
+          branch = defaults.git.branch
+        )
+      end)
+
+      test("when name=git://user/repo, default branch must be used", proc()
+        # (1) act
+        const out = parser.parse("test=git://myuser/mydocker", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "test"
+          'impl' = "git"
+          user = "myuser"
+          repo = "mydocker"
+          branch = defaults.git.branch
+        )
+      end)
+
+      test("when name=git://user/repo/mybranch, no default must be used", proc()
+        # (1) act
+        const out = parser.parse("test=git://myuser/mydocker/mybranch", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "test"
+          'impl' = "git"
+          user = "myuser"
+          repo = "mydocker"
+          branch = "mybranch"
+        )
+      end)
+
+      test("when invalid configuration, error raised", proc()
+        # (1) act
+        const (
+          conf = "user/repo/branch/anythingElse"
+          out = peval(parser.parse($"test=git://${conf}", defaults))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .it(0).equalTo(false)\
+          .it(1).equalTo(TypeError($"Invalid git configuration: ${conf}."))
+      end)
+    end)
+
+    suite("http", proc()
+      test("when http://, defaults must be used", proc()
+        # (1) act
+        const out = parser.parse("test=http://", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "test"
+          'impl' = "http"
+          host = defaults.http.host
+          base = defaults.http.base
+        )
+      end)
+
+      test("when http://host, default base and branch must be used", proc()
+        # (1) act
+        const out = parser.parse("http://my.domain.com", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "http"
+          'impl' = "http"
+          host = "my.domain.com"
+          base = defaults.http.base
+        )
+      end)
+
+      test("when http://host/base, no default must be used", proc()
+        # (1) act
+        const out = parser.parse("http://my.domain.com/mybase", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "http"
+          'impl' = "http"
+          host = "my.domain.com"
+          base = "/mybase"
+        )
+      end)
+    end)
+
+    suite("skynet", proc()
+      test("when skynet://skylink, default portal must be used", proc()
+        # (1) act
+        const (
+          out = parser.parse($"sky=skynet://${skylink}", defaults)
+        )
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "sky"
+          'impl' = "skynet"
+          portal = defaults.skynet.portal
+          skylink
+        )
+      end)
+
+      test("when skynet://portal/skylink, no default must be used", proc()
+        # (1) act
+        const (
+          out = parser.parse($"skynet://${skyportal}/${skylink}", defaults)
+        )
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "skynet"
+          'impl' = "skynet"
+          portal = skyportal
+          skylink
+        )
+      end)
+
+      test("when skynet://, defaults must be used", proc()
+        # (1) act
+        const (
+          out = parser.parse($"skynet://", defaults)
+        )
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "skynet"
+          'impl' = "skynet"
+          portal = defaults.skynet.portal
+          skylink = defaults.skynet.skylink
+        )
+      end)
+
+      test("when conf string is invalid, error must be raised", proc()
+        # (1) act
+        const (
+          out = peval(parser.parse($"sky=skynet://${skyportal}/${skylink}/additional", defaults))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .it(0).equalTo(false)\
+          .it(1).toBe(TypeError).like("Invalid skynet configuration")
+      end)
+    end)
+
+    suite("misc", proc()
+      test("when name not indicated, protocol used", proc()
+        # (1) act
+        const out = parser.parse("git://userName/repoName/branchName", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "git"
+          'impl' = "git"
+          user = "userName"
+          repo = "repoName"
+          branch = "branchName"
+        )
+      end)
+
+      test("when invalid registry string, error must be raised", proc()
+        # (1) act
+        const (
+          rs = $"skynet=skinet=${skyportal}/${skylink}"
+          out = peval(parser.parse(rs, defaults))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .it(0).equalTo(false)\
+          .it(1).equalTo(TypeError($"Invalid registry string: ${rs}."))
+      end)
+
+      test("when impl not known, error must be raised", proc()
+        # (1) act
+        const out = peval(parser.parse("test=GIT://user/repo", defaults))
+
+        # (2) assessment
+        expected(out)\
+          .it(0).equalTo(false)\
+          .it(1).equalTo(TypeError("Unknown registry implementation: GIT."))
+      end)
+    end)
+  end)
+end)

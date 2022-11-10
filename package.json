@@ -1,0 +1,37 @@
+{
+  "name": "monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "engine": {
+    "node": ">= 18",
+    "npm": ">= 8"
+  },
+  "devDependencies": {
+    "@akromio/doubles": "^0.4.0",
+    "@akromio/expected": "^0.4.3",
+    "@akromio/expected-fs": "^0.4.3",
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.20.2",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/preset-env": "^7.20.2",
+    "@dogmalang/core": "^1.0.0-rc18.0",
+    "c8": "^7.12.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "lerna": "^6.0.3",
+    "mocha": "^10.1.0",
+    "prettier": "^2.7.1"
+  },
+  "scripts": {
+    "clean": "npm run env -ws -- rm -rf node_modules/",
+    "bootstrap": "npm run clean && npm i -ws",
+    "build": "npm run -ws build",
+    "test": "npm run -ws test",
+    "test/itg": "npm run -ws --if-present test/itg",
+    "tests": "npm t; npm run test/itg",
+    "cov": "npm run -ws cov"
+  }
+}

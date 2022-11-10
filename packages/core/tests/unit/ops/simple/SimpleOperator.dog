@@ -1,0 +1,47 @@
+use (
+  alias://expected
+  {monitor, simulator} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {ActionOperator, StaticAction, Call} = ~
+)
+
+suite(__filename, proc()
+  const (
+    dataset = GlobalDataset(name = "local")
+    log = simulator.stream.duplex()
+  )
+
+  suite("perform()", proc()
+    teardown(proc()
+      monitor.clearAll()
+    end)
+
+    test("when ctx.log used, emitOpLog must be called", async proc()
+      # (1) act
+      const (
+        operator = monitor(ActionOperator(), methods = ["emitOpLog"])
+        fun = proc(ctx => {log}) log("hello!") end
+        op = StaticAction(name = "test", operator, fun)
+        out = await(op.runWith(undefined, dataset=, log))
+      )
+
+      # (2) assessment
+      const emitOpLog = monitor.log(operator)
+      expected(emitOpLog.calls).equalTo(1)
+      expected(emitOpLog.entry.args).it(0).toBe(Call).it(1).equalTo("hello!")
+    end)
+
+    test("when resultLog, emitOpLog must be called", async proc()
+      # (1) act
+      const (
+        operator = monitor(ActionOperator(), methods = ["emitOpLog"])
+        fun = nop
+        op = StaticAction(name = "test", operator, fun)
+        out = await(op.runWith(undefined, dataset=, log, resultLog = true))
+      )
+
+      # (2) assessment
+      expected(monitor.log(operator).calls).equalTo(1)
+    end)
+  end)
+end)

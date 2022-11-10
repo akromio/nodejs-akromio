@@ -1,0 +1,36 @@
+use (
+  alias://mime
+  fs = dep://fs/promises
+  dep://path
+  ../InternalConnector
+)
+
+/**
+ * A filesystem connector.
+ */
+@impl(Connector)
+export struct FsConnector: InternalConnector
+  /**
+   * The base path to connect.
+   */
+  pub const basePath: text
+
+  @override
+  pub async fn _getItem(itemPath: text) -> item
+    const loc = path.join(self.basePath, itemPath)
+    
+    if [ok, content] ::= pawait(fs.readFile(loc, "utf8")); ok then
+      item = {
+        name = itemPath
+        value = content
+        cty = mime.lookup(itemPath) or "text/plain"
+      }
+
+  /**
+   * Returns the items available in a path.
+   */
+  pub async fn listItems(dirPath: text) -> items: list
+    const loc = path.join(self.basePath, dirPath)
+
+    if [ok, entries] ::= pawait(fs.readdir(loc)); ok then
+      items = entries

@@ -1,0 +1,51 @@
+use (
+  ../Op
+)
+
+/**
+ * A macro step declaration.
+ */
+export intf Step
+  /**
+   * The title to use when the step run.
+   */
+  title?: text
+
+  /**
+   * The operation to run in this step.
+   */
+  op: Op
+
+  /**
+   * The arguments to pass to the operation when called.
+   */
+  args?: any
+
+  /**
+   * The variable name to create into the dataset
+   * with the result of the operation.
+   *
+   * If it unset, last is used.
+   */
+  resultVarName?: text
+
+  /**
+   * Indicates if the result must be logged.
+   */
+  resultLog?: bool
+
+  /**
+   * What to do on error.
+   */
+  onError: ("carryOn" | "finish")
+
+  /**
+   * Run siently?
+   */
+  quiet?: bool
+
+  /**
+   * Condition expression to run the step.
+   * Only if its value is true, the step must be run.
+   */
+  condition?: text

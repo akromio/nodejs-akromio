@@ -1,0 +1,32 @@
+use (
+  alias://expected
+  {QuestionDescriber} = ~
+)
+
+suite(__filename, proc()
+  const desc = QuestionDescriber()
+
+  suite("describe()", proc()
+    test("when ok, a map with the questions must be returned", proc()
+      # (1) act
+      const (
+        questions = [
+          {input = "i", title = "The input", defaultValue = "123"}
+          {confirm = "c", title = "The confirm", defaultValue = false}
+          {select = "s", title = "The select", options = [1, 2, 3]}
+          {select = "sm", multiple = true, title = "The select", options = [1, 2, 3], selected = 2}
+        ]
+
+        out = desc.describe(questions)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        i = {type = "input", title = "The input", defaultValue = "123"}
+        c = {type = "confirm", title = "The confirm", defaultValue = false}
+        s = {type = "select", title = "The select", options = [1, 2, 3], defaultValue = undefined}
+        sm = {type = "select[]", title = "The select", options = [1, 2, 3], defaultValue = 2}
+      )
+    end)
+  end)
+end)

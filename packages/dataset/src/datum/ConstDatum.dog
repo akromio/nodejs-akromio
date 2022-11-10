@@ -1,0 +1,11 @@
+use (
+  DatumContainer
+)
+
+/**
+ * A container with a constant datum.
+ */
+export struct ConstDatum: DatumContainer
+  @post
+  pvt proc post()
+    self.tags.push("const")

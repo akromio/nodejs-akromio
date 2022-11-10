@@ -1,0 +1,90 @@
+use (
+  alias://mime
+  dep://os
+  dep://path
+  dep://node-stream-zip
+  alias://fsx
+  fs = dep://fs/promises
+  {fromFile as determineFileType} = alias://fileType
+  ../InternalSkynetConnector
+)
+
+/**
+ * A registry connector to download files from
+ * a Skynet network
+ */
+@impl(Connector)
+export struct SkynetConnector: InternalSkynetConnector
+  /**
+   * The directory id to work as registry.
+   */
+  @override
+  pub const skylink: text
+
+  /**
+   * The fs lib to use, compatible with fs/promises.
+   */
+  pub const fs = fs
+
+  /**
+   * Downloads and saves an [itemPath] in a given [localPath].
+   *
+   * If the local path exists, this will be removed before downloading.
+   *
+   * @dev
+   * Remember that the Skynet client downloads the dirs in a zip.
+   * So that this method must unzip it if indicated in the options.
+   */
+  pub async fn downloadItem(
+    itemPath: text
+    localPath: text
+    opts?:> {unzip?: bool, overwrite?: bool}
+  ) -> downloaded: bool
+    # (1) pre
+    if pawait(fs.access(localPath))[0] then
+      if not overwrite then
+        throw(Error($"The local path already exists: ${localPath}."))
+        
+      await(fsx.remove(localPath))
+
+    await(fsx.ensureDir(path.dirname(localPath)))
+
+    # (2) download file
+    const (
+      skynet = self.client
+      skylink = path.join(self.skylink, itemPath)
+    )
+
+    if [downloaded] = pawait(skynet.downloadFile(localPath, skylink)); downloaded and unzip then
+      if await(determineFileType(localPath))?mime == "application/zip" then
+        await(unzipFile(localPath, itemPath))
+
+/**
+ * Unzips a local file as file.
+ *
+ * @dev
+ * The following is performed:
+ *
+ * 1. The zipped file is renamed.
+ * 2. The file is unzipped in its original path.
+ * 3. The renamed file is removed.
+ *
+ * @dev
+ * We have to remember that the zip saved
+ * by the Skynet client contains the content into a dir path.
+ * For example, if the dir itemPath is /my/dir/path/,
+ * the zip root is / and we have to extract from /my/dir/path.
+ * Om the other hand, we have to extract the item and do it from
+ * a relative path, due to the zip tool.
+ */
+async proc unzipFile(localPath: text, pathToExtract: text)
+  # (1) rename file
+  const zippedFilePath = localPath + ".zip"
+  await(fs.rename(localPath, zippedFilePath))
+
+  # (2) extract
+  const unzip = native("new zip.async({file: zippedFilePath})")
+
+  await(fsx.ensureDir(localPath))
+  await(unzip.extract(pathToExtract[1, -1], localPath))
+  pawait(fsx.remove(zippedFilePath))

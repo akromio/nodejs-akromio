@@ -1,0 +1,51 @@
+use (
+  Constraint
+  ConstraintError
+)
+
+/**
+ * A constraint to set the data type for a value.
+ *
+ * For some types, the value can be changed to the data type set.
+ */
+export struct DataTypeConstraint: Constraint
+  /**
+   * The data type.
+   */
+  pub const dataType: ("any" | "bool" | "list" | "map" | "num" | "text")
+
+  @override
+  pub fn validateValue(value?: any) -> value
+    # (1) check value
+    var error
+
+    with self.dataType do
+      if "any" then
+        if value == nil then
+          error = "Any value expected"
+
+      if "bool" then
+        if [true, "t", "true", "y", "yes"].includes(value) then
+          value = true
+        else if [false, "f", "false", "n", "no"].includes(value) then
+          value = false
+        else
+          error = "Boolean expected"
+      
+      if "list" then
+        if value is not list then
+          error = "List expected"
+      
+      if "num" then
+        with type(value) do
+          if num then nop
+          if text then value = expect(num(value), num)
+          else error = "Number expected"
+      
+      if "text" then
+        if value is not text then
+          error = "Text expected"
+      
+    # (2) raise error if needed
+    if error then
+      throw(ConstraintError($"${error}. Got: ${typename(value)}."))

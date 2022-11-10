@@ -1,0 +1,66 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+  {PluginParser, Plugin, Action} = ~
+)
+
+suite(__filename, proc()
+  const parser = PluginParser()
+
+  suite("parsePlugin()", proc()
+    teardown(proc()
+      monitor.clearAll()
+    end)
+
+    test("when declaration is ok, a plugin instance must be returned", async proc()
+      # (1) act
+      const (
+        decl = {
+          plugin = "test"
+          defaultOpName = "two"
+          ops =
+            one = {fun = nop}
+            two = {fun = nop}
+        }
+
+        out = await(parser.parsePlugin(decl))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Plugin).toHave(
+        name = "test"
+        defaultOpName = "two"
+        tags = []
+      )
+
+      expected(out.ops.ops).members("one", "two").toBe(Action)
+    end)
+
+    test("when declaration.ini exists, the plugin instance state must be performed", async proc()
+      # (1) act
+      const (
+        ini = monitor(nop)
+        decl = {
+          plugin = "test"
+          defaultOpName = "two"
+          ini
+          ops =
+            one = {fun = nop}
+            two = {fun = nop}
+        }
+
+        out = await(parser.parsePlugin(decl, ["arg1", "arg2"]))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Plugin).toHave(
+        name = "test"
+        defaultOpName = "two"
+        tags = []
+      )
+
+      expected(out.ops.ops).members("one", "two").toBe(Action)
+      expected(monitor.log(ini).calls).equalTo(1)
+    end)
+  end)
+end)

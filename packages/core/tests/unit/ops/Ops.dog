@@ -1,0 +1,129 @@
+use (
+  alias://expected
+  {Ops, SimpleOp, Plugin} = ~
+)
+
+struct TestOp: SimpleOp
+
+suite(__filename, proc()
+  suite("appendOp()", proc()
+    test("when op unexists, this must be appended to the collection", proc()
+      # (1) act
+      const (
+        op1 = TestOp(name = "test1", operator = {})
+        op2 = TestOp(name = "test2", operator = {})
+        ops = Ops()
+      )
+
+      ops.appendOp(op1).appendOp(op2)
+
+      # (2) assessment
+      expected(ops.ops).toHaveLen(2).toHave(
+        test1 = op1
+        test2 = op2
+      )
+    end)
+
+    test("when op exists, this must be appended to the collection, replacing", proc()
+      # (1) act
+      const (
+        op1 = TestOp(name = "test", operator = {})
+        op2 = TestOp(name = "test", operator = {})
+        ops = Ops().appendOp(op1).appendOp(op2)
+      )
+
+      # (2) assessment
+      expected(ops.ops).toHaveLen(1).toHave(test = op2)
+    end)
+  end)
+
+  suite("appendOps()", proc()
+    test("when ops, every op must be appended to the collection", proc()
+      # (1) act
+      const (
+        op1 = TestOp(name = "test1", operator = {})
+        op2 = TestOp(name = "test2", operator = {})
+        ops = Ops().appendOps(op1, op2)
+      )
+
+      # (2) assessment
+      expected(ops.ops).toHaveLen(2).toHave(
+        test1 = op1
+        test2 = op2
+      )
+    end)
+  end)
+
+  suite("getOp()", proc()
+    test("when op exists, this must be returned", proc()
+      # (1) act
+      const (
+        op = TestOp(name = "test", operator = {})
+        ops = Ops().appendOp(op)
+        out = ops.getOp("test")
+      )
+
+      # (2) assessment
+      expected(out).sameAs(op)
+    end)
+
+    test("when op unexists, nil must be returned", proc()
+      # (1) act
+      const (
+        ops = Ops()
+        out = ops.getOp("unknown")
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+
+    test("when op unexists and raiseIfNotFound, error must be raised", proc()
+      # (1) act
+      const (
+        ops = Ops()
+        out = peval(ops.getOp("unknown", raiseIfNotFound = true))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(Error).like("Operation 'unknown' not found.")
+    end)
+  end)
+
+  suite("appendPlugin()", proc()
+    test("when plugin passed, its operations must be appended as piName.opName", proc()
+      # (1) act
+      const (
+        op1 = TestOp(name = "test1", operator = {})
+        op2 = TestOp(name = "test2", operator = {})
+        pi = Plugin(name = "pi").appendOp(op1).appendOp(op2)
+        ops = Ops().appendPlugin(pi)
+      )
+
+      # (2) assessment
+      expected(ops.ops)\
+        .toHaveLen(2)\
+        .member("pi.test1").sameAs(op1)\
+        .member("pi.test2").sameAs(op2)
+    end)
+
+    test("when plugin has default op, this must be appended additionally", proc()
+      # (1) act
+      const (
+        op1 = TestOp(name = "test1", operator = {})
+        op2 = TestOp(name = "test2", operator = {})
+        pi = Plugin(name = "pi", defaultOpName = "test2").appendOp(op1).appendOp(op2)
+        ops = Ops().appendPlugin(pi)
+      )
+
+      # (2) assessment
+      expected(ops.ops)\
+        .toHaveLen(3)\
+        .member("pi").sameAs(op2)\
+        .member("pi.test1").sameAs(op1)\
+        .member("pi.test2").sameAs(op2)
+    end)
+  end)
+end)

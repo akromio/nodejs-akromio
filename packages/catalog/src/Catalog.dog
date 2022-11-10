@@ -1,0 +1,73 @@
+use (
+  {Dataset} = alias://dataset
+  {Plugins} = alias://core
+)
+
+/**
+ * A catalog, that is, a catalog of operations/jobs/tasks
+ * accessible by name.
+ */
+@abstract
+export struct Catalog
+  /**
+   * The specification version used by the user to write
+   * the catalog such as, for example, v1.0.
+   */
+  pub const spec: text
+
+  /**
+   * The catalog location.
+   */
+  pub const loc: text
+
+  /**
+   * The content type.
+   */
+  pub const cty: text
+
+  /**
+   * The catalog description if needed.
+   */
+  pub const desc?: text
+
+  /**
+   * The dataset associated to this catalog.
+   */
+  pub const dataset: Dataset
+
+  /**
+   * The plugin declarations.
+   */
+  pub const plugins: Plugins
+
+    /**
+   * The catalog name extended by this.
+   */
+  pub const extends?: text[]
+
+  /**
+   * The default job to run when not indicated explicitly.
+   */
+  pub const defaultJobName?: text
+
+  /**
+   * The cataloged jobs.
+   */
+  pub const jobs := {}
+
+  /**
+   * The default trigger name, used when not indicated explicitly.
+   */
+  pub const defaultTriggerName?: text
+
+  /**
+   * The triggers defined into the catalog.
+   */
+  pub const triggers := {}
+
+  /**
+   * Performs the final actions associated to this catalog
+   * such as, for example, the plugin finalizers.
+   */
+  @async
+  pub fn finalize() = self.plugins.finalize()

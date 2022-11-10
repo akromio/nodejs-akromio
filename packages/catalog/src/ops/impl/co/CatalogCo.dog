@@ -1,0 +1,9 @@
+use (
+  {DynamicCo} = alias://core
+  ../CatalogSteppedOp
+)
+
+/**
+ * A concurrent operation saved into a jobs catalog.
+ */
+export struct CatalogCo: DynamicCo:: CatalogSteppedOp

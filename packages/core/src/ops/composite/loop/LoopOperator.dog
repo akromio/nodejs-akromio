@@ -1,0 +1,41 @@
+use (
+  ../CompositeOperator
+  ../../Call
+  Loop
+)
+
+/**
+ * An operator to run loops.
+ */
+export struct LoopOperator: CompositeOperator
+  @override @hidden
+  pub async fn performWorks(call: Call) -> results: list
+    const loop = expect(call.op, Loop)
+
+    # (1) run initializers
+    await(self.performInitializerSteps(call, results))
+
+    # (2) get the collection
+    const (
+      collStep = loop.getCollection(call)
+      collResult = await(self.performStep(collStep, call))
+    )
+
+    results.push(collResult)
+
+    # (3) perform steps
+    const(
+      {dataset} = call
+      itemName = collStep.resultVarName ?? "i"
+      items = collResult.value
+      steps = await(loop.getSteps(call))
+    )
+
+    for each item in items do
+      dataset.setDatumValue(itemName, item)
+
+      if await(self._performSteps(steps, call, results))[0] === false then
+        return [false, results]
+
+    # (4) perform finalizers
+    await(self.performFinalizerSteps(call, results))

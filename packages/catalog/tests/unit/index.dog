@@ -1,0 +1,20 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, its api must be exported", proc()
+    expected(pkg).members(
+      "Catalog"
+      "CatalogMerger"
+      "CatalogParser"
+
+      "CatalogCo"
+      "CatalogLoop"
+      "CatalogMacro"
+
+      "JobParser"
+    ).toBeCallable()
+  end)
+end)

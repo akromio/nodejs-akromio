@@ -1,0 +1,79 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+  {Plugin, SimpleOp} = ~
+)
+
+struct TestOp: SimpleOp
+
+suite(__filename, proc()
+  suite("hasDefaultOp()", proc()
+    test("when defaultOpName set, true must be returned", proc()
+      # (1) act
+      const (
+        pi = Plugin(name = "test", defaultOpName = "theOpName")
+        out = pi.hasDefaultOp()
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+    end)
+
+    test("when defaultOpName unset, false must be returned", proc()
+      # (1) act
+      const (
+        pi = Plugin(name = "test")
+        out = pi.hasDefaultOp()
+      )
+
+      # (2) assessment
+      expected(out).equalTo(false)
+    end)
+  end)
+
+  suite("appendOp()", proc()
+    test("when called, op must be appended to ops and its parent set", proc()
+      # (1) act
+      const (
+        op1 = TestOp(name = "test1", operator = {})
+        op2 = TestOp(name = "test2", operator = {})
+        pi = Plugin(name = "pi")
+      )
+
+      pi.appendOp(op1).appendOp(op2)
+
+      # (2) assessment
+      expected(pi.ops.ops)\
+        .toHaveLen(2)\
+        .member("test1").sameAs(op1)\
+        .member("test2").sameAs(op2)
+        
+      expected(op1.parentPlugin).sameAs(pi)
+      expected(op2.parentPlugin).sameAs(pi)
+    end)
+  end)
+
+  suite("finalize()", proc()
+    test("when finalizer set, this must be run", proc()
+      # (1) act
+      const (
+        finalizer = monitor(nop)
+        pi = Plugin(name = "pi", finalizer)
+      )
+
+      pi.finalize()
+
+      # (2) assessment
+      do
+        const log = monitor.log(finalizer)
+        expected(log).toHaveLen(1)
+      finally
+        monitor.clearAll()
+    end)
+
+    test("when finaluzer unset, nothing to do", proc()
+      const pi = Plugin(name = "pi")
+      expected(proc() pi.finalize() end).notToRaise()
+    end)
+  end)
+end)

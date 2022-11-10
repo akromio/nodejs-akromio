@@ -1,0 +1,8 @@
+use (
+  Dataset
+)
+
+/**
+ * A dataset with global data.
+ */
+export struct GlobalDataset: Dataset

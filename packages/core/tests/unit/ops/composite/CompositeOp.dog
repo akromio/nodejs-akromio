@@ -1,0 +1,49 @@
+use (
+  alias://expected
+  {simulator} = alias://doubles
+  {CompositeOp as CompositeOpBase, Action, Call} = ~
+)
+
+@concrete
+struct CompositeOp: CompositeOpBase
+
+suite(__filename, proc()
+  suite("buildTitle()", proc()
+    test("when title set, this must be returned", proc()
+      # (1) act
+      const out = CompositeOp(
+        name = "the name"
+        title = "the title"
+        operator = {}
+      ).buildTitle()
+
+      # (2) assessment
+      expected(out).equalTo("the title")
+    end)
+
+    test("when title unset, the op name must be returned", proc()
+      # (1) act
+      const out = CompositeOp(
+        name = "the name"
+        operator = {}
+      ).buildTitle()
+
+      # (2) assessment
+      expected(out).equalTo("the name")
+    end)
+  end)
+
+  suite("getSteps()", proc()
+    test("when not overwritten, empty list must be returned", proc()
+      # (1) act
+      const out = CompositeOp(
+        name = "the name"
+        title = "the title"
+        operator = {}
+      ).getSteps(simulator(Call, {}))
+
+      # (2) assessment
+      expected(out).toBeEmpty()
+    end)
+  end)
+end)

@@ -1,0 +1,32 @@
+use (
+  ../SimpleOp
+)
+
+/**
+ * A JavaScript script, that is, a code text to run
+ * when called.
+ */
+export struct Script: SimpleOp
+  /**
+   * The source code to run.
+   */
+  pub const code: text
+
+  /**
+   * The params object to add to the run context.
+   *
+   * If when called, we pass arguments, these params are only
+   * used if arguments is nil.
+   */
+  pub const params?: any
+
+  /**
+   * The run type.
+   */
+  pub const kind: ("async" | "sync") = "sync"
+
+  /**
+   * The timeout, that is, the number of milliseconds to execute the
+   * code before terminating its execution.
+   */
+  pub const timeout?: num

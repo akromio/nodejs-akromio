@@ -1,0 +1,315 @@
+use (
+  dep://inquirer
+  alias://expected
+  {monitor, simulator} = alias://doubles
+  {Inquirer} = ~
+)
+
+suite(__filename, proc()
+  var (
+    i ::= Inquirer()
+    originalPrompt
+  )
+
+  setup(proc()
+    originalPrompt = inquirer.prompt
+  end)
+
+  teardown(proc()
+    inquirer.prompt = originalPrompt
+  end)
+
+  test("when invalid question, error must be raised", async proc()
+    # (1) act
+    const out = pawait(i.prompt([{inpu = "test"}]))
+
+    # (2) assessment
+    expected(out)\
+      .it(0).equalTo(false)\
+      .it(1).toBe(Error).like("Unknown question type: { inpu: 'test' }.")
+  end)
+
+  suite("performInput()", proc()
+    test("when called with answer, no question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(inquirer.prompt)
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {input = "test", title = "the title", defaultValue = false}
+        answers = {test = "321"}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(test = "321")
+      expected(log).toHaveLen(0)
+    end)
+
+    test("when no type set, input question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(simulator.fun(resolves = {test = "321"}))
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {input = "test", title = "the title", defaultValue = "123"}
+        answers = {}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(test = "321")
+      expected(log).toHaveLen(1)
+      expected(
+        log.calledWith([
+          {name = "test", type = "input", message = q.title, default = q.defaultValue}
+        ])
+      ).equalTo(1)
+    end)
+
+    test("when type is password, password question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(simulator.fun(resolves = {test = "321"}))
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {
+          input = "test"
+          type = "password"
+          title = "the title"
+          defaultValue = "123"
+        }
+        answers = {}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(test = "321")
+      expected(log).toHaveLen(1)
+      expected(
+        log.calledWith([
+          {name = "test", type = "password", message = q.title, default = q.defaultValue}
+        ])
+      ).equalTo(1)
+    end)
+  end)
+
+  suite("performConfirm()", proc()
+    test("when called, confirm question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(simulator.fun(resolves = {test = true}))
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {confirm = "test", title = "the title", defaultValue = false}
+        answers = {}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(test = true)
+      expected(log).toHaveLen(1)
+      expected(
+        log.calledWith([
+          {name = "test", type = "confirm", message = q.title, default = q.defaultValue}
+        ])
+      ).equalTo(1)
+    end)
+
+    test("when called with answer, no question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(inquirer.prompt)
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {confirm = "test", title = "the title", defaultValue = false}
+        answers = {test = true}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(test = true)
+      expected(log).toHaveLen(0)
+    end)
+  end)
+
+  suite("performSelect()", proc()
+    test("when called with answer, no question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(inquirer.prompt)
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {
+          select = "test"
+          title = "the title"
+          options = ["one", "two", "three"]
+          selected = "two"
+        }
+
+        answers = {test = "three"}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(test = "three")
+      expected(log).toHaveLen(0)
+    end)
+
+    suite("w/o multiple, list must be performed", async proc()
+      test("when selected set, selected must be used", async proc()
+        # (1) pre
+        const prompt = monitor(simulator.fun(resolves = {test = "two"}))
+        inquirer.{prompt}
+
+        # (2) act
+        const (
+          q = {
+            select = "test"
+            title = "the title"
+            options = ["one", "two", "three"]
+            selected = "three"
+          }
+          answers = {}
+          out = await(i.prompt([q], answers))
+        )
+
+        # (3) assessment
+        const log = monitor.log(prompt, clear = true)
+
+        expected(out).equalTo(test = "two")
+        expected(log).toHaveLen(1)
+        expected(
+          log.calledWith([{
+            name = "test"
+            type = "list"
+            message = q.title
+            default = q.selected
+            choices = q.options
+          }])
+        ).equalTo(1)
+      end)
+
+      test("when selected unset, defaultValue must be used", async proc()
+        # (1) pre
+        const prompt = monitor(simulator.fun(resolves = {test = "two"}))
+        inquirer.{prompt}
+
+        # (2) act
+        const (
+          q = {
+            select = "test"
+            title = "the title"
+            options = ["one", "two", "three"]
+            defaultValue = "three"
+          }
+          answers = {}
+          out = await(i.prompt([q], answers))
+        )
+
+        # (3) assessment
+        const log = monitor.log(prompt, clear = true)
+
+        expected(out).equalTo(test = "two")
+        expected(log).toHaveLen(1)
+        expected(
+          log.calledWith([{
+            name = "test"
+            type = "list"
+            message = q.title
+            default = q.defaultValue
+            choices = q.options
+          }])
+        ).equalTo(1)
+      end)
+    end)
+
+    suite("w/ multiple", proc()
+      test("when selected set, checkbox must be performed", async proc()
+        # (1) pre
+        const prompt = monitor(simulator.fun(resolves = {test = "two"}))
+        inquirer.{prompt}
+
+        # (2) act
+        const (
+          q = {
+            select = "test"
+            multiple = true
+            title = "the title"
+            options = ["one", "two", "three"]
+            selected = ["three"]
+          }
+          answers = {}
+          out = await(i.prompt([q], answers))
+        )
+
+        # (3) assessment
+        const log = monitor.log(prompt, clear = true)
+
+        expected(out).equalTo(test = "two")
+        expected(log).toHaveLen(1)
+        expected(
+          log.calledWith([{
+            name = "test"
+            type = "checkbox"
+            message = q.title
+            choices = q.options
+            default = q.selected
+          }])
+        ).equalTo(1)
+      end)
+
+      test("when selected unset, defaultValue must be used and checkbox must be performed", async proc()
+        # (1) pre
+        const prompt = monitor(simulator.fun(resolves = {test = "two"}))
+        inquirer.{prompt}
+
+        # (2) act
+        const (
+          q = {
+            select = "test"
+            multiple = true
+            title = "the title"
+            options = ["one", "two", "three"]
+            defaultValue = ["three"]
+          }
+          answers = {}
+          out = await(i.prompt([q], answers))
+        )
+
+        # (3) assessment
+        const log = monitor.log(prompt, clear = true)
+
+        expected(out).equalTo(test = "two")
+        expected(log).toHaveLen(1)
+        expected(
+          log.calledWith([{
+            name = "test"
+            type = "checkbox"
+            message = q.title
+            choices = q.options
+            default = q.defaultValue
+          }])
+        ).equalTo(1)
+      end)
+    end)
+  end)
+end)

@@ -1,0 +1,48 @@
+/**
+ * A parser for parsing arguments passed from command line.
+ */
+export struct ArgsParser
+  /**
+   * The prefix to use for the environment variables such as, for example,
+   * KRM_ARG_.
+   */
+  pub const prefix: text
+
+  /**
+   * Parses the arguments passed in a map or a list (name=value).
+   *
+   * To get the content of files, the resolver must be specified.
+   * This receives a file path and returns its content in a map.
+   */
+  pub async fn parse(decls: text[], env: map, resolver: func) -> args: map
+    args = self.parseEnvVars(env, self.prefix, args)
+    args = await(self.parseArgFiles(decls.filter(fn(i) = not i.includes("=") end), resolver, args))
+    args = self.parseArgLines(decls.filter(fn(i) = i.includes("=") end), args)
+
+  /**
+   * Gets the arguments from the environment variables whose names
+   * starts with prefix.
+   */
+  @hidden @noParamCheck
+  pub fn parseEnvVars(env: map, prefix: text, args: map) -> args
+    for each name in keys(env) do
+      if name.startsWith(prefix) then
+        args[name.replace(re("^" + prefix), "")] = env[name]
+  
+  /**
+   * Parses arguments where each argument has the following format: name=value.
+   */
+  @hidden @noParamCheck
+  pub fn parseArgLines(lines: text[], args: map) -> args
+    for each arg in lines do
+      const [name, value] = arg.split("=")
+      args[name.trim()] = value.trim()
+
+  /**
+   * Parses arguments from a file.
+   */
+  @hidden @noParamCheck
+  pub async fn parseArgFiles(filePaths: text[], resolver: func, args: map) -> args
+    for each filePath in filePaths do
+      const importedArgs = await(resolver(filePath))
+      args = args{*, ...importedArgs}

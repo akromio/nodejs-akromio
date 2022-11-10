@@ -1,0 +1,15 @@
+use (
+  Action
+)
+
+/**
+ * A static action.
+ */
+export struct StaticAction: Action
+  /**
+   * The function to call.
+   */
+  pub const fun: func
+
+  @override @hidden
+  pub fn getFn() = self.fun
