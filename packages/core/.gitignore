@@ -3,4 +3,4 @@ coverage/
 .nyc_output/
 node_modules/
 !tests/data/**/node_modules/
-!__tests__/data/plugins/node_modules/
+!__tests__/data/**/node_modules/
