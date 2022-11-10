@@ -54,8 +54,8 @@ suite(__filename, () => {
             });
             const conn = createConnector(client);
             const out = (0, await conn.getItem("/jobs.yaml"));
-            expected(out).toBeMap().equalTo({
-              'name': "/jobs.yaml",
+            expected(out).toBeMap().toHave({
+              'name': `${path.sep}jobs.yaml`,
               'cty': "text/yaml",
               'value': "spec: v1.0\ncty: yaml"
             });

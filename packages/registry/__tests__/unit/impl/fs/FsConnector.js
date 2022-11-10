@@ -65,7 +65,7 @@ suite(__filename, () => {
             expected(out).toBeMap().toHave({
               'cty': "text/yaml",
               'value': `spec: v1.0${os.EOL}cty: yaml`
-            }).member("name").toContain("catalogs").toContain("jobs.yaml");
+            }).member("name").toContain(`catalogs${path.sep}jobs.yaml`);
           }
         });
         test("when item is a json file, value and mime must be returned", async () => {
@@ -74,7 +74,7 @@ suite(__filename, () => {
             expected(out).toBeMap().toHave({
               'cty': "application/json",
               'value': `{${os.EOL}  "spec": "v1.0",${os.EOL}  "cty": "json"${os.EOL}}`
-            }).member("name").toContain("catalogs").toContain("jobs.json");
+            }).member("name").toContain(`catalogs${path.sep}jobs.json`);
           }
         });
       }
