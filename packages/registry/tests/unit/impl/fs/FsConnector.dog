@@ -1,6 +1,7 @@
 use (
   alias://expected
   dep://path
+  dep://os
   {FsConnector as Connector} = ~
 )
 
@@ -68,26 +69,34 @@ suite(__filename, proc()
 
     test("when item is a yaml file, value and mime must be returned", async proc()
       # (1) act
-      const out = await(conn.getItem("/catalogs/jobs.yaml"))
+      const (
+        itemPath = "/catalogs/jobs.yaml"
+        out = await(conn.getItem(itemPath))
+      )
 
       # (2) assessment
-      expected(out).toBeMap().equalTo(
-        name = "/catalogs/jobs.yaml"
+      expected(out).toBeMap().toHave(
         cty = "text/yaml"
-        value = "spec: v1.0\ncty: yaml"
+        value = $"spec: v1.0${os.EOL}cty: yaml"
       )
+      
+      expected.path(out.name).equalTo(itemPath)
     end)
 
     test("when item is a json file, value and mime must be returned", async proc()
       # (1) act
-      const out = await(conn.getItem("/catalogs/jobs.json"))
+      const (
+        itemPath = "/catalogs/jobs.json"
+        out = await(conn.getItem(itemPath))
+      )
 
       # (2) assessment
-      expected(out).toBeMap().equalTo(
-        name = "/catalogs/jobs.json"
+      expected(out).toBeMap().toHave(
         cty = "application/json"
-        value = "{\n  \"spec\": \"v1.0\",\n  \"cty\": \"json\"\n}"
+        value = $"{${os.EOL}  \"spec\": \"v1.0\",${os.EOL}  \"cty\": \"json\"${os.EOL}}"
       )
+      
+      expected.path(out.name).equalTo(itemPath)
     end)
   end)
 end)

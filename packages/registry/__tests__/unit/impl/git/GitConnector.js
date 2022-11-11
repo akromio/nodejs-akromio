@@ -8,6 +8,7 @@ const {
 } = _core.dogma.use(require("@akromio/doubles"));
 const axios = _core.dogma.use(require("axios"));
 const path = _core.dogma.use(require("path"));
+const os = _core.dogma.use(require("os"));
 const {
   GitConnector
 } = _core.dogma.use(require("../../../.."));
@@ -48,17 +49,18 @@ suite(__filename, () => {
                   ["headers"]: {
                     ["content-type"]: "text/plain"
                   },
-                  ["data"]: "spec: v1.0\ncty: yaml"
+                  ["data"]: `spec: v1.0${os.EOL}cty: yaml`
                 }
               })
             });
             const conn = createConnector(client);
-            const out = (0, await conn.getItem("/jobs.yaml"));
-            expected(out).toBeMap().equalTo({
-              'name': "/jobs.yaml",
+            const itemPath = "/jobs.yaml";
+            const out = (0, await conn.getItem(itemPath));
+            expected(out).toBeMap().toHave({
               'cty': "text/yaml",
-              'value': "spec: v1.0\ncty: yaml"
+              'value': `spec: v1.0${os.EOL}cty: yaml`
             });
+            expected.path(out.name).equalTo(itemPath);
           }
         });
         test("when item w/o extension, value and content-type must be returned", async () => {
@@ -75,12 +77,13 @@ suite(__filename, () => {
               })
             });
             const conn = createConnector(client);
-            const out = (0, await conn.getItem("/Dockerfile"));
-            expected(out).toBeMap().equalTo({
-              'name': "/Dockerfile",
+            const itemPath = "/Dockerfile";
+            const out = (0, await conn.getItem(itemPath));
+            expected(out).toBeMap().toHave({
               'cty': "text/plain",
               'value': "FROM golang:1.17-alpine as build"
             });
+            expected.path(out.name).equalTo(itemPath);
           }
         });
       }

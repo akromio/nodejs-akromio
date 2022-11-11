@@ -9,3 +9,6 @@ spec:
   
 ignore:
   - "**/*/__init__.js"
+
+require:
+  - ./__tests__/unit/__ini__.js
