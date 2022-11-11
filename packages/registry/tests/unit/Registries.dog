@@ -185,16 +185,18 @@ suite(__filename, proc()
         const (
           reg = createRegistry()
           regs = await(Registries().appendRegistry(reg).connect())
-          out = await(regs.getItem("/catalogs/jobs.yaml"))
+          itemPath = "/catalogs/jobs.yaml"
+          out = await(regs.getItem(itemPath))
         )
 
         # (2) assessment
         expected(out).toBe(Item).toHave(
           registryName = "test"
-          name = "/catalogs/jobs.yaml"
           cty = "text/yaml"
           value = "spec: v1.0\ncty: yaml"
         )
+
+        expected.path(out.name).equalTo(itemPath)
       end)
 
       test("when existing in the 2nd registry, item must be returned", async proc()
@@ -203,16 +205,18 @@ suite(__filename, proc()
           reg1 = createEmptyRegistry()
           reg2 = createRegistry()
           regs = await(Registries().appendRegistry(reg1).appendRegistry(reg2).connect())
-          out = await(regs.getItem("/catalogs/jobs.yaml"))
+          itemPath = "/catalogs/jobs.yaml"
+          out = await(regs.getItem(itemPath))
         )
 
         # (2) assessment
         expected(out).toBe(Item).toHave(
           registryName = "test"
-          name = "/catalogs/jobs.yaml"
           cty = "text/yaml"
           value = "spec: v1.0\ncty: yaml"
         )
+
+        expected.path(out.name).equalTo(itemPath)
       end)
     end)
 
@@ -235,16 +239,18 @@ suite(__filename, proc()
         const (
           reg = createRegistry()
           regs = await(Registries().appendRegistry(reg).connect())
-          out = await(regs.getItem("/catalogs/jobs.yaml", registryName=))
+          itemPath = "/catalogs/jobs.yaml"
+          out = await(regs.getItem(itemPath, registryName=))
         )
 
         # (2) assessment
         expected(out).toBe(Item).toHave(
           registryName = "test"
-          name = "/catalogs/jobs.yaml"
           cty = "text/yaml"
           value = "spec: v1.0\ncty: yaml"
         )
+
+        expected.path(out.name).equalTo(itemPath)
       end)
 
       test("when not existing, item must be returned", async proc()

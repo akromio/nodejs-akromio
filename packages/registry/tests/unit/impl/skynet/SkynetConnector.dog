@@ -37,11 +37,8 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toHave(
-        name = itemPath
-        cty = "text/yaml"
-      )
-
+      expected(out).toHave(cty = "text/yaml")
+      expected.path(out.name).equalTo(itemPath)
       expected(out.value.toString()).toInclude("spec: v1.0")
     end)
   end)

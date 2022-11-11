@@ -186,13 +186,14 @@ suite(__filename, () => {
               {
                 const reg = createRegistry();
                 const regs = (0, await Registries().appendRegistry(reg).connect());
-                const out = (0, await regs.getItem("/catalogs/jobs.yaml"));
+                const itemPath = "/catalogs/jobs.yaml";
+                const out = (0, await regs.getItem(itemPath));
                 expected(out).toBe(Item).toHave({
                   'registryName': "test",
-                  'name': "/catalogs/jobs.yaml",
                   'cty': "text/yaml",
                   'value': "spec: v1.0\ncty: yaml"
                 });
+                expected.path(out.name).equalTo(itemPath);
               }
             });
             test("when existing in the 2nd registry, item must be returned", async () => {
@@ -200,13 +201,14 @@ suite(__filename, () => {
                 const reg1 = createEmptyRegistry();
                 const reg2 = createRegistry();
                 const regs = (0, await Registries().appendRegistry(reg1).appendRegistry(reg2).connect());
-                const out = (0, await regs.getItem("/catalogs/jobs.yaml"));
+                const itemPath = "/catalogs/jobs.yaml";
+                const out = (0, await regs.getItem(itemPath));
                 expected(out).toBe(Item).toHave({
                   'registryName': "test",
-                  'name': "/catalogs/jobs.yaml",
                   'cty': "text/yaml",
                   'value': "spec: v1.0\ncty: yaml"
                 });
+                expected.path(out.name).equalTo(itemPath);
               }
             });
           }
@@ -227,15 +229,16 @@ suite(__filename, () => {
               {
                 const reg = createRegistry();
                 const regs = (0, await Registries().appendRegistry(reg).connect());
-                const out = (0, await regs.getItem("/catalogs/jobs.yaml", {
+                const itemPath = "/catalogs/jobs.yaml";
+                const out = (0, await regs.getItem(itemPath, {
                   'registryName': registryName
                 }));
                 expected(out).toBe(Item).toHave({
                   'registryName': "test",
-                  'name': "/catalogs/jobs.yaml",
                   'cty': "text/yaml",
                   'value': "spec: v1.0\ncty: yaml"
                 });
+                expected.path(out.name).equalTo(itemPath);
               }
             });
             test("when not existing, item must be returned", async () => {

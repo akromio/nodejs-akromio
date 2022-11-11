@@ -49,9 +49,9 @@ suite(__filename, () => {
             const itemPath = "/jobs/catalogs/empty.yaml";
             const out = (0, await conn.getItem(itemPath));
             expected(out).toHave({
-              'name': itemPath,
               'cty': "text/yaml"
             });
+            expected.path(out.name).equalTo(itemPath);
             expected(out.value.toString()).toInclude("spec: v1.0");
           }
         });

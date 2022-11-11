@@ -73,14 +73,15 @@ suite(__filename, () => {
               'name': name,
               'client': client
             }).connect());
-            const out = (0, await registry.getItem("/catalogs/jobs.yaml"));
+            const itemPath = "/catalogs/jobs.yaml";
+            const out = (0, await registry.getItem(itemPath));
             expected(out).toHave({
               'registryName': name,
-              'name': "/catalogs/jobs.yaml",
               'uri': "test:///catalogs/jobs.yaml",
               'cty': "text/yaml",
               'value': "spec: v1.0\ncty: yaml"
             });
+            expected.path(out.name).equalTo(itemPath);
             const log = monitor.log(client);
             expected(log.calls).equalTo(1);
           }

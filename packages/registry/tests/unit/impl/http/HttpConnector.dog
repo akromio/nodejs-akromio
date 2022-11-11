@@ -45,15 +45,17 @@ suite(__filename, proc()
           )
         )
         conn = createConnector(client)
-        out = await(conn.getItem("/jobs.yaml"))
+        itemPath = "/jobs.yaml"
+        out = await(conn.getItem(itemPath))
       )
 
       # (2) assessment
-      expected(out).toBeMap().equalTo(
-        name = "/jobs.yaml"
+      expected(out).toBeMap().toHave(
         cty = "text/yaml"
         value = $"spec: v1.0${os.EOL}cty: yaml"
       )
+
+      expected.path(out.name).equalTo(itemPath)
     end)
   end)
 end)

@@ -61,20 +61,24 @@ suite(__filename, () => {
         });
         test("when item is a yaml file, value and mime must be returned", async () => {
           {
-            const out = (0, await conn.getItem("/catalogs/jobs.yaml"));
+            const itemPath = "/catalogs/jobs.yaml";
+            const out = (0, await conn.getItem(itemPath));
             expected(out).toBeMap().toHave({
               'cty': "text/yaml",
               'value': `spec: v1.0${os.EOL}cty: yaml`
-            }).member("name").toContain(`catalogs${path.sep}jobs.yaml`);
+            });
+            expected.path(out.name).equalTo(itemPath);
           }
         });
         test("when item is a json file, value and mime must be returned", async () => {
           {
-            const out = (0, await conn.getItem("/catalogs/jobs.json"));
+            const itemPath = "/catalogs/jobs.json";
+            const out = (0, await conn.getItem(itemPath));
             expected(out).toBeMap().toHave({
               'cty': "application/json",
               'value': `{${os.EOL}  "spec": "v1.0",${os.EOL}  "cty": "json"${os.EOL}}`
-            }).member("name").toContain(`catalogs${path.sep}jobs.json`);
+            });
+            expected.path(out.name).equalTo(itemPath);
           }
         });
       }
