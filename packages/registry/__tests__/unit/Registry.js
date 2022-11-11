@@ -77,10 +77,10 @@ suite(__filename, () => {
             const out = (0, await registry.getItem(itemPath));
             expected(out).toHave({
               'registryName': name,
-              'uri': "test:///catalogs/jobs.yaml",
               'cty': "text/yaml",
               'value': `spec: v1.0${os.EOL}cty: yaml`
             });
+            expected(out.uri).like("test://.catalogs.jobs.yaml");
             expected.path(out.name).equalTo(itemPath);
             const log = monitor.log(client);
             expected(log.calls).equalTo(1);
