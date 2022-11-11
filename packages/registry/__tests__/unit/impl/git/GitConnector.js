@@ -54,12 +54,13 @@ suite(__filename, () => {
               })
             });
             const conn = createConnector(client);
-            const out = (0, await conn.getItem("/jobs.yaml"));
+            const itemPath = "/jobs.yaml";
+            const out = (0, await conn.getItem(itemPath));
             expected(out).toBeMap().toHave({
-              'name': `${path.sep}jobs.yaml`,
               'cty': "text/yaml",
               'value': `spec: v1.0${os.EOL}cty: yaml`
             });
+            expected.path(out.name).equalTo(itemPath);
           }
         });
         test("when item w/o extension, value and content-type must be returned", async () => {
@@ -76,12 +77,13 @@ suite(__filename, () => {
               })
             });
             const conn = createConnector(client);
-            const out = (0, await conn.getItem("/Dockerfile"));
-            expected(out).toBeMap().equalTo({
-              'name': "/Dockerfile",
+            const itemPath = "/Dockerfile";
+            const out = (0, await conn.getItem(itemPath));
+            expected(out).toBeMap().toHave({
               'cty': "text/plain",
               'value': "FROM golang:1.17-alpine as build"
             });
+            expected.path(out.name).equalTo(itemPath);
           }
         });
       }

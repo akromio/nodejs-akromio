@@ -2,6 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const fs = _core.dogma.use(require("fs/promises"));
+const os = _core.dogma.use(require("os"));
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   simulator,
@@ -41,7 +42,7 @@ suite(__filename, () => {
         });
         test("when item exists, item must be returned", async () => {
           {
-            const content = Buffer.from("spec: v1.0\njobs: []");
+            const content = Buffer.from(`spec: v1.0${os.EOL}jobs: []`);
             const client = simulator(SkynetClient, {
               'downloadData': method.resolves(content)
             });

@@ -79,7 +79,7 @@ suite(__filename, () => {
               'registryName': name,
               'uri': "test:///catalogs/jobs.yaml",
               'cty': "text/yaml",
-              'value': "spec: v1.0\ncty: yaml"
+              'value': `spec: v1.0${os.EOL}cty: yaml`
             });
             expected.path(out.name).equalTo(itemPath);
             const log = monitor.log(client);

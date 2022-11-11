@@ -1,5 +1,6 @@
 use (
   fs = dep://fs/promises
+  dep://os
   alias://expected
   {simulator, method} = alias://doubles
   {SkynetClient} = alias://skynet
@@ -29,7 +30,7 @@ suite(__filename, proc()
     test("when item exists, item must be returned", async proc()
       # (1) act
       const (
-        content = Buffer.from("spec: v1.0\njobs: []")
+        content = Buffer.from($"spec: v1.0${os.EOL}jobs: []")
         client = simulator(SkynetClient, downloadData = method.resolves(content))
         conn = createConnector(client, fs)
         itemPath = "/jobs/catalogs/empty.yaml"

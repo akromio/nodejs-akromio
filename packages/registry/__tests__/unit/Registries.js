@@ -191,7 +191,7 @@ suite(__filename, () => {
                 expected(out).toBe(Item).toHave({
                   'registryName': "test",
                   'cty': "text/yaml",
-                  'value': "spec: v1.0\ncty: yaml"
+                  'value': `spec: v1.0${os.EOL}cty: yaml`
                 });
                 expected.path(out.name).equalTo(itemPath);
               }
@@ -206,7 +206,7 @@ suite(__filename, () => {
                 expected(out).toBe(Item).toHave({
                   'registryName': "test",
                   'cty': "text/yaml",
-                  'value': "spec: v1.0\ncty: yaml"
+                  'value': `spec: v1.0${os.EOL}cty: yaml`
                 });
                 expected.path(out.name).equalTo(itemPath);
               }
@@ -236,7 +236,7 @@ suite(__filename, () => {
                 expected(out).toBe(Item).toHave({
                   'registryName': "test",
                   'cty': "text/yaml",
-                  'value': "spec: v1.0\ncty: yaml"
+                  'value': `spec: v1.0${os.EOL}cty: yaml`
                 });
                 expected.path(out.name).equalTo(itemPath);
               }

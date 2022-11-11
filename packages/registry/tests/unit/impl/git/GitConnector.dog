@@ -45,15 +45,17 @@ suite(__filename, proc()
           )
         )
         conn = createConnector(client)
-        out = await(conn.getItem("/jobs.yaml"))
+        itemPath = "/jobs.yaml"
+        out = await(conn.getItem(itemPath))
       )
 
       # (2) assessment
       expected(out).toBeMap().toHave(
-        name = $"${path.sep}jobs.yaml"
         cty = "text/yaml"
         value = $"spec: v1.0${os.EOL}cty: yaml"
       )
+
+      expected.path(out.name).equalTo(itemPath)
     end)
 
     test("when item w/o extension, value and content-type must be returned", async proc()
@@ -70,15 +72,17 @@ suite(__filename, proc()
           )
         )
         conn = createConnector(client)
-        out = await(conn.getItem("/Dockerfile"))
+        itemPath = "/Dockerfile"
+        out = await(conn.getItem(itemPath))
       )
 
       # (2) assessment
-      expected(out).toBeMap().equalTo(
-        name = "/Dockerfile"
+      expected(out).toBeMap().toHave(
         cty = "text/plain"
         value = "FROM golang:1.17-alpine as build"
       )
+
+      expected.path(out.name).equalTo(itemPath)
     end)
   end)
 end)
