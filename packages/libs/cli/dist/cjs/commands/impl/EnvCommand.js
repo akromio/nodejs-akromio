@@ -1,13 +1,13 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const path = _core.dogma.use(require("path"));
-const termSize = _core.dogma.use(require("term-size"));
+const term = _core.dogma.use(require("term-size"));
 const {
   table,
   tableOpts
 } = _core.dogma.use(require("../../helpers/table"));
 const Command = _core.dogma.use(require("../Command"));
+const prefix = "KRM_";
 const $EnvCommand = class EnvCommand extends Command {
   constructor(_) {
     super(_);
@@ -59,12 +59,51 @@ module.exports = exports = EnvCommand;
 EnvCommand.prototype.handle = function () {
   const self = this;
   {
-    listEnvVars();
+    this.printRows(this.buildRows());
     _core.ps.exit(0);
   }
 };
-const prefix = "KRM_";
-function listEnvVars() {
+EnvCommand.prototype.printRows = function (rows) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("rows", rows, _core.list);
+  {
+    const totalWidth = term().columns - 10;
+    let varWidth = 0;
+    let valueWidth = 0;
+    for (const row of rows) {
+      {
+        const width = (0, _core.len)(_core.dogma.getItem(row, 0));
+        if (width > varWidth) {
+          varWidth = width;
+        }
+      }
+      {
+        const width = (0, _core.len)(_core.dogma.getItem(row, 1));
+        if (width > valueWidth) {
+          valueWidth = width;
+        }
+      }
+    }
+    const col2Width = Math.floor((totalWidth - varWidth) / 2);
+    if (valueWidth > col2Width) {
+      valueWidth = col2Width;
+    }
+    const config = _core.dogma.clone(tableOpts, {
+      "columns": [{
+        ["width"]: varWidth
+      }, {
+        ["width"]: valueWidth
+      }, {
+        ["width"]: totalWidth - varWidth - valueWidth
+      }]
+    }, {}, [], []);
+    (0, _core.print)();
+    (0, _core.print)(table(rows, config));
+  }
+};
+EnvCommand.prototype.buildRows = function () {
+  const self = this;
+  let rows = [];
   {
     const vars = {
       ["ANSWERS_LOG"]: {
@@ -128,7 +167,7 @@ function listEnvVars() {
         ["desc"]: "The paths where the assets (plugins, catalogs...) are installed with NPM."
       }
     };
-    const rows = [["Variable", "Value", "Desc."], [prefix + "ARG_*", "", "The arguments to pass from environment variables."], [prefix + "ANSWER_*", "", "The answers to pass from environment variables."]];
+    rows = [["Variable", "Value", "Desc."], [prefix + "ARG_*", "", "The arguments to pass from environment variables."], [prefix + "ANSWER_*", "", "The answers to pass from environment variables."]];
     for (let [name, item] of Object.entries(vars)) {
       {
         var _dogma$getItem;
@@ -136,26 +175,6 @@ function listEnvVars() {
         rows.push([name, (_dogma$getItem = _core.dogma.getItem(_core.ps.env, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : "", item.desc]);
       }
     }
-    const totalCols = termSize().columns - 10;
-    let varCols = 0;
-    for (const row of rows) {
-      {
-        const cols = (0, _core.len)(_core.dogma.getItem(row, 0));
-        if (cols > varCols) {
-          varCols = cols;
-        }
-      }
-    }
-    const config = _core.dogma.clone(tableOpts, {
-      "columns": [{
-        ["width"]: varCols
-      }, {
-        ["width"]: Math.floor((totalCols - varCols) / 2)
-      }, {
-        ["width"]: Math.floor((totalCols - varCols) / 2)
-      }]
-    }, {}, [], []);
-    (0, _core.print)();
-    (0, _core.print)(table(rows, config));
   }
-}
+  return rows;
+};

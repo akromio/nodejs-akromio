@@ -1,9 +1,13 @@
 use (
-  dep://path
-  termSize = dep://term-size
+  term = dep://term-size
   {table, tableOpts} = ../../helpers/table
   ../Command
 )
+
+/**
+ * The prefix to use in the variables.
+ */
+const prefix = "KRM_"
 
 /**
  * The env command.
@@ -23,21 +27,55 @@ export struct EnvCommand: Command
 
   @override @hidden
   pub proc handle()
-    listEnvVars()
+    self.printRows(self.buildRows())
     ps.exit(0)
+  
+  /**
+   * Prints the table with the environment variable [rows].
+   */
+  @hidden
+  pub proc printRows(rows: list)
+    # (1) determine var width and initial value width
+    var (
+      totalWidth ::= term().columns - 10
+      varWidth = 0
+      valueWidth = 0
+    )
 
-/**
- * The prefix to use in the variables.
- */
-const prefix = "KRM_"
+    for each row in rows do
+      if width ::= len(row[0]); width > varWidth then
+        varWidth = width
+      
+      if width ::= len(row[1]); width > valueWidth then
+        valueWidth = width
+    
+    # (2) determine value and desc widths
+    const col2Width = Math.floor((totalWidth - varWidth) / 2)
 
-/**
- * Lists the environment variables related with the tool.
- */
-proc listEnvVars()
-  # (1) create data table to show
-  const (
-    vars = {
+    if valueWidth > col2Width then
+      valueWidth = col2Width
+    
+    const config = tableOpts{
+      *
+
+      columns = [
+        {width = varWidth}
+        {width = valueWidth}
+        {width = totalWidth - varWidth - valueWidth}
+      ]
+    }
+
+    # (3) show table
+    print()
+    print(table(rows, config))
+
+  /**
+   * Lists and returns the environment variables related with this tool.
+   */
+  @hidden
+  pub fn buildRows() -> rows: list
+    # (1) build var descriptions
+    const vars = {
       ANSWERS_LOG =
         desc = "Print the answers for their reuse: options or file."
 
@@ -99,37 +137,13 @@ proc listEnvVars()
         desc = "The paths where the assets (plugins, catalogs...) are installed with NPM."
     }
 
+    # (2) build rows
     rows = [
       ["Variable", "Value", "Desc."]
       [prefix + "ARG_*", "", "The arguments to pass from environment variables."]
       [prefix + "ANSWER_*", "", "The answers to pass from environment variables."]
     ]
-  )
-
-  for each name, item := vars do
-    name = prefix + name
-    rows.push([name, ps.env[name] ?? "", item.desc])
-  
-  # (2) determine table configuration
-  var (
-    totalCols ::= termSize().columns - 10
-    varCols = 0
-  )
-
-  for each row in rows do
-    if cols ::= len(row[0]); cols > varCols then
-      varCols = cols
-  
-  const config = tableOpts{
-    *
-
-    columns = [
-      {width = varCols}
-      {width = Math.floor((totalCols - varCols) / 2)}
-      {width = Math.floor((totalCols - varCols) / 2)}
-    ]
-  }
-
-  # (3) show table
-  print()
-  print(table(rows, config))
+    
+    for each name, item := vars do
+      name = prefix + name
+      rows.push([name, ps.env[name] ?? "", item.desc])
