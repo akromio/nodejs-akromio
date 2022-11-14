@@ -1,0 +1,16 @@
+/**
+ * Handles the errors notified by yargs.
+ */
+export proc handleErrors(msg, err?, yargs)
+  if err then
+    throw(err)
+
+  if msg like "Missing required argument" then
+    print("Error:", msg)
+  else if msg like "Not enough non-option arguments" then
+    nop
+  else if msg.startsWith("Invalid values:") then
+    print("Error:", msg)
+    ps.exit(1)
+  else
+    print("Error:", msg)

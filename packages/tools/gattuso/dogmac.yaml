@@ -1,0 +1,45 @@
+uses:
+  args:
+    js: "@akromio/args"
+  
+  catalogReader:
+    js: "@akromio/catalog-reader"
+  
+  cli:
+    js: "@akromio/cli"
+  
+  core:
+    js: "@akromio/core"
+    
+  dataset:
+    js: "@akromio/dataset"
+  
+  defaults:
+    js: "@akromio/cli-defaults"
+  
+  doubles:
+    js: "@akromio/doubles"
+    
+  expected:
+    js: "@akromio/expected"
+  
+  fsx:
+    js: "fs-extra"
+  
+  inquirer:
+    js: "@akromio/inquirer"
+  
+  jobs:
+    js: "@akromio/jobs"
+  
+  preset:
+    js: "@akromio/preset-gattuso"
+  
+  registry:
+    js: "@akromio/registry"
+  
+  reporter:
+    js: "@akromio/reporter"
+  
+  trigger:
+    js: "@akromio/trigger"

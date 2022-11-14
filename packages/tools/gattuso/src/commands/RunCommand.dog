@@ -1,0 +1,9 @@
+use (
+  {RunCommand as RunCommandBase} = alias://cli
+  _JobCommand
+)
+
+/**
+ * The run command.
+ */
+export struct RunCommand: RunCommandBase:: _JobCommand

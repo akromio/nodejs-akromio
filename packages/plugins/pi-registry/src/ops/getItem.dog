@@ -1,0 +1,24 @@
+export {
+  desc = "Returns an item from the registry."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args?) = {
+  itemPath = args
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"registry: get ${params.itemPath}"
+
+/**
+ * Returns the given item.
+ */
+@async
+fn handler(ctx => {params, state}) = state.registry.getItem(params.itemPath)

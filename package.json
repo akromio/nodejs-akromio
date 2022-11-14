@@ -2,7 +2,9 @@
   "name": "monorepo",
   "private": true,
   "workspaces": [
-    "packages/libs/*"
+    "packages/libs/*",
+    "packages/plugins/*",
+    "packages/tools/*"
   ],
   "engine": {
     "node": ">= 18",
@@ -27,12 +29,16 @@
     "prettier": "^2.7.1"
   },
   "scripts": {
-    "clean": "npm run env -ws -- rm -rf node_modules/",
+    "clean": "npm run env -ws -- rm -rf node_modules/ && rm -rf node_modules && rm package-lock.json",
     "bootstrap": "npm run clean && npm i -ws",
     "build": "npm run -ws build",
     "test": "npm run -ws test",
     "test/itg": "npm run -ws --if-present test/itg",
     "tests": "npm t; npm run test/itg",
     "cov": "npm run -ws cov"
+  },
+  "dependencies": {
+    "@akromio/cli": "^0.0.0",
+    "term-size": "^2.2.1"
   }
 }

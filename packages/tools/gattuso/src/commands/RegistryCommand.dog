@@ -1,0 +1,9 @@
+use (
+  {RegistryCommand as RegistryCommandBase} = alias://cli
+  _JobCommand
+)
+
+/**
+ * The registry command.
+ */
+export struct RegistryCommand: RegistryCommandBase:: _JobCommand

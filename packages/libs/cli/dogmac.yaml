@@ -1,0 +1,21 @@
+uses:
+  args:
+    js: "@akromio/args"
+  core:
+    js: "@akromio/core"
+  dataset:
+    js: "@akromio/dataset"
+  expected:
+    js: "@akromio/expected"
+  inquirer:
+    js: "@akromio/inquirer"
+  jobs:
+    js: "@akromio/jobs"
+  registry:
+    js: "@akromio/registry"
+  reporter:
+    js: "@akromio/reporter"
+  trigger:
+    js: "@akromio/trigger"
+  intervalTriggerImpl:
+    js: "@akromio/trigger-interval"

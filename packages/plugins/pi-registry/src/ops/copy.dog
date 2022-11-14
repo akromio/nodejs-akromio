@@ -1,0 +1,49 @@
+use (
+  fs = dep://fs/promises
+)
+
+export {
+  desc = "Writes the content of a registry item to a local file."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    params = {
+      itemPath = args[0]
+      localPath = args[1]
+      opts = args[2] ?? {}
+    }
+  else
+    params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"registry: copy '${params.itemPath}' to '${params.localPath}'"
+
+/**
+ * Writes the content of a file.
+ */
+async fn handler(ctx=> {params, state})
+  # (1) get item from registry
+  const (
+    {itemPath} = params
+    item = await(state.registry.getItem(itemPath))
+  )
+
+  if not item then
+    throw($"Item not found in registry: ${itemPath}.")
+
+  # (2) write content
+  return await(fs.writeFile(
+    params.localPath
+    item.value
+    params.opts
+  ))
+  

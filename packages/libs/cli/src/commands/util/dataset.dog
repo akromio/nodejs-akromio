@@ -1,0 +1,178 @@
+use (
+  {GlobalDataset, Datum, ConstDatum, VarDatum, DatumFn} = alias://dataset
+  {ArgsParser} = alias://args
+  fs = dep://fs/promises
+  dep://os
+  dep://path
+  dep://yaml
+  {DateTime} = dep://luxon
+)
+
+/**
+ * The global dataset to use.
+ */
+const globalDataset = GlobalDataset(name = "global")
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "text"
+    desc = "Text utility data."
+    value = {
+      eol = "\n"
+      eol2 = "\n\n"
+    }
+  )
+)
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "runStart"
+    desc = "The run start timestamp."
+    value = timestamp().valueOf()
+  )
+)
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "home"
+    desc = "The user home."
+    value = $HOME
+  )
+)
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "workDir"
+    desc = "The work directory path."
+    value = ps.workDir
+  )
+)
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "workDirName"
+    desc = "The work directory name."
+    value = path.basename(ps.workDir)
+  )
+)
+
+globalDataset.setDatum(
+  DatumFn(
+    name = "now"
+    desc = "The current timestamp (number)."
+    value = fn() = timestamp().valueOf() end
+  )
+)
+
+globalDataset.setDatum(
+  DatumFn(
+    name = "date"
+    desc = "The current date (yyyymmdd)."
+    value = fn() = DateTime.local().toFormat("yyyyMMdd") end
+  )
+)
+
+globalDataset.setDatum(
+  DatumFn(
+    name = "datetime"
+    desc = "The current datetime (yyyyMMddHHmmss)."
+    value = fn() = DateTime.local().toFormat("yyyyMMddHHmmss") end
+  )
+)
+
+const (
+  platforms = ["aix", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"]
+  userPlatform = os.platform()
+)
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "platform"
+    desc = $"The user platform: ${platforms}."
+    value = userPlatform
+  )
+)
+
+for each platform in platforms do
+  globalDataset.setDatum(
+    ConstDatum(
+      name = platform
+      desc = $"Indicates if the current platform is ${platform}."
+      value = userPlatform == platform
+    )
+  )
+
+/**
+ * Creates the global dataset to use.
+ */
+pub async fn createGlobalDataset(data:> {args?: text[], answers?: text[], catalog: map}) -> ds: GlobalDataset
+  #(1) set dataset to return
+  ds = globalDataset
+
+  #(2) append args if needed
+  if args is list then
+    args = await(ArgsParser(prefix = "KRM_ARG_").parse(args, ps.env, argResolver))
+
+    ds.setDatum(
+      ConstDatum(
+        name = "args"
+        desc = "The arguments passed from the CLI."
+        value = args
+      )
+    )
+
+  if answers is list then
+    answers = await(ArgsParser(prefix = "KRM_ANSWER_").parse(answers, ps.env, argResolver))
+
+    ds.setDatum(
+      VarDatum(
+        name = "answers"
+        desc = "The answers passed from the CLI."
+        value = answers
+      )
+    )
+  
+  ds.setDatum(
+    ConstDatum(
+      name = "__loc"
+      desc = "The catalog location."
+      value = catalog.loc
+    )
+  )
+
+  const itemPath = catalog.loc.replace(re("^.+:\/\/"), "")
+
+  ds.setDatum(
+    ConstDatum(
+      name = "__file"
+      desc = "The catalog path."
+      value = itemPath
+    )
+  )
+
+  ds.setDatum(
+    ConstDatum(
+      name = "__filename"
+      desc = "The catalog file name."
+      value = path.basename(itemPath)
+    )
+  )
+
+  ds.setDatum(
+    ConstDatum(
+      name = "__dir"
+      desc = "The dir where the catalog is."
+      value = path.dirname(itemPath)
+    )
+  )
+
+/**
+ * Parses and returns the content of a arguments file.
+ */
+async fn argResolver(filePath: text) -> content: map
+  content = await(fs.readFile(filePath, "utf8"))
+
+  with path.extname(filePath) do
+    if ".yaml", ".yml" then content = yaml.parse(content)
+    if ".json" then content = json.parse(content)
+    else content = {}

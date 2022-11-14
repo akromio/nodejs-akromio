@@ -1,0 +1,9 @@
+use (
+  {QuestionsCommand as QuestionsCommandBase} = alias://cli
+  _JobCommand
+)
+
+/**
+ * The questions command.
+ */
+export struct QuestionsCommand: QuestionsCommandBase:: _JobCommand

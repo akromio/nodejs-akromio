@@ -1,0 +1,15 @@
+use (
+  {CatalogReader as CatalogReaderBase} = alias://catalogReader
+  {JobCatalogMerger as CatalogMerger} = alias://jobs
+)
+
+/**
+ * A reader for reading catalog declarations.
+ *
+ * This reads the catalog from a given registry and,
+ * if it contains an extends field,
+ * reads the extended catalog declaration and mixes both of them.
+ */
+export struct CatalogReader: CatalogReaderBase
+  @override
+  pub const merger = CatalogMerger()

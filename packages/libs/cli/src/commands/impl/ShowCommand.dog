@@ -1,0 +1,65 @@
+use (
+  {Ops} = alias://core
+  {table, tableOpts} = ../../helpers/table
+  ../CatalogCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = CatalogCommandBase
+
+/**
+ * A catalog command.
+ */
+@abstract
+export struct CatalogCommand: CatalogCommandBase
+  @override
+  pub const name := ["show"]
+
+  @override
+  pub const desc := "Show a job catalog declaration."
+
+  @override
+  pub const hidden := true
+
+  @override
+  pub const positionals := {}
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+  }
+
+  /**
+   * Creates the job parser to use.
+   */
+  @abstract
+  pub fn createJobParser(): JobParser
+
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, all, tag, args, desc})
+    #(1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      #(2) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+
+      #(3) get the catalog decl
+      var decl
+      
+      catalogName = self.buildCatalogPath(catalogName)
+      decl = await(self.readCatalogDecl(catalogName, registries))
+
+      if not decl then
+        print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+
+      #(4) show
+      printf(decl)
+    finally
+      await(registries.disconnect())

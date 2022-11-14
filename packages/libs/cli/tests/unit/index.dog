@@ -1,0 +1,21 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, its API must be exported", proc()
+    expected(pkg).members(
+      "createCommands"
+      "table"
+      "CatalogCommand"
+      "DatasetCommand"
+      "DescCommand"
+      "EnvCommand"
+      "RegistryCommandBase"
+      "RunCommand"
+      "ShowCommand"
+      "TriggerCommand"
+    ).toBeCallable()
+  end)
+end)

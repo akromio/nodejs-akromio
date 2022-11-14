@@ -1,0 +1,39 @@
+/**
+ * A CLI command.
+ */
+@abstract
+export struct Command
+  /**
+   * The command name.
+   */
+  @abstract
+  pub const name: text[]
+
+  /**
+   * The command description.
+   */
+  @abstract
+  pub const desc: text
+
+  /**
+   * The command options.
+   */
+  @abstract
+  pub const options?: map
+
+  /**
+   * The positional options.
+   */
+  @abstract
+  pub const positionals: map
+
+  /**
+   * When true, don't display option in the help.
+   */
+  @abstract
+  pub const hidden := false
+
+  /**
+   * The command handler.
+   */
+  pub fn handler = bind(self, "handle")

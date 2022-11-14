@@ -1,0 +1,8 @@
+/**
+ * The state which a triger is in.
+ */
+export enum TriggerState
+  nonStarted
+  started
+  running
+  stopped

@@ -1,0 +1,39 @@
+/**
+ * Creates the CLI commands.
+ */
+export proc createCommands(yargs, commands)
+  for each cmd in commands do
+    if cmd is list then
+      createCompositeCommand(yargs, ...cmd)
+    else
+      createSimpleCommand(yargs, cmd)
+
+/**
+ * Creates a simple command.
+ */
+proc createSimpleCommand(yargs, cmd)
+  if not cmd.positionals then
+    yargs.command(cmd.name, cmd.desc, cmd.options, cmd.handler)
+  else
+    fn builder(yargs)
+      for each key, value in cmd.positionals do
+        yargs.positional(key, value)
+      
+      for each key, value in cmd.options do
+        yargs.option(key, value)
+
+    yargs.command(
+      cmd.name
+      if cmd.hidden then false else cmd.desc end
+      builder
+      cmd.handler
+    )
+
+/**
+ * Creates a composite command.
+ */
+proc createCompositeCommand(yargs, cmd, ...subcmds)
+  yargs.command(cmd.name, cmd.desc, proc(yargs)
+    for each cmd in subcmds do
+      createSimpleCommand(yargs, cmd)
+  end)

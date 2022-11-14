@@ -1,0 +1,13 @@
+/**
+ * Interface for the trigger implementations.
+ */
+export intf TriggerImpl
+  /**
+   * Starts the trigger.
+   */
+  start: func
+  
+  /**
+   * Stops the trigger.
+   */
+  stop: func
