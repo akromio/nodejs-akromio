@@ -35,7 +35,7 @@
     "@dogmalang/core": "^1.0.0-rc18.0"
   },
   "devDependencies": {
-    "@akromio/dataset": "^0.0.0"
+    "@akromio/dataset": "^0.1.0"
   },
   "scripts": {
     "lint": "dogmac check src tests",
