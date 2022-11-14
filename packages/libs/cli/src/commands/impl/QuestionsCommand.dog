@@ -1,0 +1,95 @@
+use (
+  {DatasetParser} = alias://dataset
+  {QuestionDescriber} = alias://inquirer
+  {table, tableOpts} = ../../helpers/table
+  ../CatalogCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = CatalogCommandBase
+
+/**
+ * A questions command.
+ */
+@abstract
+export struct QuestionsCommand: CatalogCommandBase
+  @override
+  pub const name := ["questions", "q"]
+
+  @override
+  pub const desc := "List the questions available in a catalog."
+
+  @override
+  pub const positionals := {}
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+  }
+
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, args})
+    #(1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      #(2) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+      
+      #(3) get the catalog decl
+      var decl
+      
+      catalogName = self.buildCatalogPath(catalogName)
+      decl = await(self.readCatalogDecl(catalogName, registries))
+
+      if not decl then
+        print($"Catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+
+      #(4) create dataset
+      const (
+        {createGlobalDataset} = use("../util/dataset")
+        globalDataset = await(createGlobalDataset(catalog = decl, args))
+      )
+
+      const localDataset = DatasetParser().parse(
+        decl.dataset ?? []
+        name = "catalog"
+        parent = globalDataset
+      )
+
+      #(5) show questions
+      print("\nLocation:", decl.loc)
+      listQuestions(localDataset.getData(tag = "questions"))
+    finally
+      await(registries.disconnect())
+
+/**
+ * List the given questions.
+ */
+@noParamCheck
+proc listQuestions(data: Datum[])
+  for each datum in data do
+    #(1) get the data to show
+    const data = QuestionDescriber().describe(datum.getValue())
+
+    #(2) create rows to show
+    const rows = [["Name", "Type", "Question", "Default"]]
+
+    for each key in keys(data).sort() do
+      const (
+        q = data[key]
+        title = q.title + if q.type == "select" then " (" + q.options + ")" else "" end
+      )
+
+      rows.push([key, q.type, title, q.defaultValue])
+
+    #(3) show table
+    print("\nQuestions:", datum.name)
+    print(table(rows, tableOpts))

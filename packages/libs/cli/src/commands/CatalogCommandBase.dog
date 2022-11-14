@@ -1,0 +1,74 @@
+use (
+  dep://path
+  {Registries} = alias://registry
+  RegistryCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = RegistryCommandBase
+
+/**
+ * A command that reads a catalog.
+ */
+@abstract
+export struct CatalogCommandBase: RegistryCommandBase
+  /**
+   * Common options for the catalog commands.
+   */
+  @hidden
+  pub static const baseOptions = baseOptions{
+    *
+    
+    catalogName = {
+      type = "string"
+      alias = ["c", "catalog"]
+      desc = "The catalog to use: catalogName or registryName://catalogName."
+      default = $KRM_JOB_CATALOG_NAME
+    }
+
+    registryAndCatalogName = {
+      type = "string"
+      alias = ["C"]
+      desc = "Register a built-in registry and set its catalog to use: registry://catalogName."
+    }
+    
+    arg = {
+      type = "array"
+      alias = ["a", "args"]
+      desc = "An argument (if name=value) or an arguments file path. Available using $(args.name)."
+      default = []
+    }
+  }
+
+  /**
+  * The registries to use.
+   */
+  @hidden
+  pub var registries?: Registries
+
+  /**
+   * Creates and returns the catalog reader to use.
+   */
+  @abstract @hidden
+  pub fn createCatalogReader(): CatalogReader
+  
+  /**
+   * Reads a catalog declaration from the registries.
+   *
+   * If the catalog unexists, nil returned.
+   */
+  @hidden @noParamCheck
+  pub async fn readCatalogDecl(catalogName: text, registries: Registries, registryName?: text): map
+    const reader = self.createCatalogReader()
+    return await(reader.readCatalogDecl(catalogName, registries, registryName))
+  
+  /**
+   * Returns the default catalog name when relative.
+   * If path is returned w/o changes.
+   */
+  @hidden
+  pub fn buildCatalogPath(catalogPath: text) -> catalogPath
+    if not catalogPath.startsWith("/") then
+      catalogPath = path.join("/", $KRM_JOB_CATALOGS_PATH, catalogPath)

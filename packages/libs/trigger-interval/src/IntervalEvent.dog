@@ -1,0 +1,13 @@
+/**
+ * An interval event.
+ */
+export struct IntervalEvent
+  /**
+   * The time when the event happened.
+   */
+  pub const ts: timestamp
+
+  /**
+   * When true, this is the last event to be fired.
+   */
+  pub const last: bool

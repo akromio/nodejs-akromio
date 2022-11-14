@@ -1,0 +1,13 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(pkg)\
+      .toHave(name = "interval")\
+      .member("desc").toBeText()\
+      .member("impl").toBeCallable()
+  end)
+end)

@@ -1,0 +1,13 @@
+/**
+ * The data of the job to run by the trigger.
+ */
+export intf JobCall
+  /**
+   * The job name.
+   */
+  jobName: text
+
+  /**
+   * The arguments to pass.
+   */
+  args?: any

@@ -1,0 +1,86 @@
+use (
+  IntervalEvent
+)
+
+/**
+ * A trigger implementation to fire an event periodically.
+ *
+ * The first event is raised immediately, except if immediate is false.
+ */
+export struct IntervalTriggerImpl
+  /**
+   * The timer object.
+   */
+  @hidden @strict
+  pub var timer = nil
+
+  /**
+   * The interval, in miliseconds.
+   */
+  pub const interval: num
+
+  /**
+   * It indicates if the first event must be after delay.
+   */
+  pub const immediate := true
+
+  /**
+   * Number of times the trigger must be fired.
+   *
+   * If unset, infinite.
+   */
+  pub const times?: num
+
+  /**
+   * Number of times fired up to now.
+   */
+  @hidden @strict
+  pub var fired = 0
+
+  /**
+   * The handler to call when event fired.
+   *
+   * Prototype: proc(e: {ts: timestamp}).
+   */
+  @hidden
+  pub var handler?: func
+
+  /**
+   * Starts the trigger.
+   */
+  pub fn start(handler: func) -> self
+    # (1) define callback
+    const callback = proc()
+      self.fired += 1
+
+      if not (self.times is num and self.fired > self.times) then
+        self.fire(timestamp())
+    end
+
+    # (2) set timers
+    self.{handler, fired = 0}
+
+    if self.immediate then setImmediate(callback)
+    self.timer = setInterval(callback, self.interval)
+  
+  /**
+   * Stops de trigger.
+   */
+  pub fn stop() -> self
+    self.handler = nil
+    clearInterval(self.timer)
+    self.timer = nil
+  
+  /**
+   * Handles an interval event.
+   */
+  @hidden
+  pub async proc fire(ts: timestamp)
+    # (1) create event
+    const e = IntervalEvent(
+      ts=,
+      last = self.times is num and self.fired >= self.times
+    )
+
+    # (2) call the handler
+    await(self.handler(e))

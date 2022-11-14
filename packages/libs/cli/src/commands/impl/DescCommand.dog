@@ -1,0 +1,264 @@
+use (
+  dep://yaml
+  ../Command
+)
+
+/**
+ * The thing descriptions.
+ */
+const things = {
+  env =
+    desc = "The environment used by the tool."
+    observations = "
+      - The prefix used for the environment variables is KRM_,
+        Akromio without vowels.
+
+      - The .env file must be located in the $KRM_DIR_NAME.
+        The secrets and cryptographic keys should be saved in $KRM_PRIVATE_ENV_FILE.
+        If you don't want to load some of these files, set its environment variable to the empty string.
+
+        The $KRM_PRIVATE_ENV_FILE should contain secrets or private keys, make sure that this is in .gitignore.
+        The secrets and private keys shouldn't be commited to a Git repo.
+
+        Every variable have the following format: name=value or name=\"value\".
+        Comments: #comment to the end of the line.
+      
+      - You can list the environment with the command 'e' or 'env' of the tool.
+    "
+  
+  registries =
+    desc = "How to use the registries."
+    observations = "
+      - By default, the following registries are created:
+
+        - local, linked to the current directory.
+
+        - localApm, linked to the APM in the current directory.
+
+        - user, linked to the user home directory.
+      
+      - The default registries to create are set in $KRM_REGISTRIES.
+      
+      - We can use the following registries:
+
+        - fs://localDirAbsolutePath:
+          a filesystem registry bound to the local given dir path.
+        
+        - git://user/repo/branch, git://user/repo, git://repo:
+          a Git registry bound to a GitHub repo.
+          We can configure it with $KRM_REGISTRY_GIT_*.
+
+        - http, http://host/basePath or http://host:
+          an HTTP registry bound to a web service.
+          The $KRM_REGISTRY_HTTP_* can be used.
+
+        - sns, sns://skynetPortal/publicKey/name, sns://publicKey/name,
+          sns://portal/name or sns://name:
+          a Sia Name Service registry, bound to a public key and a data key (or name).
+          All the segments can be set with $KRM_REGISTRY_SNS_*.
+
+        - skynet, skynet://portal/skylink or skynet://skylink:
+          a dir uploaded to Sia Skynet.
+          $KRM_REGISTRY_SKYNET_* available.
+    "
+
+  macro =
+    desc = "Creates a catalog macro, that is, a sequence of steps to run one by one."
+    examples = "
+      - macro: json2yaml
+        desc: Generates a YAML file from a JSON file.
+        steps:
+          - [$data, <file.read, $(args.src)]
+          - [$value, json.decode, $(data)]
+          - [$value, yaml.encode, $(value)]
+          - [file.write, $(value), $(args.dst)]
+    "
+  
+  loop =
+    desc = "Creates a catalog loop, that is, a sequence of steps to run for each item in a collection."
+    examples = "
+      - loop: backupFiles
+        desc: Performs a backup of several files.
+        forEach: [list, one.txt, two.txt, three.txt]
+        steps:
+          - [$filePath, path.join, $(dir), $(i)]
+          - [fs.cp, $(filePath), $(filePath).backup]
+    "
+  
+  co =
+    desc = "Creates an concurrent operation, that is, several steps to run concurrently."
+    examples = "
+      - co: backup
+        desc: Performs a backup of several files.
+        steps:
+          - [fs.cp, file1.txt, file1.txt.old]
+          - [fs.cp, file2.txt, file2.txt.old]
+    "
+
+  dataset =
+    desc = "Creates the data to use in the catalog."
+    examples = "
+      dataset:
+        - const: src
+          desc: The source file path.
+          value: $(args.src)
+          defaultValue: file.json
+        
+        - var: dst
+          desc: The destination file.
+          value: $(args.dst)
+          defaultValue: file.yaml
+    "
+    observations = "
+      - Please, see 'var' too.
+    "
+  
+  var =
+    desc = "Creates a variable datum in the dataset, accessible with $(name) in the catalog."
+    def = "
+      - var: var name
+        desc: brief description
+        value: the value to set
+        defaultValue: the value to set if value is undefined
+        dataType: the data type (any, bool, text, num or list)
+        options: [the, possible, values]
+    "
+    observations = "
+      - When dataType is bool, if the value is text ('y', 'yes', 't' or 'true').
+        this is casted to true implicitly.
+      
+      - When dataType is bool, if the value is text ('n', 'no', 'f' or 'false'),
+        this is casted to false implicitly.
+      
+      - When dataType is num, if the value is a text,
+        this is parsed to number implicitly.
+      
+      - The value can access to previous data defined using $(datumName)
+        such as, for example:
+
+          value: /my/file.$(args.ext)
+    "
+  
+  const =
+    desc = "Creates a constant datum into the dataset, accessible with $(name) in the catalog."
+    observations = "
+      - Similar to var but using the 'const' field instead of 'var'.
+    "
+  
+  questions =
+    desc = "How to create questions."
+
+    def = "
+      # confirm something
+      - confirm: answerName
+        title: text to show to the user
+        defaultValue: true or false
+      
+      # input from the user
+      - input: answerName
+        title: text to show to the user
+        defaultValue: value to set if no input
+      
+      # password input from the user
+      - password: answerName
+        title: text to show to the user
+        defaultValue: value to set if no input
+      
+      # select from several options
+      - select: answerName
+        title: text to show to the user
+        options: [option1, option2, option3...]
+        multiple: true or false, indicating if several options can be selected
+        selected: default selection
+        defaultValue: alias for selected
+    "
+
+    examples = "
+      spec: v1.0
+      desc: Catalog for working with Visual Studio Code.
+
+      dataset:
+        - const: src
+          desc: The source code of this catalog.
+          value: $(__dir)/__vscode
+          tags: [hidden]
+        
+        - const: dst
+          desc: The local destination dir where to save the files and dirs.
+          value: $(workDir)
+        
+        - const: settingsQ
+          tags: [hidden, questions]
+          value:
+            - input: lang
+              title: cSpell.language (for example, es, en, fr, it...)
+              defaultValue: en
+
+            - confirm: prettier
+              title: Would you like to configure Prettier for TypeScript
+              defaultValue: true
+
+      jobs:
+        - macro: settings
+          desc: Creates the .vscode/settings.
+          ini:
+            - quiet: $answers = inquire $(settingsQ) $(answers)
+          steps:
+            - fs.createDir $(dst)/.vscode
+            - quiet: $item = cr.getItem $(src)/_vscode/settings.json
+            - quiet: $settings = hbs.render $(item.value) $(answers)
+            - file.write $(settings) $(dst)/.vscode/settings.json
+    "
+
+    observations = "
+      - The questions must be created in a const datum.
+        This must have the questions tag and optionally hidden if wanted.
+      
+      - The questions are performed with the inquire plugin.
+        Example:
+          - quiet: $answers = inquire $(myQ) $(answers)
+      
+      - We list the questions defined in a catalog with the command questions (q).
+
+      - We can pass the value for the questions with the options -a, --arg or --args.
+        Show the help of the 'run' command.
+    "
+}
+
+/**
+ * The desc command.
+ */
+export struct DescCommand: Command
+  @override
+  pub const name := ["describe <thing>", "desc"]
+
+  @override
+  pub const desc := "Describe a thing on akro such as, for example, an operation."
+
+  @override
+  pub const options := {}
+
+  @override
+  pub const positionals := {
+    thing =
+      choices = keys(things)
+      desc = "Thing to describe."
+  }
+
+  @override
+  pub async proc handle(argv=> {thing})
+    if desc ::= things[thing] then
+      print("Name:", thing)
+      print("Description:", desc.desc)
+
+      if desc.def then
+        print("Definition:")
+        print(desc.def)
+      
+      if desc.observations then
+        print("Observations:")
+        print(desc.observations)
+
+      if desc.examples then
+        print("Examples:")
+        print(desc.examples)

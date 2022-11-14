@@ -1,0 +1,9 @@
+use (
+  IntervalTriggerImpl
+)
+
+export {
+  name = "interval"
+  desc = "Trigger to fire an event at intervals."
+  impl = IntervalTriggerImpl
+}

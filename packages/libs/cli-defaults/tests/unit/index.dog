@@ -1,0 +1,14 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, its API must be exported", proc()
+    expected(pkg).toHave(
+      "dir"
+      "apm"
+      "registry"
+    )
+  end)
+end)

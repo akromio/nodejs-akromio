@@ -1,0 +1,82 @@
+use (
+  Command
+  {Registries, RegistryBuilder, RegistryStringParser} = alias://registry
+  dep://path
+)
+
+/**
+ * Base for the commands using registries.
+ */
+export struct RegistryCommandBase: Command
+  /**
+   * Common options for the registry commands.
+   */
+  @hidden
+  pub static const baseOptions = {
+    registries =
+      type = "string"
+      alias = ["g"]
+      desc = "The registries to use, separated by commas."
+      default = $KRM_REGISTRIES
+  }
+
+  /**
+   * The registry defaults to use.
+   */
+  @abstract
+  pub const defaults: map
+
+  /**
+   * Creates the registries to use.
+   */
+  @hidden
+  pub fn createRegistries(opts: map) -> registries: Registries
+    #(1) set defaults to use
+    const {defaults} = self
+
+    #(2) create the registries
+    const (
+      builder = RegistryBuilder()
+      parser = RegistryStringParser()
+      registriesToCreate = if opts.registryAndCatalogName then
+        [opts.registryAndCatalogName.split("://")[0]]
+      else
+        opts.registries.split(",")
+      end
+    )
+
+    registries = Registries()
+
+    for each decl := registriesToCreate do
+      with decl do
+        if "local" then
+          decl = "local=fs://" + path.join(ps.workDir, $KRM_DIR_NAME)
+        
+        if "localApm" then
+          decl = "localApm=fs://" + path.join(ps.workDir, $KRM_DIR_NAME, $KRM_APM_DIR_NAME)
+
+        if "user" then
+          decl = "user=fs://" + path.join($HOME, $KRM_DIR_NAME)
+
+        if "skynet" then
+          decl = "skynet://" + $KRM_REGISTRY_SKYNET_PORTAL + "/" + $KRM_REGISTRY_SKYNET_SKYLINK
+        
+        if "sns" then
+          decl = "sns://" + $KRM_REGISTRY_SNS_PORTAL + "/" + $KRM_REGISTRY_SNS_NAME
+          
+        if "http" then
+          decl = "http://" + $KRM_REGISTRY_HTTP_HOST
+
+          if base ::= $KRM_REGISTRY_HTTP_BASE then
+            decl += if base.startsWith("/") then "" else "/" end + base
+
+      registries.appendRegistry(builder.create(parser.parse(decl, defaults)))
+  
+  /**
+   * Returns an item from the registries or a given registry.
+   */
+  @hidden
+  pub fn getRegistryItem(itemName: text, registries, registryName?: text) = registries.getItem(
+    itemName
+    registry
+  )

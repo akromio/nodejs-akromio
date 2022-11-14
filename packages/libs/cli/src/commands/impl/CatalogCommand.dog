@@ -1,0 +1,140 @@
+use (
+  {Ops} = alias://core
+  {table, tableOpts} = ../../helpers/table
+  ../CatalogCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = CatalogCommandBase
+
+/**
+ * A catalog command.
+ */
+@abstract
+export struct CatalogCommand: CatalogCommandBase
+  @override
+  pub const name := ["catalog", "cat", "c", "*"]
+
+  @override
+  pub const desc := "List the content of a jobs catalog."
+
+  @override
+  pub const positionals := {}
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+    
+    desc =
+      type = "boolean"
+      desc = "Show the catalog description if available."
+      default = false
+    
+    all =
+      type = "boolean"
+      alias = ["l"]
+      desc = "Show all the jobs, including these with hidden tag."
+      default = false
+    
+    tag =
+      type = "string"
+      alias = ["t"]
+      desc = "Show the jobs with a given tag."
+  }
+
+  /**
+   * Creates the job parser to use.
+   */
+  @abstract
+  pub fn createJobParser(): JobParser
+
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, all, tag, args, desc})
+    #(1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      #(2) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+      
+      #(3) get the catalog decl
+      var decl
+      
+      catalogName = self.buildCatalogPath(catalogName)
+      decl = await(self.readCatalogDecl(catalogName, registries))
+
+      if not decl then
+        print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+
+      #(4) list
+      print("\nLocation:", decl.loc)
+      showCatalogDesc(decl, desc)
+      self.listJobDecls(decl.jobs ?? [], decl.defaultJobName, tag, all)
+    finally
+      await(registries.disconnect())
+
+  /**
+  * Lists the job declarations.
+  */
+  @hidden
+  pub proc listJobDecls(decls: map[], defaultJobName?: text, tag?: text, all: bool)
+    #(1) get the data to show
+    const (
+      data = {}
+      jobParser = self.createJobParser()
+      jobs = jobParser.parseJobs(
+        decls
+        ops = Ops()
+      )
+    )
+
+    for each name, job in jobs do
+      if all then
+        data[name] = job
+      else if tag then
+        if job.tags.includes(tag) then
+          data[name] = job
+      else
+        if job.tags.includes("hidden") then nop
+        else data[name] = job
+    
+    #(2) create rows to show
+    const rows = [["Job", "Type", "Tags", "Desc."]]
+
+    for each key in keys(data).sort() do
+      var (
+        job ::= data[key]
+        name ::= key + if key == defaultJobName then "*" else "" end
+        opType
+      )
+
+      with type(job) do
+        if "Macro" then opType = "macro"
+        if "Loop" then opType = "loop"
+        if "Co" then opType = "co"
+        if "Script" then opType = "script"
+      
+      rows.push([name, opType, job.tags, job.desc])
+
+    #(3) show table
+    print("\nJobs:")
+    print(table(rows, tableOpts))
+
+/**
+ * Shows a given catalog description if requested.
+ */
+proc showCatalogDesc(catalog: map, show: bool)
+  if show then
+    if extends ::= catalog.extends; len(extends) > 0 then
+      print("\nExtends:", extends.join(", "))
+
+    if desc ::= catalog.desc then
+      print("\nDescription:")
+      print(desc)

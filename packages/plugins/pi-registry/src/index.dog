@@ -1,0 +1,29 @@
+export {
+  plugin = "registry"
+  desc = "Plugin for working with registries."
+  tags = ["built-in"]
+  defaultOpName = "getItem"
+  ini = initialize
+  fin = finalize
+  ops =
+    getItem = use("./ops/getItem")
+    copy = use("./ops/copy")
+}
+
+/**
+ * Initializes the plugin, returning its state.
+ */
+async fn initialize(args) -> state: map
+  if args is "Registry" then
+    state.builtIn = true
+    state.registry = args
+  # else
+  #   state.registry = ...
+  #   await(state.connect())
+
+/**
+ * Finalizes the plugin.
+ */
+proc finalize(state)
+  if not state.builtIn then
+    state.registry.disconnect()

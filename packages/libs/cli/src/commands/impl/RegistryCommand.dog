@@ -1,0 +1,77 @@
+use (
+  dep://path
+  dep://yaml
+  {Ops} = alias://core
+  {table, tableOpts} = ../../helpers/table
+  ../RegistryCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = RegistryCommandBase
+
+/**
+ * A registry command.
+ */
+@abstract
+export struct RegistryCommand: RegistryCommandBase
+  @override
+  pub const name := ["registry [registryName]", "g"]
+
+  @override
+  pub const desc := "List the catalogs available in a registry."
+
+  @override
+  pub const positionals := {
+    registryName =
+      type = "string"
+      desc = "The registry name to list."
+  }
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+  }
+
+  @override @hidden
+  pub async proc handle(argv=> {registryName})
+    #(1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      #(2) determine the registry to query
+      registryName ?= registries.registryNames[0]
+
+      const registry = registries.getRegistry(registryName)
+      
+      if not registry then
+        print($"Registry '${registryName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+      
+      #(3) list
+      await(listCatalogs(registry, path.join("/", $KRM_JOB_CATALOGS_PATH)))
+    finally
+      await(registries.disconnect())
+  
+/**
+ * Lists the catalogs of a given [registry].
+ * The [rootPath] sets the root where the catalogs are in the registry.
+ */
+async proc listCatalogs(registry, rootPath: text)
+  #(1) get the catalog rows
+  const rows = [["Catalog", "Desc."]]
+
+  for each entry in await(registry.listItems(rootPath)) do
+    if not entry.startsWith("_") and entry.endsWith(".yaml") then
+      const (
+        catalogName = path.basename(entry, ".yaml")
+        itemPath = path.join(rootPath, entry)
+        item = await(registry.getItem(itemPath))
+      )
+
+      rows.push([catalogName, yaml.parse(text(item.value)).desc])
+  
+  #(2) show
+  print()
+  print(table(rows, tableOpts))

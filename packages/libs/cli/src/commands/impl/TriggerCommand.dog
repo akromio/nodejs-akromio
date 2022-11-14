@@ -1,0 +1,154 @@
+use (
+  {Duplex} = dep://stream
+  {Runner, Ops, PluginLoader, PluginParser} = alias://core
+  {Trigger} = alias://trigger
+  alias://intervalTriggerImpl
+  ../RunCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = RunCommandBase
+
+/**
+ * The trigger command.
+ */
+@abstract
+export struct TriggerCommand: RunCommandBase
+  @override
+  pub const name := ["trigger [jobName]", "t"]
+
+  @override
+  pub const desc := "Fire a trigger to run a job from a catalog."
+
+  @override
+  pub const positionals := {
+    jobName =
+      type = "string"
+      desc = "The job name to run. If unset, defaultJobName will be used."
+  }
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+    {onError} = baseOptions
+    {reporter} = baseOptions
+    {summaryReporter} = baseOptions
+    {answer} = baseOptions
+
+    triggerName =
+      type = "string"
+      alias = ["trigger", "t"]
+      desc = "The trigger name to use. If unset, defaultTriggerName will be used."
+  }
+
+  /**
+   * Creates and returns the catalog parser to use.
+   */
+  @abstract @hidden
+  pub fn createCatalogParser(opts: map): CatalogParser
+
+  @override @hidden
+  pub async proc handle(argv=> {triggerName, catalogName, registryAndCatalogName, jobName, onError, args, answers, reporters, summaryReporters})
+    #(1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      #(2) create the ops to use
+      const ops = Ops()
+
+      #(3) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+
+      #(4) get the catalog decl
+      const decl = await(self.readCatalogDecl(
+        (catalogName = self.buildCatalogPath(catalogName))
+        registries
+      ))
+
+      if not decl then
+        print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+
+      #(5) create global dataset
+      const (
+        {createGlobalDataset} = use("../util/dataset")
+        globalDataset = await(createGlobalDataset(catalog = decl, args, answers))
+      )
+
+      #(6) create catalog instance
+      const (
+        pluginParser = PluginParser()
+        catalog = await(self.createCatalog(decl, pluginParser, globalDataset, ops))
+      )
+
+      #(7) create engine
+      const (
+        log = native("new Duplex({emitClose: true, read() {}, write() {}})")
+        engine = await(self.createEngine(
+          {
+            dataset = catalog.dataset
+            onError = catalog.onError or onError
+            runner = Runner(log=)
+            pluginParser
+            ops
+          }
+
+          registries.getRegistry(decl.registryName)
+        ))
+      )
+      
+      reporters = self.createReporters(reporters, log).connect()
+      ops.appendOps(...values(catalog.jobs))
+
+      #(8) create trigger
+      const trigger = createTrigger(triggerName, catalog, engine, jobName, args)
+
+      if not trigger.call.jobName then
+        console.error("Catalog doesn't contain default job name.")
+        ps.exit(2)
+
+      #(9) run trigger
+      var code = 0
+
+      trigger.start(async proc(result?)
+        do
+          if result then code = 1
+        finally
+          await(catalog.finalize())
+          ps.exit(code)
+      end)
+    finally
+      pawait(registries.disconnect())
+      peval(reporters.disconnect())
+
+/**
+ * Creates a trigger with the given data.
+ */
+@noParamCheck
+fn createTrigger(name, cat, engine, jobName?, jobArgs?) -> trigger
+  #(1) get trigger declaration
+  const decl = cat.triggers[name ?? cat.defaultTriggerName]
+
+  #(2) get the trigger implementation
+  var TriggerImpl
+
+  with i ::= decl.impl do
+    if "interval" then TriggerImpl = intervalTriggerImpl.impl
+    else throw(TypeError($"Invalid trigger implementation: ${i}."))
+
+  #(3) create trigger
+  trigger = Trigger(
+    name = decl.trigger
+    engine
+    call = {
+      jobName = jobName ?? cat.defaultJobName
+      args = jobArgs
+    }
+    triggerImpl = TriggerImpl(decl)
+  )

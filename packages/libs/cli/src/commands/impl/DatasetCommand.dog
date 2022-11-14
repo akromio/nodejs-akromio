@@ -1,0 +1,134 @@
+use (
+  {DatasetParser, DatasetDescriber} = alias://dataset
+  {QuestionDescriber} = alias://inquirer
+  {table, tableOpts} = ../../helpers/table
+  ../CatalogCommandBase
+)
+
+/**
+ * The options defined in the super types.
+ */
+const {baseOptions} = CatalogCommandBase
+
+/**
+ * A dataset command.
+ */
+@abstract
+export struct DatasetCommand: CatalogCommandBase
+  @override
+  pub const name := ["dataset", "ds"]
+
+  @override
+  pub const desc := "List the dataset of a catalog."
+
+  @override
+  pub const positionals := {}
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+
+    showPasswordValues =
+      type = "boolean"
+      alias = ["p"]
+      desc = "Show the password values (these with the tag 'password'); otherwise, these will be obfuscated."
+      default = false
+    
+    tag =
+      type = "string"
+      alias = ["t"]
+      desc = "Only show the data with the given tag."
+    
+    showType =
+      type = "boolean"
+      desc = "Show the datum type: var, const, fn."
+      default = false
+    
+    showOptions =
+      type = "boolean"
+      alias = ["o"]
+      desc = "Show the datum options."
+      default = false
+    
+    notShowDesc =
+      type = "boolean"
+      alias = ["D"]
+      desc = "Not show the datum description."
+      default = false
+  }
+
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, args})
+    #(1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      #(2) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+      
+      #(3) get the catalog decl
+      var decl
+      
+      catalogName = self.buildCatalogPath(catalogName)
+      decl = await(self.readCatalogDecl(catalogName, registries))
+
+      if not decl then
+        print($"Catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+
+      #(4) create dataset
+      const (
+        {createGlobalDataset} = use("../util/dataset")
+        globalDataset = await(createGlobalDataset(catalog = decl, args))
+      )
+
+      const localDataset = DatasetParser().parse(
+        decl.dataset ?? []
+        name = "catalog"
+        parent = globalDataset
+      )
+
+      #(5) show data
+      print("\nLocation:", decl.loc)
+      listDataset(localDataset, argv)
+    finally
+      await(registries.disconnect())
+
+/**
+ * List the data in a given dataset.
+ */
+proc listDataset(dataset, opts=> {showType, showOptions, notShowDesc})
+  #(1) get the data to show
+  const data = DatasetDescriber().describeData(dataset, opts)
+
+  #(2) determine header
+  const header = ["Datum"]
+  
+  if showType then header.push("Type")
+  header.push("Value")
+  if showOptions then header.push("Options")
+  if not notShowDesc then header.push("Desc.")
+
+  #(3) create rows to show
+  const rows = [header]
+
+  for each key in keys(data).sort() do
+    const (
+      datum = data[key]
+      row = [key]
+    )
+
+    if showType then row.push(datum.kind)
+    row.push(datum.value)
+    if showOptions then row.push(datum.options ?? "")
+    if not notShowDesc then row.push(datum.desc ?? "")
+
+    rows.push(row)
+
+  #(4) show table
+  print("\nDataset:")
+  print(table(rows, tableOpts))

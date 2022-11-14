@@ -1,0 +1,35 @@
+use (
+  {table} = dep://table
+)
+
+/**
+ * The table package.
+ */
+pub table
+
+/**
+ * The options to use with table.
+ */
+pub const tableOpts = {
+  border =
+    topBody = ""
+    topJoin = ""
+    topLeft = ""
+    topRight = ""
+
+    bottomBody = ""
+    bottomJoin = ""
+    bottomLeft = ""
+    bottomRight = ""
+
+    bodyLeft = ""
+    bodyRight = ""
+    bodyJoin = ""
+
+    joinBody = "-"
+    joinLeft = ""
+    joinRight = ""
+    joinJoin = ""
+
+  drawHorizontalLine = fn(ix) = ix == 1 end
+}

@@ -1,0 +1,12 @@
+use (
+  {CatalogCommand as CatalogCommandBase} = alias://cli
+  {JobParser} = alias://jobs
+  _JobCommand
+)
+
+/**
+ * The catalog command.
+ */
+export struct CatalogCommand: CatalogCommandBase:: _JobCommand
+  @override
+  pub fn createJobParser() = JobParser()
