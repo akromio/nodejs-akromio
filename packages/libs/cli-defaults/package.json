@@ -1,6 +1,6 @@
 {
   "name": "@akromio/cli-defaults",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI defaults for the Akromio core tools.",
   "author": {
     "name": "Sia Codelabs",
