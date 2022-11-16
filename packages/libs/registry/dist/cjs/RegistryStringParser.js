@@ -114,13 +114,20 @@ function parseGitString(name, conf, defaults) {
   _core.dogma.expect("conf", conf, _core.text); /* c8 ignore next */
   _core.dogma.expect("defaults", defaults, _core.map);
   {
-    const segments = conf.split("/");
+    const segments = conf == "" ? [] : conf.split("/");
     let user;
     let repo;
     let branch;
+    let prefix = "";
     {
       const _ = (0, _core.len)(segments);
       switch (_) {
+        case 0:
+          {
+            _core.dogma.raise(TypeError(`Invalid git configuration: ${conf}.`));
+          } /* c8 ignore start */
+          break;
+        /* c8 ignore stop */
         case 1:
           {
             user = defaults.user;
@@ -136,15 +143,10 @@ function parseGitString(name, conf, defaults) {
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
-        case 3:
-          {
-            [user, repo, branch] = _core.dogma.getArrayToUnpack(segments, 3);
-          } /* c8 ignore start */
-          break;
-        /* c8 ignore stop */
         default:
           {
-            _core.dogma.raise(TypeError(`Invalid git configuration: ${conf}.`));
+            [user, repo, branch] = _core.dogma.getArrayToUnpack(_core.dogma.getSlice(segments, 0, 2), 3);
+            prefix = _core.dogma.getSlice(segments, 3, -1).join("/");
           }
       }
     }
@@ -153,7 +155,8 @@ function parseGitString(name, conf, defaults) {
       ["impl"]: "git",
       ["user"]: user,
       ["repo"]: repo,
-      ["branch"]: branch
+      ["branch"]: branch,
+      ["prefix"]: prefix
     };
   }
   return parsed;

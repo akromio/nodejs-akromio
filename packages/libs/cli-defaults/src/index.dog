@@ -15,7 +15,10 @@ export {
   registry =
     git =
       host = "raw.githubusercontent.com"
+      user = "akromio"
+      repo = "builtin-registry"
       branch = "master"
+      prefix = ".akromio"
     
     http =
       host = "web3portal.com"

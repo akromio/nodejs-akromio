@@ -57,6 +57,14 @@ export struct RegistryCommandBase: Command
 
         if "user" then
           decl = "user=fs://" + path.join($HOME, $KRM_DIR_NAME)
+        
+        if "git" then
+          decl = \
+            "git://" + \
+            $KRM_REGISTRY_GIT_USER + \
+            "/" + $KRM_REGISTRY_GIT_REPO + \
+            "/" + $KRM_REGISTRY_GIT_BRANCH + \
+            "/" + $KRM_REGISTRY_GIT_PREFIX
 
         if "skynet" then
           decl = "skynet://" + $KRM_REGISTRY_SKYNET_PORTAL + "/" + $KRM_REGISTRY_SKYNET_SKYLINK

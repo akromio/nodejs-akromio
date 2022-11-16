@@ -11,9 +11,11 @@ suite(__filename, proc()
   const (
     user = "akromio"
     repo = "test"
+    branch = "master"
+    prefix = ""
   )
 
-  fn createConnector(client) = GitConnector(client=, user, repo)
+  fn createConnector(client) = GitConnector(client=, user, repo, branch, prefix)
 
   suite("getItem()", proc()
     test("when item unexists, nil must be returned", async proc()

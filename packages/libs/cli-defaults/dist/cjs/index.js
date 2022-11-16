@@ -18,7 +18,10 @@ module.exports = exports = {
   ["registry"]: {
     ["git"]: {
       ["host"]: "raw.githubusercontent.com",
-      ["branch"]: "master"
+      ["user"]: "akromio",
+      ["repo"]: "builtin-registry",
+      ["branch"]: "master",
+      ["prefix"]: ".akromio"
     },
     ["http"]: {
       ["host"]: "web3portal.com",

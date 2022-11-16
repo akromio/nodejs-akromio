@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const path = _core.dogma.use(require("path"));
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   RegistryStringParser
@@ -11,6 +12,12 @@ suite(__filename, () => {
     const skylink = "0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0";
     const skyportal = "siasky.net";
     const defaults = {
+      ["dir"]: ".akromio",
+      ["jobs"]: {
+        ["catalogs"]: {
+          ["path"]: "/jobs/catalogs/"
+        }
+      },
       ["git"]: {
         ["user"]: "akromio",
         ["repo"]: "docker",
@@ -68,7 +75,8 @@ suite(__filename, () => {
                   'impl': "git",
                   'user': defaults.git.user,
                   'repo': "mydocker",
-                  'branch': defaults.git.branch
+                  'branch': defaults.git.branch,
+                  'prefix': ""
                 });
               }
             });
@@ -80,7 +88,8 @@ suite(__filename, () => {
                   'impl': "git",
                   'user': "myuser",
                   'repo': "mydocker",
-                  'branch': defaults.git.branch
+                  'branch': defaults.git.branch,
+                  'prefix': ""
                 });
               }
             });
@@ -92,13 +101,27 @@ suite(__filename, () => {
                   'impl': "git",
                   'user': "myuser",
                   'repo': "mydocker",
-                  'branch': "mybranch"
+                  'branch': "mybranch",
+                  'prefix': ""
+                });
+              }
+            });
+            test("when name=git://user/repo/mybranch/prefix, no default must be used", () => {
+              {
+                const out = parser.parse("test=git://myuser/mydocker/mybranch/pref/ix", defaults);
+                expected(out).equalTo({
+                  'name': "test",
+                  'impl': "git",
+                  'user': "myuser",
+                  'repo': "mydocker",
+                  'branch': "mybranch",
+                  'prefix': "pref/ix"
                 });
               }
             });
             test("when invalid configuration, error raised", () => {
               {
-                const conf = "user/repo/branch/anythingElse";
+                const conf = "";
                 const out = _core.dogma.peval(() => {
                   return parser.parse(`test=git://${conf}`, defaults);
                 });
@@ -194,7 +217,7 @@ suite(__filename, () => {
             test("when name not indicated, protocol used", () => {
               {
                 const out = parser.parse("git://userName/repoName/branchName", defaults);
-                expected(out).equalTo({
+                expected(out).toHave({
                   'name': "git",
                   'impl': "git",
                   'user': "userName",

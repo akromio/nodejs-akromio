@@ -16,13 +16,17 @@ suite(__filename, () => {
   {
     const user = "akromio";
     const repo = "test";
+    const branch = "master";
+    const prefix = "";
     function createConnector(client) {
       /* c8 ignore next */_core.dogma.expect("client", client);
       {
         return GitConnector({
           'client': client,
           'user': user,
-          'repo': repo
+          'repo': repo,
+          'branch': branch,
+          'prefix': prefix
         });
       }
     }
