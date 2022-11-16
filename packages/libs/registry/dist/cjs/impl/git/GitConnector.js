@@ -34,10 +34,15 @@ const $GitConnector = class GitConnector extends InternalConnector {
       writable: false,
       enumerable: true
     });
-    /* c8 ignore start */
-    if (_['branch'] != null) (0, _core.expect)('branch', _['branch'], _core.text); /* c8 ignore stop */
+    (0, _core.expect)('branch', _['branch'], _core.text);
     Object.defineProperty(this, 'branch', {
-      value: (0, _core.coalesce)(_['branch'], "master"),
+      value: (0, _core.coalesce)(_['branch'], null),
+      writable: false,
+      enumerable: true
+    });
+    (0, _core.expect)('prefix', _['prefix'], _core.text);
+    Object.defineProperty(this, 'prefix', {
+      value: (0, _core.coalesce)(_['prefix'], null),
       writable: false,
       enumerable: true
     });
@@ -62,7 +67,7 @@ GitConnector.prototype._getItem = async function (itemPath) {
   _core.dogma.expect("itemPath", itemPath, _core.text);
   {
     const axios = this.client;
-    const url = `https://${self.host}/${self.user}/${self.repo}/${self.branch}/${itemPath}`;
+    const url = `https://${self.host}/${self.user}/${self.repo}/${self.branch}/${self.prefix}${itemPath}`;
     {
       const [ok, resp] = await _core.dogma.pawait(() => axios.get(url));
       if (ok && resp.status == 200) {

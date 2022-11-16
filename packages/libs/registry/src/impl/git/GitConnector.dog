@@ -11,12 +11,12 @@ use (
 @impl(Connector)
 export struct GitConnector: InternalConnector
   /**
-   * The HTTP client to use, compatible with Axios.
+   * HTTP client to use, compatible with Axios.
    */
   pub const client = axios
 
   /**
-   * The host.
+   * Host.
    */
   pub const host := "raw.githubusercontent.com"
 
@@ -26,22 +26,27 @@ export struct GitConnector: InternalConnector
   pub const user: text
 
   /**
-   * The repository name.
+   * Repository name.
    */
   pub const repo: text
 
   /**
-   * The branch name.
+   * Branch name.
    */
-  pub const branch := "master"
+  pub const branch: text
+
+  /**
+   * Path prefix such as, for example, .akromio.
+   */
+  pub const prefix: text
 
   @override
   pub async fn _getItem(itemPath: text) -> item
     const (
       axios = self.client
-      url = $"https://${self.host}/${self.user}/${self.repo}/${self.branch}/${itemPath}"
+      url = $"https://${self.host}/${self.user}/${self.repo}/${self.branch}/${self.prefix}${itemPath}"
     )
-    
+
     if [ok, resp] ::= pawait(axios.get(url)); ok and resp.status == 200 then
       item = {
         name = itemPath

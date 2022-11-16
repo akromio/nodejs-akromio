@@ -74,6 +74,12 @@ RegistryCommandBase.prototype.createRegistries = function (opts) {
             } /* c8 ignore start */
             break;
           /* c8 ignore stop */
+          case "git":
+            {
+              decl = "git://" + _core.ps.env.KRM_REGISTRY_GIT_USER + "/" + _core.ps.env.KRM_REGISTRY_GIT_REPO + "/" + _core.ps.env.KRM_REGISTRY_GIT_BRANCH + "/" + _core.ps.env.KRM_REGISTRY_GIT_PREFIX;
+            } /* c8 ignore start */
+            break;
+          /* c8 ignore stop */
           case "skynet":
             {
               decl = "skynet://" + _core.ps.env.KRM_REGISTRY_SKYNET_PORTAL + "/" + _core.ps.env.KRM_REGISTRY_SKYNET_SKYLINK;

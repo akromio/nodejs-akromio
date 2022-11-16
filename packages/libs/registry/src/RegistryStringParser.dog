@@ -61,11 +61,14 @@ fn parseFsString(name: text, conf: text) -> parsed: map
 fn parseGitString(name: text, conf: text, defaults: map) -> parsed: map
   # (1) extract components
   var (
-    segments ::= conf.split("/")
-    user, repo, branch
+    segments ::= if conf == "" then [] else conf.split("/") end
+    user, repo, branch, prefix = ""
   )
 
   with len(segments) do
+    if 0 then
+      throw(TypeError($"Invalid git configuration: ${conf}."))
+
     if 1 then
       user = defaults.user
       repo = segments[0]
@@ -75,14 +78,17 @@ fn parseGitString(name: text, conf: text, defaults: map) -> parsed: map
       [user, repo] = segments
       branch = defaults.branch
 
-    if 3 then
-      [user, repo, branch] = segments
-    
     else
-      throw(TypeError($"Invalid git configuration: ${conf}."))
+      [user, repo, branch] = segments[0, 2]
+      prefix = segments[3, -1].join("/")
+
   
   # (2) create parsed result
-  parsed = {name, impl = "git", user, repo, branch}
+  parsed = {
+    name
+    impl = "git"
+    user, repo, branch, prefix
+  }
 
 /**
  * Parses a Skynet configuration string.

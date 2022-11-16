@@ -80,61 +80,67 @@ export struct EnvCommand: Command
         desc = "Print the answers for their reuse: options or file."
 
       DIR_NAME =
-        desc = "The dir name where the akromio data is."
+        desc = "Dir name where the akromio data is."
       
       ENV_FILE =
-        desc = "The .env file to load when started. Relative to $DIR_NAME."
+        desc = ".env file to load when started. Relative to $DIR_NAME."
       
       PRIVATE_ENV_FILE =
-        desc = "The .private.env file to load when started. Relative to $DIRNAME."
+        desc = ".private.env file to load when started. Relative to $DIRNAME."
       
       APM_DIR_NAME =
-        desc = "The dir name where the apm catalogs are installed. Relative to $DIR_NAME."
+        desc = "Dir name where the apm catalogs are installed. Relative to $DIR_NAME."
         
       JOB_CATALOGS_PATH =
-        desc = "The dir path to prefix when root job catalog name is relative."
+        desc = "Dir path to prefix when root job catalog name is relative."
       
       JOB_CATALOG_NAME =
-        desc = "The catalog name to use when unset."
+        desc = "Catalog name to use when unset."
       
       JOB_NAME =
-        desc = "The default job name to run when unset."
+        desc = "Default job name to run when unset."
 
       REGISTRIES =
-        desc = "The available registries to use in order, separated by commas."
+        desc = "Available registries to use in order, separated by commas."
       
       REGISTRY_GIT_HOST =
-        desc = "The host where the Git repository is."
+        desc = "Host where the Git repository is."
       
       REGISTRY_GIT_USER =
-        desc = "The user name where the Git repository is."
+        desc = "User name where the Git repository is."
+      
+      REGISTRY_GIT_REPO =
+        desc = "Repository name to use as registry."
       
       REGISTRY_GIT_BRANCH =
-        desc = "The branch name to use."
+        desc = "Branch name to use."
+      
+      REGISTRY_GIT_PREFIX =
+        desc = "Path prefix to use."
       
       REGISTRY_SKYNET_PORTAL =
-        desc = "The Skynet portal (w/o https://) to use when unset."
+        desc = "Skynet portal (w/o https://) to use when unset."
       
       REGISTRY_SKYNET_SKYLINK =
-        desc = "The skylink to use when unset."
+        desc = "Skylink to use when unset."
       
       REGISTRY_SNS_PORTAL =
-        desc = "The Skynet portal (w/o https://) to use when unset."
+        desc = "Skynet portal (w/o https://) to use when unset."
       
       REGISTRY_SNS_PUBLIC_KEY =
-        desc = "The Skynet registry public key to use when unset."
+        desc = "Skynet registry public key to use when unset."
       
       REGISTRY_SNS_NAME =
-        desc = "The SNS name to use when unset."
+        desc = "SNS name to use when unset."
       
       REGISTRY_HTTP_HOST =
-        desc = "The host (w/o https://) to use when unset."
+        desc = "Host (w/o https://) to use when unset."
       
       REGISTRY_HTTP_BASE =
-        desc = "The base path to prefix when HTTP registry used."
+        desc = "Base path to prefix when HTTP registry used."
       
       NODE_PATH =
-        desc = "The paths where the assets (plugins, catalogs...) are installed with NPM."
+        desc = "Paths where the assets (plugins, catalogs...) are installed with NPM."
     }
 
     # (2) build rows

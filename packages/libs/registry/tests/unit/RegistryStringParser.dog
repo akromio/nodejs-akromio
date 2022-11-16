@@ -1,4 +1,5 @@
 use (
+  dep://path
   alias://expected
   {RegistryStringParser} = ~
 )
@@ -9,6 +10,10 @@ suite(__filename, proc()
     skylink = "0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"
     skyportal = "siasky.net"
     defaults = {
+      dir = ".akromio"
+      jobs =
+        catalogs =
+          path = "/jobs/catalogs/"
       git =
         user = "akromio"
         repo = "docker"
@@ -70,6 +75,7 @@ suite(__filename, proc()
           user = defaults.git.user
           repo = "mydocker"
           branch = defaults.git.branch
+          prefix = ""
         )
       end)
 
@@ -84,6 +90,7 @@ suite(__filename, proc()
           user = "myuser"
           repo = "mydocker"
           branch = defaults.git.branch
+          prefix = ""
         )
       end)
 
@@ -98,13 +105,29 @@ suite(__filename, proc()
           user = "myuser"
           repo = "mydocker"
           branch = "mybranch"
+          prefix = ""
+        )
+      end)
+
+      test("when name=git://user/repo/mybranch/prefix, no default must be used", proc()
+        # (1) act
+        const out = parser.parse("test=git://myuser/mydocker/mybranch/pref/ix", defaults)
+
+        # (2) assessment
+        expected(out).equalTo(
+          name = "test"
+          'impl' = "git"
+          user = "myuser"
+          repo = "mydocker"
+          branch = "mybranch"
+          prefix = "pref/ix"
         )
       end)
 
       test("when invalid configuration, error raised", proc()
         # (1) act
         const (
-          conf = "user/repo/branch/anythingElse"
+          conf = ""
           out = peval(parser.parse($"test=git://${conf}", defaults))
         )
 
@@ -221,7 +244,7 @@ suite(__filename, proc()
         const out = parser.parse("git://userName/repoName/branchName", defaults)
 
         # (2) assessment
-        expected(out).equalTo(
+        expected(out).toHave(
           name = "git"
           'impl' = "git"
           user = "userName"
