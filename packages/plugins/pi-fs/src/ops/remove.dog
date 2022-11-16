@@ -1,0 +1,39 @@
+use (
+  alias://fs
+)
+
+export {
+  desc = "Remove a fs entry."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if text then
+      params = {
+        path = args
+      }
+    
+    if list then
+      params = {
+        path = args[0]
+      }
+      
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {path}) = $"fs: remove '${path}'"
+
+/**
+ * Removes a fs entry.
+ */
+@async
+fn run(ctx=> {params}) = fs.remove(params.path)

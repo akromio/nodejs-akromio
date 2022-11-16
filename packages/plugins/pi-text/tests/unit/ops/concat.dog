@@ -1,0 +1,51 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.concat
+    buildParams = op.parameterizer
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when args is list, args must be returned", proc()
+      # (1) act
+      const (
+        args = ["one", 2, "three"]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+
+    test("when args is not list, [args] must be returned", proc()
+      # (1) act
+      const (
+        args = {x = 1, y = 2}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo([args])
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when called, params must be returned", proc()
+      # (1) act
+      const (
+        params = ["one", 2, "three"]
+        ctx = {params}
+        out = handler(ctx)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("one2three")
+    end)
+  end)
+end)

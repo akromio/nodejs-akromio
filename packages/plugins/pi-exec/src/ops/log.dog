@@ -1,0 +1,73 @@
+use (
+  {spawn} = dep://child_process
+)
+
+export {
+  desc = "Runs a command, logging the output."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params.command = args[0]
+      params.opts = args[1] ?? {}
+    if text then
+      params.command = args
+      params.opts = {}
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"exec: run '${params.command}'"
+
+/**
+ * Runs a command.
+ */
+@async
+fn handle(ctx=> {params, log})
+  # (1) prepare command
+  var (
+    cmd
+    args
+  )
+
+  if params.command is list then
+    cmd = params.command[0]
+    args = params.command[1]
+  else
+    const segments = params.command.split(re(" +"))
+    cmd = segments[0]
+    args = segments[1, -1]
+
+  # (2) prepara options
+  const {opts} = params
+
+  if "workDir" in opts then
+    opts.cwd = opts.workDir
+    remove("workDir", opts)
+  
+  # (3) run
+  return promise(proc(resolve, reject)
+    const ps = spawn(cmd, args, opts)
+
+    ps.stdout.on("data", proc(out)
+      log(out)
+    end)
+
+    ps.stderr.on("data", proc(out)
+      log(out)
+    end)
+
+    ps.on("exit", proc(code)
+      if code == 0 then resolve(code)
+      else reject(code)
+    end)
+  end)

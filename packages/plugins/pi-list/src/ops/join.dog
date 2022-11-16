@@ -1,0 +1,23 @@
+use (
+  dep://yaml
+)
+
+export {
+  desc = "Returns a text with all the items separated by some text."
+  title = "list: join items"
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args) = {
+  list = args[0]
+  if args[1] then separator = args[1]
+}
+
+/**
+ * Creates a list with the given data.
+ */
+fn handler(ctx=> {params}) = params.list.join(params.separator ?? ", ")

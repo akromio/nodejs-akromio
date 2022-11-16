@@ -1,0 +1,42 @@
+use (
+  alias://get
+)
+
+export {
+  desc = "Selects one or more fields from an object."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args?) -> params: map
+  params.object = args[0]
+  params.fields = []
+
+  for each arg in args[1, -1] do
+    params.fields = params.fields.concat(arg)
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {fields}) = $"select: fields ${fields.join(', ')}"
+
+/**
+ * Returns an object with only the given fields.
+ */
+fn handler(ctx=> {params}) -> result: map
+  const {object, fields} = params
+
+  for each field in fields do
+    #decompose alias=path
+    var [alias, path] = field.split("=")
+
+    alias = alias.trim()
+    if path then path = path.trim()
+    else path = alias
+
+    #get value
+    result[alias] = get(object, path)

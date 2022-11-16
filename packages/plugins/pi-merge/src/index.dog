@@ -1,0 +1,9 @@
+export {
+  plugin = "merge"
+  desc = "Plugin for merging several objects in one."
+  tags = ["built-in"]
+  defaultOpName = "merge"
+  ops =
+    deep = use("./ops/deep")
+    merge = use("./ops/merge")
+}

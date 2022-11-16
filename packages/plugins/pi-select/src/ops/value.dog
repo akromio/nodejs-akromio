@@ -1,0 +1,28 @@
+use (
+  alias://get
+)
+
+export {
+  desc = "Selects field value from an object."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args?) = {
+  object = args[0]
+  field = expect(args[1], text)
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {field}) = $"select: value ${field}"
+
+/**
+ * Returns an object with only the given fields.
+ */
+fn handler(ctx=> {params}) = get(params.object, params.field)

@@ -1,0 +1,13 @@
+/**
+ * Builds the parameters object from the arguments.
+ */
+pub fn buildParams(args) -> params: map
+  #!cov ignore else
+  with type(args) do
+    if text then
+      params = {url = args}
+    if list then
+      params = {
+        url = args[0]
+        opts = args[1]
+      }

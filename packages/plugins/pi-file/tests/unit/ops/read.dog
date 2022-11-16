@@ -1,0 +1,96 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+const op = pi.ops.read
+
+suite(__filename, proc()
+  const (
+    path = "/my/file.txt"
+  )
+
+  suite("buildParams()", proc()
+    const buildParams = op.parameterizer
+
+    test("when path, {path, opts= {}} must be returned", proc()
+      # (1) act
+      const out = buildParams(path)
+
+      # (2) assessment
+      expected(out).equalTo(path=, opts = {})
+    end)
+
+    test("when [path], {path, opts = {}} must be returned", proc()
+      # (1) act
+      const out = buildParams([path])
+
+      # (2) assessment
+      expected(out).equalTo(path=, opts = {})
+    end)
+
+    test("when [path, opts], {path, opts} must be returned", proc()
+      # (1) act
+      const (
+        opts = {encoding = "utf8"}
+        out = buildParams([path, opts])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(path=, opts)
+    end)
+
+    test("when map, that map must be returned", proc()
+      # (1) act
+      const (
+        opts = {encoding = "utf8"}
+        args = {path, opts}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    const buildTitle = op.title
+
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const out = buildTitle({path, opts = {}})
+
+      # (2) assessment
+      expected(out).equalTo($"file: read content of '${path}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const handler = op.fun
+
+    test("when accessible file, its content must be returned", async proc()
+      # (1) act
+      const (
+        path = __filename
+        out = await(handler(params = {path, opts = "utf8"}))
+      )
+
+      # (2) assessment
+      expected(out).like("buildTitle")
+    end)
+
+    test("when non-accessible file, error must be raised", async proc()
+      # (1) act
+      const (
+        path = "unknown"
+        out = pawait(handler(params = {path, opts = {}}))
+      )
+
+      # (2) assessment
+      expected(
+        out
+      ).it(0).equalTo(false)\
+       .it(1).like("no such file")
+    end)
+  end)
+end)

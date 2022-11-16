@@ -1,0 +1,15 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, its api must be exported", proc()
+    expected(pkg).toHave(
+      plugin = "xdg"
+      tags = ["built-in"]
+    ).member("ops").toHave(
+      "open"
+    )
+  end)
+end)

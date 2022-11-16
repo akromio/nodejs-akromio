@@ -1,0 +1,31 @@
+export {
+  desc = "Replaces a text with other."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds and returns the arguments as a params object.
+ */
+fn buildParams(args?) -> params
+  with type(args) do
+    if list then
+      params = {
+        str = args[0]
+        substr = args[1]
+        newSubstr = args[2]
+      }
+
+    if map then
+      params = args
+
+/**
+ * Builds the title using the given params.
+ */
+fn buildTitle(params=> {substr, newSubstr}) = $"text: replace '${substr}' by '${newSubstr}'"
+
+/**
+ * Returns the content.
+ */
+fn handler(ctx=> {params}) = params.str.replace(params.substr, params.newSubstr)

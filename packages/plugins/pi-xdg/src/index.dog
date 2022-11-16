@@ -1,0 +1,7 @@
+export {
+  plugin = "xdg"
+  desc = "Plugin for opening files with the default apps."
+  tags = ["built-in"]
+  ops =
+    open = use("./ops/open")
+}

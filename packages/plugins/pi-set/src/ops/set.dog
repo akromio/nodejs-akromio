@@ -1,0 +1,29 @@
+use (
+  setValue = alias://set
+)
+
+export {
+  desc = "Sets a field value of an object."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args?) = {
+  object = args[0]
+  field = args[1]
+  value = args[2]
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {field}) = $"set: ${field}"
+
+/**
+ * Sets the value of an object field.
+ */
+fn handler(ctx=> {params}) = setValue(params.object, params.field, params.value)

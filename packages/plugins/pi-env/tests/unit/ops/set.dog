@@ -1,0 +1,53 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.set
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when args, {name = args[0], value = args[1]} must be returned", proc()
+      # (1) act
+      const (
+        args = ["NODE_EXTRA_CA_CERTS", "cosmosdb-emulator.crt"]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(name = args[0], value = args[1])
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a text title must be returned", proc()
+      # (1) args
+      const (
+        params = {name = "NODE_EXTRA_CA_CERTS", value = "cosmosdb-emulator.crt"}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("env: set 'NODE_EXTRA_CA_CERTS' to 'cosmosdb-emulator.crt'")
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when called, ps.env must be updated with the var", proc()
+      # (1) act
+      const (
+        params = {name = "NODE_EXTRA_CA_CERTS", value = "cosmosdb-emulator.crt"}
+        out = handler(params=)
+      )
+
+      # (2) assessment
+      expected(out).toBeMap()
+      expected(ps.env).toHave(NODE_EXTRA_CA_CERTS = "cosmosdb-emulator.crt")
+    end)
+  end)
+end)

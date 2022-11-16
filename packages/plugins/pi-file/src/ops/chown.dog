@@ -1,0 +1,41 @@
+use (
+  fs = dep://fs/promises
+)
+
+export {
+  desc = "Changes the ownership of a file."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    const [uid, gid] = args[0].split(":")
+    
+    params = {
+      uid
+      gid
+      path = args[1]
+    }
+  else
+    params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"file: changes ownership of '${params.path}' to '${params.uid}:${params.gid}'"
+
+/**
+ * Changes the ownership of a file.
+ */
+@async
+fn run(ctx=> {params}) = fs.chown(
+  params.path
+  params.uid
+  params.gid
+)
+  

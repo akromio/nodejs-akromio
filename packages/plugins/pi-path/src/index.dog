@@ -1,0 +1,8 @@
+export {
+  plugin = "path"
+  desc = "Plugin for working with file system paths."
+  tags = ["built-in"]
+  ops =
+    join = use("./ops/join")
+    normalize = use("./ops/normalize")
+}

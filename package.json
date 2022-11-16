@@ -4,6 +4,7 @@
   "workspaces": [
     "packages/libs/*",
     "packages/plugins/*",
+    "packages/presets/*",
     "packages/tools/*"
   ],
   "engine": {

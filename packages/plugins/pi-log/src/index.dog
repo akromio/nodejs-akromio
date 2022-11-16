@@ -1,0 +1,8 @@
+export {
+  plugin = "log"
+  desc = "Plugin for printing a value."
+  tags = ["built-in"]
+  defaultOpName = "info"
+  ops =
+    info = use("./ops/info")
+}

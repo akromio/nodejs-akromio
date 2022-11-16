@@ -1,0 +1,30 @@
+use (
+  fs = dep://fs/promises
+  {constants} = dep://fs
+)
+
+export {
+  desc = "Checks whether a filesystem entry is readable."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if text then params = {path = args}
+    if list then params = {path = args[0]}
+    else params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"fs: check whether '${params.path}' is readable"
+
+/**
+ * Writes the content of a file.
+ */
+async fn handler(ctx=> {params}) = pawait(fs.access(params.path, constants.R_OK))[0]

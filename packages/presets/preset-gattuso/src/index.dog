@@ -1,0 +1,28 @@
+/**
+ * The built-in plugins associated to this preset.
+ */
+const plugins = [
+  "banner"
+  "env", "exec"
+  "file", "fs"
+  "http"
+  "inc", "inquire"
+  "json"
+  "list", "log"
+  "merge"
+  "path"
+  "select", "set", "sleep"
+  "text"
+  "xdg"
+  "yaml"
+]
+
+export {
+  name = "akro"
+  desc = "Preset for the akro tool."
+  tags = ["built-in"]
+  
+  plugins = plugins.map(
+    fn(name) = {plugin = name, impl = use($"@akromio/pi-${name}")} end
+  )
+}

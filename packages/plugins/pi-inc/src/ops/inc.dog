@@ -1,0 +1,23 @@
+export {
+  desc = "Returns a value incremented."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args?) = {
+  value = args
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"inc: value ${params.value}"
+
+/**
+ * Increments a value.
+ */
+fn handler(ctx=> {params}) = (params.value ?? 0) + 1

@@ -1,0 +1,13 @@
+export {
+  plugin = "fs"
+  desc = "Plugin for performing operations with the file system."
+  tags = ["built-in"]
+  ops =
+    chmod = use("./ops/chmod")
+    copy = use("./ops/copy")
+    createDir = use("./ops/createDir")
+    emptyDir = use("./ops/emptyDir")
+    exists = use("./ops/exists")
+    move = use("./ops/move")
+    remove = use("./ops/remove")
+}

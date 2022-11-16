@@ -1,0 +1,80 @@
+use (
+  fs = dep://fs/promises
+  alias://expected
+  {monitor} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.remove
+
+suite(__filename, proc()
+  const (
+    path = "/my/file.txt"
+  )
+
+  suite("buildParams()", proc()
+    const buildParams = op.parameterizer
+
+    test("when path, {path} must be returned", proc()
+      # (1) act
+      const out = buildParams(path)
+
+      # (2) assessment
+      expected(out).equalTo(path=)
+    end)
+
+    test("when [path], {path} must be returned", proc()
+      # (1) act
+      const out = buildParams([path])
+
+      # (2) assessment
+      expected(out).equalTo(path=)
+    end)
+
+    test("when map, that map must be returned", proc()
+      # (1) act
+      const (
+        args = {path}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    const buildTitle = op.title
+
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const out = buildTitle({path})
+
+      # (2) assessment
+      expected(out).equalTo($"file: remove '${path}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const handler = op.fun
+
+    test("when existing, the file must be removed", async proc()
+      # (1) act
+      const originalUnlink = fs.unlink
+      fs.unlink = monitor(nop)
+
+      const out = pawait(handler(params = {path}))
+
+      # (2) assessment
+      do
+        const log = monitor.log(fs.unlink)
+
+        expected(out).it(0).equalTo(true)
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([path])).equalTo(1)
+      finally
+        monitor.clearAll()
+        fs.unlink = originalUnlink
+    end)
+  end)
+end)

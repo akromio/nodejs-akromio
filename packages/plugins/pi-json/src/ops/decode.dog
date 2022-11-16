@@ -1,0 +1,10 @@
+export {
+  desc = "Decodes a JSON string."
+  title = "json: decode"
+  fun = run
+}
+
+/**
+ * Decodes a JSON text.
+ */
+fn run(ctx=> {params}) = json.decode(params)

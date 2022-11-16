@@ -1,0 +1,24 @@
+use (
+  alias://expected
+  dep://yaml
+  pi = ~
+)
+
+const op = pi.ops.encode
+
+suite(__filename, proc()
+  suite("fun", proc()
+    const {fun} = op
+
+    test("when value, this must be returned as a YAML text", proc()
+      # (1) act
+      const (
+        value = {x = 1, y = 2}
+        out = fun(params = value)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(yaml.stringify(value))
+    end)
+  end)
+end)

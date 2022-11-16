@@ -1,0 +1,10 @@
+export {
+  desc = "Encodes a value to a JSON text/string."
+  title = "json: encode"
+  fun = run
+}
+
+/**
+ * Encodes a value to a JSON text.
+ */
+fn run(ctx=> {params}) = json.encode(params)

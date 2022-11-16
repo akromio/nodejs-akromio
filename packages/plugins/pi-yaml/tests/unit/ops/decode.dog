@@ -1,0 +1,24 @@
+use (
+  alias://expected
+  dep://yaml
+  pi = ~
+)
+
+const op = pi.ops.decode
+
+suite(__filename, proc()
+  suite("fun", proc()
+    const {fun} = op
+
+    test("when YAML text, this must be parsed and returned as JS value", proc()
+      # (1) act
+      const (
+        value = {x = 1, y = 2}
+        out = fun(params = yaml.stringify(value))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(value)
+    end)
+  end)
+end)

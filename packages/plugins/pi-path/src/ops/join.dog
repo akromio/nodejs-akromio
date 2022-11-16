@@ -1,0 +1,27 @@
+use (
+  dep://path
+)
+
+export {
+  desc = "Joins all segments of a path."
+  title = "path: join path segments"
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    params = {
+      segments = args
+    }
+  else
+    params = args
+
+/**
+ * Joins the path segments.
+ */
+fn handler(ctx=> {params}) = path.join(...params.segments)
+  

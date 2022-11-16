@@ -1,0 +1,95 @@
+use (
+  alias://expected
+  fs = dep://fs/promises
+  {monitor} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.touch
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    path = "/my/file.txt"
+    atime = timestamp()
+    mtime = timestamp()
+  )
+
+  suite("buildParams()", proc()
+    test("when [path, map], {path, atime, mtime} must be returned", proc()
+      # (1) act
+      const (
+        times = {atime, mtime}
+        out = buildParams([path, times])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        path=,
+        atime
+        mtime
+      )
+    end)
+
+    test("when [path, atime, mtime], {path, atime, mtime} must be returned", proc()
+      # (1) act
+      const out = buildParams([path, atime, mtime])
+
+      # (2) assessment
+      expected(out).equalTo(
+        path=,
+        atime
+        mtime
+      )
+    end)
+
+    test("when map, the same map must be returned", proc()
+      # (1) act
+      const (
+        args = {path, atime, mtime}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    const buildTitle = op.title
+
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {path, atime, mtime}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"file: changes the timestamps of '${path}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const handler = op.fun
+
+    test("when called, the file must be written", async proc()
+      # (1) act
+      const originalUtimes = fs.utimes
+      fs.utimes = monitor(nop)
+
+      const out = pawait(handler(params = {path, atime, mtime}))
+
+      # (2) assessment
+      do
+        const log = monitor.log(fs.utimes)
+
+        expected(out).it(0).equalTo(true)
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([path, atime, mtime])).equalTo(1)
+      finally
+        monitor.clearAll()
+        fs.utimes = originalUtimes
+    end)
+  end)
+end)

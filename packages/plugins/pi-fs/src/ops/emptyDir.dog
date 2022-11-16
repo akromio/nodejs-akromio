@@ -1,0 +1,41 @@
+use (
+  alias://fs
+)
+
+export {
+  desc = "Clears a directory."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if text then
+      params = {
+        path = args
+      }
+    
+    if list then
+      params = {
+        path = args[0]
+      }
+
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"fs: empty dir '${params.path}' if exists"
+
+/**
+ * Empties a directory.
+ */
+@async
+fn handler(ctx=> {params}) = fs.emptyDir(
+  params.path
+)

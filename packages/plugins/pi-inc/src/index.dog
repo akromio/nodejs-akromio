@@ -1,0 +1,8 @@
+export {
+  plugin = "inc"
+  desc = "Plugin for incrementing a value."
+  tags = ["built-in"]
+  defaultOpName = "inc"
+  ops =
+    inc = use("./ops/inc")
+}

@@ -1,0 +1,26 @@
+export {
+  desc = "Sleeps."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if map then params = args
+    if text then params = {duration = args}
+    else params = {duration = args[0]}
+  
+/**
+ * Builds the title.
+ */
+fn buildTitle(params=> {duration}) = $"sleep: for '${duration}'"
+
+/**
+ * Generates the hash and returns it in hexadecimal.
+ */
+@async
+fn handler(ctx=> {params}) = sleep(params.duration)

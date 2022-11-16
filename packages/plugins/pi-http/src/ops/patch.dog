@@ -1,0 +1,22 @@
+use (
+  dep://axios
+  {buildParams} = util
+)
+
+export {
+  desc = "Performs a PATCH request."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"http: patch '${params.url}'"
+
+/**
+ * Performs an HTTP request, returning its response.
+ */
+@async
+fn handler(ctx=> {params}) = axios.patch(params.url, params.opts ?? {})

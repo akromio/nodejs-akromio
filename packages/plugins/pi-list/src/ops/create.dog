@@ -1,0 +1,25 @@
+use (
+  dep://yaml
+)
+
+export {
+  desc = "Creates a list with the given items."
+  title = "list: create data list"
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args?) -> l: list
+  if args !== undefined then
+    if args is list then
+      l = args
+    else
+      l.push(args)
+
+/**
+ * Creates a list with the given data.
+ */
+fn handler(ctx=> {params}) = list(params)

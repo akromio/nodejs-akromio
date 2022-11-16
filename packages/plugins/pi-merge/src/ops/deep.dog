@@ -1,0 +1,23 @@
+use (
+  merge = dep://deepmerge
+  base = merge
+)
+
+export {
+  desc = "Merges recursively several objects in one."
+  parameterizer = base.parameterizer
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"merge: recursively ${len(params.values)} objects"
+
+/**
+ * Increments a value.
+ */
+fn handler(ctx=> {params}) -> merged: map
+  for each value in params.values do
+    merged = merge(merged, value)

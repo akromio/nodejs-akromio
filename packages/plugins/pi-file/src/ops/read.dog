@@ -1,0 +1,45 @@
+use (
+  fs = dep://fs/promises
+)
+
+export {
+  desc = "Reads the content of a file."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if text then
+      params = {
+        path = args
+        opts = {}
+      }
+    
+    if list then
+      params = {
+        path = args[0]
+        opts = args[1] ?? {}
+      }
+      
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"file: read content of '${params.path}'"
+
+/**
+ * Reads the content of a file.
+ */
+@async
+fn run(ctx=> {params}) = fs.readFile(
+  params.path
+  params.opts
+)
+  

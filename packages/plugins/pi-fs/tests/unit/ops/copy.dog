@@ -1,0 +1,95 @@
+use (
+  alias://expected
+  alias://fs
+  {monitor} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.copy
+
+suite(__filename, proc()
+  const (
+    src = "/my/file.txt"
+    dst = "/my/file.txt.old"
+  )
+
+  suite("buildParams()", proc()
+    const buildParams = op.parameterizer
+
+    test("when [src, dst], {src, dst, opts = {}} must be returned", proc()
+      # (1) act
+      const out = buildParams([src, dst])
+
+      # (2) assessment
+      expected(out).equalTo(
+        src=,
+        dst
+        opts = {}
+      )
+    end)
+
+    test("when [src, dst, opts], {src, dst, opts} must be returned", proc()
+      # (1) act
+      const (
+        opts = {overwrite = false}
+        out = buildParams([src, dst, opts])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(src=, dst, opts)
+    end)
+
+    test("when map, the same map must be returned", proc()
+      # (1) act
+      const (
+        opts = {overwrite = false}
+        args = {src, dst, opts}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    const buildTitle = op.title
+
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {src, dst}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"fs: copy '${src}' to '${dst}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const handler = op.fun
+
+    test("when called, source must be copied to destination", async proc()
+      # (1) act
+      const originalCopy = fs.copy
+      fs.copy = monitor(nop)
+
+      const (
+        opts = {overwrite = false}
+        out = pawait(handler(params = {src, dst, opts}))
+      )
+
+      # (2) assessment
+      do
+        const log = monitor.log(fs.copy)
+
+        expected(out).it(0).equalTo(true)
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([src, dst, opts])).equalTo(1)
+      finally
+        monitor.clearAll()
+        fs.copy = originalCopy
+    end)
+  end)
+end)

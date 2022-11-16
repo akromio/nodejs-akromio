@@ -1,0 +1,51 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.join
+    buildParams = op.parameterizer
+    handler = op.fun
+
+    args = [1, "two", 3]
+    separator = " | "
+  )
+
+  suite("buildParams()", proc()
+    test("when [list] received, {list} must be returned", proc()
+      # (1) act
+      const out = buildParams([args])
+
+      # (2) assessment
+      expected(out).equalTo({list = args})
+    end)
+
+    test("when [list, separator], {list, separator} must be returned", proc()
+      # (1) act
+      const out = buildParams([args, separator])
+
+      # (2) assessment
+      expected(out).equalTo({list = args, separator})
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when called w/ separator, a text must be returned using this separator", proc()
+      # (1) act
+      const out = handler(params = {list = args, separator})
+
+      # (2) assessment
+      expected(out).equalTo("1 | two | 3")
+    end)
+
+    test("when called w/o separator, a text must be returned using the default separator", proc()
+      # (1) act
+      const out = handler(params = {list = args})
+
+      # (2) assessment
+      expected(out).equalTo("1, two, 3")
+    end)
+  end)
+end)

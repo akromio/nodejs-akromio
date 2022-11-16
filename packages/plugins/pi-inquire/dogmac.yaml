@@ -1,0 +1,6 @@
+uses:
+  expected:
+    js: "@akromio/expected"
+  
+  inquirer:
+    js: "@akromio/inquirer"

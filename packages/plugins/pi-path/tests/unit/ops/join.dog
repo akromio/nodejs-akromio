@@ -1,0 +1,55 @@
+use (
+  alias://expected
+  dep://path
+  pi = ~
+)
+
+const op = pi.ops.join
+
+suite(__filename, proc()
+  const (
+    segments = ["one", "two", "three"]
+  )
+
+  suite("buildParams()", proc()
+    const (
+      buildParams = op.parameterizer
+    )
+
+    test("when [...segments], {segments} must be returned", proc()
+      # (1) act
+      const out = buildParams(segments)
+
+      # (2) assessment
+      expected(out).equalTo(segments=)
+    end)
+
+    test("when {segments}, the same argument must be returned", proc()
+      # (1) act
+      const (
+        args = {segments}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("handler()", proc()
+    const (
+      handler = op.fun
+    )
+
+    test("when called, the path must be returned", proc()
+      # (1) act
+      const (
+        params = {segments}
+        out = handler(params=)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(path.join(...segments))
+    end)
+  end)
+end)

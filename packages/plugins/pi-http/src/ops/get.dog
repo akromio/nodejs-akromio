@@ -1,0 +1,22 @@
+use (
+  dep://axios
+  {buildParams} = util
+)
+
+export {
+  desc = "Performs a GET request."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"http: get '${params.url}'"
+
+/**
+ * Performs an HTTP request, returning its response.
+ */
+@async
+fn handler(ctx=> {params}) = axios.get(params.url, params.opts ?? {})

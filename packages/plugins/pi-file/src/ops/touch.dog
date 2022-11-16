@@ -1,0 +1,46 @@
+use (
+  fs = dep://fs/promises
+)
+
+export {
+  desc = "Changes the timestamps of a file."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    if len(args) == 2 then
+      params = {
+        path = args[0]
+        atime = args[1].atime
+        mtime = args[1].mtime
+      }
+    else
+      params = {
+        path = args[0]
+        atime = args[1]
+        mtime = args[2]
+      }
+  else
+    params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"file: changes the timestamps of '${params.path}'"
+
+/**
+ * Changes the timestamps of a file.
+ */
+@async
+fn run(ctx=> {params}) = fs.utimes(
+  params.path
+  params.atime
+  params.mtime
+)
+  

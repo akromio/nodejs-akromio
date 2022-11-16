@@ -1,0 +1,16 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(pkg).toHave(
+      plugin = "log"
+      tags = ["built-in"]
+      defaultOpName = "info"
+    ).member("ops").toHave(
+      "info"
+    )
+  end)
+end)

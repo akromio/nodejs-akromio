@@ -1,0 +1,10 @@
+export {
+  plugin = "list"
+  desc = "Plugin for working with lists."
+  tags = ["built-in"]
+  defaultOpName = "create"
+  ops =
+    append = use("./ops/append")
+    create = use("./ops/create")
+    join = use("./ops/join")
+}

@@ -1,0 +1,48 @@
+use (
+  {webcrypto} = dep://crypto
+)
+
+export {
+  desc = "Generates a hash with SHA."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * The algorithm to use when unset by the user.
+ */
+const defaultAlgorithm = "SHA-512"
+
+/**
+ * The hash function to use.
+ */
+const digest = bind(webcrypto.subtle, "digest")
+
+/**
+ * The encoder to use.
+ */
+const encoder = native("new TextEncoder()")
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if map then params = args
+    if list then params = {data = args[0], algorithm = args[1]}
+    else params = {data = args}
+  
+/**
+ * Builds the title.
+ */
+fn buildTitle(params=> {algorithm}) -> title: text
+  algorithm ?= defaultAlgorithm
+  title = $"sha: generate hash with '${algorithm}'"
+
+/**
+ * Generates the hash and returns it in hexadecimal.
+ */
+async fn handler(ctx=> {params}) = Buffer.from(
+  await(digest(params.algorithm ?? defaultAlgorithm, encoder.encode(params.data)))
+).toString("hex")

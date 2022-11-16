@@ -1,0 +1,10 @@
+export {
+  plugin = "text"
+  desc = "Plugin for working with text."
+  tags = ["built-in"]
+  defaultOpName = "concat"
+  ops =
+    concat = use("./ops/concat")
+    includes = use("./ops/includes")
+    replace = use("./ops/replace")
+}

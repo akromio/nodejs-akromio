@@ -1,0 +1,20 @@
+export {
+  desc = "Concatenates several values in a text."
+  parameterizer = buildParams
+  title = "text: concatenate values in a text"
+  fun = handler
+}
+
+/**
+ * Builds the params object from the arguments.
+ */
+fn buildParams(args?) = if args is list then
+  args
+else
+  [args]
+end
+
+/**
+ * Returns the content.
+ */
+fn handler(ctx=> {params}) = params.join("")

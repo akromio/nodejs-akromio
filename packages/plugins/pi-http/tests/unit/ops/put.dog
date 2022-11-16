@@ -1,0 +1,80 @@
+use (
+  dep://axios
+  alias://expected
+  {monitor, simulator} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.put
+
+suite(__filename, proc()
+  const (
+    buildTitle = op.title
+    handler = op.fun
+    url = "https://www.google.es"
+  )
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {url}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"http: put '${params.url}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const originalPut = axios.put
+
+    teardown(proc()
+      axios.put = originalPut
+    end)
+
+    test("when called w/o options, {} is used and a response must be returned", async proc()
+      # (1) pre
+      const (
+        resp = {status = 200, statusText = "OK"}
+        put = monitor(simulator.fun(resolves = resp))
+      )
+
+      axios.{put}
+
+      # (2) act
+      const out = await(handler({params = {url}}))
+
+      # (3) assessment
+      const log = monitor.log(put, clear = true)
+
+      expected(out).equalTo(resp)
+      expected(log).toHaveLen(1)
+      expected(log.calledWith([url, {}])).equalTo(1)
+    end)
+
+    test("when called w/ options, these options used and a response must be returned", async proc()
+      # (1) pre
+      const (
+        resp = {status = 200, statusText = "OK"}
+        put = monitor(simulator.fun(resolves = resp))
+      )
+
+      axios.{put}
+
+      # (2) act
+      const (
+        opts = {headers = {'X-Requested-With' = "akromio"}}
+        out = await(handler({params = {url, opts}}))
+      )
+
+      # (3) assessment
+      const log = monitor.log(put, clear = true)
+
+      expected(out).equalTo(resp)
+      expected(log).toHaveLen(1)
+      expected(log.calledWith([url, opts])).equalTo(1)
+    end)
+  end)
+end)

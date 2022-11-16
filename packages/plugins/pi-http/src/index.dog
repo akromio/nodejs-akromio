@@ -1,0 +1,13 @@
+export {
+  plugin = "http"
+  desc = "Plugin for performing HTTP requests."
+  tags = ["built-in"]
+  ops =
+    delete = use("./ops/delete")
+    get = use("./ops/get")
+    head = use("./ops/head")
+    options = use("./ops/options")
+    patch = use("./ops/patch")
+    post = use("./ops/post")
+    put = use("./ops/put")
+}

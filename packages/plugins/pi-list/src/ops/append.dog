@@ -1,0 +1,25 @@
+use (
+  dep://yaml
+)
+
+export {
+  desc = "Appends an item at the end of a list."
+  title = "list: append item in the end"
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args) = {
+  item = args[0]
+  list = args[1]
+}
+
+/**
+ * Creates a list with the given data.
+ */
+fn handler(ctx=> {params}) -> l: list
+  l = params.list
+  l.push(params.item)

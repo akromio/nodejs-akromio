@@ -1,0 +1,26 @@
+export {
+  desc = "Sets a environment variable."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handle
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args) = {
+  name = args[0]
+  value = args[1]
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {name, value}) = $"env: set '${name}' to '${value}'"
+
+/**
+ * Sets a environment variable.
+ */
+fn handle(ctx=> {params})
+  ps.env[params.name] = params.value
+  return ps.env

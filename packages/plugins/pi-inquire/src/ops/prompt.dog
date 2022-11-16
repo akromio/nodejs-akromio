@@ -1,0 +1,48 @@
+use (
+  {Inquirer} = alias://inquirer
+)
+
+export {
+  desc = "Does the questions to the user."
+  parameterizer = buildParams
+  title = "inquire: do questions"
+  fun = handler
+}
+
+/**
+ * Builds the params object from the arguments.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params = {
+        questions = args[0]
+        answers = args[1]
+      }
+    else
+      params = args
+
+/**
+ * Does the questions and returns the answers.
+ */
+async fn handler(ctx=> {params}) -> answers
+  # (1) prompt
+  await(sleep("50ms")) #composite op start event must be shown
+  answers = await(Inquirer().prompt(params.questions, params.answers ?? {}))
+
+  # (2) log if needed
+  var answersLog = ""
+
+  with $KRM_ANSWERS_LOG do
+    if "options" then
+      for each key, value in answers do
+        answersLog += if answersLog then " " else "" end + $"-A ${key}='${value}'"
+
+    if "file" then
+      for each key, value in answers do
+        answersLog += $"${key}=${value}\n"
+
+  if answersLog then
+    print("\n=> Answers:")
+    print(answersLog)
+    print()
