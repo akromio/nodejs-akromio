@@ -1,0 +1,14 @@
+export {
+  plugin = "file"
+  desc = "Plugin for performing operations with files."
+  tags = ["built-in"]
+  ops =
+    append = use("./ops/append")
+    chmod = use("./ops/chmod")
+    chown = use("./ops/chown")
+    isReadable = use("./ops/isReadable")
+    read = use("./ops/read")
+    remove = use("./ops/remove")
+    touch = use("./ops/touch")
+    write = use("./ops/write")
+}

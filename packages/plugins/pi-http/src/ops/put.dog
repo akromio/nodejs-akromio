@@ -1,0 +1,22 @@
+use (
+  dep://axios
+  {buildParams} = util
+)
+
+export {
+  desc = "Performs a PUT request."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"http: put '${params.url}'"
+
+/**
+ * Performs an HTTP request, returning its response.
+ */
+@async
+fn handler(ctx=> {params}) = axios.put(params.url, params.opts ?? {})

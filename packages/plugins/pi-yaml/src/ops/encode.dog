@@ -1,0 +1,22 @@
+use (
+  dep://yaml
+)
+
+export {
+  desc = "Encodes a value to a YAML text/string."
+  title = "yaml: encode"
+  fun = run
+}
+
+/**
+ * The options to use.
+ */
+const opts = {
+  indent = 2
+  schema = "core"
+}
+
+/**
+ * Encodes a value to a YAML text.
+ */
+fn run(ctx=> {params}) = yaml.stringify(params, opts)

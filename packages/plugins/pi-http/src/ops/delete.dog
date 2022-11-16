@@ -1,0 +1,22 @@
+use (
+  dep://axios
+  {buildParams} = util
+)
+
+export {
+  desc = "Performs a DELETE request."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"http: delete '${params.url}'"
+
+/**
+ * Performs an HTTP request, returning its response.
+ */
+@async
+fn handler(ctx=> {params}) = axios.delete(params.url, params.opts ?? {})

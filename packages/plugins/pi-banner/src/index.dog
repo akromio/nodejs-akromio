@@ -1,0 +1,8 @@
+export {
+  plugin = "banner"
+  desc = "Plugin for performing a banner."
+  tags = ["built-in"]
+  defaultOpName = "banner"
+  ops =
+    banner = use("./ops/banner")
+}

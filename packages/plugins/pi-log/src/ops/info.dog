@@ -1,0 +1,11 @@
+export {
+  desc = "Prints a value."
+  title = "log: print a value"
+  fun = run
+}
+
+/**
+ * Prints a value using the default log.
+ */
+proc run(ctx=> {params, log})
+  log(params)

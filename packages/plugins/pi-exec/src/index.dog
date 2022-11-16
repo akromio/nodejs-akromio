@@ -1,0 +1,9 @@
+export {
+  plugin = "exec"
+  desc = "Plugin for executing commands from shell."
+  tags = ["built-in"]
+  defaultOpName = "command"
+  ops =
+    command = use("./ops/command")
+    log = use("./ops/log")
+}

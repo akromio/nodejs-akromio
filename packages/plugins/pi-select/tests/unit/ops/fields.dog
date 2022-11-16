@@ -1,0 +1,55 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.fields
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when [object, ...fields], {object, fields} must be returned", proc()
+      # (1) act
+      const (
+        object = {x = 1, y = 2}
+        field1 = "x"
+        field2 = ["y"]
+        out = buildParams([object, field1, field2])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(object=, fields = ["x", "y"])
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {object = {}, fields = ["x", "y"]}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("select: fields x, y")
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when called, fields must be filtered and new object returned", async proc()
+      # (1) act
+      const (
+        object = {x = 1, y = 2, z = 3}
+        fields = ["x", "zzz=z"]
+        out = handler(params = {object, fields})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(x = 1, zzz = 3)
+    end)
+  end)
+end)

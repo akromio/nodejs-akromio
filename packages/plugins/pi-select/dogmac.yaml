@@ -1,0 +1,6 @@
+uses:
+  get:
+    js: "lodash.get"
+    
+  expected:
+    js: "@akromio/expected"

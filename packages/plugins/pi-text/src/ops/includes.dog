@@ -1,0 +1,15 @@
+use (
+  {parameterizer} = concat
+)
+
+export {
+  desc = "Checks whether a text contains other."
+  parameterizer
+  title = "text: check if including"
+  fun = handler
+}
+
+/**
+ * Returns the content.
+ */
+fn handler(ctx=> {params}) = params[0].includes(params[1])

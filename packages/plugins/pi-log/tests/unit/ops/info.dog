@@ -1,0 +1,29 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.info
+
+suite(__filename, proc()
+  suite("fun", proc()
+    const {fun} = op
+
+    test("when value, this must be printed using log", proc()
+      # (1) act
+      const (
+        value = "waterfront"
+        logger = monitor(nop)
+        out = fun(params = value, log = logger)
+      )
+
+      # (2) assessment
+      const log = monitor.log(logger, clear = true)
+
+      expected(out).toBeNil()
+      expected(log).toHaveLen(1)
+      expected(log.calledWith([value])).equalTo(1)
+    end)
+  end)
+end)

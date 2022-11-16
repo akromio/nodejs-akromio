@@ -1,0 +1,8 @@
+export {
+  plugin = "inquire"
+  desc = "Plugin for doing questions to the user."
+  tags = ["built-in"]
+  defaultOpName = "prompt"
+  ops =
+    prompt = use("./ops/prompt")
+}

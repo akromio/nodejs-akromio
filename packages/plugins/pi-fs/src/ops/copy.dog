@@ -1,0 +1,39 @@
+use (
+  alias://fs
+)
+
+export {
+  desc = "Copy a file or a directory."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    params = {
+      src = args[0]
+      dst = args[1]
+      opts = args[2] ?? {}
+    }
+  else
+    params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"fs: copy '${params.src}' to '${params.dst}'"
+
+/**
+ * Writes the content of a file.
+ */
+@async
+fn run(ctx=> {params}) = fs.copy(
+  params.src
+  params.dst
+  params.opts
+)
+  

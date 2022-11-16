@@ -1,0 +1,9 @@
+export {
+  plugin = "select"
+  desc = "Plugin for selecting fields from an object"
+  tags = ["built-in"]
+  defaultOpName = "fields"
+  ops =
+    fields = use("./ops/fields")
+    value = use("./ops/value")
+}

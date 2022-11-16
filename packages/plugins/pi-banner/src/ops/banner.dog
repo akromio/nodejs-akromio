@@ -1,0 +1,22 @@
+use (
+  dep://chalk
+)
+
+export {
+  desc = "Performs a banner."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = nop
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args) = {
+  value = args
+}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"banner: ${chalk.underline.bold(params.value)}"

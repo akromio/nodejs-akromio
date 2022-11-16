@@ -1,0 +1,79 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.sleep
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when text, {duration} must be returned", proc()
+      # (1) act
+      const (
+        args = "3s"
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(duration = args)
+    end)
+
+    test("when [text], {duration} must be returned", proc()
+      # (1) act
+      const (
+        duration = "3s"
+        args = [duration]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(duration=)
+    end)
+
+    test("when [text], {duration} must be returned", proc()
+      # (1) act
+      const (
+        duration = "3s"
+        args = {duration}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        duration = "3s"
+        params = {duration}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"sleep: for '${duration}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when called, sleep must be performed", async proc()
+      # (1) act
+      const (
+        duration = "1s"
+        started = timestamp()
+        out = await(handler(params = {duration}))
+        ended = timestamp()
+      )
+
+      # (2) assessment
+      expected(ended - started).greaterThanOrEqualTo(1000)
+    end)
+  end)
+end)

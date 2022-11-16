@@ -1,0 +1,8 @@
+export {
+  plugin = "json"
+  desc = "Plugin for encoding/decoding JSON."
+  tags = ["built-in"]
+  ops =
+    encode = use("./ops/encode")
+    decode = use("./ops/decode")
+}

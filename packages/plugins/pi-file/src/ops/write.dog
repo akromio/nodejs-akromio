@@ -1,0 +1,39 @@
+use (
+  fs = dep://fs/promises
+)
+
+export {
+  desc = "Writes the content of a file."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    params = {
+      content = args[0]
+      path = args[1]
+      opts = args[2] ?? {}
+    }
+  else
+    params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"file: write content to '${params.path}'"
+
+/**
+ * Writes the content of a file.
+ */
+@async
+fn run(ctx=> {params}) = fs.writeFile(
+  params.path
+  params.content
+  params.opts
+)
+  

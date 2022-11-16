@@ -1,0 +1,38 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.banner
+    buildParams = op.parameterizer
+    buildTitle = op.title
+  )
+
+  suite("buildParams()", proc()
+    test("when args, {value = args} must be returned", proc()
+      # (1) act
+      const (
+        args = "hola!"
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(value = args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a text title must be returned", proc()
+      # (1) args
+      const (
+        params = {value = "ciao!"}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).like("^banner: .*ciao!.*")
+    end)
+  end)
+end)

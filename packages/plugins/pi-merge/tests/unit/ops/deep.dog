@@ -1,0 +1,48 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.deep
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  const (
+    one = {a = 1, b = 1, c = 1}
+    two = {b = 2, d = 2}
+  )
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {values = [one, two]}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("merge: recursively 2 objects")
+    end)
+  end)
+
+  suite("handler", proc()
+    test("when called, a new merged object must be returned", proc()
+      # (1) act
+      const (
+        values = [one, two]
+        out = handler(params = {values})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        a = 1
+        b = 2
+        c = 1
+        d = 2
+      )
+    end)
+  end)
+end)

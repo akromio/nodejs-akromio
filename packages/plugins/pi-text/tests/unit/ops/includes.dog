@@ -1,0 +1,39 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.includes
+    buildParams = op.parameterizer
+    handler = op.fun
+  )
+
+  suite("handler()", proc()
+    test("when included, true must be returned", proc()
+      # (1) act
+      const (
+        params = ["one two thhree", "two"]
+        ctx = {params}
+        out = handler(ctx)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+    end)
+
+    test("when not included, false must be returned", proc()
+      # (1) act
+      const (
+        params = ["one two thhree", "four"]
+        ctx = {params}
+        out = handler(ctx)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(false)
+    end)
+  end)
+end)

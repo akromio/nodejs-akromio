@@ -1,0 +1,3 @@
+uses:
+  expected:
+    js: "@akromio/expected"

@@ -1,0 +1,6 @@
+uses:
+  doubles:
+    js: "@akromio/doubles"
+    
+  expected:
+    js: "@akromio/expected"

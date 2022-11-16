@@ -1,0 +1,14 @@
+use (
+  dep://yaml
+)
+
+export {
+  desc = "Decodes a YAML string."
+  title = "yaml: decode"
+  fun = run
+}
+
+/**
+ * Decodes a YAML text.
+ */
+fn run(ctx=> {params}) = yaml.parse(params)

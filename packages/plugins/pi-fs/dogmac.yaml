@@ -1,0 +1,9 @@
+uses:
+  fs:
+    js: fs-extra
+    
+  doubles:
+    js: "@akromio/doubles"
+    
+  expected:
+    js: "@akromio/expected"

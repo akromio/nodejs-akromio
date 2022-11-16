@@ -1,0 +1,8 @@
+export {
+  plugin = "env"
+  desc = "Plugin for working environment variables."
+  tags = ["built-in"]
+  defaultOpName = "set"
+  ops =
+    set = use("./ops/set")
+}

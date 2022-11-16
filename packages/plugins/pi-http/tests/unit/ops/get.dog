@@ -1,0 +1,102 @@
+use (
+  dep://axios
+  alias://expected
+  {monitor, simulator} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.get
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+    url = "https://www.google.es"
+  )
+
+  suite("buildParams()", proc()
+    test("when url, {url} must be returned", async proc()
+      # (1) act
+      const out = buildParams(url)
+
+      # (2) assessment
+      expected(out).equalTo({url})
+    end)
+
+    test("when [url, opts], {url, opts} must be returned", proc()
+      # (1) act
+      const (
+        opts = {headers = {'X-Requested-With' = "akromio"}}
+        out = buildParams([url, opts])
+      )
+
+      # (2) assessment
+      expected(out).equalTo({url, opts})
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {url}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"http: get '${params.url}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const originalGet = axios.get
+
+    teardown(proc()
+      axios.get = originalGet
+    end)
+
+    test("when called w/o options, {} is used and a response must be returned", async proc()
+      # (1) pre
+      const (
+        resp = {status = 200, statusText = "OK"}
+        get = monitor(simulator.fun(resolves = resp))
+      )
+
+      axios.{get}
+
+      # (2) act
+      const out = await(handler({params = {url}}))
+
+      # (3) assessment
+      const log = monitor.log(get, clear = true)
+
+      expected(out).equalTo(resp)
+      expected(log).toHaveLen(1)
+      expected(log.calledWith([url, {}])).equalTo(1)
+    end)
+
+    test("when called w/ options, these options used and a response must be returned", async proc()
+      # (1) pre
+      const (
+        resp = {status = 200, statusText = "OK"}
+        get = monitor(simulator.fun(resolves = resp))
+      )
+
+      axios.{get}
+
+      # (2) act
+      const (
+        opts = {headers = {'X-Requested-With' = "akromio"}}
+        out = await(handler({params = {url, opts}}))
+      )
+
+      # (3) assessment
+      const log = monitor.log(get, clear = true)
+
+      expected(out).equalTo(resp)
+      expected(log).toHaveLen(1)
+      expected(log.calledWith([url, opts])).equalTo(1)
+    end)
+  end)
+end)

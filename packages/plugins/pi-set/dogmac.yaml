@@ -1,0 +1,6 @@
+uses:
+  set:
+    js: "lodash.set"
+    
+  expected:
+    js: "@akromio/expected"

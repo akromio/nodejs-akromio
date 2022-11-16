@@ -1,0 +1,79 @@
+use (
+  alias://expected
+  fs = dep://fs/promises
+  {monitor} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.chmod
+
+suite(__filename, proc()
+  const (
+    path = "/my/file.txt"
+    mode = "0o400"
+  )
+
+  suite("buildParams()", proc()
+    const buildParams = op.parameterizer
+
+    test("when [mode, path], {path, mode} must be returned", proc()
+      # (1) act
+      const out = buildParams([mode, path])
+
+      # (2) assessment
+      expected(out).equalTo(
+        path=,
+        mode
+      )
+    end)
+
+    test("when map, the same map must be returned", proc()
+      # (1) act
+      const (
+        args = {path, mode}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    const buildTitle = op.title
+
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {path, mode}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"file: changes permissions of '${path}' to '${mode}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const handler = op.fun
+
+    test("when called, the permissions must be changed", async proc()
+      # (1) act
+      const originalChmod = fs.chmod
+      fs.chmod = monitor(nop)
+
+      const out = pawait(handler(params = {path, mode}))
+
+      # (2) assessment
+      do
+        const log = monitor.log(fs.chmod)
+
+        expected(out).it(0).equalTo(true)
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([path, mode])).equalTo(1)
+      finally
+        monitor.clearAll()
+        fs.chmod = originalChmod
+    end)
+  end)
+end)

@@ -1,0 +1,17 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(pkg).toHave(
+      plugin = "merge"
+      tags = ["built-in"]
+      defaultOpName = "merge"
+    ).member("ops").toHave(
+      "deep"
+      "merge"
+    )
+  end)
+end)

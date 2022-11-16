@@ -1,0 +1,99 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.generate
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when text, {data} must be returned", proc()
+      # (1) act
+      const (
+        data = "ciao!"
+        out = buildParams(data)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(data=)
+    end)
+
+    test("when [text, algorithm], {data, algorithm} must be returned", proc()
+      # (1) act
+      const (
+        data = "ciao!"
+        algorithm = "SHA-512"
+        out = buildParams([data, algorithm])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(data=, algorithm)
+    end)
+
+    test("when {data}, {data} must be returned", proc()
+      # (1) act
+      const (
+        data = "ciao!"
+        out = buildParams(data=)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(data=)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called with algorithm, a title must be generated with it and returned", proc()
+      # (1) act
+      const (
+        params = {algorithm = "SHA-512"}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("sha: generate hash with 'SHA-512'")
+    end)
+
+    test("when called w/o algorithm, a title must be generated with SHA-512 and returned", proc()
+      # (1) act
+      const (
+        params = {}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("sha: generate hash with 'SHA-512'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const hash = "edfe3ce299ac088010d9fbee30c4e0b230db29e165a1ae52d2cc9cc5cb10952fec46723f03d5eb23354e2e23e997f6c6d9e405c43d03526be7d3a7210fc40593"
+
+    test("when called w/o algorithm, a hash must be generated with default algorithm and returned", async proc()
+      # (1) act
+      const (
+        data = "ciao!"
+        out = await(handler(params = {data}))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(hash)
+    end)
+
+    test("when called w/ algorithm, a hash must be generated with it and returned", async proc()
+      # (1) act
+      const (
+        data = "ciao!"
+        out = await(handler(params = {data, algorithm = "SHA-512"}))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(hash)
+    end)
+  end)
+end)

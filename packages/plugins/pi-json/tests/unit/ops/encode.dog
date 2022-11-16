@@ -1,0 +1,23 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+const op = pi.ops.encode
+
+suite(__filename, proc()
+  suite("fun", proc()
+    const {fun} = op
+
+    test("when value, this must be returned as a JSON text", proc()
+      # (1) act
+      const (
+        value = {x = 1, y = 2}
+        out = fun(params = value)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(json.encode(value))
+    end)
+  end)
+end)

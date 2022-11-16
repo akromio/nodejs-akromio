@@ -1,0 +1,36 @@
+use (
+  alias://fs
+)
+
+export {
+  desc = "Move a fs entry."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if list then
+      params = {
+        src = args[0]
+        dst = args[1]
+        opts = args[2]
+      }
+      
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {src, dst}) = $"fs: move '${src}' to '${dst}'"
+
+/**
+ * Moves a fs entry.
+ */
+@async
+fn run(ctx=> {params}) = fs.move(params.src, params.dst, params.opts ?? {})

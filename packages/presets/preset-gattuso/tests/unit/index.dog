@@ -1,0 +1,12 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, its api must be exported", proc()
+    expected(pkg).toHave(
+      name = "akro"
+    ).member("plugins").len().greaterThan(2)
+  end)
+end)

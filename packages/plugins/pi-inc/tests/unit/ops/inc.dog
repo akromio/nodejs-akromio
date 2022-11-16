@@ -1,0 +1,63 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+suite(__filename, proc()
+  const (
+    op = pi.ops.inc
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when value, {value} must be returned", proc()
+      # (1) act
+      const (
+        value = 123
+        out = buildParams(value)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(value=)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        value = 123
+        out = buildTitle(value=)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"inc: value ${value}")
+    end)
+  end)
+
+  suite("handler", proc()
+    test("when called, the value + 1 must be returned", proc()
+      # (1) act
+      const (
+        value = 123
+        out = handler(params = {value})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(124)
+    end)
+
+    test("when called with nil as value, 1 must be returned", proc()
+      # (1) act
+      const (
+        value = nil
+        out = handler(params = {value})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(1)
+    end)
+  end)
+end)

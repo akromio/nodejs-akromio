@@ -1,0 +1,95 @@
+use (
+  alias://expected
+  fs = dep://fs/promises
+  {monitor} = alias://doubles
+  pi = ~
+)
+
+const op = pi.ops.write
+
+suite(__filename, proc()
+  const (
+    path = "/my/file.txt"
+    content = "my content"
+  )
+
+  suite("buildParams()", proc()
+    const buildParams = op.parameterizer
+
+    test("when [content, path], {path, content, opts = {}} must be returned", proc()
+      # (1) act
+      const out = buildParams([content, path])
+
+      # (2) assessment
+      expected(out).equalTo(
+        path=,
+        content
+        opts = {}
+      )
+    end)
+
+    test("when [content, path, opts], {path, content, opts} must be returned", proc()
+      # (1) act
+      const (
+        opts = {encoding = "utf8"}
+        out = buildParams([content, path, opts])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(path=, content, opts)
+    end)
+
+    test("when map, the same map must be returned", proc()
+      # (1) act
+      const (
+        opts = {encoding = "utf8"}
+        args = {path, content, opts}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    const buildTitle = op.title
+
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {path, content}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"file: write content to '${path}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    const handler = op.fun
+
+    test("when called, the file must be written", async proc()
+      # (1) act
+      const originalWriteFile = fs.writeFile
+      fs.writeFile = monitor(nop)
+
+      const (
+        opts = {encoding = "utf8"}
+        out = pawait(handler(params = {path, content, opts}))
+      )
+
+      # (2) assessment
+      do
+        const log = monitor.log(fs.writeFile)
+
+        expected(out).it(0).equalTo(true)
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([path, content, opts])).equalTo(1)
+      finally
+        monitor.clearAll()
+        fs.writeFile = originalWriteFile
+    end)
+  end)
+end)

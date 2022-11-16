@@ -1,0 +1,8 @@
+export {
+  plugin = "sha"
+  desc = "Plugin for generating hashes with SHA."
+  tags = ["built-in"]
+  defaultOpName = "generate"
+  ops =
+    generate = use("./ops/generate")
+}

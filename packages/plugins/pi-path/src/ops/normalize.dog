@@ -1,0 +1,25 @@
+use (
+  dep://path
+)
+
+export {
+  desc = "Normalizes a path, resolving '.' and '..'."
+  title = "path: normalize path"
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is text then
+    params = {path = args}
+  else
+    params = args
+
+/**
+ * Joins the path segments.
+ */
+fn handler(ctx=> {params}) = path.normalize(params.path)
+  

@@ -1,0 +1,8 @@
+export {
+  plugin = "sleep"
+  desc = "Plugin for sleeping."
+  tags = ["built-in"]
+  defaultOpName = "sleep"
+  ops =
+    sleep = use("./ops/sleep")
+}

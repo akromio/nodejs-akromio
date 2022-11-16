@@ -1,0 +1,8 @@
+export {
+  plugin = "set"
+  desc = "Plugin for setting a field value of an object"
+  tags = ["built-in"]
+  defaultOpName = "set"
+  ops =
+    set = use("./ops/set")
+}

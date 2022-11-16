@@ -1,0 +1,44 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+const op = pi.ops.append
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    const (
+      buildParams = op.parameterizer
+    )
+
+    test("when [item, list], {list, item} must be returned", proc()
+      # (1) act
+      const (
+        list = []
+        item = "123"
+        out = buildParams([item, list])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(item=, list)
+    end)
+  end)
+
+  suite("handler()", proc()
+    const (
+      handler = op.fun
+    )
+
+    test("when called, the same list must be returned with the item appended", proc()
+      # (1) act
+      const (
+        item = "456"
+        list = ["123"]
+        out = handler(params = {item, list})
+      )
+
+      # (2) assessment
+      expected(out).sameAs(list).equalTo(["123", item])
+    end)
+  end)
+end)

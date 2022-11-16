@@ -1,0 +1,31 @@
+use (
+  dep://open
+)
+
+export {
+  desc = "Open a file with its default app."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the params object from the arguments.
+ */
+fn buildParams(args?) -> params
+  with type(args) do
+    if text then params = {target = args}
+    if list then params = {target = args[0], opts = args[1]}
+    else params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"xdg: open '${params.target}'"
+
+/**
+ * Returns the content.
+ */
+#!cov ignore
+@async
+fn handler(ctx=> {params}) = open(params.target, params.opts)

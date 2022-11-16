@@ -1,0 +1,37 @@
+use (
+  fs = dep://fs/promises
+)
+
+export {
+  desc = "Changes the permissions of a file."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = run
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  if args is list then
+    params = {
+      mode = args[0]
+      path = args[1]
+    }
+  else
+    params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"file: changes permissions of '${params.path}' to '${params.mode}'"
+
+/**
+ * Changes the permissions of a file.
+ */
+@async
+fn run(ctx=> {params}) = fs.chmod(
+  params.path
+  params.mode
+)
+  

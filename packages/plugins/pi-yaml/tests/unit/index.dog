@@ -1,0 +1,16 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(pkg).toHave(
+      plugin = "yaml"
+      tags = ["built-in"]
+    ).member("ops").toHave(
+      "decode"
+      "encode"
+    )
+  end)
+end)

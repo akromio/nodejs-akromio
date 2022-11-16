@@ -1,0 +1,63 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+const op = pi.ops.open
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    buildTitle = op.title
+  )
+
+  suite("buildParams()", proc()
+    test("when text, {target} must be returned", proc()
+      # (1) act
+      const (
+        args = __filename
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(target = args)
+    end)
+
+    test("when [target, opts], {target, opts} must be returned", proc()
+      # (1) act
+      const (
+        target = __filename
+        opts = {wait = true}
+        out = buildParams([target, opts])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(target=, opts)
+    end)
+
+    test("when map, args must be returned", proc()
+      # (1) act
+      const (
+        args = {target = __filename}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        target = __filename
+        params = {target}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"xdg: open '${target}'")
+    end)
+  end)
+end)

@@ -1,0 +1,24 @@
+export {
+  desc = "Merges several objects in one."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handler
+}
+
+/**
+ * Builds the parameters object from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if list then params.values = args
+    else params.values = [args]
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params) = $"merge: ${len(params.values)} objects"
+
+/**
+ * Increments a value.
+ */
+fn handler(ctx=> {params}) = Object.assign({}, ...params.values)

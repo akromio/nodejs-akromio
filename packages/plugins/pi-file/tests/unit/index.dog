@@ -1,0 +1,21 @@
+use (
+  alias://expected
+  pkg = ~
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(pkg).toHave(
+      plugin = "file"
+      tags = ["built-in"]
+    ).member("ops").toHave(
+      "append"
+      "chmod"
+      "chown"
+      "isReadable"
+      "read"
+      "remove"
+      "write"
+    )
+  end)
+end)
