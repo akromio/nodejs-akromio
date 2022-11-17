@@ -121,7 +121,7 @@ export struct CatalogCommand: CatalogCommandBase
         if "Co" then opType = "co"
         if "Script" then opType = "script"
       
-      rows.push([name, opType, job.tags, job.desc])
+      rows.push([name, opType, job.tags, job.desc or job.title])
 
     #(3) show table
     print("\nJobs:")
