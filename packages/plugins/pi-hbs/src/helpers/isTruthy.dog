@@ -1,0 +1,4 @@
+/**
+ * Checks whether a value is truthy, that is, true, 'true', 't', 'y' or 'yes'.
+ */
+export fn isTruthy(value?) = [true, "true", "t", "yes", "y"].includes(value)

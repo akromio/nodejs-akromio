@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/ne
+)
+
+suite(__filename, proc()
+  test("when not equal, true must be returned", proc()
+    # (1) act
+    const out = ne("a", "b")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when equal, false must be returned", proc()
+    # (1) act
+    const out = ne("a", "a")
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)

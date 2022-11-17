@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/isFalsey
+)
+
+suite(__filename, proc()
+  test("when no, true must be returned", proc()
+    # (1) act
+    const out = isFalsey("no")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when truthy, false must be returned", proc()
+    # (1) act
+    const out = isFalsey(true)
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)

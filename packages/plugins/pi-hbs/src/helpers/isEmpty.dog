@@ -1,0 +1,4 @@
+/**
+ * Checks whether a value is empty, that is, its length is zero.
+ */
+export fn isEmpty(value?) = len(value) == 0

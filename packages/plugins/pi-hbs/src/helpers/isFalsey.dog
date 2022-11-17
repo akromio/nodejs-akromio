@@ -1,0 +1,4 @@
+/**
+ * Checks whether a value is falsey, that is, false, 'false', 'f', 'n' or 'no'.
+ */
+export fn isFalsey(value?) = [false, "false", "f", "no", "n"].includes(value)

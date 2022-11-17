@@ -1,0 +1,4 @@
+/**
+ * Checks whether a value is different to nil.
+ */
+export fn isDefined(value?) = value != nil

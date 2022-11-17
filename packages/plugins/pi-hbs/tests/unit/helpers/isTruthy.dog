@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/isTruthy
+)
+
+suite(__filename, proc()
+  test("when yes, true must be returned", proc()
+    # (1) act
+    const out = isTruthy("yes")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when falsey, false must be returned", proc()
+    # (1) act
+    const out = isTruthy("123")
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)

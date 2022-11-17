@@ -1,0 +1,53 @@
+use (
+  alias://expected
+  pi = ~
+)
+
+const op = pi.ops.render
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    handler = op.fun
+    tmpl = "{{x}}{{y}}"
+    data = {x = 11, y = 22}
+    opts = {}
+  )
+
+  suite("buildParams()", proc()
+    test("when args is list, {tmpl: args[0], data: args[1], opts: args[2]} must be returned", proc()
+      # (1) act
+      const (
+        args = [tmpl, data, opts]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(tmpl=, data, opts)
+    end)
+
+    test("when args is not list, args must be returned", proc()
+      # (1) act
+      const (
+        args = {tmpl = "{{x}}", x = 123}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when called, template must be rendered and its result returned", proc()
+      # (1) act
+      const (
+        params = {tmpl, data, opts}
+        out = handler(params=)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("1122")
+    end)
+  end)
+end)

@@ -1,0 +1,53 @@
+use (
+  dep://handlebars
+)
+
+export {
+  desc = "Renders a Handlebars template."
+  parameterizer = buildParams
+  title = "hbs: render template"
+  fun = handler
+}
+
+/**
+ * The built-in helpers.
+ */
+const helpers = [
+  "eq"
+  "isDefined"
+  "isEmpty"
+  "isFalsey"
+  "isTruthy"
+  "join"
+  "ne"
+  "split"
+  "trim"
+]
+
+/**
+ * Builds the params object from the arguments.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params = {
+        tmpl = args[0]
+        data = args[1]
+        opts = args[2]
+      }
+    else
+      params = args
+
+/**
+ * Returns the content.
+ */
+fn handler(ctx=> {params}) -> rendered: text
+  # (1) create runtime
+  const hbs = handlebars.create()
+  
+  for each helper in helpers do
+    hbs.registerHelper(helper, use($"../helpers/${helper}"))
+
+  # (2) render template
+  const tmpl = hbs.compile(text(params.tmpl), params.opts)
+  rendered = tmpl(params.data)

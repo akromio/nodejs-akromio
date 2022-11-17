@@ -5,7 +5,7 @@ const plugins = [
   "banner"
   "env", "exec"
   "file", "fs"
-  "http"
+  "hbs", "http"
   "inc", "inquire"
   "json"
   "list", "log"

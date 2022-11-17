@@ -1,0 +1,14 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/trim
+)
+
+suite(__filename, proc()
+  test("when text with whitespaces, these must be removed and the result returned", proc()
+    # (1) act
+    const out = trim("  one, two, three   ")
+
+    # (2) assessment
+    expected(out).equalTo("one, two, three")
+  end)
+end)

@@ -1,0 +1,26 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/join
+)
+
+suite(__filename, proc()
+  const (
+    array = [1, "two", 3]
+  )
+
+  test("when list, ', ' as separator must be used", proc()
+    # (1) act
+    const out = join(array)
+
+    # (2) assessment
+    expected(out).equalTo("1, two, 3")
+  end)
+
+  test("when list and separator, this separator must be used", proc()
+    # (1) act
+    const out = join(array, " | ")
+
+    # (2) assessment
+    expected(out).equalTo("1 | two | 3")
+  end)
+end)

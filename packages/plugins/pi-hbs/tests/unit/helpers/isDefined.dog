@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/isDefined
+)
+
+suite(__filename, proc()
+  test("when defined, true must be returned", proc()
+    # (1) act
+    const out = isDefined("")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when undefined, false must be returned", proc()
+    # (1) act
+    const out = isDefined(undefined)
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)

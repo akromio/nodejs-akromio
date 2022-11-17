@@ -1,0 +1,4 @@
+/**
+ * Checks whether a value is equal to other.
+ */
+export fn eq(value1?, value2?) = value1 == value2

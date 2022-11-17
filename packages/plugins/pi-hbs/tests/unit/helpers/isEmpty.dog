@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/isEmpty
+)
+
+suite(__filename, proc()
+  test("when empty, true must be returned", proc()
+    # (1) act
+    const out = isEmpty("")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when not empty, false must be returned", proc()
+    # (1) act
+    const out = isEmpty("123")
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)
