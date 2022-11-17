@@ -35,27 +35,27 @@ globalDataset.setDatum(ConstDatum({
 }));
 globalDataset.setDatum(ConstDatum({
   'name': "runStart",
-  'desc': "The run start timestamp.",
+  'desc': "Run start timestamp.",
   'value': (0, _core.timestamp)().valueOf()
 }));
 globalDataset.setDatum(ConstDatum({
   'name': "home",
-  'desc': "The user home.",
+  'desc': "User home.",
   'value': _core.ps.env.HOME
 }));
 globalDataset.setDatum(ConstDatum({
   'name': "workDir",
-  'desc': "The work directory path.",
+  'desc': "Work directory path.",
   'value': _core.ps.workDir
 }));
 globalDataset.setDatum(ConstDatum({
   'name': "workDirName",
-  'desc': "The work directory name.",
+  'desc': "Work directory name.",
   'value': path.basename(_core.ps.workDir)
 }));
 globalDataset.setDatum(DatumFn({
   'name': "now",
-  'desc': "The current timestamp (number).",
+  'desc': "Current timestamp (number).",
   'value': () => {
     {
       return (0, _core.timestamp)().valueOf();
@@ -64,7 +64,7 @@ globalDataset.setDatum(DatumFn({
 }));
 globalDataset.setDatum(DatumFn({
   'name': "date",
-  'desc': "The current date (yyyymmdd).",
+  'desc': "Current date (yyyymmdd).",
   'value': () => {
     {
       return DateTime.local().toFormat("yyyyMMdd");
@@ -73,7 +73,7 @@ globalDataset.setDatum(DatumFn({
 }));
 globalDataset.setDatum(DatumFn({
   'name': "datetime",
-  'desc': "The current datetime (yyyyMMddHHmmss).",
+  'desc': "Current datetime (yyyyMMddHHmmss).",
   'value': () => {
     {
       return DateTime.local().toFormat("yyyyMMddHHmmss");
@@ -84,7 +84,7 @@ const platforms = ["aix", "darwin", "freebsd", "linux", "openbsd", "sunos", "win
 const userPlatform = os.platform();
 globalDataset.setDatum(ConstDatum({
   'name': "platform",
-  'desc': `The user platform: ${platforms}.`,
+  'desc': `User platform: ${platforms}.`,
   'value': userPlatform
 }));
 for (const platform of platforms) {
@@ -127,13 +127,25 @@ async function createGlobalDataset(data) {
   } = data;
   {
     ds = globalDataset;
+    ds.setDatum(ConstDatum({
+      'name': "krm",
+      'desc': "Akromio data.",
+      'value': {
+        ["dirName"]: _core.ps.env.KRM_DIR_NAME,
+        ["jobs"]: {
+          ["catalogs"]: {
+            ["path"]: _core.ps.env.KRM_JOB_CATALOGS_PATH
+          }
+        }
+      }
+    }));
     if (_core.dogma.is(args, _core.list)) {
       args = (0, await ArgsParser({
         'prefix': "KRM_ARG_"
       }).parse(args, _core.ps.env, argResolver));
       ds.setDatum(ConstDatum({
         'name': "args",
-        'desc': "The arguments passed from the CLI.",
+        'desc': "Arguments passed from the CLI.",
         'value': args
       }));
     }
@@ -143,29 +155,29 @@ async function createGlobalDataset(data) {
       }).parse(answers, _core.ps.env, argResolver));
       ds.setDatum(VarDatum({
         'name': "answers",
-        'desc': "The answers passed from the CLI.",
+        'desc': "Answers passed from the CLI.",
         'value': answers
       }));
     }
     ds.setDatum(ConstDatum({
       'name': "__loc",
-      'desc': "The catalog location.",
+      'desc': "Catalog location.",
       'value': catalog.loc
     }));
     const itemPath = catalog.loc.replace((0, _core.re)("^.+:\\/\\/"), "");
     ds.setDatum(ConstDatum({
       'name': "__file",
-      'desc': "The catalog path.",
+      'desc': "Catalog path.",
       'value': itemPath
     }));
     ds.setDatum(ConstDatum({
       'name': "__filename",
-      'desc': "The catalog file name.",
+      'desc': "Catalog file name.",
       'value': path.basename(itemPath)
     }));
     ds.setDatum(ConstDatum({
       'name': "__dir",
-      'desc': "The dir where the catalog is.",
+      'desc': "Dir where the catalog is.",
       'value': path.dirname(itemPath)
     }));
   }
