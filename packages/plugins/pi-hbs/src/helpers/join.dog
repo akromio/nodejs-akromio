@@ -1,0 +1,10 @@
+/**
+ * Joins the items of a list using a separator.
+ */
+export fn join(...args) = args[0].join(
+  if args[1] is text then
+    args[1]
+  else
+    ", "
+  end
+)

@@ -1,0 +1,4 @@
+/**
+ * Checks whether a value is not equal to other.
+ */
+export fn ne(value1?, value2?) = value1 != value2

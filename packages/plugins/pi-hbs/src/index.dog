@@ -1,0 +1,8 @@
+export {
+  plugin = "hbs"
+  desc = "Plugin for working with Handlebars."
+  tags = ["built-in"]
+  defaultOpName = "render"
+  ops =
+    render = use("./ops/render")
+}

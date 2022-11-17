@@ -1,0 +1,4 @@
+/**
+ * Splits a text attending to a given separator.
+ */
+export fn split(value: text, sep: text) = value.split(sep)

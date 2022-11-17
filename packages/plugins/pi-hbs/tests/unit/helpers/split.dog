@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/split
+)
+
+suite(__filename, proc()
+  test("when text with separator, [...] must be returned", proc()
+    # (1) act
+    const out = split("one,two,three", ",")
+
+    # (2) assessment
+    expected(out).equalTo(["one", "two", "three"])
+  end)
+
+  test("when text w/o separator, [text] must be returned", proc()
+    # (1) act
+    const out = split("123", ",")
+
+    # (2) assessment
+    expected(out).equalTo(["123"])
+  end)
+end)

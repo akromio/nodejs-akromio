@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ~/dist/cjs/helpers/eq
+)
+
+suite(__filename, proc()
+  test("when equal, true must be returned", proc()
+    # (1) act
+    const out = eq("a", "a")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when not equal, false must be returned", proc()
+    # (1) act
+    const out = eq("a", "b")
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)

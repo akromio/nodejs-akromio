@@ -1,0 +1,4 @@
+/**
+ * Removes the whitespaces from both ends of a text.
+ */
+export fn trim(value: text) = value.trim()
