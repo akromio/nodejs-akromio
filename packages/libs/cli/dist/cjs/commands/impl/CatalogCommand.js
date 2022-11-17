@@ -177,7 +177,7 @@ CatalogCommand.prototype.listJobDecls = function (decls, defaultJobName, tag, al
           }
         }
       }
-      rows.push([name, opType, job.tags, job.desc]);
+      rows.push([name, opType, job.tags, job.desc || job.title]);
     }
     (0, _core.print)("\nJobs:");
     (0, _core.print)(table(rows, tableOpts));
