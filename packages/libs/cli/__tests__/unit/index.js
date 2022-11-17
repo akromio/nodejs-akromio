@@ -1,14 +1,3 @@
-"use strict";
-
-var _core = require("@dogmalang/core");
-const expected = _core.dogma.use(require("@akromio/expected"));
-const pkg = _core.dogma.use(require("../.."));
-suite(__filename, () => {
-  {
-    test("when imported, its API must be exported", () => {
-      {
-        expected(pkg).members("createCommands", "table", "CatalogCommand", "DatasetCommand", "DescCommand", "EnvCommand", "RegistryCommandBase", "RunCommand", "ShowCommand", "TriggerCommand").toBeCallable();
-      }
-    });
-  }
-});
+import {any, bool, func, list, map, num, promise, proxy, re, set, text, timestamp, abstract, bind, coalesce, date, dogma, echo, echof, expect, fmt, json, keys, len, print, printf, promisify, ps, remove, sleep, todo, typename, values} from "@dogmalang/core";
+const expected = dogma.use(require("@akromio/expected"));const pkg = dogma.use(require("../.."));
+suite(__filename, (() => { {test("when imported, its API must be exported", (() => { {expected(pkg).members("createCommands", "table", "CatalogCommand", "DatasetCommand", "DescCommand", "EnvCommand", "RegistryCommandBase", "RunCommand", "ShowCommand", "TriggerCommand").toBeCallable();} }));} }));
