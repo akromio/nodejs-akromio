@@ -58,7 +58,10 @@ module.exports = exports = _JobCommand;
 _JobCommand.prototype.createCatalogReader = function () {
   const self = this;
   {
-    return CatalogReader();
+    return CatalogReader({
+      'akromioDirName': _core.ps.env.KRM_DIR_NAME,
+      'akromioJobCatalogsPath': _core.ps.env.KRM_JOB_CATALOGS_PATH
+    });
   }
 };
 _JobCommand.prototype.createCatalogParser = function (opts) {

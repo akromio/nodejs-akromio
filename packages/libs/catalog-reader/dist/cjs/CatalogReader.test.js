@@ -12,9 +12,7 @@ const {
   Registries,
   Item
 } = _core.dogma.use(require("@akromio/registry"));
-const {
-  CatalogReader: CatalogReaderBase
-} = _core.dogma.use(require("../.."));
+const CatalogReaderBase = _core.dogma.use(require("./CatalogReader"));
 const $CatalogReader = class CatalogReader extends CatalogReaderBase {
   constructor(_) {
     super(_);
@@ -28,11 +26,11 @@ const $CatalogReader = class CatalogReader extends CatalogReaderBase {
       enumerable: true
     });
     /* c8 ignore start */
-    if (this._pvt_1f65b8ed03dcb3cc55b73c6d80aa44e8___init__ instanceof Function) this._pvt_1f65b8ed03dcb3cc55b73c6d80aa44e8___init__(_); /* c8 ignore stop */
+    if (this._pvt_24113994d4e0484b7664d2419d3050a4___init__ instanceof Function) this._pvt_24113994d4e0484b7664d2419d3050a4___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_1f65b8ed03dcb3cc55b73c6d80aa44e8___post__ instanceof Function) this._pvt_1f65b8ed03dcb3cc55b73c6d80aa44e8___post__(); /* c8 ignore stop */
+    if (this._pvt_24113994d4e0484b7664d2419d3050a4___post__ instanceof Function) this._pvt_24113994d4e0484b7664d2419d3050a4___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_1f65b8ed03dcb3cc55b73c6d80aa44e8___validate__ instanceof Function) this._pvt_1f65b8ed03dcb3cc55b73c6d80aa44e8___validate__(); /* c8 ignore stop */
+    if (this._pvt_24113994d4e0484b7664d2419d3050a4___validate__ instanceof Function) this._pvt_24113994d4e0484b7664d2419d3050a4___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -43,11 +41,15 @@ const CatalogReader = new Proxy($CatalogReader, {
 });
 suite(__filename, () => {
   {
+    const akromioDirName = ".akromio";
+    const akromioJobCatalogsPath = "/jobs/catalogs";
     suite("readCatalogDecl()", () => {
       {
         const merger = {};
         const reader = CatalogReader({
-          'merger': merger
+          'merger': merger,
+          'akromioDirName': akromioDirName,
+          'akromioJobCatalogsPath': akromioJobCatalogsPath
         });
         test("when catalog unexists, nil must be returned", async () => {
           {
@@ -136,7 +138,7 @@ suite(__filename, () => {
               'spec': "v1.0",
               'jobs': [],
               'registryName': "test",
-              'name': "jobs.json",
+              'name': "/jobs.json",
               'loc': "test://jobs.json",
               'cty': "application/json"
             });
@@ -212,7 +214,9 @@ suite(__filename, () => {
       {
         const merger = {};
         const reader = CatalogReader({
-          'merger': merger
+          'merger': merger,
+          'akromioDirName': akromioDirName,
+          'akromioJobCatalogsPath': akromioJobCatalogsPath
         });
         teardown(() => {
           {
@@ -229,7 +233,7 @@ suite(__filename, () => {
                 }
               })
             }), {
-              'methods': ["extendCatalogDecl"]
+              'method': "extendCatalogDecl"
             });
             const item = Item({
               'registryName': "test",
@@ -257,7 +261,7 @@ suite(__filename, () => {
             expected(monitor.log(rdr).calls).equalTo(1);
           }
         });
-        test("when base existing, merge must be performed", async () => {
+        test("when reusable existing, merge must be performed", async () => {
           {
             const merger = simulator({
               'merge': method.returns({
@@ -265,7 +269,9 @@ suite(__filename, () => {
               })
             });
             const reader = CatalogReader({
-              'merger': merger
+              'merger': merger,
+              'akromioDirName': akromioDirName,
+              'akromioJobCatalogsPath': akromioJobCatalogsPath
             });
             const jobsItem = Item({
               'registryName': "test",
@@ -309,7 +315,7 @@ suite(__filename, () => {
             });
           }
         });
-        test("when base not existing, error must be raised", async () => {
+        test("when reusable not existing, error must be raised", async () => {
           {
             const jobsItem = Item({
               'registryName': "test",

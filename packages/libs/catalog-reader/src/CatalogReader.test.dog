@@ -2,18 +2,23 @@ use (
   alias://expected
   {monitor, simulator, interceptor, method} = alias://doubles
   {Registries, Item} = alias://registry
-  {CatalogReader as CatalogReaderBase} = ~
+  CatalogReaderBase = CatalogReader
 )
 
-#The reader to use for testing.
+# The reader to use for testing.
 struct CatalogReader: CatalogReaderBase
   pub const merger
 
 suite(__filename, proc()
+  const (
+    akromioDirName = ".akromio"
+    akromioJobCatalogsPath = "/jobs/catalogs"
+  )
+
   suite("readCatalogDecl()", proc()
     const (
       merger = {}
-      reader = CatalogReader(merger=)
+      reader = CatalogReader(merger=, akromioDirName, akromioJobCatalogsPath)
     )
 
     test("when catalog unexists, nil must be returned", async proc()
@@ -123,7 +128,7 @@ suite(__filename, proc()
         spec = "v1.0"
         jobs = []
         registryName = "test"
-        name = "jobs.json"
+        name = "/jobs.json"
         loc = "test://jobs.json"
         cty = "application/json"
       )
@@ -185,7 +190,7 @@ suite(__filename, proc()
   suite("extendCatalogDecl()", proc()
     const (
       merger = {}
-      reader = CatalogReader(merger=)
+      reader = CatalogReader(merger=, akromioDirName, akromioJobCatalogsPath)
     )
 
     teardown(proc()
@@ -201,7 +206,7 @@ suite(__filename, proc()
             extendCatalogDecl = method.invokes(fn(decl) = decl end)
           )
           
-          methods = ["extendCatalogDecl"]
+          method = "extendCatalogDecl"
         )
 
         item = Item(
@@ -232,11 +237,11 @@ suite(__filename, proc()
       expected(monitor.log(rdr).calls).equalTo(1)
     end)
 
-    test("when base existing, merge must be performed", async proc()
+    test("when reusable existing, merge must be performed", async proc()
       # (1) act
       const (
         merger = simulator(merge = method.returns(merged = true))
-        reader = CatalogReader(merger=)
+        reader = CatalogReader(merger=, akromioDirName, akromioJobCatalogsPath)
 
         jobsItem = Item(
           registryName = "test"
@@ -270,12 +275,10 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toHave(
-        merged = true
-      )
+      expected(out).toHave(merged = true)
     end)
 
-    test("when base not existing, error must be raised", async proc()
+    test("when reusable not existing, error must be raised", async proc()
       # (1) act
       const (
         jobsItem = Item(

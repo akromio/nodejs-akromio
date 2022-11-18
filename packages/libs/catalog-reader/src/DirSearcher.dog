@@ -1,0 +1,24 @@
+use (
+  dep://path
+  fs = dep://fs/promises
+)
+
+/**
+ * A searcher for a directory containing an entry
+ * above a given directory.
+ */
+export struct DirSearcher
+  /**
+   * Searches the directory containing a given [entry]
+   * above other given [dir]ectory.
+   *
+   * If directory not found, nil returned.
+   */
+  pub async fn searchDirWith(entry: text, dir = "") -> superDirPath
+    var curDir = dir
+    for i = 0; i < 10; i += 1 do
+      const entries = await(fs.readdir((curDir = path.join(curDir, ".."))))
+
+      if entry in entries then
+        superDirPath = curDir
+        break

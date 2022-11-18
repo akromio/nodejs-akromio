@@ -79,11 +79,20 @@ Registries.prototype.disconnect = async function () {
   }
   return this;
 };
-Registries.prototype.appendRegistry = function (reg) {
+Registries.prototype.appendRegistry = function (reg, opts) {
   const self = this; /* c8 ignore next */
-  _core.dogma.expect("reg", reg, Registry);
+  _core.dogma.expect("reg", reg, Registry); /* c8 ignore next */
+  if (opts != null) _core.dogma.expect("opts", opts, _core.dogma.intf("inline", {
+    force: {
+      optional: false,
+      type: _core.bool
+    }
+  }));
+  let {
+    force
+  } = opts || {};
   {
-    if (_core.dogma.enumEq(this.state, "connected")) {
+    if (!force && _core.dogma.enumEq(this.state, "connected")) {
       _core.dogma.raise(TypeError("New registries can only be appended when disconnected."));
     }
     this.registries.push(reg);

@@ -1,6 +1,6 @@
 use (
   alias://expected
-  pkg = ~
+  pkg = index
 )
 
 suite(__filename, proc()
