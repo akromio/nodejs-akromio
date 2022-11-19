@@ -13,7 +13,7 @@ suite(__filename, () => {
         test("when entry found, super path must be returned", async () => {
           {
             const out = (0, await searcher.searchDirWith("packages"));
-            expected(out).equalTo("../../..");
+            expected.path(out).equalTo("../../..");
           }
         });
         test("when entry not found, nil must be returned", async () => {
