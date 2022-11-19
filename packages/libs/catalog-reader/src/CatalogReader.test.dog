@@ -2,6 +2,7 @@ use (
   alias://expected
   {monitor, simulator, interceptor, method} = alias://doubles
   {Registries, Item} = alias://registry
+  DirSearcher
   CatalogReaderBase = CatalogReader
 )
 
@@ -305,6 +306,40 @@ suite(__filename, proc()
       expected(out)\
         .it(0).equalTo(false)\
         .it(1).equalTo(Error("Catalog to extend not found: unknown."))
+    end)
+  end)
+
+  suite("searchBaseRegistry()", proc()
+    test("when base not found, nil returned and nil must be raised", async proc()
+      # (1) arrange
+      const (
+        dirSearcher = simulator(DirSearcher, searchDirWith = method.resolves(nil))
+        regs = await(Registries().connect())
+        reader = CatalogReader(merger = {}, akromioDirName, akromioJobCatalogsPath, dirSearcher)
+      )
+
+      # (2) act
+      const (
+        out = pawait(reader.readCatalogDecl("base:///my/catalog.yaml", regs))
+      )
+
+      # (3) assessment
+      expected(out).it(0).equalTo(false).it(1).like("'base' registry not found.")
+    end)
+
+    test("when base found, path returned and catalog must be returned", async proc()
+      # (1) arrange
+      const (
+        dirSearcher = simulator(DirSearcher, searchDirWith = method.resolves("../.."))
+        regs = await(Registries().connect())
+        reader = CatalogReader(merger = {}, akromioDirName, akromioJobCatalogsPath, dirSearcher)
+      )
+
+      # (2) act
+      const out = await(reader.readCatalogDecl("base:///my/catalog.yaml", regs))
+
+      # (3) assessment
+      expected(out).toBeNil() # /my/catalog.yaml not found in base registry
     end)
   end)
 end)

@@ -138,6 +138,31 @@ suite(__filename, proc()
     end)
   end)
 
+  suite("hasRegistry()", proc()
+    test("when registry found, true must be returned", proc()
+      # (1) act
+      const (
+        reg = createRegistry()
+        regs = Registries().appendRegistry(reg)
+        out = regs.hasRegistry("test")
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+    end)
+
+    test("when registry not found, false must be returned", proc()
+      # (1) act
+      const (
+        regs = Registries()
+        out = regs.hasRegistry("test")
+      )
+
+      # (2) assessment
+      expected(out).equalTo(false)
+    end)
+  end)
+
   suite("registryNames", proc()
     test("a list must be returned with the registry names", proc()
       # (1) act

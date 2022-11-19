@@ -150,6 +150,25 @@ suite(__filename, () => {
         });
       }
     });
+    suite("hasRegistry()", () => {
+      {
+        test("when registry found, true must be returned", () => {
+          {
+            const reg = createRegistry();
+            const regs = Registries().appendRegistry(reg);
+            const out = regs.hasRegistry("test");
+            expected(out).equalTo(true);
+          }
+        });
+        test("when registry not found, false must be returned", () => {
+          {
+            const regs = Registries();
+            const out = regs.hasRegistry("test");
+            expected(out).equalTo(false);
+          }
+        });
+      }
+    });
     suite("registryNames", () => {
       {
         test("a list must be returned with the registry names", () => {

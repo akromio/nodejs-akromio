@@ -68,6 +68,11 @@ export struct Registries
     self.registries.push(reg)
   
   /**
+   * Checks and returns whether a [registry] exists.
+   */
+  pub fn hasRegistry(registry: text) = bool(self.getRegistry(registry))
+  
+  /**
    * Returns a registry by its name.
    *
    * If it unexists, nil returned.

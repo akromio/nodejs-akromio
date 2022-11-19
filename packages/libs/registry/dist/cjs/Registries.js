@@ -99,6 +99,13 @@ Registries.prototype.appendRegistry = function (reg, opts) {
   }
   return this;
 };
+Registries.prototype.hasRegistry = function (registry) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("registry", registry, _core.text);
+  {
+    return (0, _core.bool)(this.getRegistry(registry));
+  }
+};
 Registries.prototype.getRegistry = function (name) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("name", name, _core.text);

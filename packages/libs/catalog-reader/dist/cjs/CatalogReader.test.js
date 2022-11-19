@@ -12,6 +12,7 @@ const {
   Registries,
   Item
 } = _core.dogma.use(require("@akromio/registry"));
+const DirSearcher = _core.dogma.use(require("./DirSearcher"));
 const CatalogReaderBase = _core.dogma.use(require("./CatalogReader"));
 const $CatalogReader = class CatalogReader extends CatalogReaderBase {
   constructor(_) {
@@ -341,6 +342,42 @@ suite(__filename, () => {
             });
             const out = await _core.dogma.pawait(() => reader.readCatalogDecl("jobs", regs));
             expected(out).it(0).equalTo(false).it(1).equalTo(Error("Catalog to extend not found: unknown."));
+          }
+        });
+      }
+    });
+    suite("searchBaseRegistry()", () => {
+      {
+        test("when base not found, nil returned and nil must be raised", async () => {
+          {
+            const dirSearcher = simulator(DirSearcher, {
+              'searchDirWith': method.resolves(null)
+            });
+            const regs = (0, await Registries().connect());
+            const reader = CatalogReader({
+              'merger': {},
+              'akromioDirName': akromioDirName,
+              'akromioJobCatalogsPath': akromioJobCatalogsPath,
+              'dirSearcher': dirSearcher
+            });
+            const out = await _core.dogma.pawait(() => reader.readCatalogDecl("base:///my/catalog.yaml", regs));
+            expected(out).it(0).equalTo(false).it(1).like("'base' registry not found.");
+          }
+        });
+        test("when base found, path returned and catalog must be returned", async () => {
+          {
+            const dirSearcher = simulator(DirSearcher, {
+              'searchDirWith': method.resolves("../..")
+            });
+            const regs = (0, await Registries().connect());
+            const reader = CatalogReader({
+              'merger': {},
+              'akromioDirName': akromioDirName,
+              'akromioJobCatalogsPath': akromioJobCatalogsPath,
+              'dirSearcher': dirSearcher
+            });
+            const out = (0, await reader.readCatalogDecl("base:///my/catalog.yaml", regs));
+            expected(out).toBeNil();
           }
         });
       }

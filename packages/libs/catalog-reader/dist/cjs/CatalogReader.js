@@ -10,11 +10,15 @@ const {
 } = _core.dogma.use(require("@akromio/registry"));
 const DirSearcher = _core.dogma.use(require("./DirSearcher"));
 const extensions = [".yaml", ".yml", ".json"];
-const dirSearcher = DirSearcher();
 const $CatalogReader = class CatalogReader {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */
+    Object.defineProperty(this, 'dirSearcher', {
+      value: (0, _core.coalesce)(_['dirSearcher'], DirSearcher()),
+      writable: false,
+      enumerable: true
+    });
     (0, _core.expect)('akromioDirName', _['akromioDirName'], _core.text);
     Object.defineProperty(this, 'akromioDirName', {
       value: (0, _core.coalesce)(_['akromioDirName'], null),
@@ -51,7 +55,7 @@ CatalogReader.prototype.searchBaseRegistry = async function () {
       akromioJobCatalogsPath
     } = this;
     {
-      let basePath = (0, await dirSearcher.searchDirWith(akromioDirName));
+      let basePath = (0, await this.dirSearcher.searchDirWith(akromioDirName));
       if (basePath) {
         basePath = path.join(basePath, akromioDirName, akromioJobCatalogsPath);
         base = Registry({
@@ -95,7 +99,7 @@ CatalogReader.prototype.readCatalogDecl = async function (catalogName, registrie
       registryName: registryName,
       catalogName: catalogName
     } = this.decomposeCatalogName(catalogName, registryName));
-    if (registryName == "base" && !registries.getRegistry("base")) {
+    if (registryName == "base" && !registries.hasRegistry("base")) {
       {
         const base = (0, await this.searchBaseRegistry("base"));
         if (base) {
@@ -104,7 +108,7 @@ CatalogReader.prototype.readCatalogDecl = async function (catalogName, registrie
             'force': true
           });
         } else {
-          _core.dogma.raise(Error("base registry not found."));
+          _core.dogma.raise(Error("'base' registry not found."));
         }
       }
     }

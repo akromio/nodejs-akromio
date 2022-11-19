@@ -8,14 +8,16 @@ use (
 # Implicit extensions to concat when needed.
 const extensions = [".yaml", ".yml", ".json"]
 
-# Dir searcher to use.
-const dirSearcher = DirSearcher()
-
 /**
  * A reader for reading catalog declarations.
  */
 @abstract
 export struct CatalogReader
+  /**
+   * Directory searcher to use.
+   */
+  pub const dirSearcher = DirSearcher()
+
   /**
    * Catalog merger to use.
    */
@@ -42,7 +44,7 @@ export struct CatalogReader
   pub async fn searchBaseRegistry() -> base: Registry
     const {akromioDirName, akromioJobCatalogsPath} = self
 
-    if basePath := await(dirSearcher.searchDirWith(akromioDirName)) then
+    if basePath := await(self.dirSearcher.searchDirWith(akromioDirName)) then
       basePath = path.join(basePath, akromioDirName, akromioJobCatalogsPath)
       base = Registry(name = "base", client = FsConnector(basePath=))
   
@@ -81,12 +83,12 @@ export struct CatalogReader
     {registryName, catalogName} = self.decomposeCatalogName(catalogName, registryName)
     
     # (2) create base registry if needed
-    if registryName == "base" and not registries.getRegistry("base") then
+    if registryName == "base" and not registries.hasRegistry("base") then
       if base ::= await(self.searchBaseRegistry("base")) then
         await(base.connect())
         registries.appendRegistry(base, force = true)
       else
-        throw(Error("base registry not found."))
+        throw(Error("'base' registry not found."))
     
     # (3) get the catalog declaration item
     var item
