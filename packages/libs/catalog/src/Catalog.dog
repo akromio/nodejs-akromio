@@ -40,10 +40,10 @@ export struct Catalog
    */
   pub const plugins: Plugins
 
-    /**
-   * The catalog name extended by this.
+  /**
+   * Catalog names extended by this.
    */
-  pub const extends?: text[]
+  pub const extends?: (text | text[])
 
   /**
    * The default job to run when not indicated explicitly.

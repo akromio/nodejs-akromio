@@ -5,5 +5,8 @@ uses:
   expected:
     js: "@akromio/expected"
   
+  expectedpath:
+    js: "@akromio/expected-path"
+  
   registry:
     js: "@akromio/registry"

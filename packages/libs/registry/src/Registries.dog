@@ -59,13 +59,18 @@ export struct Registries
    * New registries can be appended only when the
    * collection is disconnected.
    */
-  pub fn appendRegistry(reg: Registry) -> self
+  pub fn appendRegistry(reg: Registry, opts?:> {force: bool}) -> self
     # (1) pre
-    if self.state ==~ connected then
+    if not force and self.state ==~ connected then
       throw(TypeError("New registries can only be appended when disconnected."))
 
     # (2) add registry
     self.registries.push(reg)
+  
+  /**
+   * Checks and returns whether a [registry] exists.
+   */
+  pub fn hasRegistry(registry: text) = bool(self.getRegistry(registry))
   
   /**
    * Returns a registry by its name.

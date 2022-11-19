@@ -1,12 +1,11 @@
 use (
   dep://path
   dep://yaml
-  {Registries} = alias://registry
+  {Registries, Registry, FsConnector} = alias://registry
+  DirSearcher
 )
 
-/**
- * The implicit extensions to concat when needed.
- */
+# Implicit extensions to concat when needed.
 const extensions = [".yaml", ".yml", ".json"]
 
 /**
@@ -15,10 +14,63 @@ const extensions = [".yaml", ".yml", ".json"]
 @abstract
 export struct CatalogReader
   /**
-   * The catalog merger to use.
+   * Directory searcher to use.
+   */
+  pub const dirSearcher = DirSearcher()
+
+  /**
+   * Catalog merger to use.
    */
   @abstract
   pub const merger: CatalogMerger
+
+  /**
+   * Akromio directory name such as, for example, .akromio.
+   * Used when root registry searched.
+   */
+  pub const akromioDirName: text
+
+  /**
+   * Akromio job catalogs path such as, for example, /jobs/catalogs.
+   * Used when root registry searched.
+   */
+  pub const akromioJobCatalogsPath: text
+
+  /**
+   * Searches and returns the base registry.
+   * If not found, nil returned.
+   */
+  @hidden
+  pub async fn searchBaseRegistry() -> base: Registry
+    const {akromioDirName, akromioJobCatalogsPath} = self
+
+    if basePath := await(self.dirSearcher.searchDirWith(akromioDirName)) then
+      basePath = path.join(basePath, akromioDirName, akromioJobCatalogsPath)
+      base = Registry(name = "base", client = FsConnector(basePath=))
+  
+  /**
+   * Decomposes the catalog name into registry and catalogName.
+   *
+   * For example:
+   * - base:///catalog.yaml in {registryName = base, catalogName = /catalogName}.
+   * - /catalog.yaml in {registryName = nil, catalogName = /catalogName}.
+   */
+  @hidden
+  pub fn decomposeCatalogName(catalogName: text, defaultRegistryName?: text): map
+    # (1) decompose
+    var (
+      uriPattern ::= re("^(.+):\/\/(.+)$")
+      registryName: text
+    )
+
+    if uriPattern.test(catalogName) then
+      [_, registryName, catalogName] = uriPattern.exec(catalogName)
+
+      if registryName then
+        catalogName = "/" + catalogName
+    
+    # (2) return decomposition
+    return {registryName = registryName or defaultRegistryName, catalogName}
 
   /**
    * Reads and returns a catalog declaration
@@ -27,13 +79,18 @@ export struct CatalogReader
    * When catalog unexists, nil returned.
    */
   pub async fn readCatalogDecl(catalogName: text, registries: Registries, registryName?: text) -> decl: map
-    # (1) get registry if explicit in catalog name
-    const uriPattern = re("^(.+):\/\/(.+)$")
-
-    if uriPattern.test(catalogName) then
-      [_, registryName, catalogName] = uriPattern.exec(catalogName)
+    # (1) decompose catalog name in registry and catalog
+    {registryName, catalogName} = self.decomposeCatalogName(catalogName, registryName)
     
-    # (2) get the catalog declaration item
+    # (2) create base registry if needed
+    if registryName == "base" and not registries.hasRegistry("base") then
+      if base ::= await(self.searchBaseRegistry("base")) then
+        await(base.connect())
+        registries.appendRegistry(base, force = true)
+      else
+        throw(Error("'base' registry not found."))
+    
+    # (3) get the catalog declaration item
     var item
 
     if path.extname(catalogName) then
@@ -45,7 +102,7 @@ export struct CatalogReader
         if (item = await(registries.getItem(itemPath, registryName=))) then
           break
     
-    # (3) parse catalog if needed
+    # (4) parse catalog if needed
     if (decl = item?value) then
       if decl is Buffer then
         decl = text(decl)
@@ -56,7 +113,7 @@ export struct CatalogReader
           if "application/json" then decl = json.decode(decl)
           else throw(TypeError($"Invalid content-type for catalog: ${cty}."))
     
-    # (4) set registry data
+    # (5) set registry data
     if decl then
       decl.{
         registryName = item.registryName
@@ -65,7 +122,7 @@ export struct CatalogReader
         cty = item.cty
       }
 
-    # (5) extend if needed
+    # (6) extend if needed
     if "extends" in decl then
       decl = await(self.extendCatalogDecl(decl, registries))
     
@@ -97,7 +154,8 @@ export struct CatalogReader
     )
 
     for each catalogName := catalogNames do
-      catalogName = path.join(basePath, catalogName)
+      if "://" not in catalogName then
+        catalogName = path.join(basePath, catalogName)
 
       if baseDecl ::= await(self.readCatalogDecl(catalogName, registries, registryName)) then
         extend.push(baseDecl)

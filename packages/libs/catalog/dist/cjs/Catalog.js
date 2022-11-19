@@ -49,12 +49,12 @@ const $Catalog = class Catalog {
       enumerable: true
     });
     /* c8 ignore start */
-    if (_['extends'] != null) (0, _core.expect)('extends', _['extends'], _core.dogma.TypeDef({
+    if (_['extends'] != null) (0, _core.expect)('extends', _['extends'], [_core.text, _core.dogma.TypeDef({
       name: 'inline',
       types: [_core.text],
       min: 0,
       max: null
-    })); /* c8 ignore stop */
+    })]); /* c8 ignore stop */
     Object.defineProperty(this, 'extends', {
       value: (0, _core.coalesce)(_['extends'], null),
       writable: false,

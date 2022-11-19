@@ -1,0 +1,29 @@
+use (
+  alias://expected
+  plugin = alias://expectedpath
+  DirSearcher
+)
+
+expected.plugin(plugin)
+
+suite(__filename, proc()
+  const searcher = DirSearcher()
+
+  suite("searchDirWith()", proc()
+    test("when entry found, super path must be returned", async proc()
+      # (1) act
+      const out = await(searcher.searchDirWith("packages"))
+
+      # (2) assessment
+      expected.path(out).equalTo("../../..")
+    end)
+
+    test("when entry not found, nil must be returned", async proc()
+      # (1) act
+      const out = await(searcher.searchDirWith("unknown"))
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+  end)
+end)
