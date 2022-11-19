@@ -2,7 +2,9 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
+const plugin = _core.dogma.use(require("@akromio/expected-path"));
 const DirSearcher = _core.dogma.use(require("./DirSearcher"));
+expected.plugin(plugin);
 suite(__filename, () => {
   {
     const searcher = DirSearcher();

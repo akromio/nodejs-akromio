@@ -1,7 +1,10 @@
 use (
   alias://expected
+  plugin = alias://expectedpath
   DirSearcher
 )
+
+expected.plugin(plugin)
 
 suite(__filename, proc()
   const searcher = DirSearcher()
@@ -12,7 +15,7 @@ suite(__filename, proc()
       const out = await(searcher.searchDirWith("packages"))
 
       # (2) assessment
-      expected(out).equalTo("../../..")
+      expected.path(out).equalTo("../../..")
     end)
 
     test("when entry not found, nil must be returned", async proc()
