@@ -14,20 +14,25 @@ const prefix = "KRM_"
  */
 export struct EnvCommand: Command
   @override
-  pub const name := ["env", "e"]
+  pub const name := ["env [pattern]", "e"]
 
   @override
   pub const desc := "Show the run environment."
 
   @override
-  pub const positionals := {}
+  pub const positionals := {
+    pattern =
+      type = "string"
+      desc = "Variable pattern to use."
+      default = "*"
+  }
 
   @override
   pub const options := {}
 
   @override @hidden
-  pub proc handle()
-    self.printRows(self.buildRows())
+  pub proc handle(argv=> {pattern})
+    self.printRows(self.buildRows(pattern))
     ps.exit(0)
   
   /**
@@ -73,9 +78,15 @@ export struct EnvCommand: Command
    * Lists and returns the environment variables related with this tool.
    */
   @hidden
-  pub fn buildRows() -> rows: list
+  pub fn buildRows(pattern: text) -> rows: list
     # (1) build var descriptions
     const vars = {
+      'ARG_*' =
+        desc = "The arguments to pass from environment variables."
+      
+      'ANSWER_*' =
+        desc = "The answers to pass from environment variables."
+
       ANSWERS_LOG =
         desc = "Print the answers for their reuse: options or file."
 
@@ -144,12 +155,9 @@ export struct EnvCommand: Command
     }
 
     # (2) build rows
-    rows = [
-      ["Variable", "Value", "Desc."]
-      [prefix + "ARG_*", "", "The arguments to pass from environment variables."]
-      [prefix + "ANSWER_*", "", "The answers to pass from environment variables."]
-    ]
-    
+    rows = [["Variable", "Value", "Desc."]]
+
+    pattern = re($"^${pattern}$".replace("*", ".*"))
     for each name, item := vars do
-      name = prefix + name
-      rows.push([name, ps.env[name] ?? "", item.desc])
+      if pattern.test((name = prefix + name)) then
+        rows.push([name, ps.env[name] ?? "", item.desc])
