@@ -16,7 +16,7 @@ const $EnvCommand = class EnvCommand extends Command {
     /* c8 ignore stop */ /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["env", "e"]),
+      value: (0, _core.coalesce)(_['name'], ["env [pattern]", "e"]),
       writable: false,
       enumerable: true
     });
@@ -30,7 +30,13 @@ const $EnvCommand = class EnvCommand extends Command {
     /* c8 ignore start */
     if (_['positionals'] != null) (0, _core.expect)('positionals', _['positionals'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'positionals', {
-      value: (0, _core.coalesce)(_['positionals'], {}),
+      value: (0, _core.coalesce)(_['positionals'], {
+        ["pattern"]: {
+          ["type"]: "string",
+          ["desc"]: "Variable pattern to use.",
+          ["default"]: "*"
+        }
+      }),
       writable: false,
       enumerable: true
     });
@@ -56,10 +62,14 @@ const EnvCommand = new Proxy($EnvCommand, {
   }
 });
 module.exports = exports = EnvCommand;
-EnvCommand.prototype.handle = function () {
-  const self = this;
+EnvCommand.prototype.handle = function (argv) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("argv", argv, _core.map);
+  let {
+    pattern
+  } = argv;
   {
-    this.printRows(this.buildRows());
+    this.printRows(this.buildRows(pattern));
     _core.ps.exit(0);
   }
 };
@@ -101,11 +111,18 @@ EnvCommand.prototype.printRows = function (rows) {
     (0, _core.print)(table(rows, config));
   }
 };
-EnvCommand.prototype.buildRows = function () {
+EnvCommand.prototype.buildRows = function (pattern) {
   const self = this;
-  let rows = [];
+  let rows = []; /* c8 ignore next */
+  _core.dogma.expect("pattern", pattern, _core.text);
   {
     const vars = {
+      ["ARG_*"]: {
+        ["desc"]: "The arguments to pass from environment variables."
+      },
+      ["ANSWER_*"]: {
+        ["desc"]: "The answers to pass from environment variables."
+      },
       ["ANSWERS_LOG"]: {
         ["desc"]: "Print the answers for their reuse: options or file."
       },
@@ -173,12 +190,14 @@ EnvCommand.prototype.buildRows = function () {
         ["desc"]: "Paths where the assets (plugins, catalogs...) are installed with NPM."
       }
     };
-    rows = [["Variable", "Value", "Desc."], [prefix + "ARG_*", "", "The arguments to pass from environment variables."], [prefix + "ANSWER_*", "", "The answers to pass from environment variables."]];
+    rows = [["Variable", "Value", "Desc."]];
+    pattern = (0, _core.re)(`^${pattern}$`.replace("*", ".*"));
     for (let [name, item] of Object.entries(vars)) {
       {
-        var _dogma$getItem;
-        name = prefix + name;
-        rows.push([name, (_dogma$getItem = _core.dogma.getItem(_core.ps.env, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : "", item.desc]);
+        if (pattern.test(name = prefix + name)) {
+          var _dogma$getItem;
+          rows.push([name, (_dogma$getItem = _core.dogma.getItem(_core.ps.env, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : "", item.desc]);
+        }
       }
     }
   }
