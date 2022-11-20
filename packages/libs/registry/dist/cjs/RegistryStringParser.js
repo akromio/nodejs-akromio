@@ -109,6 +109,7 @@ function parseFsString(name, conf) {
   return parsed;
 }
 function parseGitString(name, conf, defaults) {
+  (0, _core.print)(...arguments);
   let parsed = {}; /* c8 ignore next */
   _core.dogma.expect("name", name, _core.text); /* c8 ignore next */
   _core.dogma.expect("conf", conf, _core.text); /* c8 ignore next */
@@ -118,7 +119,7 @@ function parseGitString(name, conf, defaults) {
     let user;
     let repo;
     let branch;
-    let prefix = "";
+    let prefix;
     {
       const _ = (0, _core.len)(segments);
       switch (_) {
@@ -130,16 +131,13 @@ function parseGitString(name, conf, defaults) {
         /* c8 ignore stop */
         case 1:
           {
-            user = defaults.user;
             repo = _core.dogma.getItem(segments, 0);
-            branch = defaults.branch;
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
         case 2:
           {
             [user, repo] = _core.dogma.getArrayToUnpack(segments, 2);
-            branch = defaults.branch;
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -149,6 +147,18 @@ function parseGitString(name, conf, defaults) {
             prefix = _core.dogma.getSlice(segments, 3, -1).join("/");
           }
       }
+    }
+    if (!user) {
+      user = defaults.user;
+    }
+    if (!repo) {
+      repo = defaults.repo;
+    }
+    if (!branch) {
+      branch = defaults.branch;
+    }
+    if (!prefix) {
+      prefix = defaults.prefix;
     }
     parsed = {
       ["name"]: name,

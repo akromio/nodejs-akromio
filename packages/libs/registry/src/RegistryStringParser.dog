@@ -58,30 +58,26 @@ fn parseFsString(name: text, conf: text) -> parsed: map
  * - user/repo
  * - user/repo/branch
  */
+@input
 fn parseGitString(name: text, conf: text, defaults: map) -> parsed: map
   # (1) extract components
   var (
     segments ::= if conf == "" then [] else conf.split("/") end
-    user, repo, branch, prefix = ""
+    user, repo, branch, prefix
   )
 
   with len(segments) do
-    if 0 then
-      throw(TypeError($"Invalid git configuration: ${conf}."))
-
-    if 1 then
-      user = defaults.user
-      repo = segments[0]
-      branch = defaults.branch
-
-    if 2 then
-      [user, repo] = segments
-      branch = defaults.branch
-
+    if 0 then throw(TypeError($"Invalid git configuration: ${conf}."))
+    if 1 then repo = segments[0]
+    if 2 then [user, repo] = segments
     else
       [user, repo, branch] = segments[0, 2]
       prefix = segments[3, -1].join("/")
-
+  
+  if not user then user = defaults.user
+  if not repo then repo = defaults.repo
+  if not branch then branch = defaults.branch
+  if not prefix then prefix = defaults.prefix
   
   # (2) create parsed result
   parsed = {
