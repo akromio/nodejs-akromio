@@ -54,8 +54,8 @@ DatasetEval.prototype.evalExp = function (exp, ds) {
   const self = this;
   let value;
   {
-    const onlyVarPattern = (0, _core.re)("^\\$\\(([^(]+)\\)$");
-    const multiVarsPattern = (0, _core.re)("\\$\\(([^(]+)\\)");
+    const onlyVarPattern = (0, _core.re)("^\\$\\(([^()]+)\\)$");
+    const multiVarsPattern = (0, _core.re)("\\$\\(([^()]+)\\)");
     if (exp == "$(*)") {
       value = ds.reprMap;
     } else if (onlyVarPattern.test(exp)) {
