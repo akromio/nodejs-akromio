@@ -58,7 +58,6 @@ fn parseFsString(name: text, conf: text) -> parsed: map
  * - user/repo
  * - user/repo/branch
  */
-@input
 fn parseGitString(name: text, conf: text, defaults: map) -> parsed: map
   # (1) extract components
   var (

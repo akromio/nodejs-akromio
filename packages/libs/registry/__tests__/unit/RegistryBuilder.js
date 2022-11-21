@@ -14,7 +14,9 @@ suite(__filename, () => {
     const defaults = {
       ["git"]: {
         ["user"]: "akromio",
-        ["branch"]: "master"
+        ["repo"]: "builtin-catalog",
+        ["branch"]: "master",
+        ["prefix"]: ""
       },
       ["http"]: {
         ["host"]: "siasky.net",

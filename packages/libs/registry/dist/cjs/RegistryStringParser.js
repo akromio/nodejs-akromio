@@ -109,7 +109,6 @@ function parseFsString(name, conf) {
   return parsed;
 }
 function parseGitString(name, conf, defaults) {
-  (0, _core.print)(...arguments);
   let parsed = {}; /* c8 ignore next */
   _core.dogma.expect("name", name, _core.text); /* c8 ignore next */
   _core.dogma.expect("conf", conf, _core.text); /* c8 ignore next */
