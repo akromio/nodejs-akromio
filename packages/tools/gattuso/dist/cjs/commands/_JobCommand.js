@@ -21,7 +21,9 @@ const $_JobCommand = class _JobCommand {
         ["git"]: {
           ["host"]: _core.ps.env.KRM_REGISTRY_GIT_HOST,
           ["user"]: _core.ps.env.KRM_REGISTRY_GIT_USER,
-          ["branch"]: _core.ps.env.KRM_REGISTRY_GIT_BRANCH
+          ["repo"]: _core.ps.env.KRM_REGISTRY_GIT_REPO,
+          ["branch"]: _core.ps.env.KRM_REGISTRY_GIT_BRANCH,
+          ["prefix"]: _core.ps.env.KRM_REGISTRY_GIT_PREFIX
         },
         ["http"]: {
           ["host"]: _core.ps.env.KRM_REGISTRY_HTTP_HOST,

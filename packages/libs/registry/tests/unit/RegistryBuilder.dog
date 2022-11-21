@@ -10,7 +10,9 @@ suite(__filename, proc()
     defaults = {
       git =
         user = "akromio"
+        repo = "builtin-catalog"
         branch = "master"
+        prefix = ""
       http =
         host = "siasky.net"
         base = "/0007rdh37vandm5ndsgmabb1o3t2k4iuiniohaovgnvphp9lj1aeoj0"

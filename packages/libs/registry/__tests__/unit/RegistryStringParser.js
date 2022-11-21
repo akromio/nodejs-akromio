@@ -21,7 +21,8 @@ suite(__filename, () => {
       ["git"]: {
         ["user"]: "akromio",
         ["repo"]: "docker",
-        ["branch"]: "master"
+        ["branch"]: "master",
+        ["prefix"]: ""
       },
       ["http"]: {
         ["host"]: "skynet.apm.akromio.com",

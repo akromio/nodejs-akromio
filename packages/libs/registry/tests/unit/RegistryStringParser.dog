@@ -18,6 +18,7 @@ suite(__filename, proc()
         user = "akromio"
         repo = "docker"
         branch = "master"
+        prefix = ""
       http =
         host = "skynet.apm.akromio.com"
         base = "/"

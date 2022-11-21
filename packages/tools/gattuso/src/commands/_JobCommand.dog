@@ -14,7 +14,9 @@ export struct _JobCommand
     git =
       host = $KRM_REGISTRY_GIT_HOST
       user = $KRM_REGISTRY_GIT_USER
+      repo = $KRM_REGISTRY_GIT_REPO
       branch = $KRM_REGISTRY_GIT_BRANCH
+      prefix = $KRM_REGISTRY_GIT_PREFIX
 
     http =
       host = $KRM_REGISTRY_HTTP_HOST
