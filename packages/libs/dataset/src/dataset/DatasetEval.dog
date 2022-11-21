@@ -29,8 +29,8 @@ export struct DatasetEval
   @hidden @noParamCheck
   pub fn evalExp(exp: text, ds: Dataset) -> value
     const (
-      onlyVarPattern = re("^\\$\\(([^(]+)\\)$")
-      multiVarsPattern = re("\\$\\(([^(]+)\\)")
+      onlyVarPattern = re("^\\$\\(([^()]+)\\)$")
+      multiVarsPattern = re("\\$\\(([^()]+)\\)")
     )
 
     if exp == "$(*)" then
