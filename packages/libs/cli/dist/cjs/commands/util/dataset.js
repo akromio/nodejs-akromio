@@ -180,6 +180,11 @@ async function createGlobalDataset(data) {
       'desc': "Dir where the catalog is.",
       'value': path.dirname(itemPath)
     }));
+    ds.setDatum(ConstDatum({
+      'name': "__catalogName",
+      'desc': "Catalog name (without extension).",
+      'value': path.parse(itemPath).name
+    }));
   }
   return ds;
 }
