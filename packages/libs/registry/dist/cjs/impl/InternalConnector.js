@@ -34,7 +34,7 @@ InternalConnect.prototype.buildItemPath = function (itemPath) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("itemPath", itemPath, _core.text);
   {
-    if (!(itemPath.startsWith("/") || itemPath.startsWith("\\"))) {
+    if (!path.isAbsolute(itemPath)) {
       _core.dogma.raise(Error(`Path must be absolute and start with slash. Got: ${itemPath}.`));
     }
   }
