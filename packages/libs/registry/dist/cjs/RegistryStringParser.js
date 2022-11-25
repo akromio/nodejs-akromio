@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const path = _core.dogma.use(require("path"));
 const $RegistryStringParser = class RegistryStringParser {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -97,7 +98,7 @@ function parseFsString(name, conf) {
   _core.dogma.expect("name", name, _core.text); /* c8 ignore next */
   _core.dogma.expect("conf", conf, _core.text);
   {
-    if (!conf.startsWith("/")) {
+    if (!path.isAbsolute(conf)) {
       _core.dogma.raise(TypeError(`FS registry expecting an absolute base path: ${conf}.`));
     }
     parsed = {

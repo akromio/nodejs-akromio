@@ -1,3 +1,7 @@
+use (
+  dep://path
+)
+
 /**
  * A parser for declaration strings, that is,
  * a parser to return registries attending to a
@@ -43,7 +47,7 @@ export struct RegistryStringParser
  */
 fn parseFsString(name: text, conf: text) -> parsed: map
   # (1) pre
-  if not conf.startsWith("/") then
+  if not path.isAbsolute(conf) then
     throw(TypeError($"FS registry expecting an absolute base path: ${conf}."))
 
   # (2) create parsed result
