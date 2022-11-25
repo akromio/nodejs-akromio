@@ -26,7 +26,7 @@ export struct InternalConnect
    */
   @hidden
   pub fn buildItemPath(itemPath: text) -> itemPath
-    if not (itemPath.startsWith("/") or itemPath.startsWith("\\")) then
+    if not path.isAbsolute(itemPath) then
       throw(Error($"Path must be absolute and start with slash. Got: ${itemPath}."))
   
   /**
