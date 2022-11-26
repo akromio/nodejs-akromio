@@ -2,6 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const inquirer = _core.dogma.use(require("inquirer"));
+const humanize = _core.dogma.use(require("humanize-string"));
 const $Inquirer = class Inquirer {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -52,17 +53,19 @@ Inquirer.prototype.performInput = async function (q, answers) {
     {
       const name = q.input;
       if (!_core.dogma.includes(answers, name)) {
+        var _q$title;
+        const title = (_q$title = q.title) !== null && _q$title !== void 0 ? _q$title : humanize(name);
         if (q.type == "password") {
           _core.dogma.setItem("=", answers, name, _core.dogma.getItem((0, await inquirer.prompt({
             'type': "password",
-            'message': q.title,
+            'message': title,
             'default': q.defaultValue,
             'name': name
           })), name));
         } else {
           _core.dogma.setItem("=", answers, name, _core.dogma.getItem((0, await inquirer.prompt({
             'type': "input",
-            'message': q.title,
+            'message': title,
             'default': q.defaultValue,
             'name': name
           })), name));
@@ -79,9 +82,11 @@ Inquirer.prototype.performConfirm = async function (q, answers) {
     {
       const name = q.confirm;
       if (!_core.dogma.includes(answers, name)) {
+        var _q$title2;
+        const title = (_q$title2 = q.title) !== null && _q$title2 !== void 0 ? _q$title2 : humanize(name);
         _core.dogma.setItem("=", answers, name, _core.dogma.getItem((0, await inquirer.prompt({
           'type': "confirm",
-          'message': q.title,
+          'message': title,
           'default': q.defaultValue,
           'name': name
         })), name));
@@ -97,11 +102,13 @@ Inquirer.prototype.performSelect = async function (q, answers) {
     {
       const name = q.select;
       if (!_core.dogma.includes(answers, name)) {
+        var _q$title3;
+        const title = (_q$title3 = q.title) !== null && _q$title3 !== void 0 ? _q$title3 : humanize(name);
         if (q.multiple) {
           var _q$selected;
           _core.dogma.setItem("=", answers, name, _core.dogma.getItem((0, await inquirer.prompt({
             'type': "checkbox",
-            'message': q.title,
+            'message': title,
             'choices': q.options,
             'default': (_q$selected = q.selected) !== null && _q$selected !== void 0 ? _q$selected : q.defaultValue,
             'name': name
@@ -110,7 +117,7 @@ Inquirer.prototype.performSelect = async function (q, answers) {
           var _q$selected2;
           _core.dogma.setItem("=", answers, name, _core.dogma.getItem((0, await inquirer.prompt({
             'type': "list",
-            'message': q.title,
+            'message': title,
             'choices': q.options,
             'default': (_q$selected2 = q.selected) !== null && _q$selected2 !== void 0 ? _q$selected2 : q.defaultValue,
             'name': name

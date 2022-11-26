@@ -34,7 +34,7 @@ suite(__filename, () => {
     });
     suite("performInput()", () => {
       {
-        test("when called with answer, no question must be performed", async () => {
+        test("when called w/ answer, no question must be performed", async () => {
           {
             const prompt = monitor(inquirer.prompt);
             _core.dogma.update(inquirer, {
@@ -44,19 +44,18 @@ suite(__filename, () => {
               value: prompt
             });
             const q = {
-              ["input"]: "test",
-              ["title"]: "the title",
+              ["input"]: "myInput",
               ["defaultValue"]: false
             };
             const answers = {
-              ["test"]: "321"
+              ["myInput"]: "321"
             };
             const out = (0, await i.prompt([q], answers));
             const log = monitor.log(prompt, {
               'clear': true
             });
             expected(out).equalTo({
-              'test': "321"
+              'myInput': "321"
             });
             expected(log).toHaveLen(0);
           }
@@ -100,7 +99,7 @@ suite(__filename, () => {
           {
             const prompt = monitor(simulator.fun({
               'resolves': {
-                ["test"]: "321"
+                ["myTest"]: "321"
               }
             }));
             _core.dogma.update(inquirer, {
@@ -110,9 +109,8 @@ suite(__filename, () => {
               value: prompt
             });
             const q = {
-              ["input"]: "test",
+              ["input"]: "myTest",
               ["type"]: "password",
-              ["title"]: "the title",
               ["defaultValue"]: "123"
             };
             const answers = {};
@@ -121,13 +119,13 @@ suite(__filename, () => {
               'clear': true
             });
             expected(out).equalTo({
-              'test': "321"
+              'myTest': "321"
             });
             expected(log).toHaveLen(1);
             expected(log.calledWith([{
-              ["name"]: "test",
+              ["name"]: "myTest",
               ["type"]: "password",
-              ["message"]: q.title,
+              ["message"]: "My test",
               ["default"]: q.defaultValue
             }])).equalTo(1);
           }
@@ -136,11 +134,11 @@ suite(__filename, () => {
     });
     suite("performConfirm()", () => {
       {
-        test("when called, confirm question must be performed", async () => {
+        test("when called w/o answer (humanize needed), confirm question must be performed", async () => {
           {
             const prompt = monitor(simulator.fun({
               'resolves': {
-                ["test"]: true
+                ["myTest"]: true
               }
             }));
             _core.dogma.update(inquirer, {
@@ -150,7 +148,41 @@ suite(__filename, () => {
               value: prompt
             });
             const q = {
-              ["confirm"]: "test",
+              ["confirm"]: "myTest",
+              ["defaultValue"]: false
+            };
+            const answers = {};
+            const out = (0, await i.prompt([q], answers));
+            const log = monitor.log(prompt, {
+              'clear': true
+            });
+            expected(out).equalTo({
+              'myTest': true
+            });
+            expected(log).toHaveLen(1);
+            expected(log.calledWith([{
+              ["name"]: "myTest",
+              ["type"]: "confirm",
+              ["message"]: "My test",
+              ["default"]: q.defaultValue
+            }])).equalTo(1);
+          }
+        });
+        test("when called w/o answer (humanize not needed), confirm question must be performed", async () => {
+          {
+            const prompt = monitor(simulator.fun({
+              'resolves': {
+                ["myTest"]: true
+              }
+            }));
+            _core.dogma.update(inquirer, {
+              name: "prompt",
+              visib: ".",
+              assign: "=",
+              value: prompt
+            });
+            const q = {
+              ["confirm"]: "myTest",
               ["title"]: "the title",
               ["defaultValue"]: false
             };
@@ -160,18 +192,18 @@ suite(__filename, () => {
               'clear': true
             });
             expected(out).equalTo({
-              'test': true
+              'myTest': true
             });
             expected(log).toHaveLen(1);
             expected(log.calledWith([{
-              ["name"]: "test",
+              ["name"]: "myTest",
               ["type"]: "confirm",
-              ["message"]: q.title,
+              ["message"]: "the title",
               ["default"]: q.defaultValue
             }])).equalTo(1);
           }
         });
-        test("when called with answer, no question must be performed", async () => {
+        test("when called w/ answer, no question must be performed", async () => {
           {
             const prompt = monitor(inquirer.prompt);
             _core.dogma.update(inquirer, {
@@ -202,7 +234,7 @@ suite(__filename, () => {
     });
     suite("performSelect()", () => {
       {
-        test("when called with answer, no question must be performed", async () => {
+        test("when called w/ answer, no question must be performed", async () => {
           {
             const prompt = monitor(inquirer.prompt);
             _core.dogma.update(inquirer, {
@@ -212,20 +244,19 @@ suite(__filename, () => {
               value: prompt
             });
             const q = {
-              ["select"]: "test",
-              ["title"]: "the title",
+              ["select"]: "myTest",
               ["options"]: ["one", "two", "three"],
               ["selected"]: "two"
             };
             const answers = {
-              ["test"]: "three"
+              ["myTest"]: "three"
             };
             const out = (0, await i.prompt([q], answers));
             const log = monitor.log(prompt, {
               'clear': true
             });
             expected(out).equalTo({
-              'test': "three"
+              'myTest': "three"
             });
             expected(log).toHaveLen(0);
           }
@@ -236,7 +267,7 @@ suite(__filename, () => {
               {
                 const prompt = monitor(simulator.fun({
                   'resolves': {
-                    ["test"]: "two"
+                    ["myTest"]: "two"
                   }
                 }));
                 _core.dogma.update(inquirer, {
@@ -246,8 +277,7 @@ suite(__filename, () => {
                   value: prompt
                 });
                 const q = {
-                  ["select"]: "test",
-                  ["title"]: "the title",
+                  ["select"]: "myTest",
                   ["options"]: ["one", "two", "three"],
                   ["selected"]: "three"
                 };
@@ -257,13 +287,13 @@ suite(__filename, () => {
                   'clear': true
                 });
                 expected(out).equalTo({
-                  'test': "two"
+                  'myTest': "two"
                 });
                 expected(log).toHaveLen(1);
                 expected(log.calledWith([{
-                  ["name"]: "test",
+                  ["name"]: "myTest",
                   ["type"]: "list",
-                  ["message"]: q.title,
+                  ["message"]: "My test",
                   ["default"]: q.selected,
                   ["choices"]: q.options
                 }])).equalTo(1);

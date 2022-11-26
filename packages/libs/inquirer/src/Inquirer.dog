@@ -1,5 +1,6 @@
 use (
   dep://inquirer
+  humanize = dep://humanize-string
 )
 
 /**
@@ -24,17 +25,21 @@ export struct Inquirer
   @hidden
   pub async proc performInput(q: map, answers: map)
     if name ::= q.input; name not in answers then
+      # if needed, build title from name
+      const title = q.title ?? humanize(name)
+
+      # inquire value
       if q.type == "password" then
         answers[name] = await(inquirer.prompt(
           'type' = "password"
-          message = q.title
+          message = title
           default = q.defaultValue
           name
         ))[name]
       else
         answers[name] = await(inquirer.prompt(
           'type' = "input"
-          message = q.title
+          message = title
           default = q.defaultValue
           name
         ))[name]
@@ -45,9 +50,13 @@ export struct Inquirer
   @hidden
   pub async proc performConfirm(q: map, answers: map)
     if name ::= q.confirm; name not in answers then
+      # if needed, build title from name
+      const title = q.title ?? humanize(name)
+
+      # inquire value
       answers[name] = await(inquirer.prompt(
         'type' = "confirm"
-        message = q.title
+        message = title
         default = q.defaultValue
         name
       ))[name]
@@ -58,10 +67,14 @@ export struct Inquirer
   @hidden
   pub async proc performSelect(q: map, answers: map)
     if name ::= q.select; name not in answers then
+      # if needed, build title from name
+      const title = q.title ?? humanize(name)
+
+      # inquire value
       if q.multiple then
         answers[name] = await(inquirer.prompt(
           'type' = "checkbox"
-          message = q.title
+          message = title
           choices = q.options
           default = q.selected ?? q.defaultValue
           name
@@ -69,7 +82,7 @@ export struct Inquirer
       else
         answers[name] = await(inquirer.prompt(
           'type' = "list"
-          message = q.title
+          message = title
           choices = q.options
           default = q.selected ?? q.defaultValue
           name
