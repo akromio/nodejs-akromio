@@ -66,6 +66,21 @@ JobParser.prototype.parseJob = function (decl, opts) {
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
+    {
+      const local = decl.local;
+      if (_core.dogma.is(local, _core.list)) {
+        for (let i = 0; i < (0, _core.len)(local); i += 1) {
+          {
+            const datum = _core.dogma.getItem(local, i);
+            if (_core.dogma.is(datum, _core.text)) {
+              _core.dogma.setItem("=", local, i, {
+                ["var"]: datum
+              });
+            }
+          }
+        }
+      }
+    }
     if (_core.dogma.includes(decl, "group")) {
       job = this.parseGroup(decl, opts);
     } else if (_core.dogma.includes(decl, "macro")) {
