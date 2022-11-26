@@ -1,6 +1,6 @@
 {
   "name": "@akromio/trigger-interval",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Interval trigger implementation for Akromio.",
   "author": {
     "name": "Sia Codelabs",

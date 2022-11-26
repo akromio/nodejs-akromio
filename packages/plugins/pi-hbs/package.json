@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-hbs",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Plugin for working with Handlebars on Akromio.",
   "author": {
     "name": "Sia Codelabs",

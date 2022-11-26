@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-list",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Plugin for working with data lists on Akromio.",
   "author": {
     "name": "Sia Codelabs",
