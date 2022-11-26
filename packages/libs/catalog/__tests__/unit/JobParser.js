@@ -18,13 +18,19 @@ suite(__filename, () => {
           {
             const decl = {
               ["macro"]: "test",
+              ["local"]: ["v1", "v2"],
               ["steps"]: []
             };
             const out = parser.parseJob(decl, {
               'ops': ops
             });
             expected(out).toBe("CatalogMacro").toHave({
-              'name': "test"
+              'name': "test",
+              'local': [{
+                ["var"]: "v1"
+              }, {
+                ["var"]: "v2"
+              }]
             });
           }
         });
