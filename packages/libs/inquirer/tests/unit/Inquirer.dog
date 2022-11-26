@@ -30,22 +30,22 @@ suite(__filename, proc()
   end)
 
   suite("performInput()", proc()
-    test("when called with answer, no question must be performed", async proc()
+    test("when called w/ answer, no question must be performed", async proc()
       # (1) pre
       const prompt = monitor(inquirer.prompt)
       inquirer.{prompt}
 
       # (2) act
       const (
-        q = {input = "test", title = "the title", defaultValue = false}
-        answers = {test = "321"}
+        q = {input = "myInput", defaultValue = false}
+        answers = {myInput = "321"}
         out = await(i.prompt([q], answers))
       )
 
       # (3) assessment
       const log = monitor.log(prompt, clear = true)
 
-      expected(out).equalTo(test = "321")
+      expected(out).equalTo(myInput = "321")
       expected(log).toHaveLen(0)
     end)
 
@@ -75,15 +75,14 @@ suite(__filename, proc()
 
     test("when type is password, password question must be performed", async proc()
       # (1) pre
-      const prompt = monitor(simulator.fun(resolves = {test = "321"}))
+      const prompt = monitor(simulator.fun(resolves = {myTest = "321"}))
       inquirer.{prompt}
 
       # (2) act
       const (
         q = {
-          input = "test"
+          input = "myTest"
           type = "password"
-          title = "the title"
           defaultValue = "123"
         }
         answers = {}
@@ -93,25 +92,25 @@ suite(__filename, proc()
       # (3) assessment
       const log = monitor.log(prompt, clear = true)
 
-      expected(out).equalTo(test = "321")
+      expected(out).equalTo(myTest = "321")
       expected(log).toHaveLen(1)
       expected(
         log.calledWith([
-          {name = "test", type = "password", message = q.title, default = q.defaultValue}
+          {name = "myTest", type = "password", message = "My test", default = q.defaultValue}
         ])
       ).equalTo(1)
     end)
   end)
 
   suite("performConfirm()", proc()
-    test("when called, confirm question must be performed", async proc()
+    test("when called w/o answer (humanize needed), confirm question must be performed", async proc()
       # (1) pre
-      const prompt = monitor(simulator.fun(resolves = {test = true}))
+      const prompt = monitor(simulator.fun(resolves = {myTest = true}))
       inquirer.{prompt}
 
       # (2) act
       const (
-        q = {confirm = "test", title = "the title", defaultValue = false}
+        q = {confirm = "myTest", defaultValue = false}
         answers = {}
         out = await(i.prompt([q], answers))
       )
@@ -119,16 +118,40 @@ suite(__filename, proc()
       # (3) assessment
       const log = monitor.log(prompt, clear = true)
 
-      expected(out).equalTo(test = true)
+      expected(out).equalTo(myTest = true)
       expected(log).toHaveLen(1)
       expected(
         log.calledWith([
-          {name = "test", type = "confirm", message = q.title, default = q.defaultValue}
+          {name = "myTest", type = "confirm", message = "My test", default = q.defaultValue}
         ])
       ).equalTo(1)
     end)
 
-    test("when called with answer, no question must be performed", async proc()
+    test("when called w/o answer (humanize not needed), confirm question must be performed", async proc()
+      # (1) pre
+      const prompt = monitor(simulator.fun(resolves = {myTest = true}))
+      inquirer.{prompt}
+
+      # (2) act
+      const (
+        q = {confirm = "myTest", title = "the title", defaultValue = false}
+        answers = {}
+        out = await(i.prompt([q], answers))
+      )
+
+      # (3) assessment
+      const log = monitor.log(prompt, clear = true)
+
+      expected(out).equalTo(myTest = true)
+      expected(log).toHaveLen(1)
+      expected(
+        log.calledWith([
+          {name = "myTest", type = "confirm", message = "the title", default = q.defaultValue}
+        ])
+      ).equalTo(1)
+    end)
+
+    test("when called w/ answer, no question must be performed", async proc()
       # (1) pre
       const prompt = monitor(inquirer.prompt)
       inquirer.{prompt}
@@ -149,7 +172,7 @@ suite(__filename, proc()
   end)
 
   suite("performSelect()", proc()
-    test("when called with answer, no question must be performed", async proc()
+    test("when called w/ answer, no question must be performed", async proc()
       # (1) pre
       const prompt = monitor(inquirer.prompt)
       inquirer.{prompt}
@@ -157,34 +180,32 @@ suite(__filename, proc()
       # (2) act
       const (
         q = {
-          select = "test"
-          title = "the title"
+          select = "myTest"
           options = ["one", "two", "three"]
           selected = "two"
         }
 
-        answers = {test = "three"}
+        answers = {myTest = "three"}
         out = await(i.prompt([q], answers))
       )
 
       # (3) assessment
       const log = monitor.log(prompt, clear = true)
 
-      expected(out).equalTo(test = "three")
+      expected(out).equalTo(myTest = "three")
       expected(log).toHaveLen(0)
     end)
 
     suite("w/o multiple, list must be performed", async proc()
       test("when selected set, selected must be used", async proc()
         # (1) pre
-        const prompt = monitor(simulator.fun(resolves = {test = "two"}))
+        const prompt = monitor(simulator.fun(resolves = {myTest = "two"}))
         inquirer.{prompt}
 
         # (2) act
         const (
           q = {
-            select = "test"
-            title = "the title"
+            select = "myTest"
             options = ["one", "two", "three"]
             selected = "three"
           }
@@ -195,13 +216,13 @@ suite(__filename, proc()
         # (3) assessment
         const log = monitor.log(prompt, clear = true)
 
-        expected(out).equalTo(test = "two")
+        expected(out).equalTo(myTest = "two")
         expected(log).toHaveLen(1)
         expected(
           log.calledWith([{
-            name = "test"
+            name = "myTest"
             type = "list"
-            message = q.title
+            message = "My test"
             default = q.selected
             choices = q.options
           }])
