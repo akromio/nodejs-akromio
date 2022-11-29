@@ -55,6 +55,8 @@ fn parseFsString(name: text, conf: text) -> parsed: map
 
 /**
  * Parses a git configuration string.
+ * When the repository name not containing -registry suffix,
+ * this is added automatically.
  *
  * @dev
  * The possibilities are:
@@ -81,8 +83,12 @@ fn parseGitString(name: text, conf: text, defaults: map) -> parsed: map
   if not repo then repo = defaults.repo
   if not branch then branch = defaults.branch
   if not prefix then prefix = defaults.prefix
+
+  # (2) add registry suffix if needed
+  if not repo.endsWith("-registry") then
+    repo += "-registry"
   
-  # (2) create parsed result
+  # (3) create parsed result
   parsed = {
     name
     impl = "git"
