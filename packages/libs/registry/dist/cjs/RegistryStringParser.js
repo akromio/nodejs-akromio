@@ -160,6 +160,9 @@ function parseGitString(name, conf, defaults) {
     if (!prefix) {
       prefix = defaults.prefix;
     }
+    if (!repo.endsWith("-registry")) {
+      repo += "-registry";
+    }
     parsed = {
       ["name"]: name,
       ["impl"]: "git",

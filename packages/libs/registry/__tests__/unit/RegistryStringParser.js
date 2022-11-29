@@ -68,27 +68,27 @@ suite(__filename, () => {
         });
         suite("git", () => {
           {
-            test("when name=git://repo, default user and branch must be used", () => {
+            test("when name=git://repo, -registry must be added and default user and branch must be used", () => {
               {
                 const out = parser.parse("test=git://mydocker", defaults);
                 expected(out).equalTo({
                   'name': "test",
                   'impl': "git",
                   'user': defaults.git.user,
-                  'repo': "mydocker",
+                  'repo': "mydocker-registry",
                   'branch': defaults.git.branch,
                   'prefix': ""
                 });
               }
             });
-            test("when name=git://user/repo, default branch must be used", () => {
+            test("when name=git://user/repo-registry, default branch must be used", () => {
               {
-                const out = parser.parse("test=git://myuser/mydocker", defaults);
+                const out = parser.parse("test=git://myuser/mydocker-registry", defaults);
                 expected(out).equalTo({
                   'name': "test",
                   'impl': "git",
                   'user': "myuser",
-                  'repo': "mydocker",
+                  'repo': "mydocker-registry",
                   'branch': defaults.git.branch,
                   'prefix': ""
                 });
@@ -96,12 +96,12 @@ suite(__filename, () => {
             });
             test("when name=git://user/repo/mybranch, no default must be used", () => {
               {
-                const out = parser.parse("test=git://myuser/mydocker/mybranch", defaults);
+                const out = parser.parse("test=git://myuser/mydocker-registry/mybranch", defaults);
                 expected(out).equalTo({
                   'name': "test",
                   'impl': "git",
                   'user': "myuser",
-                  'repo': "mydocker",
+                  'repo': "mydocker-registry",
                   'branch': "mybranch",
                   'prefix': ""
                 });
@@ -109,12 +109,12 @@ suite(__filename, () => {
             });
             test("when name=git://user/repo/mybranch/prefix, no default must be used", () => {
               {
-                const out = parser.parse("test=git://myuser/mydocker/mybranch/pref/ix", defaults);
+                const out = parser.parse("test=git://myuser/mydocker-registry/mybranch/pref/ix", defaults);
                 expected(out).equalTo({
                   'name': "test",
                   'impl': "git",
                   'user': "myuser",
-                  'repo': "mydocker",
+                  'repo': "mydocker-registry",
                   'branch': "mybranch",
                   'prefix': "pref/ix"
                 });
@@ -222,7 +222,7 @@ suite(__filename, () => {
                   'name': "git",
                   'impl': "git",
                   'user': "userName",
-                  'repo': "repoName",
+                  'repo': "repoName-registry",
                   'branch': "branchName"
                 });
               }
