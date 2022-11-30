@@ -21,7 +21,7 @@ module.exports = exports = {
       ["user"]: "akromio",
       ["repo"]: "builtin-registry",
       ["branch"]: "master",
-      ["prefix"]: ".akromio"
+      ["prefix"]: "registry"
     },
     ["http"]: {
       ["host"]: "web3portal.com",
