@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-path",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Plugin for working with file system paths on Akromio.",
   "author": {
     "name": "Sia Codelabs",
