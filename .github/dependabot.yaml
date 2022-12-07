@@ -11,6 +11,6 @@ updates:
     labels:
       - dependencies
     commit-message:
-      prefix: "dependabot(prod): "
-      prefix-development: "dependabot(dev): "
+      prefix: "depbot(prod): "
+      prefix-development: "depbot(dev): "
       include: scope
