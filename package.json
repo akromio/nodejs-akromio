@@ -40,6 +40,6 @@
   },
   "dependencies": {
     "@akromio/cli": "^0.0.0",
-    "term-size": "^2.2.1"
+    "term-size": "^3.0.2"
   }
 }
