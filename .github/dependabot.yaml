@@ -11,6 +11,11 @@ updates:
     labels:
       - dependencies
     commit-message:
-      prefix: "depbot(prod): "
-      prefix-development: "depbot(dev): "
+      prefix: depbot
+      prefix-development: depbot
       include: scope
+    ignore:
+      - dependency-name: chalk
+      - dependency-name: inquirer
+      - dependency-name: file-type
+      - dependency-name: term-size
