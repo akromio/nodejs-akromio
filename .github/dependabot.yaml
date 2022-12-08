@@ -19,3 +19,5 @@ updates:
       - dependency-name: inquirer
       - dependency-name: file-type
       - dependency-name: term-size
+      - dependency-name: humanize-string
+      - dependency-name: indent-string
