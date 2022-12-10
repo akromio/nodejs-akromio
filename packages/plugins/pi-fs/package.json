@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-fs",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Plugin for performing operations with the file system on Akromio.",
   "author": {
     "name": "Sia Codelabs",
