@@ -56,26 +56,6 @@ suite(__filename, () => {
         });
       }
     });
-    suite("parseCondition()", () => {
-      {
-        test("when condition?, datum name must be returned", () => {
-          {
-            const out = parser.parseStep("xyz? op", "continue");
-            expected(out).toHave({
-              'condition': "xyz"
-            });
-          }
-        });
-        test("when no condition, nil must be returned", () => {
-          {
-            const out = parser.parseStep("op", "continue");
-            expected(out).toHave({
-              'condition': null
-            });
-          }
-        });
-      }
-    });
     suite("parseResult()", () => {
       {
         test("when $varName, datum name must be returned", () => {
@@ -102,7 +82,6 @@ suite(__filename, () => {
           {
             const out = parser.parseStep("banner $(i.slug)", "finish");
             expected(out).toHave({
-              'condition': null,
               'resultVarName': null,
               'opName': "banner",
               'args': "$(i.slug)",
@@ -114,7 +93,6 @@ suite(__filename, () => {
           {
             const out = parser.parseStep("$xyz = op one two three", "finish");
             expected(out).toHave({
-              'condition': null,
               'resultVarName': "xyz",
               'opName': "op",
               'args': ["one", "two", "three"],
@@ -130,34 +108,10 @@ suite(__filename, () => {
             expected(out).item(0).equalTo(false).item(1).equalTo(TypeError("'=' expected after $resultVarName."));
           }
         });
-        test("when 'cond? opName ...args', {condition, opName, args, onError = finish} must be returned", () => {
-          {
-            const out = parser.parseStep("xyz? op one two three", "finish");
-            expected(out).toHave({
-              'condition': "xyz",
-              'resultVarName': null,
-              'opName': "op",
-              'args': ["one", "two", "three"],
-              'onError': "finish"
-            });
-          }
-        });
       }
     });
     suite("parseListStep()", () => {
       {
-        test("when [cond?, $result, opName], {condition, resultVarName, opName, args=nil, onError} must be returned", () => {
-          {
-            const out = parser.parseStep(["xyz?", "$zyx", "op"], "finish");
-            expected(out).toHave({
-              'condition': "xyz",
-              'resultVarName': "zyx",
-              'opName': "op",
-              'args': null,
-              'onError': "finish"
-            });
-          }
-        });
         test("when [opName, arg], {opName, args = arg, onError = finish} must be returned", () => {
           {
             const out = parser.parseStep(["banner", "$(i.slug)"], "finish");

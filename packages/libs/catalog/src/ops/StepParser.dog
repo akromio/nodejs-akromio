@@ -1,10 +1,10 @@
 /**
- * An object to parse the steps of the composite ops.
+ * Parser to parse the steps of the composite ops.
  */
 export struct StepParser
   /**
    * Parses a step, returning a map with its definition:
-   * {condition, resultVarName, opName, args, onError}
+   * {resultVarName, opName, args, onError}
    *
    * args will be list only when 2 or more arguments passed.
    */
@@ -14,13 +14,6 @@ export struct StepParser
       if text then def = parseTextStep(decl, onError)
       if list then def = parseListStep(decl, onError)
 
-/**
- * Parses a condition: datumName?.
- * If not exists, nil returned.
- */
-fn parseCondition(cond: text) = if cond.endsWith("?") then
-  cond[0, -2]
-end
 
 /**
  * Parses a result: $datumName.
@@ -67,13 +60,10 @@ fn parseTextStep(decl: text, defaultOnError: text): map
   # (1) split declaration
   decl = decl.split(re(" +"))
 
-  # (2) extract condition and result names
-  var condition, resultVarName
+  # (2) extract result name
+  const resultVarName = parseResult(decl[0])
 
-  if (condition = parseCondition(decl[0])) then
-    decl = decl[1, -1]
-
-  if (resultVarName = parseResult(decl[0])) then
+  if resultVarName then
     if decl[1] != "=" then
       throw(TypeError("'=' expected after $resultVarName."))
 
@@ -87,7 +77,6 @@ fn parseTextStep(decl: text, defaultOnError: text): map
 
   # (4) return
   return {
-    condition
     resultVarName
     opName
     args
@@ -98,17 +87,12 @@ fn parseTextStep(decl: text, defaultOnError: text): map
  * Parses a list step.
  *
  * Formats:
- * - [condition?, $result, opName, ...args]
+ * - [$result, opName, ...args]
  */
 fn parseListStep(decl: list, defaultOnError: text): map
-  # (1) extract condition and result names
-  var condition, resultVarName
-
-  if (condition = parseCondition(decl[0])) then
-    decl = decl[1, -1]
-
-  if (resultVarName = parseResult(decl[0])) then
-    decl = decl[1, -1]
+  # (1) extract result name
+  const resultVarName = parseResult(decl[0])
+  if resultVarName then decl = decl[1, -1]
 
   # (2) parse op and args
   const (
@@ -118,7 +102,6 @@ fn parseListStep(decl: list, defaultOnError: text): map
 
   # (3) return
   return {
-    condition
     resultVarName
     opName
     args

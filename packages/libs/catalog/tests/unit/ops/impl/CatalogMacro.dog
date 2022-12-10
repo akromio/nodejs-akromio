@@ -29,6 +29,7 @@ suite(__filename, proc()
           {log = "cp"}
           {log = ["cp", "$(src)", "$(dst)"]}
           {quiet = "cp"}
+          {step = "cp"}
         ]
         macro = CatalogMacro(name = "test", steps, ops, operator)
         call = Call(op = macro, dataset, onError, title, log, ctx)
@@ -36,7 +37,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toBeList().toHaveLen(6)
+      expected(out).toBeList().toHaveLen(7)
 
       expected(out[0]).toBeMap().member("op").toBe(Action)
 
@@ -79,6 +80,8 @@ suite(__filename, proc()
         quiet = true
         args = nil
       ).member("op").toBe(Action)
+
+      expected(out[6]).toBeMap().member("op").toBe(Action)
     end)
   end)
 
