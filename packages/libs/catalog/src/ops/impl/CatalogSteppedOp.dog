@@ -40,13 +40,18 @@ export struct CatalogSteppedOp
     )
 
     if decl.log then
+      condition = decl.'if'
       decl = decl.log
       resultLog = true
     else if decl.quiet then
+      condition = decl.'if'
       decl = decl.quiet
       quiet = true
+    else if decl.step then
+      condition = decl.'if'
+      decl = decl.step
 
-    {condition, resultVarName, opName, args, onError} = stepParser.parseStep(
+    {resultVarName, opName, args, onError} = stepParser.parseStep(
       decl
       self.onError
     )

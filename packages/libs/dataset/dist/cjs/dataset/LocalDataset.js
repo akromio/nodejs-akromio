@@ -31,6 +31,22 @@ const LocalDataset = new Proxy($LocalDataset, {
   }
 });
 module.exports = exports = LocalDataset;
+Object.defineProperty(LocalDataset.prototype, "reprMap", {
+  enum: true,
+  get: function () {
+    const self = this;
+    let obj = {};
+    {
+      obj = this.parent.reprMap;
+      for (const [key, datum] of Object.entries(this.data)) {
+        {
+          _core.dogma.setItem("=", obj, key, datum.getValue());
+        }
+      }
+    }
+    return obj;
+  }
+});
 LocalDataset.prototype.setLocalDatum = function (datum) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("datum", datum, Datum);

@@ -62,28 +62,6 @@ suite(__filename, proc()
     end)
   end)
 
-  suite("parseCondition()", proc()
-    test("when condition?, datum name must be returned", proc()
-      # (1) act
-      const out = parser.parseStep("xyz? op", "continue")
-
-      # (2) assessment
-      expected(out).toHave(
-        condition = "xyz"
-      )
-    end)
-
-    test("when no condition, nil must be returned", proc()
-      # (1) act
-      const out = parser.parseStep("op", "continue")
-
-      # (2) assessment
-      expected(out).toHave(
-        condition = nil
-      )
-    end)
-  end)
-
   suite("parseResult()", proc()
     test("when $varName, datum name must be returned", proc()
       # (1) act
@@ -113,7 +91,6 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).toHave(
-        condition = nil
         resultVarName = nil
         opName = "banner"
         args = "$(i.slug)"
@@ -127,7 +104,6 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).toHave(
-        condition = nil
         resultVarName = "xyz"
         opName = "op"
         args = ["one", "two", "three"]
@@ -144,37 +120,9 @@ suite(__filename, proc()
         .item(0).equalTo(false)\
         .item(1).equalTo(TypeError("'=' expected after $resultVarName."))
     end)
-
-    test("when 'cond? opName ...args', {condition, opName, args, onError = finish} must be returned", proc()
-      # (1) act
-      const out = parser.parseStep("xyz? op one two three", "finish")
-
-      # (2) assessment
-      expected(out).toHave(
-        condition = "xyz"
-        resultVarName = nil
-        opName = "op"
-        args = ["one", "two", "three"]
-        onError = "finish"
-      )
-    end)
   end)
 
   suite("parseListStep()", proc()
-    test("when [cond?, $result, opName], {condition, resultVarName, opName, args=nil, onError} must be returned", proc()
-      # (1) act
-      const out = parser.parseStep(["xyz?", "$zyx", "op"], "finish")
-
-      # (2) assessment
-      expected(out).toHave(
-        condition = "xyz"
-        resultVarName = "zyx"
-        opName = "op"
-        args = nil
-        onError = "finish"
-      )
-    end)
-
     test("when [opName, arg], {opName, args = arg, onError = finish} must be returned", proc()
       # (1) act
       const out = parser.parseStep(["banner", "$(i.slug)"], "finish")

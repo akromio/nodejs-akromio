@@ -12,6 +12,8 @@ const Context = _core.dogma.use(require("../Context"));
 const Result = _core.dogma.use(require("../Result"));
 const CompositeOp = _core.dogma.use(require("./CompositeOp"));
 const Step = _core.dogma.use(require("./Step"));
+const ConditionalEval = _core.dogma.use(require("./ConditionalEval"));
+const ceval = ConditionalEval().eval;
 const $CompositeOperator = class CompositeOperator extends Operator {
   constructor(_) {
     super(_);
@@ -164,8 +166,7 @@ CompositeOperator.prototype._performSteps = async function (steps, call, results
       {
         let cond = step.condition;
         if (cond) {
-          cond = "$(" + cond + ")";
-          if (!_core.dogma.includes([true, "true", "y", "yes", "Y"], dataset.eval(cond))) {
+          if (!_core.dogma.includes([true, "true", "y", "yes", "Y"], ceval(cond, dataset.reprMap))) {
             continue;
           }
         }

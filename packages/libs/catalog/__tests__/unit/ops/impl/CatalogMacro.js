@@ -47,6 +47,8 @@ suite(__filename, () => {
               ["log"]: ["cp", "$(src)", "$(dst)"]
             }, {
               ["quiet"]: "cp"
+            }, {
+              ["step"]: "cp"
             }];
             const macro = CatalogMacro({
               'name': "test",
@@ -63,7 +65,7 @@ suite(__filename, () => {
               'ctx': ctx
             });
             const out = macro.getSteps(call);
-            expected(out).toBeList().toHaveLen(6);
+            expected(out).toBeList().toHaveLen(7);
             expected(_core.dogma.getItem(out, 0)).toBeMap().member("op").toBe(Action);
             expected(_core.dogma.getItem(out, 1)).toBeMap().toHave({
               'onError': "finish",
@@ -100,6 +102,7 @@ suite(__filename, () => {
               'quiet': true,
               'args': null
             }).member("op").toBe(Action);
+            expected(_core.dogma.getItem(out, 6)).toBeMap().member("op").toBe(Action);
           }
         });
       }

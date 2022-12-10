@@ -4,6 +4,22 @@ use (
 )
 
 suite(__filename, proc()
+  suite("reprMap", proc()
+    test("when called, super and own data must be returned", proc()
+      # (1) act
+      const (
+        g = VarDatum(name = "g", value = 123)
+        globalDs = GlobalDataset(name = "global").setDatum(g)
+        l = VarDatum(name = "l", value = 321)
+        ds = LocalDataset(name = "local", parent = globalDs).setDatum(l)
+        out = ds.reprMap
+      )
+
+      # (2) assessment
+      expected(out).equalTo(g = 123, l = 321)
+    end)
+  end)
+
   suite("getDatum()", proc()
     var g, l, globalDs, ds
 

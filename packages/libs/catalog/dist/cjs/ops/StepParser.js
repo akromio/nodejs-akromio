@@ -40,12 +40,6 @@ StepParser.prototype.parseStep = function (decl, onError) {
   }
   return def;
 };
-function parseCondition(cond) {
-  /* c8 ignore next */_core.dogma.expect("cond", cond, _core.text);
-  {
-    return cond.endsWith("?") ? _core.dogma.getSlice(cond, 0, -2) : null;
-  }
-}
 function parseResult(result) {
   /* c8 ignore next */_core.dogma.expect("result", result, _core.text);
   {
@@ -100,12 +94,8 @@ function parseTextStep(decl, defaultOnError) {
   _core.dogma.expect("defaultOnError", defaultOnError, _core.text);
   {
     decl = decl.split((0, _core.re)(" +"));
-    let condition;
-    let resultVarName;
-    if (condition = parseCondition(_core.dogma.getItem(decl, 0))) {
-      decl = _core.dogma.getSlice(decl, 1, -1);
-    }
-    if (resultVarName = parseResult(_core.dogma.getItem(decl, 0))) {
+    const resultVarName = parseResult(_core.dogma.getItem(decl, 0));
+    if (resultVarName) {
       if (_core.dogma.getItem(decl, 1) != "=") {
         _core.dogma.raise(TypeError("'=' expected after $resultVarName."));
       }
@@ -117,7 +107,6 @@ function parseTextStep(decl, defaultOnError) {
     } = parseOpName(_core.dogma.getItem(decl, 0), defaultOnError);
     const args = parseOpArgs(_core.dogma.getSlice(decl, 1, -1));
     return {
-      ["condition"]: condition,
       ["resultVarName"]: resultVarName,
       ["opName"]: opName,
       ["args"]: args,
@@ -129,12 +118,8 @@ function parseListStep(decl, defaultOnError) {
   /* c8 ignore next */_core.dogma.expect("decl", decl, _core.list); /* c8 ignore next */
   _core.dogma.expect("defaultOnError", defaultOnError, _core.text);
   {
-    let condition;
-    let resultVarName;
-    if (condition = parseCondition(_core.dogma.getItem(decl, 0))) {
-      decl = _core.dogma.getSlice(decl, 1, -1);
-    }
-    if (resultVarName = parseResult(_core.dogma.getItem(decl, 0))) {
+    const resultVarName = parseResult(_core.dogma.getItem(decl, 0));
+    if (resultVarName) {
       decl = _core.dogma.getSlice(decl, 1, -1);
     }
     const {
@@ -143,7 +128,6 @@ function parseListStep(decl, defaultOnError) {
     } = parseOpName(_core.dogma.getItem(decl, 0), defaultOnError);
     const args = parseOpArgs(_core.dogma.getSlice(decl, 1, -1));
     return {
-      ["condition"]: condition,
       ["resultVarName"]: resultVarName,
       ["opName"]: opName,
       ["args"]: args,
