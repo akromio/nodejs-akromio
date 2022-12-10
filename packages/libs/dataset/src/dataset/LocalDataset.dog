@@ -16,6 +16,15 @@ export struct LocalDataset: Dataset
    */
   pub const parent: Dataset
 
+  @override
+  pub fn reprMap -> obj: map
+    # (1) get superdata
+    obj = self.parent.reprMap
+
+    # (2) set own data
+    for each key, datum in self.data do
+      obj[key] = datum.getValue()
+
   /**
    * Sets a datum in its own data.
    */

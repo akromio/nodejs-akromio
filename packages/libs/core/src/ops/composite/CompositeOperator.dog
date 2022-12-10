@@ -3,7 +3,13 @@ use (
   ../{Operator, Call, CallOpts, Context, Result}
   CompositeOp
   Step
+  ConditionalEval
 )
+
+/**
+ * Conditional evaluator to use.
+ */
+const ceval = ConditionalEval().eval
 
 /**
  * An operator to run composite operations.
@@ -154,22 +160,20 @@ export struct CompositeOperator: Operator
     const {dataset} = call
 
     for each step: Step in steps do
-      #pre
+      # pre
       if cond := step.condition then
-        cond = "$(" + cond + ")"
-        
-        if dataset.eval(cond) not in [true, "true", "y", "yes", "Y"] then
+        if ceval(cond, dataset.reprMap) not in [true, "true", "y", "yes", "Y"] then
           next
 
-      #run step
+      # run step
       const result = await(self.performStep(step, call))
       
       if not step.quiet then
         results.push(result)
 
-      #break if needed
+      # break if needed
       if result.kind == "failed" and step.onError == "finish" then
         return [false, results]
       
-      #add result value to call dataset
+      # add result value to call dataset
       dataset.setDatumValue(step.resultVarName ?? "last", result.value)

@@ -9,6 +9,34 @@ const {
 } = _core.dogma.use(require("../../.."));
 suite(__filename, () => {
   {
+    suite("reprMap", () => {
+      {
+        test("when called, super and own data must be returned", () => {
+          {
+            const g = VarDatum({
+              'name': "g",
+              'value': 123
+            });
+            const globalDs = GlobalDataset({
+              'name': "global"
+            }).setDatum(g);
+            const l = VarDatum({
+              'name': "l",
+              'value': 321
+            });
+            const ds = LocalDataset({
+              'name': "local",
+              'parent': globalDs
+            }).setDatum(l);
+            const out = ds.reprMap;
+            expected(out).equalTo({
+              'g': 123,
+              'l': 321
+            });
+          }
+        });
+      }
+    });
     suite("getDatum()", () => {
       {
         let g;

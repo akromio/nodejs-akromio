@@ -70,16 +70,16 @@ CatalogSteppedOp.prototype.buildStep = function (decl, call, defaultResultVarNam
     let resultLog = false;
     let quiet = false;
     if (decl.log) {
-      decl = decl.log;
       condition = decl.if;
+      decl = decl.log;
       resultLog = true;
     } else if (decl.quiet) {
-      decl = decl.quiet;
       condition = decl.if;
+      decl = decl.quiet;
       quiet = true;
     } else if (decl.step) {
-      decl = decl.step;
       condition = decl.if;
+      decl = decl.step;
     }
     ({
       resultVarName: resultVarName,

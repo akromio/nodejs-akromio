@@ -14,7 +14,6 @@ export struct StepParser
       if text then def = parseTextStep(decl, onError)
       if list then def = parseListStep(decl, onError)
 
-
 /**
  * Parses a result: $datumName.
  * If not exists, nil returned.

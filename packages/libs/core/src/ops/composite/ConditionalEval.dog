@@ -1,0 +1,14 @@
+use (
+  dep://vm
+)
+
+/**
+ * A conditional expression evaluator.
+ */
+export struct ConditionalExpEval
+  /**
+   * Evaluates a given [expr]ession with the given [ctx] and returns its value.
+   */
+  pub fn eval(exp: text, ctx: map) -> result: any
+    const script = native("new vm.Script(exp)")
+    result = script.runInNewContext(ctx)
