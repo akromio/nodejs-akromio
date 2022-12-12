@@ -17,9 +17,14 @@ function buildParams(args) {
       const _ = args;
       if (_core.dogma.is(_, _core.list)) {
         {
-          var _dogma$getItem;
-          params.command = _core.dogma.getItem(args, 0);
-          params.opts = (_dogma$getItem = _core.dogma.getItem(args, 1)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : {};
+          if ((0, _core.len)(args) == 2 && _core.dogma.is(_core.dogma.getItem(args, -1), _core.map)) {
+            var _dogma$getItem;
+            params.command = _core.dogma.getItem(args, 0);
+            params.opts = (_dogma$getItem = _core.dogma.getItem(args, 1)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : {};
+          } else {
+            params.command = args.join(" ");
+            params.opts = {};
+          }
         }
       } else if (_core.dogma.is(_, _core.text)) {
         {
