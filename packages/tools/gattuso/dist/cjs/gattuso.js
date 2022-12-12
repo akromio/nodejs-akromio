@@ -7,6 +7,7 @@ const env = _core.dogma.use(require("./env"));
 const {
   DescCommand,
   EnvCommand,
+  SysCommand,
   createCommands,
   handleErrors
 } = _core.dogma.use(require("@akromio/cli"));
@@ -29,6 +30,6 @@ yargs.help("help");
 yargs.epilogue(`Copyright © ${years} ${author}. All rights reserved.
 Product of Spain, EU, made in Valencia.`);
 yargs.fail(handleErrors);
-const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), QuestionsCommand(), RegistryCommand(), RunCommand(), ShowCommand(), TriggerCommand()];
+const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), QuestionsCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand(), TriggerCommand()];
 createCommands(yargs, commands);
 yargs.argv;

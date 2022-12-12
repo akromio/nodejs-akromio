@@ -13,6 +13,7 @@ pub use (
   commands/impl/RegistryCommand
   commands/impl/RunCommand
   commands/impl/ShowCommand
+  commands/impl/SysCommand
   commands/impl/TriggerCommand
   helpers/createCommands
   helpers/handleErrors

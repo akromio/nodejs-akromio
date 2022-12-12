@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.tableOpts = exports.table = exports.handleErrors = exports.createCommands = exports.TriggerCommand = exports.ShowCommand = exports.RunCommand = exports.RegistryCommandBase = exports.RegistryCommand = exports.QuestionsCommand = exports.EnvCommand = exports.DescCommand = exports.DatasetCommand = exports.Command = exports.CatalogCommand = void 0;
+exports.tableOpts = exports.table = exports.handleErrors = exports.createCommands = exports.TriggerCommand = exports.SysCommand = exports.ShowCommand = exports.RunCommand = exports.RegistryCommandBase = exports.RegistryCommand = exports.QuestionsCommand = exports.EnvCommand = exports.DescCommand = exports.DatasetCommand = exports.Command = exports.CatalogCommand = void 0;
 var _core = require("@dogmalang/core");
 const {
   table,
@@ -31,6 +31,8 @@ const RunCommand = _core.dogma.use(require("./commands/impl/RunCommand"));
 exports.RunCommand = RunCommand;
 const ShowCommand = _core.dogma.use(require("./commands/impl/ShowCommand"));
 exports.ShowCommand = ShowCommand;
+const SysCommand = _core.dogma.use(require("./commands/impl/SysCommand"));
+exports.SysCommand = SysCommand;
 const TriggerCommand = _core.dogma.use(require("./commands/impl/TriggerCommand"));
 exports.TriggerCommand = TriggerCommand;
 const createCommands = _core.dogma.use(require("./helpers/createCommands"));

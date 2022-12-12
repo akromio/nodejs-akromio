@@ -1,0 +1,27 @@
+use (
+  dep://os
+  dep://process
+  ../Command
+)
+
+/**
+ * The system command.
+ */
+export struct SysCommand: Command
+  @override
+  pub const name := ["sys", "s"]
+
+  @override
+  pub const desc := "Show the system info."
+
+  @override
+  pub const positionals := {}
+
+  @override
+  pub const options := {}
+
+  @override @hidden
+  pub proc handle(argv=> {pattern})
+    printf("OS: %s (%s) %s", process.platform, os.release(), os.version())
+    print("Arch:", process.arch)
+    print("Node.js:", process.version)
