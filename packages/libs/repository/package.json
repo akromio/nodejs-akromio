@@ -1,6 +1,6 @@
 {
   "name": "@akromio/repository",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Data repository library for Akromio.",
   "author": {
     "name": "Sia Codelabs",

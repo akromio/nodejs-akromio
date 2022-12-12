@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-exec",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Plugin for executing from shell on Akromio.",
   "author": {
     "name": "Sia Codelabs",
