@@ -4,6 +4,6 @@
   "reporter": ["lcov", "text"],
   "statements": 40,
   "branches": 100,
-  "functions": 24,
+  "functions": 23,
   "lines": 40
 }
