@@ -1,0 +1,5 @@
+/**
+ * Builds the title from the parameters
+ * for the exec operations.
+ */
+export fn buildTitle(params) = $"exec: run '${params.command}'"

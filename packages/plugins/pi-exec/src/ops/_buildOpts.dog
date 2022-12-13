@@ -1,0 +1,6 @@
+export fn buildOpts(opts: map) -> opts
+  opts = copy(opts)
+
+  if "workDir" in opts then
+    opts.cwd = opts.workDir
+    remove("workDir", opts)

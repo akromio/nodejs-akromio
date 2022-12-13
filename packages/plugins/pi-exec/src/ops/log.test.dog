@@ -1,0 +1,116 @@
+use (
+  alias://expected
+  {fun, monitor} = alias://doubles
+  op = log
+)
+
+const handler = op.fun
+
+suite(__filename, proc()
+  suite("handler()", proc()
+  test("when command error, 1 must be returned", async proc()
+      # (1) act
+      const (
+        log = monitor(fun())
+        ctx = {
+          log
+          params =
+            command = "lslslsls -l"
+            opts = {}
+        }
+
+        out = pawait(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(1)
+
+      const mlog = monitor.log(log, clear = true)
+      expected(mlog.calls).equalTo(1)
+      expected(mlog.call.args [0]).like("ENOENT")
+    end)
+
+    test("when textual command run ok, 0 must be returned", async proc()
+      # (1) act
+      const (
+        log = monitor(fun())
+        ctx = {
+          log
+          params =
+            command = "ls -l"
+            opts =
+              workDir = __dirname
+        }
+
+        out = await(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(0)
+
+      const mlog = monitor.log(log, clear = true)
+      expected(mlog.calls).equalTo(1)
+      expected(text(mlog.call.args)).toContain("_buildParams.js")
+    end)
+
+    test("when list command run ok, 0 must be returned", async proc()
+      # (1) act
+      const (
+        log = monitor(fun())
+        ctx = {
+          log
+          params =
+            command = ["ls", "-l"]
+            opts =
+              workDir = __dirname
+        }
+
+        out = await(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(0)
+
+      const mlog = monitor.log(log, clear = true)
+      expected(mlog.calls).equalTo(1)
+      expected(text(mlog.call.args)).toContain("_buildParams.js")
+    end)
+
+    test("when command prints on error, this error must be sent to log", async proc()
+      # (1) act
+      const (
+        log = monitor(fun())
+        ctx = {
+          log
+          params =
+            command = "node -e console.error('my-error')"
+            opts = {}
+        }
+        out = await(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(0)
+      
+      const mlog = monitor.log(log, clear = true)
+      expected(mlog.calls).equalTo(1)
+      expected(text(mlog.call.args)).toContain("my-error")
+    end)
+
+    test("when command exits with 1, error must be raised", async proc()
+      # (1) act
+      const (
+        ctx = {
+          log = fun()
+          params =
+            command = "node -e process.exit(1)"
+            opts = {}
+        }
+        out = pawait(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(1)
+    end)
+  end)
+end)

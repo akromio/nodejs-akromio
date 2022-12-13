@@ -1,0 +1,66 @@
+use (
+  alias://expected
+  buildParams = _buildParams
+)
+
+suite(__filename, proc()
+  suite("params is text", proc()
+    test("when command is a text, {command, opts = {}} must be returned", proc()
+      # (1) act
+      const out = buildParams("ls -l")
+
+      # (2) assessment
+      expected(out).equalTo(
+        command = "ls -l"
+        opts = {}
+      )
+    end)
+  end)
+
+  suite("params is list", proc()
+    test("when [command], {command, opts = {}} must be returned", proc()
+      # (1) act
+      const out = buildParams(["ls -l"])
+
+      # (2) assessment
+      expected(out).equalTo(
+        command = "ls -l"
+        opts = {}
+      )
+    end)
+
+    test("when [command, arg], {command, opts = {}} must be returned", proc()
+      # (1) act
+      const out = buildParams(["ls", "-l"])
+
+      # (2) assessment
+      expected(out).equalTo(
+        command = "ls -l"
+        opts = {}
+      )
+    end)
+
+    test("when [command, opts], {command, opts} must be returned", proc()
+      # (1) act
+      const out = buildParams(["ls -l", {workDir = "/"}])
+
+      # (2) assessment
+      expected(out).equalTo(
+        command = "ls -l"
+        opts = {workDir = "/"}
+      )
+    end)
+  end)
+
+  suite("params is map", proc()
+    test("when {...}, the same map must be returned", proc()
+      # (1) act
+      const out = buildParams({command = "ls -l"})
+
+      # (2) assessment
+      expected(out).equalTo(
+        command = "ls -l"
+      )
+    end)
+  end)
+end)

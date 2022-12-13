@@ -1,5 +1,8 @@
 use (
   {spawn} = dep://child_process
+  buildParams = _buildParams
+  buildTitle = _buildTitle
+  buildOpts = _buildOpts
 )
 
 export {
@@ -10,32 +13,7 @@ export {
 }
 
 /**
- * Builds params from args.
- */
-fn buildParams(args?) -> params: map
-  with type(args) do
-    if list then
-      if len(args) == 2 and args[-1] is map then
-        params.command = args[0]
-        params.opts = args[1] ?? {}
-      else
-        params.command = args.join(" ")
-        params.opts = {}
-
-    if text then
-      params.command = args
-      params.opts = {}
-      
-    else
-      params = args
-
-/**
- * Builds the title from the parameters.
- */
-fn buildTitle(params) = $"exec: run '${params.command}'"
-
-/**
- * Runs a command.
+ * Runs the exec command with log.
  */
 @async
 fn handle(ctx=> {params, log})
@@ -47,22 +25,22 @@ fn handle(ctx=> {params, log})
 
   if params.command is list then
     cmd = params.command[0]
-    args = params.command[1]
+    args = params.command[1, -1]
   else
     const segments = params.command.split(re(" +"))
     cmd = segments[0]
     args = segments[1, -1]
 
-  # (2) prepara options
-  const {opts} = params
+  # (2) run
+  const opts = buildOpts(params.opts)
 
-  if "workDir" in opts then
-    opts.cwd = opts.workDir
-    remove("workDir", opts)
-  
-  # (3) run
   return promise(proc(resolve, reject)
     const ps = spawn(cmd, args, opts)
+
+    ps.on("error", proc(error)
+      log(error)
+      reject(1)
+    end)
 
     ps.stdout.on("data", proc(out)
       log(out)
