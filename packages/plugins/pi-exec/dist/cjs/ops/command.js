@@ -4,61 +4,22 @@ var _core = require("@dogmalang/core");
 const {
   exec
 } = _core.dogma.use(require("child_process"));
+const buildParams = _core.dogma.use(require("./_buildParams"));
+const buildTitle = _core.dogma.use(require("./_buildTitle"));
+const buildOpts = _core.dogma.use(require("./_buildOpts"));
 module.exports = exports = {
   ["desc"]: "Runs a command.",
   ["title"]: buildTitle,
   ["parameterizer"]: buildParams,
   ["fun"]: handle
 };
-function buildParams(args) {
-  let params = {};
-  {
-    {
-      const _ = args;
-      if (_core.dogma.is(_, _core.list)) {
-        {
-          if ((0, _core.len)(args) == 2 && _core.dogma.is(_core.dogma.getItem(args, -1), _core.map)) {
-            var _dogma$getItem;
-            params.command = _core.dogma.getItem(args, 0);
-            params.opts = (_dogma$getItem = _core.dogma.getItem(args, 1)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : {};
-          } else {
-            params.command = args.join(" ");
-            params.opts = {};
-          }
-        }
-      } else if (_core.dogma.is(_, _core.text)) {
-        {
-          params.command = args;
-          params.opts = {};
-        }
-      } else {
-        {
-          params = args;
-        }
-      }
-    }
-  }
-  return params;
-}
-function buildTitle(params) {
-  /* c8 ignore next */_core.dogma.expect("params", params);
-  {
-    return `exec: run '${params.command}'`;
-  }
-}
 function handle(ctx) {
   /* c8 ignore next */_core.dogma.expect("ctx", ctx, _core.map);
   let {
     params
   } = ctx;
   {
-    const {
-      opts
-    } = params;
-    if (_core.dogma.includes(opts, "workDir")) {
-      opts.cwd = opts.workDir;
-      (0, _core.remove)("workDir", opts);
-    }
+    const opts = buildOpts(params.opts);
     const {
       command
     } = params;

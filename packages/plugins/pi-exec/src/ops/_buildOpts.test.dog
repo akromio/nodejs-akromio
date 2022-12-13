@@ -1,0 +1,30 @@
+use (
+  alias://expected
+  buildOpts = _buildOpts
+)
+
+suite(__filename, proc()
+  test("when workDir unset, nothing to do", proc()
+    # (1) act
+    const (
+      opts = {}
+      out = buildOpts(opts)
+    )
+
+    # (2) assessment
+    expected(out).notSameAs(opts)
+    expected(out).equalTo(opts)
+  end)
+
+  test("when workDir set, workdDir must be replaced by cwd", proc()
+    # (1) act
+    const (
+      opts = {workDir = "/tmp/my/dir"}
+      out = buildOpts(opts)
+    )
+
+    # (2) assessment
+    expected(out).notSameAs(opts)
+    expected(out).equalTo(cwd = "/tmp/my/dir")
+  end)
+end)

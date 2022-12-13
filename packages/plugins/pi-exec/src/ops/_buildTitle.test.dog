@@ -1,0 +1,18 @@
+use (
+  alias://expected
+  buildTitle = _buildTitle
+)
+
+suite(__filename, proc()
+  test("when called, a title must be returned", proc()
+    # (1) act
+    const (
+      command = "ls -l"
+      params = {command}
+      out = buildTitle(params)
+    )
+
+    # (2) assessment
+    expected(out).equalTo($"exec: run '${command}'")
+  end)
+end)

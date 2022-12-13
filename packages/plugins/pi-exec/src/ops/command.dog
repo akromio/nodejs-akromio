@@ -1,5 +1,8 @@
 use (
   {exec} = dep://child_process
+  buildParams = _buildParams
+  buildTitle = _buildTitle
+  buildOpts = _buildOpts
 )
 
 export {
@@ -10,44 +13,14 @@ export {
 }
 
 /**
- * Builds params from args.
- */
-fn buildParams(args?) -> params: map
-  with type(args) do
-    if list then
-      if len(args) == 2 and args[-1] is map then
-        params.command = args[0]
-        params.opts = args[1] ?? {}
-      else
-        params.command = args.join(" ")
-        params.opts = {}
-
-    if text then
-      params.command = args
-      params.opts = {}
-      
-    else
-      params = args
-
-/**
- * Builds the title from the parameters.
- */
-fn buildTitle(params) = $"exec: run '${params.command}'"
-
-/**
  * Runs a command.
  */
 @async
 fn handle(ctx=> {params})
-  # (1) prepare options
-  const {opts} = params
-
-  if "workDir" in opts then
-    opts.cwd = opts.workDir
-    remove("workDir", opts)
-  
-  # (2) run
-  const {command} = params
+  const (
+    opts = buildOpts(params.opts)
+    {command} = params
+  )
 
   return promise(proc(resolve, reject)
     exec(command, opts, proc(err?, stdout, stderr)

@@ -1,0 +1,46 @@
+use (
+  alias://expected
+  op = command
+)
+
+const handler = op.fun
+
+suite(__filename, proc()
+  suite("handler()", proc()
+    test("when command run ok, result must be returned", async proc()
+      # (1) act
+      const (
+        ctx = {
+          params =
+            command = "ls -l"
+            opts =
+              workDir = __dirname
+        }
+
+        out = await(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .toBeMap()\
+        .member("stdout").like("command")\
+        .member("stderr").equalTo("")
+    end)
+
+    test("when command error, error must be raised", async proc()
+      # (1) act
+      const (
+        ctx = {
+          params =
+            command = "lslslsls -l"
+            opts = {}
+        }
+
+        out = pawait(handler(ctx))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).like("Command failed")
+    end)
+  end)
+end)
