@@ -2,10 +2,9 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const pi = _core.dogma.use(require("../../.."));
+const op = _core.dogma.use(require("./banner"));
 suite(__filename, () => {
   {
-    const op = pi.ops.banner;
     const buildParams = op.parameterizer;
     const buildTitle = op.title;
     suite("buildParams()", () => {
@@ -23,13 +22,22 @@ suite(__filename, () => {
     });
     suite("buildTitle()", () => {
       {
-        test("when called, a text title must be returned", () => {
+        test("when value is text, a text title must be returned", () => {
           {
             const params = {
               ["value"]: "ciao!"
             };
             const out = buildTitle(params);
             expected(out).like("^banner: .*ciao!.*");
+          }
+        });
+        test("when value is list, a joined title must be returned", () => {
+          {
+            const params = {
+              ["value"]: ["ciao", "!"]
+            };
+            const out = buildTitle(params);
+            expected(out).like("^banner: .*ciao !.*");
           }
         });
       }

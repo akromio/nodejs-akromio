@@ -17,8 +17,21 @@ function buildParams(args) {
   }
 }
 function buildTitle(params) {
-  /* c8 ignore next */_core.dogma.expect("params", params);
+  let title = ""; /* c8 ignore next */
+  _core.dogma.expect("params", params, _core.dogma.intf("inline", {
+    value: {
+      optional: false,
+      type: null
+    }
+  }));
+  let {
+    value
+  } = params;
   {
-    return `banner: ${chalk.underline.bold(params.value)}`;
+    if (_core.dogma.is(value, _core.list)) {
+      value = value.join(" ");
+    }
+    title = `banner: ${chalk.underline.bold(value)}`;
   }
+  return title;
 }
