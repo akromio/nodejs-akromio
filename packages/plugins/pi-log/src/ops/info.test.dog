@@ -1,0 +1,43 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+  op = info
+)
+
+suite(__filename, proc()
+  suite("handle()", proc()
+    const handle = op.fun
+
+    test("when value is text, this must be printed using log", proc()
+      # (1) act
+      const (
+        value = "waterfront"
+        logger = monitor(nop)
+        out = handle(params = value, log = logger)
+      )
+
+      # (2) assessment
+      const log = monitor.log(logger, clear = true)
+
+      expected(out).toBeNil()
+      expected(log).toHaveLen(1)
+      expected(log.calledWith([value])).equalTo(1)
+    end)
+
+    test("when value is list, list.join(' ') must be printed using log", proc()
+      # (1) act
+      const (
+        value = ["water", "front"]
+        logger = monitor(nop)
+        out = handle(params = value, log = logger)
+      )
+
+      # (2) assessment
+      const log = monitor.log(logger, clear = true)
+
+      expected(out).toBeNil()
+      expected(log).toHaveLen(1)
+      expected(log.calledWith(["water front"])).equalTo(1)
+    end)
+  end)
+end)

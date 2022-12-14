@@ -1,11 +1,12 @@
 export {
   desc = "Prints a value."
   title = "log: print a value"
-  fun = run
+  fun = handle
 }
 
 /**
  * Prints a value using the default log.
  */
-proc run(ctx=> {params, log})
+proc handle(ctx=> {params, log})
+  if params is list then params = params.join(" ")
   log(params)
