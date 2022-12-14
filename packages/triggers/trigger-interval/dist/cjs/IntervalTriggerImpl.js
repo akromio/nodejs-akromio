@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const ms = _core.dogma.use(require("ms"));
 const IntervalEvent = _core.dogma.use(require("./IntervalEvent"));
 const $IntervalTriggerImpl = class IntervalTriggerImpl {
   constructor(_) {
@@ -11,7 +12,7 @@ const $IntervalTriggerImpl = class IntervalTriggerImpl {
       writable: true,
       enumerable: false
     });
-    (0, _core.expect)('interval', _['interval'], _core.num);
+    (0, _core.expect)('interval', _['interval'], _core.text);
     Object.defineProperty(this, 'interval', {
       value: (0, _core.coalesce)(_['interval'], null),
       writable: false,
@@ -84,7 +85,7 @@ IntervalTriggerImpl.prototype.start = function (handler) {
     if (this.immediate) {
       setImmediate(callback);
     }
-    this.timer = setInterval(callback, this.interval);
+    this.timer = setInterval(callback, ms(this.interval));
   }
   return this;
 };

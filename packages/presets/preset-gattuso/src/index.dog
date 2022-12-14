@@ -12,7 +12,7 @@ const plugins = [
   "merge"
   "path"
   "select", "set", "sleep"
-  "text"
+  "text", "timestamp"
   "xdg"
   "yaml"
 ]

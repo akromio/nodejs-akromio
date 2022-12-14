@@ -33,7 +33,7 @@ const $TriggerCommand = class TriggerCommand extends RunCommandBase {
     /* c8 ignore start */
     if (_['desc'] != null) (0, _core.expect)('desc', _['desc'], _core.text); /* c8 ignore stop */
     Object.defineProperty(this, 'desc', {
-      value: (0, _core.coalesce)(_['desc'], "Fire a trigger to run a job from a catalog."),
+      value: (0, _core.coalesce)(_['desc'], "Use a trigger to run a job of a catalog."),
       writable: false,
       enumerable: true
     });
@@ -43,7 +43,7 @@ const $TriggerCommand = class TriggerCommand extends RunCommandBase {
       value: (0, _core.coalesce)(_['positionals'], {
         ["jobName"]: {
           ["type"]: "string",
-          ["desc"]: "The job name to run. If unset, defaultJobName will be used."
+          ["desc"]: "Job name to run. If unset, defaultJobName used."
         }
       }),
       writable: false,
@@ -64,7 +64,7 @@ const $TriggerCommand = class TriggerCommand extends RunCommandBase {
         ["triggerName"]: {
           ["type"]: "string",
           ["alias"]: ["trigger", "t"],
-          ["desc"]: "The trigger name to use. If unset, defaultTriggerName will be used."
+          ["desc"]: "Trigger name to use. If unset, defaultTriggerName used."
         }
       }),
       writable: false,
@@ -173,7 +173,8 @@ function createTrigger(name, cat, engine, jobName, jobArgs) {
     const decl = _core.dogma.getItem(cat.triggers, name !== null && name !== void 0 ? name : cat.defaultTriggerName);
     let TriggerImpl;
     {
-      const i = decl.impl;
+      var _decl$impl;
+      const i = (_decl$impl = decl.impl) !== null && _decl$impl !== void 0 ? _decl$impl : name;
       switch (i) {
         case "interval":
           {
@@ -188,7 +189,7 @@ function createTrigger(name, cat, engine, jobName, jobArgs) {
       }
     }
     trigger = Trigger({
-      'name': decl.trigger,
+      'name': name,
       'engine': engine,
       'call': {
         ["jobName"]: jobName !== null && jobName !== void 0 ? jobName : cat.defaultJobName,
