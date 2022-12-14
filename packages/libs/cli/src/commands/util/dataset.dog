@@ -49,14 +49,6 @@ globalDataset.setDatum(
 
 globalDataset.setDatum(
   ConstDatum(
-    name = "home"
-    desc = "User home."
-    value = $HOME
-  )
-)
-
-globalDataset.setDatum(
-  ConstDatum(
     name = "workDir"
     desc = "Work directory path."
     value = ps.workDir

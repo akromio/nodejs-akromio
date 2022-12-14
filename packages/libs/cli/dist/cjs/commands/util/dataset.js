@@ -50,11 +50,6 @@ globalDataset.setDatum(ConstDatum({
   }
 }));
 globalDataset.setDatum(ConstDatum({
-  'name': "home",
-  'desc': "User home.",
-  'value': _core.ps.env.HOME
-}));
-globalDataset.setDatum(ConstDatum({
   'name': "workDir",
   'desc': "Work directory path.",
   'value': _core.ps.workDir
