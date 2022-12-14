@@ -8,9 +8,9 @@ const {
 const {
   impl: TriggerImpl
 } = _core.dogma.use(require("../.."));
-suite(__filename, () => {
+suite.only(__filename, () => {
   {
-    const interval = 10000;
+    const interval = "10s";
     setup(() => {
       {
         monitor.clearAll();
@@ -54,7 +54,7 @@ suite(__filename, () => {
       {
         const handler = monitor(_core.dogma.nop());
         const trigger = TriggerImpl({
-          'interval': 225
+          'interval': "225ms"
         }).start(handler);
         0, await (0, _core.sleep)(800);
         try {
@@ -74,7 +74,7 @@ suite(__filename, () => {
         const handler = monitor(_core.dogma.nop());
         const trigger = TriggerImpl({
           'immediate': false,
-          'interval': 225
+          'interval': "225ms"
         }).start(handler);
         0, await (0, _core.sleep)(800);
         try {
@@ -94,7 +94,7 @@ suite(__filename, () => {
         const times = 2;
         const handler = monitor(_core.dogma.nop());
         const trigger = TriggerImpl({
-          'interval': 225,
+          'interval': "225ms",
           'times': times
         }).start(handler);
         0, await (0, _core.sleep)(800);

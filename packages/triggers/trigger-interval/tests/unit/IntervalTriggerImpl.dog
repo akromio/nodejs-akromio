@@ -4,8 +4,8 @@ use (
   {'impl' as TriggerImpl} = ~
 )
 
-suite(__filename, proc()
-  const interval = 10000
+suite.only(__filename, proc()
+  const interval = "10s"
 
   setup(proc()
     monitor.clearAll()
@@ -49,7 +49,7 @@ suite(__filename, proc()
     # (1) act
     const (
       handler = monitor(nop)
-      trigger = TriggerImpl(interval = 225).start(handler)
+      trigger = TriggerImpl(interval = "225ms").start(handler)
     )
 
     await(sleep(800))
@@ -73,7 +73,7 @@ suite(__filename, proc()
     # (1) act
     const (
       handler = monitor(nop)
-      trigger = TriggerImpl(immediate = false, interval = 225).start(handler)
+      trigger = TriggerImpl(immediate = false, interval = "225ms").start(handler)
     )
 
     await(sleep(800))
@@ -98,7 +98,7 @@ suite(__filename, proc()
     const (
       times = 2
       handler = monitor(nop)
-      trigger = TriggerImpl(interval = 225, times).start(handler)
+      trigger = TriggerImpl(interval = "225ms", times).start(handler)
     )
 
     await(sleep(800))
