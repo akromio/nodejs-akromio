@@ -1,11 +1,10 @@
 use (
   alias://expected
-  pi = ~
+  op = banner
 )
 
 suite(__filename, proc()
   const (
-    op = pi.ops.banner
     buildParams = op.parameterizer
     buildTitle = op.title
   )
@@ -24,7 +23,7 @@ suite(__filename, proc()
   end)
 
   suite("buildTitle()", proc()
-    test("when called, a text title must be returned", proc()
+    test("when value is text, a text title must be returned", proc()
       # (1) args
       const (
         params = {value = "ciao!"}
@@ -33,6 +32,17 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).like("^banner: .*ciao!.*")
+    end)
+
+    test("when value is list, a joined title must be returned", proc()
+      # (1) args
+      const (
+        params = {value = ["ciao", "!"]}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).like("^banner: .*ciao !.*")
     end)
   end)
 end)

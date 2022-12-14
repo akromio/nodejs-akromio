@@ -19,4 +19,6 @@ fn buildParams(args) = {
 /**
  * Builds the title from the parameters.
  */
-fn buildTitle(params) = $"banner: ${chalk.underline.bold(params.value)}"
+fn buildTitle(params:> {value}) -> title: text
+  if value is list then value = value.join(" ")
+  title = $"banner: ${chalk.underline.bold(value)}"
