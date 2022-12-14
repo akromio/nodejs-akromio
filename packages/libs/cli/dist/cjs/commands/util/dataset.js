@@ -38,6 +38,17 @@ globalDataset.setDatum(ConstDatum({
   'desc': "Run start timestamp.",
   'value': (0, _core.timestamp)().valueOf()
 }));
+const userInfo = os.userInfo();
+globalDataset.setDatum(ConstDatum({
+  'name': "user",
+  'desc': "User info.",
+  'value': {
+    ["uid"]: userInfo.uid,
+    ["gid"]: userInfo.gid,
+    ["name"]: userInfo.username,
+    ["home"]: userInfo.homedir
+  }
+}));
 globalDataset.setDatum(ConstDatum({
   'name': "home",
   'desc': "User home.",
