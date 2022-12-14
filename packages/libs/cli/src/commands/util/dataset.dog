@@ -32,11 +32,18 @@ globalDataset.setDatum(
   )
 )
 
+const userInfo = os.userInfo()
+
 globalDataset.setDatum(
   ConstDatum(
-    name = "home"
-    desc = "User home."
-    value = $HOME
+    name = "user"
+    desc = "User info."
+    value = {
+      uid = userInfo.uid
+      gid = userInfo.gid
+      name = userInfo.username
+      home = userInfo.homedir
+    }
   )
 )
 
