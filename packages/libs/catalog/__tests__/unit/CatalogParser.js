@@ -292,11 +292,12 @@ suite(__filename, () => {
             };
             const triggers = [trg1, trg2];
             const out = (0, await parser.parse(_core.dogma.clone(catalogDecl, {
-              "triggers": triggers
+              "on": triggers
             }, {}, [], []), {
               'parentDataset': parentDataset,
               'ops': ops
             })).triggers;
+            (0, _core.printf)(out);
             expected(out).equalTo({
               'trg1': trg1,
               'trg2': trg2
