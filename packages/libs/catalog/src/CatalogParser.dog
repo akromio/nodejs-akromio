@@ -44,7 +44,7 @@ export struct CatalogParser
     # (1) parse base components
     const (
       dataset = self.parseDataset(decl.dataset ?? [], opts{*, name = decl.name})
-      triggers = self.parseTriggers(decl.triggers ?? [], dataset)
+      triggers = self.parseTriggers(decl.on ?? [], dataset)
     )
 
     # (2) parse plugins

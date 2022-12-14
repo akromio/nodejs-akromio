@@ -4,6 +4,6 @@ use (
 
 export {
   name = "interval"
-  desc = "Trigger to fire an event at intervals."
+  desc = "Trigger for firing an event at intervals."
   impl = IntervalTriggerImpl
 }

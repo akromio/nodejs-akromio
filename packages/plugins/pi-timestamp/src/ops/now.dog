@@ -1,0 +1,11 @@
+export {
+  desc = "Returns the current timestamp."
+  title = "timestamp: now"
+  fun = handler
+}
+
+/**
+ * Returns the current timestamp.
+ */
+@async
+fn handler() = timestamp().valueOf()

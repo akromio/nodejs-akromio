@@ -5,7 +5,8 @@
     "packages/libs/*",
     "packages/plugins/*",
     "packages/presets/*",
-    "packages/tools/*"
+    "packages/tools/*",
+    "packages/triggers/*"
   ],
   "engine": {
     "node": ">= 18",

@@ -1,0 +1,16 @@
+use (
+  alias://expected
+  now
+)
+
+const handler = now.fun
+
+suite(__filename, proc()
+  test("when called, current timemestamp must be returned", proc()
+    # (1) act
+    const out = handler()
+
+    # (2) assessment
+    expected(out).toBeNum().greaterThan(123456789)
+  end)
+end)

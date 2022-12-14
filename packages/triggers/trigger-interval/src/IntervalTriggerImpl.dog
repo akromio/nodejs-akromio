@@ -1,4 +1,5 @@
 use (
+  dep://ms
   IntervalEvent
 )
 
@@ -15,9 +16,9 @@ export struct IntervalTriggerImpl
   pub var timer = nil
 
   /**
-   * The interval, in miliseconds.
+   * Interval to use such as, for example, 1h, 10m or 1000s.
    */
-  pub const interval: num
+  pub const interval: text
 
   /**
    * It indicates if the first event must be after delay.
@@ -61,7 +62,7 @@ export struct IntervalTriggerImpl
     self.{handler, fired = 0}
 
     if self.immediate then setImmediate(callback)
-    self.timer = setInterval(callback, self.interval)
+    self.timer = setInterval(callback, ms(self.interval))
   
   /**
    * Stops de trigger.

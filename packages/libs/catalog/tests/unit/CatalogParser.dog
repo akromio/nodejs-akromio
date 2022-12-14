@@ -190,13 +190,14 @@ suite(__filename, proc()
         trg2 = {trigger = "trg2"}
         triggers = [trg1, trg2]
         out = await(parser.parse(
-          catalogDecl{*, triggers}
+          catalogDecl{*, on = triggers}
           parentDataset=,
           ops
         )).triggers
       )
 
       # (2) assessment
+      printf(out)
       expected(out).equalTo(trg1=, trg2)
     end)
   end)

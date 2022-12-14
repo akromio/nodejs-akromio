@@ -20,13 +20,13 @@ export struct TriggerCommand: RunCommandBase
   pub const name := ["trigger [jobName]", "t"]
 
   @override
-  pub const desc := "Fire a trigger to run a job from a catalog."
+  pub const desc := "Use a trigger to run a job of a catalog."
 
   @override
   pub const positionals := {
     jobName =
       type = "string"
-      desc = "The job name to run. If unset, defaultJobName will be used."
+      desc = "Job name to run. If unset, defaultJobName used."
   }
 
   @override
@@ -43,7 +43,7 @@ export struct TriggerCommand: RunCommandBase
     triggerName =
       type = "string"
       alias = ["trigger", "t"]
-      desc = "The trigger name to use. If unset, defaultTriggerName will be used."
+      desc = "Trigger name to use. If unset, defaultTriggerName used."
   }
 
   /**
@@ -54,18 +54,18 @@ export struct TriggerCommand: RunCommandBase
 
   @override @hidden
   pub async proc handle(argv=> {triggerName, catalogName, registryAndCatalogName, jobName, onError, args, answers, reporters, summaryReporters})
-    #(1) create the registry instances to use
+    # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
 
     do
-      #(2) create the ops to use
+      # (2) create the ops to use
       const ops = Ops()
 
-      #(3) determine the catalogName
+      # (3) determine the catalogName
       if registryAndCatalogName then
         catalogName = registryAndCatalogName.split("://")[1]
 
-      #(4) get the catalog decl
+      # (4) get the catalog decl
       const decl = await(self.readCatalogDecl(
         (catalogName = self.buildCatalogPath(catalogName))
         registries
@@ -75,19 +75,19 @@ export struct TriggerCommand: RunCommandBase
         print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
         ps.exit(1)
 
-      #(5) create global dataset
+      # (5) create global dataset
       const (
         {createGlobalDataset} = use("../util/dataset")
         globalDataset = await(createGlobalDataset(catalog = decl, args, answers))
       )
 
-      #(6) create catalog instance
+      # (6) create catalog instance
       const (
         pluginParser = PluginParser()
         catalog = await(self.createCatalog(decl, pluginParser, globalDataset, ops))
       )
 
-      #(7) create engine
+      # (7) create engine
       const (
         log = native("new Duplex({emitClose: true, read() {}, write() {}})")
         engine = await(self.createEngine(
@@ -106,14 +106,14 @@ export struct TriggerCommand: RunCommandBase
       reporters = self.createReporters(reporters, log).connect()
       ops.appendOps(...values(catalog.jobs))
 
-      #(8) create trigger
+      # (8) create trigger
       const trigger = createTrigger(triggerName, catalog, engine, jobName, args)
 
       if not trigger.call.jobName then
         console.error("Catalog doesn't contain default job name.")
         ps.exit(2)
 
-      #(9) run trigger
+      # (9) run trigger
       var code = 0
 
       trigger.start(async proc(result?)
@@ -132,19 +132,19 @@ export struct TriggerCommand: RunCommandBase
  */
 @noParamCheck
 fn createTrigger(name, cat, engine, jobName?, jobArgs?) -> trigger
-  #(1) get trigger declaration
+  # (1) get trigger declaration
   const decl = cat.triggers[name ?? cat.defaultTriggerName]
 
-  #(2) get the trigger implementation
+  # (2) get the trigger implementation
   var TriggerImpl
 
-  with i ::= decl.impl do
+  with i ::= decl.impl ?? name do
     if "interval" then TriggerImpl = intervalTriggerImpl.impl
     else throw(TypeError($"Invalid trigger implementation: ${i}."))
 
-  #(3) create trigger
+  # (3) create trigger
   trigger = Trigger(
-    name = decl.trigger
+    name=,
     engine
     call = {
       jobName = jobName ?? cat.defaultJobName

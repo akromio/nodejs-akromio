@@ -56,11 +56,11 @@ CatalogParser.prototype.parse = async function (decl, opts) {
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
-    var _decl$dataset, _decl$triggers, _decl$plugins;
+    var _decl$dataset, _decl$on, _decl$plugins;
     const dataset = this.parseDataset((_decl$dataset = decl.dataset) !== null && _decl$dataset !== void 0 ? _decl$dataset : [], _core.dogma.clone(opts, {
       "name": decl.name
     }, {}, [], []));
-    const triggers = this.parseTriggers((_decl$triggers = decl.triggers) !== null && _decl$triggers !== void 0 ? _decl$triggers : [], dataset);
+    const triggers = this.parseTriggers((_decl$on = decl.on) !== null && _decl$on !== void 0 ? _decl$on : [], dataset);
     const {
       ops
     } = opts;
