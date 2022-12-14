@@ -16,7 +16,7 @@ export struct IntervalTriggerImpl
   pub var timer = nil
 
   /**
-   * The interval, in miliseconds.
+   * Interval to use such as, for example, 1h, 10m or 1000s.
    */
   pub const interval: text
 
