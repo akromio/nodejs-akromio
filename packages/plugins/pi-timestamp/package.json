@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-timestamp",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Plugin for working with timestamps on Akromio.",
   "author": {
     "name": "Sia Codelabs",
