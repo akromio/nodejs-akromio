@@ -121,32 +121,32 @@ JobParser.prototype.parseAddOnJob = function (decl, opts) {
   }
 };
 JobParser.prototype.parseMacro = function (decl, opts) {
-  const self = this; /* c8 ignore next */
+  const self = this;
+  let macro; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
-    var _decl$ini, _decl$fin;
-    return CatalogMacro(_core.dogma.clone(decl, {
+    macro = CatalogMacro(_core.dogma.clone(decl, {
       "name": decl.macro,
       "operator": MacroOperator(),
       "ops": opts.ops,
-      "initializers": (_decl$ini = decl.ini) !== null && _decl$ini !== void 0 ? _decl$ini : [],
-      "finalizers": (_decl$fin = decl.fin) !== null && _decl$fin !== void 0 ? _decl$fin : []
+      "initializers": parseIni(decl),
+      "finalizers": parseFin(decl)
     }, {}, [], []));
   }
+  return macro;
 };
 JobParser.prototype.parseLoop = function (decl, opts) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
-    var _decl$ini2, _decl$fin2;
     return CatalogLoop(_core.dogma.clone(decl, {
       "name": decl.loop,
       "operator": LoopOperator(),
       "ops": opts.ops,
-      "initializers": (_decl$ini2 = decl.ini) !== null && _decl$ini2 !== void 0 ? _decl$ini2 : [],
-      "finalizers": (_decl$fin2 = decl.fin) !== null && _decl$fin2 !== void 0 ? _decl$fin2 : []
+      "initializers": parseIni(decl),
+      "finalizers": parseFin(decl)
     }, {}, [], []));
   }
 };
@@ -173,3 +173,17 @@ JobParser.prototype.parseScript = function (decl, opts) {
     }, {}, [], []));
   }
 };
+function parseIni(decl) {
+  /* c8 ignore next */_core.dogma.expect("decl", decl, _core.map);
+  {
+    var _decl$ini;
+    return _core.dogma.is(decl.ini, _core.text) ? [decl.ini] : (_decl$ini = decl.ini) !== null && _decl$ini !== void 0 ? _decl$ini : [];
+  }
+}
+function parseFin(decl) {
+  /* c8 ignore next */_core.dogma.expect("decl", decl, _core.map);
+  {
+    var _decl$fin;
+    return _core.dogma.is(decl.fin, _core.text) ? [decl.fin] : (_decl$fin = decl.fin) !== null && _decl$fin !== void 0 ? _decl$fin : [];
+  }
+}

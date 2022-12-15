@@ -111,5 +111,18 @@ suite(__filename, proc()
         .member("test2").toBe("CatalogLoop").toHave(name = "test2", tags = ["testing"])\
         .member("test3").toBe("CatalogMacro").toHave(name = "test3")
     end)
+
+    test("when inline ini or fin, [step] must be parsed", proc()
+      # (1) act
+      const (
+        macro = {macro = "test", ini = "log ini", steps = [], fin = "log fin"}
+        decl = [macro]
+        out = parser.parseJobs(decl, ops=)
+      )
+
+      # (2) assessment
+      expected(out.test.initializers).equalTo(["log ini"])
+      expected(out.test.finalizers).equalTo(["log fin"])
+    end)
   end)
 end)
