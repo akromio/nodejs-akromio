@@ -117,12 +117,11 @@ JobParser.prototype.parseAddOnJob = function (decl, opts) {
   }
 };
 JobParser.prototype.parseMacro = function (decl, opts) {
-  const self = this;
-  let macro; /* c8 ignore next */
+  const self = this; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
-    macro = CatalogMacro(_core.dogma.clone(decl, {
+    return CatalogMacro(_core.dogma.clone(decl, {
       "name": decl.macro,
       "operator": MacroOperator(),
       "ops": opts.ops,
@@ -130,7 +129,6 @@ JobParser.prototype.parseMacro = function (decl, opts) {
       "finalizers": parseFin(decl)
     }, {}, [], []));
   }
-  return macro;
 };
 JobParser.prototype.parseCo = function (decl, opts) {
   const self = this; /* c8 ignore next */

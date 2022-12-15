@@ -117,7 +117,6 @@ export struct CatalogCommand: CatalogCommandBase
 
       with type(job) do
         if "Macro" then opType = "macro"
-        if "Loop" then opType = "loop"
         if "Co" then opType = "co"
         if "Script" then opType = "script"
       

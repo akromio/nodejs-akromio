@@ -74,17 +74,6 @@ const things = {
           - [file.write, $(value), $(args.dst)]
     "
   
-  loop =
-    desc = "Creates a catalog loop, that is, a sequence of steps to run for each item in a collection."
-    examples = "
-      - loop: backupFiles
-        desc: Performs a backup of several files.
-        forEach: [list, one.txt, two.txt, three.txt]
-        steps:
-          - [$filePath, path.join, $(dir), $(i)]
-          - [fs.cp, $(filePath), $(filePath).backup]
-    "
-  
   co =
     desc = "Creates an concurrent operation, that is, several steps to run concurrently."
     examples = "

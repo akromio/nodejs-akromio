@@ -81,15 +81,16 @@ export struct JobParser
    * Parses a macro declaration.
    */
   @hidden
-  pub fn parseMacro(decl: map, opts: ParseOpts) -> macro: CatalogMacro
-    macro = CatalogMacro(decl{
+  pub fn parseMacro(decl: map, opts: ParseOpts) = CatalogMacro(
+    decl{
       *
       name = decl.macro
       operator = MacroOperator()
       ops = opts.ops
       initializers = parseIni(decl)
       finalizers = parseFin(decl)
-    })
+    }
+  )
 
   /**
    * Parses a concurrent declaration.

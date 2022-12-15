@@ -23,5 +23,5 @@ fn buildTitle(params=> {start, stop}) = $"range: [${start}, ${stop}]"
  */
 @async
 fn handler(ctx=> {params}) -> seq: list
-  for i = params.start; i <= params.stop; i += 1 do
+  for i = num(params.start); i <= num(params.stop); i += 1 do
     seq.push(i)

@@ -163,10 +163,6 @@ CatalogCommand.prototype.listJobDecls = function (decls, defaultJobName, tag, al
           {
             opType = "macro";
           }
-        } else if (_core.dogma.is(_, "Loop")) {
-          {
-            opType = "loop";
-          }
         } else if (_core.dogma.is(_, "Co")) {
           {
             opType = "co";

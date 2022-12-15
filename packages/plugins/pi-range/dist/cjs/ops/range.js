@@ -46,7 +46,7 @@ function handler(ctx) {
     params
   } = ctx;
   {
-    for (let i = params.start; i <= params.stop; i += 1) {
+    for (let i = (0, _core.num)(params.start); i <= (0, _core.num)(params.stop); i += 1) {
       seq.push(i);
     }
   }
