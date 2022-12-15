@@ -28,12 +28,6 @@ Macro.prototype.isLoop = function () {
     return false;
   }
 };
-Macro.prototype.getIterDatumName = function () {
-  const self = this;
-  {
-    return "i";
-  }
-};
 Macro.prototype.getLoopCollection = function (call) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("call", call, Call);

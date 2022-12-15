@@ -16,12 +16,6 @@ export struct Macro: CompositeOp
   pub fn isLoop() = false
 
   /**
-   * Returns the datum name where to save the iteration item
-   * if loop.
-   */
-  pub fn getIterDatumName() = "i"
-
-  /**
    * Returns the collection to iterate.
    */
   pub fn getLoopCollection(call: Call) = []
