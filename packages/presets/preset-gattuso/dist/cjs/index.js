@@ -1,7 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const plugins = ["banner", "env", "exec", "file", "fs", "hbs", "http", "inc", "inquire", "json", "list", "log", "merge", "path", "select", "set", "sleep", "text", "timestamp", "xdg", "yaml"];
+const plugins = ["banner", "env", "exec", "file", "fs", "hbs", "http", "inc", "inquire", "json", "list", "log", "merge", "path", "range", "select", "set", "sleep", "text", "timestamp", "xdg", "yaml"];
 module.exports = exports = {
   ["name"]: "akro",
   ["desc"]: "Preset for the akro tool.",

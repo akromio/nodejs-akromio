@@ -161,7 +161,7 @@ function getPluginName(decl) {
 function getJobName(decl) {
   /* c8 ignore next */_core.dogma.expect("decl", decl, _core.map);
   {
-    var _ref2, _decl$macro;
-    return (_ref2 = (_decl$macro = decl.macro) !== null && _decl$macro !== void 0 ? _decl$macro : decl.loop) !== null && _ref2 !== void 0 ? _ref2 : decl.co;
+    var _decl$macro;
+    return (_decl$macro = decl.macro) !== null && _decl$macro !== void 0 ? _decl$macro : decl.co;
   }
 }

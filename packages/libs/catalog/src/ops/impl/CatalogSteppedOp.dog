@@ -20,7 +20,7 @@ export struct CatalogSteppedOp
   pub const ops: Ops
 
   /**
-   * The declaration of the steps associated to this loop.
+   * The declaration of the steps associated to this op.
    */
   @hidden
   pub const steps: any[]

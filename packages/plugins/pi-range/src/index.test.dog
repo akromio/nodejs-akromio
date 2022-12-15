@@ -1,0 +1,16 @@
+use (
+  alias://expected
+  index
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(index).toHave(
+      plugin = "range"
+      tags = ["built-in"]
+      defaultOpName = "range"
+    ).member("ops").toHave(
+      "range"
+    )
+  end)
+end)

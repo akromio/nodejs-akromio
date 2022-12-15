@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, its api must be exported", () => {
       {
-        expected(pkg).members("NotFoundError", "SimpleOp", "SimpleOperator", "CompositeOp", "CompositeOperator", "Call", "Context", "Result", "Ops", "Plugin", "Plugins", "PluginParser", "PluginLoader", "Action", "StaticAction", "ActionOperator", "Script", "ScriptOperator", "DynamicMacro", "MacroOperator", "DynamicLoop", "LoopOperator", "DynamicCo", "CoOperator", "Runner").toBeCallable();
+        expected(pkg).members("NotFoundError", "SimpleOp", "SimpleOperator", "CompositeOp", "CompositeOperator", "Call", "Context", "Result", "Ops", "Plugin", "Plugins", "PluginParser", "PluginLoader", "Action", "StaticAction", "ActionOperator", "Script", "ScriptOperator", "DynamicMacro", "MacroOperator", "DynamicCo", "CoOperator", "Runner").toBeCallable();
       }
     });
   }

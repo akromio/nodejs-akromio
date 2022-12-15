@@ -5,6 +5,17 @@ use (
 /**
  * A macro, that is, an operation composed of a sequence
  * of steps to run one by one.
+ *
+ * This macro can be a loop if the isLoop() returns true.
  */
 @abstract
 export struct Macro: CompositeOp
+  /**
+   * Checks whether the macro is a loop.
+   */
+  pub fn isLoop() = false
+
+  /**
+   * Returns the collection to iterate.
+   */
+  pub fn getLoopCollection(call: Call) = []

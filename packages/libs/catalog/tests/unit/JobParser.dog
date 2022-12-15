@@ -11,29 +11,34 @@ suite(__filename, proc()
   )
 
   suite("pareJob()", proc()
-    test("when macro, a macro instance must be returned", proc()
-      # (1) act
-      const (
-        decl = {macro = "test", local = ["v1", "v2"], steps = []}
-        out = parser.parseJob(decl, ops=)
-      )
+    suite("macro", proc()
+      test("when simple macro, a macro instance must be returned", proc()
+        # (1) act
+        const (
+          decl = {macro = "test", local = ["v1", "v2"], steps = []}
+          out = parser.parseJob(decl, ops=)
+        )
 
-      # (2) assessment
-      expected(out).toBe("CatalogMacro").toHave(
-        name = "test"
-        local = [{var = "v1"}, {var = "v2"}]
-      )
-    end)
+        # (2) assessment
+        expected(out).toBe("CatalogMacro").toHave(
+          name = "test"
+          local = [{var = "v1"}, {var = "v2"}]
+        )
 
-    test("when loop, a loop instance must be returned", proc()
-      # (1) act
-      const (
-        decl = {loop = "test", steps = [], forEach = []}
-        out = parser.parseJob(decl, ops=)
-      )
+        expected(out.isLoop()).equalTo(false)
+      end)
 
-      # (2) assessment
-      expected(out).toBe("CatalogLoop").toHave(name = "test")
+      test("when looped macro, a macro instance must be returned", proc()
+        # (1) act
+        const (
+          decl = {macro = "test", forEach = "range 1 5", steps = [], forEach = []}
+          out = parser.parseJob(decl, ops=)
+        )
+
+        # (2) assessment
+        expected(out).toBe("CatalogMacro").toHave(name = "test")
+        expected(out.isLoop()).equalTo(true)
+      end)
     end)
 
     test("when co, a co instance must be returned", proc()
@@ -97,7 +102,7 @@ suite(__filename, proc()
       # (1) act
       const (
         macro1 = {macro = "test1", ini = [], steps = [], fin = []}
-        macro2 = {loop = "test2", ini = [], steps = [], fin = [], forEach = []}
+        macro2 = {macro = "test2", ini = [], steps = [], fin = [], forEach = []}
         macro3 = {macro = "test3", steps = []}
         group = {group = "testing", jobs = [macro1, macro2]}
         decl = [group, macro3]
@@ -108,7 +113,7 @@ suite(__filename, proc()
       expected(out)\
         .toHaveLen(3)\
         .member("test1").toBe("CatalogMacro").toHave(name = "test1", tags = ["testing"])\
-        .member("test2").toBe("CatalogLoop").toHave(name = "test2", tags = ["testing"])\
+        .member("test2").toBe("CatalogMacro").toHave(name = "test2", tags = ["testing"])\
         .member("test3").toBe("CatalogMacro").toHave(name = "test3")
     end)
 

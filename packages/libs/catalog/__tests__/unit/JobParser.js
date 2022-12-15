@@ -14,38 +14,45 @@ suite(__filename, () => {
     const ops = Ops();
     suite("pareJob()", () => {
       {
-        test("when macro, a macro instance must be returned", () => {
+        suite("macro", () => {
           {
-            const decl = {
-              ["macro"]: "test",
-              ["local"]: ["v1", "v2"],
-              ["steps"]: []
-            };
-            const out = parser.parseJob(decl, {
-              'ops': ops
+            test("when simple macro, a macro instance must be returned", () => {
+              {
+                const decl = {
+                  ["macro"]: "test",
+                  ["local"]: ["v1", "v2"],
+                  ["steps"]: []
+                };
+                const out = parser.parseJob(decl, {
+                  'ops': ops
+                });
+                expected(out).toBe("CatalogMacro").toHave({
+                  'name': "test",
+                  'local': [{
+                    ["var"]: "v1"
+                  }, {
+                    ["var"]: "v2"
+                  }]
+                });
+                expected(out.isLoop()).equalTo(false);
+              }
             });
-            expected(out).toBe("CatalogMacro").toHave({
-              'name': "test",
-              'local': [{
-                ["var"]: "v1"
-              }, {
-                ["var"]: "v2"
-              }]
-            });
-          }
-        });
-        test("when loop, a loop instance must be returned", () => {
-          {
-            const decl = {
-              ["loop"]: "test",
-              ["steps"]: [],
-              ["forEach"]: []
-            };
-            const out = parser.parseJob(decl, {
-              'ops': ops
-            });
-            expected(out).toBe("CatalogLoop").toHave({
-              'name': "test"
+            test("when looped macro, a macro instance must be returned", () => {
+              {
+                const decl = {
+                  ["macro"]: "test",
+                  ["forEach"]: "range 1 5",
+                  ["steps"]: [],
+                  ["forEach"]: []
+                };
+                const out = parser.parseJob(decl, {
+                  'ops': ops
+                });
+                expected(out).toBe("CatalogMacro").toHave({
+                  'name': "test"
+                });
+                expected(out.isLoop()).equalTo(true);
+              }
             });
           }
         });
@@ -130,7 +137,7 @@ suite(__filename, () => {
               ["fin"]: []
             };
             const macro2 = {
-              ["loop"]: "test2",
+              ["macro"]: "test2",
               ["ini"]: [],
               ["steps"]: [],
               ["fin"]: [],
@@ -151,7 +158,7 @@ suite(__filename, () => {
             expected(out).toHaveLen(3).member("test1").toBe("CatalogMacro").toHave({
               'name': "test1",
               'tags': ["testing"]
-            }).member("test2").toBe("CatalogLoop").toHave({
+            }).member("test2").toBe("CatalogMacro").toHave({
               'name': "test2",
               'tags': ["testing"]
             }).member("test3").toBe("CatalogMacro").toHave({

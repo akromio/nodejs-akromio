@@ -1,0 +1,27 @@
+export {
+  desc = "Returns a list with a sequence of numbers between given two."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handler
+}
+
+/**
+ * Builds the parameters from the arguments.
+ */
+fn buildParams(args) -> params: map
+  with type(args) do
+    if map then params = args
+    else params = {start = args[0], stop = args[1]}
+  
+/**
+ * Builds the title.
+ */
+fn buildTitle(params=> {start, stop}) = $"range: [${start}, ${stop}]"
+
+/**
+ * Generates the hash and returns it in hexadecimal.
+ */
+@async
+fn handler(ctx=> {params}) -> seq: list
+  for i = num(params.start); i <= num(params.stop); i += 1 do
+    seq.push(i)

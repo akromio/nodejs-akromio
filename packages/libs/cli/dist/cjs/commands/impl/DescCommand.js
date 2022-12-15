@@ -16,10 +16,6 @@ const things = {
     ["desc"]: "Creates a catalog macro, that is, a sequence of steps to run one by one.",
     ["examples"]: "\n      - macro: json2yaml\n        desc: Generates a YAML file from a JSON file.\n        steps:\n          - [$data, <file.read, $(args.src)]\n          - [$value, json.decode, $(data)]\n          - [$value, yaml.encode, $(value)]\n          - [file.write, $(value), $(args.dst)]\n    "
   },
-  ["loop"]: {
-    ["desc"]: "Creates a catalog loop, that is, a sequence of steps to run for each item in a collection.",
-    ["examples"]: "\n      - loop: backupFiles\n        desc: Performs a backup of several files.\n        forEach: [list, one.txt, two.txt, three.txt]\n        steps:\n          - [$filePath, path.join, $(dir), $(i)]\n          - [fs.cp, $(filePath), $(filePath).backup]\n    "
-  },
   ["co"]: {
     ["desc"]: "Creates an concurrent operation, that is, several steps to run concurrently.",
     ["examples"]: "\n      - co: backup\n        desc: Performs a backup of several files.\n        steps:\n          - [fs.cp, file1.txt, file1.txt.old]\n          - [fs.cp, file2.txt, file2.txt.old]\n    "

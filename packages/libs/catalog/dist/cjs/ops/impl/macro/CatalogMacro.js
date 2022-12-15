@@ -28,6 +28,13 @@ const $CatalogMacro = class CatalogMacro extends DynamicMacro {
       enumerable: true
     });
     /* c8 ignore start */
+    if (_['forEach'] != null) (0, _core.expect)('forEach', _['forEach'], [_core.list, _core.text]); /* c8 ignore stop */
+    Object.defineProperty(this, 'forEach', {
+      value: (0, _core.coalesce)(_['forEach'], null),
+      writable: false,
+      enumerable: false
+    });
+    /* c8 ignore start */
     if (this._pvt_160654bea4872492d55d37f082261698___init__ instanceof Function) this._pvt_160654bea4872492d55d37f082261698___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_160654bea4872492d55d37f082261698___post__ instanceof Function) this._pvt_160654bea4872492d55d37f082261698___post__(); /* c8 ignore stop */
@@ -55,5 +62,17 @@ CatalogMacro.prototype.getFinalizerSteps = function (call) {
   _core.dogma.expect("call", call, Call);
   {
     return this.buildSteps(this.finalizers, call);
+  }
+};
+CatalogMacro.prototype.isLoop = function () {
+  const self = this;
+  {
+    return (0, _core.bool)(this.forEach);
+  }
+};
+CatalogMacro.prototype.getLoopCollection = function (call) {
+  const self = this;
+  {
+    return this.buildStep(this.forEach, call, "i");
   }
 };

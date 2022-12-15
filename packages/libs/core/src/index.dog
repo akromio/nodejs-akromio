@@ -26,8 +26,6 @@ pub use (
   ops/composite/co/CoOperator
   ops/composite/macro/DynamicMacro
   ops/composite/macro/MacroOperator
-  ops/composite/loop/DynamicLoop
-  ops/composite/loop/LoopOperator
   
   runners/Runner
   

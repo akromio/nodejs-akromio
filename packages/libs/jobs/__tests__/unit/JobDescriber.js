@@ -7,10 +7,6 @@ const {
   MacroOperator
 } = _core.dogma.use(require("@akromio/core"));
 const {
-  DynamicLoop: LoopBase,
-  LoopOperator
-} = _core.dogma.use(require("@akromio/core"));
-const {
   DynamicCo: CoBase,
   CoOperator
 } = _core.dogma.use(require("@akromio/core"));
@@ -38,25 +34,6 @@ const $Macro = class Macro extends MacroBase {
 const Macro = new Proxy($Macro, {
   apply(receiver, self, args) {
     return new $Macro(...args);
-  }
-});
-const $Loop = class Loop extends LoopBase {
-  constructor(_) {
-    super(_);
-    /* c8 ignore start */
-    if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___init__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___init__(_); /* c8 ignore stop */
-    /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___post__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___post__(); /* c8 ignore stop */
-    /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___validate__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___validate__(); /* c8 ignore stop */
-  }
-};
-
-const Loop = new Proxy($Loop, {
-  apply(receiver, self, args) {
-    return new $Loop(...args);
   }
 });
 const $Co = class Co extends CoBase {
@@ -97,23 +74,6 @@ suite(__filename, () => {
               'tags': ["tag1", "tag2"],
               'desc': "The description.",
               'opType': "macro"
-            });
-          }
-        });
-        test("when loop, a loop description object must be returned", () => {
-          {
-            const op = Loop({
-              'name': "myloop",
-              'tags': ["tag1", "tag2"],
-              'desc': "The description.",
-              'operator': LoopOperator()
-            });
-            const out = describer.describeJob(op);
-            expected(out).toHave({
-              'name': "myloop",
-              'tags': ["tag1", "tag2"],
-              'desc': "The description.",
-              'opType': "loop"
             });
           }
         });

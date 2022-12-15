@@ -22,3 +22,16 @@ const Macro = new Proxy($Macro, {
   } /* c8 ignore stop */
 });
 module.exports = exports = Macro;
+Macro.prototype.isLoop = function () {
+  const self = this;
+  {
+    return false;
+  }
+};
+Macro.prototype.getLoopCollection = function (call) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("call", call, Call);
+  {
+    return [];
+  }
+};

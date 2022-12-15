@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StaticAction = exports.SingleRunnerEngine = exports.SimpleOperator = exports.SimpleOp = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.LoopOperator = exports.Engine = exports.DynamicMacro = exports.DynamicLoop = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CoOperator = exports.Call = exports.ActionOperator = exports.Action = void 0;
+exports.StaticAction = exports.SingleRunnerEngine = exports.SimpleOperator = exports.SimpleOp = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CoOperator = exports.Call = exports.ActionOperator = exports.Action = void 0;
 var _core = require("@dogmalang/core");
 const NotFoundError = _core.dogma.use(require("./errors/NotFoundError"));
 exports.NotFoundError = NotFoundError;
@@ -51,10 +51,6 @@ const DynamicMacro = _core.dogma.use(require("./ops/composite/macro/DynamicMacro
 exports.DynamicMacro = DynamicMacro;
 const MacroOperator = _core.dogma.use(require("./ops/composite/macro/MacroOperator"));
 exports.MacroOperator = MacroOperator;
-const DynamicLoop = _core.dogma.use(require("./ops/composite/loop/DynamicLoop"));
-exports.DynamicLoop = DynamicLoop;
-const LoopOperator = _core.dogma.use(require("./ops/composite/loop/LoopOperator"));
-exports.LoopOperator = LoopOperator;
 const Runner = _core.dogma.use(require("./runners/Runner"));
 exports.Runner = Runner;
 const Engine = _core.dogma.use(require("./engines/Engine"));
