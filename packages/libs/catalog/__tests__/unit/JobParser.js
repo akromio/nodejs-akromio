@@ -159,6 +159,22 @@ suite(__filename, () => {
             });
           }
         });
+        test("when inline ini or fin, [step] must be parsed", () => {
+          {
+            const macro = {
+              ["macro"]: "test",
+              ["ini"]: "log ini",
+              ["steps"]: [],
+              ["fin"]: "log fin"
+            };
+            const decl = [macro];
+            const out = parser.parseJobs(decl, {
+              'ops': ops
+            });
+            expected(out.test.initializers).equalTo(["log ini"]);
+            expected(out.test.finalizers).equalTo(["log fin"]);
+          }
+        });
       }
     });
   }

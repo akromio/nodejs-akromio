@@ -83,16 +83,15 @@ export struct JobParser
    * Parses a macro declaration.
    */
   @hidden
-  pub fn parseMacro(decl: map, opts: ParseOpts) = CatalogMacro(
-    decl{
+  pub fn parseMacro(decl: map, opts: ParseOpts) -> macro: CatalogMacro
+    macro = CatalogMacro(decl{
       *
       name = decl.macro
       operator = MacroOperator()
       ops = opts.ops
-      initializers = decl.ini ?? []
-      finalizers = decl.fin ?? []
-    }
-  )
+      initializers = parseIni(decl)
+      finalizers = parseFin(decl)
+    })
 
   /**
    * Parses a loop declaration.
@@ -104,8 +103,8 @@ export struct JobParser
       name = decl.loop
       operator = LoopOperator()
       ops = opts.ops
-      initializers = decl.ini ?? []
-      finalizers = decl.fin ?? []
+      initializers = parseIni(decl)
+      finalizers = parseFin(decl)
     }
   )
 
@@ -133,3 +132,27 @@ export struct JobParser
       operator = ScriptOperator()
     }
   )
+
+/**
+ * Parses the ini field of a declaration.
+ *
+ * @dev
+ * This field must be a list, but only one inline step is accepted too.
+ */
+fn parseIni(decl: map) = if decl.ini is text then
+  [decl.ini]
+else
+  decl.ini ?? []
+end
+
+/**
+ * Parses the fin field of a declaration.
+ *
+ * @dev
+ * Similar to parseIni().
+ */
+fn parseFin(decl: map) = if decl.fin is text then
+  [decl.fin]
+else
+  decl.fin ?? []
+end
