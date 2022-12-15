@@ -1,0 +1,62 @@
+use (
+  alias://expected
+  op = range
+)
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when list, {start, stop} must be returned", proc()
+      # (1) act
+      const (
+        args = [1, 5]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(start = 1, stop = 5)
+    end)
+
+
+    test("when map, map must be returned", proc()
+      # (1) act
+      const (
+        args = {start = 1, stop = 5}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        start = 1
+        stop = 5
+        params = {start, stop}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"range: [${start}, ${stop}]")
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when called, list must be performed", async proc()
+      # (1) act
+      const out = await(handler(params = {start = 1, stop = 5}))
+
+      # (2) assessment
+      expected(out).equalTo([1, 2, 3, 4, 5])
+    end)
+  end)
+end)

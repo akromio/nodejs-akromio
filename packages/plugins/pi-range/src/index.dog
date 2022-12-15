@@ -1,0 +1,8 @@
+export {
+  plugin = "range"
+  desc = "Plugin for returning a list with a sequence of numbers between given two."
+  tags = ["built-in"]
+  defaultOpName = "range"
+  ops =
+    range = use("./ops/range")
+}
