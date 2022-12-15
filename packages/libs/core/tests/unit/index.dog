@@ -26,8 +26,6 @@ suite(__filename, proc()
       "ScriptOperator"
       "DynamicMacro"
       "MacroOperator"
-      "DynamicLoop"
-      "LoopOperator"
       "DynamicCo"
       "CoOperator"
       "Runner"

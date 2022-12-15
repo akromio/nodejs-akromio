@@ -36,10 +36,6 @@ JobDescriber.prototype.describeJob = function (job) {
         {
           opType = "macro";
         }
-      } else if (_core.dogma.is(_, "Loop")) {
-        {
-          opType = "loop";
-        }
       } else if (_core.dogma.is(_, "Co")) {
         {
           opType = "co";

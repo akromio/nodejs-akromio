@@ -4,13 +4,11 @@ var _core = require("@dogmalang/core");
 const {
   Ops,
   MacroOperator,
-  LoopOperator,
   CoOperator,
   Script,
   ScriptOperator
 } = _core.dogma.use(require("@akromio/core"));
 const CatalogMacro = _core.dogma.use(require("./ops/impl/macro/CatalogMacro"));
-const CatalogLoop = _core.dogma.use(require("./ops/impl/loop/CatalogLoop"));
 const CatalogCo = _core.dogma.use(require("./ops/impl/co/CatalogCo"));
 const ParseOpts = _core.dogma.intf('ParseOpts', {
   ops: {
@@ -85,8 +83,6 @@ JobParser.prototype.parseJob = function (decl, opts) {
       job = this.parseGroup(decl, opts);
     } else if (_core.dogma.includes(decl, "macro")) {
       job = this.parseMacro(decl, opts);
-    } else if (_core.dogma.includes(decl, "loop")) {
-      job = this.parseLoop(decl, opts);
     } else if (_core.dogma.includes(decl, "co")) {
       job = this.parseCo(decl, opts);
     } else if (_core.dogma.includes(decl, "script")) {
@@ -135,20 +131,6 @@ JobParser.prototype.parseMacro = function (decl, opts) {
     }, {}, [], []));
   }
   return macro;
-};
-JobParser.prototype.parseLoop = function (decl, opts) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
-  _core.dogma.expect("opts", opts, ParseOpts);
-  {
-    return CatalogLoop(_core.dogma.clone(decl, {
-      "name": decl.loop,
-      "operator": LoopOperator(),
-      "ops": opts.ops,
-      "initializers": parseIni(decl),
-      "finalizers": parseFin(decl)
-    }, {}, [], []));
-  }
 };
 JobParser.prototype.parseCo = function (decl, opts) {
   const self = this; /* c8 ignore next */

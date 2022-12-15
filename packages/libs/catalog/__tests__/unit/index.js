@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, its api must be exported", () => {
       {
-        expected(pkg).members("Catalog", "CatalogMerger", "CatalogParser", "CatalogCo", "CatalogLoop", "CatalogMacro", "JobParser").toBeCallable();
+        expected(pkg).members("Catalog", "CatalogMerger", "CatalogParser", "CatalogCo", "CatalogMacro", "JobParser").toBeCallable();
       }
     });
   }

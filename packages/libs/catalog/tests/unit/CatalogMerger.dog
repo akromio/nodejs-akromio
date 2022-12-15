@@ -199,7 +199,7 @@ suite(__filename, proc()
         extended2 = {
           jobs = [
             {macro = "x", desc = "extended2", steps = []}
-            {loop = "y", desc = "extended2", steps = []}
+            {macro = "y", desc = "extended2", steps = []}
             {co = "z", desc = "extended2", steps = []}
           ]
         }
@@ -210,7 +210,7 @@ suite(__filename, proc()
       # (2) assessment
       expected(out.jobs).equalTo([
         {macro = "x", desc = "extended2", steps = []}
-        {loop = "y", desc = "extended2", steps = []}
+        {macro = "y", desc = "extended2", steps = []}
         {co = "z", desc = "extended2", steps = []}
       ])
     end)

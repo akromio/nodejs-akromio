@@ -9,11 +9,8 @@ suite(__filename, proc()
       "Catalog"
       "CatalogMerger"
       "CatalogParser"
-
       "CatalogCo"
-      "CatalogLoop"
       "CatalogMacro"
-
       "JobParser"
     ).toBeCallable()
   end)

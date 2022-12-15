@@ -25,7 +25,7 @@ suite(__filename, () => {
                 ["impl"]: "plugin"
               }],
               ["jobs"]: [{
-                ["loop"]: "myloop",
+                ["macro"]: "mymacro",
                 ["steps"]: []
               }, {
                 ["co"]: "myco",
@@ -45,7 +45,7 @@ suite(__filename, () => {
                 ["impl"]: "plugin"
               }],
               'jobs': [{
-                ["loop"]: "myloop",
+                ["macro"]: "mymacro",
                 ["steps"]: []
               }, {
                 ["co"]: "myco",

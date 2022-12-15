@@ -118,4 +118,26 @@ suite(__filename, proc()
       expected(out[0].op).toBe(Action)
     end)
   end)
+
+  suite("getLoopCollection()", proc()
+    test("when called, a list must be returned", proc()
+      # (1) act
+      const (
+        op = Action(name = "list", fun = nop, operator = ActionOperator())
+        ops = Ops().appendOp(op)
+        forEach = ["list", "file1", "file2"]
+        steps = []
+        loop = CatalogMacro(name = "test", forEach, steps, ops, operator)
+        call = Call(op = loop, dataset, onError, title, log, ctx)
+        out = loop.getLoopCollection(call)
+      )
+
+      # (2) assessment
+      expected(out).toBeMap().toHave(
+        args = ["file1", "file2"]
+        onError = "carryOn"
+        resultVarName = "i"
+      ).member("op").toBe(Action)
+    end)
+  end)
 end)

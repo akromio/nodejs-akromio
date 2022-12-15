@@ -1,14 +1,12 @@
 use (
   alias://expected
   {DynamicMacro as MacroBase, MacroOperator} = alias://core
-  {DynamicLoop as LoopBase, LoopOperator} = alias://core
   {DynamicCo as CoBase, CoOperator} = alias://core
   {Script, ScriptOperator} = alias://core
   {JobDescriber} = ~
 )
 
 struct Macro: MacroBase
-struct Loop: LoopBase
 struct Co: CoBase
 
 suite(__filename, proc()
@@ -33,27 +31,6 @@ suite(__filename, proc()
         tags = ["tag1", "tag2"]
         desc = "The description."
         opType = "macro"
-      )
-    end)
-
-    test("when loop, a loop description object must be returned", proc()
-      # (1) act
-      const (
-        op = Loop(
-          name = "myloop"
-          tags = ["tag1", "tag2"]
-          desc = "The description."
-          operator = LoopOperator()
-        )
-        out = describer.describeJob(op)
-      )
-
-      # (2) assessment
-      expected(out).toHave(
-        name = "myloop"
-        tags = ["tag1", "tag2"]
-        desc = "The description."
-        opType = "loop"
       )
     end)
 

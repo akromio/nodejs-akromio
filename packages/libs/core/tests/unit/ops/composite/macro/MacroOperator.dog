@@ -12,92 +12,16 @@ suite(__filename, proc()
     log = simulator.stream.duplex()
   )
 
-  suite("performWorks()", proc()
-    struct TestMacro: DynamicMacro
-      @override
-      pub fn getSteps() = [
-        {
-          title = "1st step"
-          op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
-          args = 123
-          onError = "carryOn"
-        }
-
-        {
-          title = "2nd step"
-          op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
-          args = 321
-          resultVarName = "2nd"
-          onError = "carryOn"
-        }
-
-        {
-          title = "3rd step"
-          op = StaticAction(name = "3rd", fun = fn() = "action #3" end, operator = ActionOperator())
-          args = 135
-          resultVarName = "3rd"
-          onError = "carryOn"
-          quiet = true
-        }
-
-        {
-          title = "4th step"
-          op = StaticAction(name = "4th", fun = fn() = "action #4" end, operator = ActionOperator())
-          args = 531
-          resultVarName = "4th"
-          onError = "carryOn"
-          conditionDatumName = "condition"
-        }
-      ]
-
-    test("when called and everything is alright, a result for every step must be returned as value", async proc()
-      # (1) act
-      const (
-        localDataset = LocalDataset(name = "local", parent = globalDataset).setDatumValue("condition", true)
-        macro = TestMacro(name = "macro", operator = MacroOperator())
-        out = await(macro.run(dataset = localDataset, log))
-      )
-
-      # (2) assessment
-      expected(out)\
-        .toBe("Result")\
-        .toHave(title = "macro", kind = "ok", onError = "carryOn")
-
-      expected(out.value)\
-        .toBeList().toHaveLen(3)\
-        .it(0).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
-        .it(1).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action #2")\
-        .it(2).toBe("Result").toHave(title = "4th", kind = "ok", value = "action #4")
-    end)
-
-    test("when called with dataset and ok, the step results must be returned and dataset must be updated", async proc()
-      # (1) act
-      const (
-        macro = TestMacro(name = "macro", operator = MacroOperator())
-        out = await(macro.run(dataset = globalDataset, log))
-      )
-
-      # (2) assessment
-      expected(out)\
-        .toBe("Result")\
-        .toHave(title = "macro", kind = "ok", onError = "carryOn")
-
-      expected(out.value)\
-        .toBeList().toHaveLen(3)\
-        .it(0).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
-        .it(1).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action #2")\
-        .it(2).toBe("Result").toHave(title = "4th", kind = "ok", value = "action #4")
-    end)
-
-    test("when onError is finish and error, break must be performed and value contains the results", async proc()
+  suite("non-loop", proc()
+    suite("performWorks()", proc()
       struct TestMacro: DynamicMacro
         @override
         pub fn getSteps() = [
           {
             title = "1st step"
-            op = StaticAction(name = "1st", fun = fn() throw(Error("error!")) end, operator = ActionOperator())
+            op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
             args = 123
-            onError = "finish"
+            onError = "carryOn"
           }
 
           {
@@ -107,22 +31,211 @@ suite(__filename, proc()
             resultVarName = "2nd"
             onError = "carryOn"
           }
+
+          {
+            title = "3rd step"
+            op = StaticAction(name = "3rd", fun = fn() = "action #3" end, operator = ActionOperator())
+            args = 135
+            resultVarName = "3rd"
+            onError = "carryOn"
+            quiet = true
+          }
+
+          {
+            title = "4th step"
+            op = StaticAction(name = "4th", fun = fn() = "action #4" end, operator = ActionOperator())
+            args = 531
+            resultVarName = "4th"
+            onError = "carryOn"
+            conditionDatumName = "condition"
+          }
         ]
-      
-      # (1) act
-      const (
-        macro = TestMacro(name = "macro", operator = MacroOperator())
-        out = await(macro.run(dataset = globalDataset, log))
-      )
 
-      # (2) assessment
-      expected(out)\
-        .toBe("Result")\
-        .toHave(title = "macro", kind = "failed", onError = "carryOn")
+      test("when called and everything is alright, a result for every step must be returned as value", async proc()
+        # (1) act
+        const (
+          localDataset = LocalDataset(name = "local", parent = globalDataset).setDatumValue("condition", true)
+          macro = TestMacro(name = "macro", operator = MacroOperator())
+          out = await(macro.run(dataset = localDataset, log))
+        )
 
-      expected(out.value)\
-        .toBeList().toHaveLen(1)\
-        .item(0).toBe("Result").toHave(title = "1st", kind = "failed", value = Error("error!"))
+        # (2) assessment
+        expected(out)\
+          .toBe("Result")\
+          .toHave(title = "macro", kind = "ok", onError = "carryOn")
+
+        expected(out.value)\
+          .toBeList().toHaveLen(3)\
+          .it(0).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
+          .it(1).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action #2")\
+          .it(2).toBe("Result").toHave(title = "4th", kind = "ok", value = "action #4")
+      end)
+
+      test("when called with dataset and ok, the step results must be returned and dataset must be updated", async proc()
+        # (1) act
+        const (
+          macro = TestMacro(name = "macro", operator = MacroOperator())
+          out = await(macro.run(dataset = globalDataset, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe("Result")\
+          .toHave(title = "macro", kind = "ok", onError = "carryOn")
+
+        expected(out.value)\
+          .toBeList().toHaveLen(3)\
+          .it(0).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
+          .it(1).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action #2")\
+          .it(2).toBe("Result").toHave(title = "4th", kind = "ok", value = "action #4")
+      end)
+
+      test("when onError is finish and error, break must be performed and value contains the results", async proc()
+        struct TestMacro: DynamicMacro
+          @override
+          pub fn getSteps() = [
+            {
+              title = "1st step"
+              op = StaticAction(name = "1st", fun = fn() throw(Error("error!")) end, operator = ActionOperator())
+              args = 123
+              onError = "finish"
+            }
+
+            {
+              title = "2nd step"
+              op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+              args = 321
+              resultVarName = "2nd"
+              onError = "carryOn"
+            }
+          ]
+        
+        # (1) act
+        const (
+          macro = TestMacro(name = "macro", operator = MacroOperator())
+          out = await(macro.run(dataset = globalDataset, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe("Result")\
+          .toHave(title = "macro", kind = "failed", onError = "carryOn")
+
+        expected(out.value)\
+          .toBeList().toHaveLen(1)\
+          .item(0).toBe("Result").toHave(title = "1st", kind = "failed", value = Error("error!"))
+      end)
+    end)
+  end)
+
+  suite("loop", proc()
+    suite("performWorks()", proc()
+      struct TestMacro: DynamicMacro
+        @override
+        pub fn isLoop() = true
+        
+        @override
+        pub fn getLoopCollection() = {
+          title = "get collection"
+          op = StaticAction(name = "coll", fun = fn() = [1, 2] end, operator = ActionOperator())
+          onError = "carryOn"
+        }
+
+        @override
+        pub fn getSteps() = [
+          {
+            title = "1st step"
+            op = StaticAction(name = "1st", fun = fn(ctx=> {params}) = $"action #${params}" end, operator = ActionOperator())
+            args = "$(i)"
+            onError = "carryOn"
+          }
+
+          {
+            title = "2nd step"
+            op = StaticAction(name = "2nd", fun = fn(ctx=> {params}) = params end, operator = ActionOperator())
+            args = "action $(i)"
+            resultVarName = "2nd"
+            onError = "carryOn"
+          }
+
+          {
+            title = "3rd step"
+            op = StaticAction(name = "3rd", fun = fn(ctx=> {params}) = params end, operator = ActionOperator())
+            args = "action $(i)"
+            resultVarName = "3rd"
+            onError = "carryOn"
+            quiet = true
+          }
+        ]
+
+      test("when called and everything is alright, a result for every step must be returned as value", async proc()
+        # (1) act
+        const (
+          loop = TestMacro(name = "loop", operator = MacroOperator())
+          out = await(loop.run(dataset = globalDataset, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe("Result")\
+          .toHave(title = "loop", kind = "ok", onError = "carryOn")
+        
+        expected(out.value)\
+          .toBeList().toHaveLen(5)\
+          .it(0).toBe("Result").toHave(title = "coll", kind = "ok", value = [1, 2])\
+          .it(1).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #1")\
+          .it(2).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action 1")\
+          .it(3).toBe("Result").toHave(title = "1st", kind = "ok", value = "action #2")\
+          .it(4).toBe("Result").toHave(title = "2nd", kind = "ok", value = "action 2")
+      end)
+
+      test("when onError is finish and error, break must be perform and value contains the results", async proc()
+        struct TestMacro: DynamicMacro
+          @override
+          pub fn isLoop() = true
+
+          @override
+          pub fn getLoopCollection() = {
+            title = "get collection"
+            op = StaticAction(name = "coll", fun = fn() = [1, 2] end, operator = ActionOperator())
+            onError = "carryOn"
+            resultVarName = "j"
+          }
+
+          @override
+          pub fn getSteps() = [
+            {
+              title = "1st step"
+              op = StaticAction(name = "1st", fun = fn() throw(Error("error!")) end, operator = ActionOperator())
+              args = 123
+              onError = "finish"
+            }
+
+            {
+              title = "2nd step"
+              op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+              args = 321
+              resultVarName = "2nd"
+              onError = "carryOn"
+            }
+          ]
+        
+        # (1) act
+        const (
+          loop = TestMacro(name = "loop", operator = MacroOperator())
+          out = await(loop.run(dataset = globalDataset, log))
+        )
+
+        # (2) assessment
+        expected(out)\
+          .toBe("Result")\
+          .toHave(title = "loop", kind = "failed", onError = "carryOn")
+
+        expected(out.value)\
+          .toBeList().toHaveLen(2)\
+          .it(0).toBe("Result").toHave(title = "coll", kind = "ok", value = [1, 2])\
+          .it(1).toBe("Result").toHave(title = "1st", kind = "failed", value = Error("error!"))
+      end)
     end)
   end)
 end)

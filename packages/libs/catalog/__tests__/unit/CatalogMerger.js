@@ -273,7 +273,7 @@ suite(__filename, () => {
                 ["desc"]: "extended2",
                 ["steps"]: []
               }, {
-                ["loop"]: "y",
+                ["macro"]: "y",
                 ["desc"]: "extended2",
                 ["steps"]: []
               }, {
@@ -288,7 +288,7 @@ suite(__filename, () => {
               ["desc"]: "extended2",
               ["steps"]: []
             }, {
-              ["loop"]: "y",
+              ["macro"]: "y",
               ["desc"]: "extended2",
               ["steps"]: []
             }, {

@@ -1,7 +1,6 @@
 use (
-  {Ops, MacroOperator, LoopOperator, CoOperator, Script, ScriptOperator} = alias://core
+  {Ops, MacroOperator, CoOperator, Script, ScriptOperator} = alias://core
   ops/impl/macro/CatalogMacro
-  ops/impl/loop/CatalogLoop
   ops/impl/co/CatalogCo
 )
 
@@ -48,7 +47,6 @@ export struct JobParser
     # (2) parse job
     if "group" in decl then job = self.parseGroup(decl, opts)
     else if "macro" in decl then job = self.parseMacro(decl, opts)
-    else if "loop" in decl then job = self.parseLoop(decl, opts)
     else if "co" in decl then job = self.parseCo(decl, opts)
     else if "script" in decl then job = self.parseScript(decl, opts)
     else job = self.parseAddOnJob(decl, opts)
@@ -92,21 +90,6 @@ export struct JobParser
       initializers = parseIni(decl)
       finalizers = parseFin(decl)
     })
-
-  /**
-   * Parses a loop declaration.
-   */
-  @hidden
-  pub fn parseLoop(decl: map, opts: ParseOpts) = CatalogLoop(
-    decl{
-      *
-      name = decl.loop
-      operator = LoopOperator()
-      ops = opts.ops
-      initializers = parseIni(decl)
-      finalizers = parseFin(decl)
-    }
-  )
 
   /**
    * Parses a concurrent declaration.

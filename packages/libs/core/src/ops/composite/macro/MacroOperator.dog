@@ -1,8 +1,53 @@
 use (
+  Macro
   ../CompositeOperator
+  ../../Call
 )
 
 /**
  * An operator to run macros.
  */
 export struct MacroOperator: CompositeOperator
+  @override @hidden
+  pub async fn performWorks(call: Call) -> results: list
+    const macro = expect(call.op, Macro)
+
+    if macro.isLoop() then
+      results = self.performLoop(call)
+    else
+      results = super.performWorks(call)
+  
+  /**
+   * Performs this macro as a loop using the [call] passed.
+   */
+  @hidden @noParamCheck
+  pub async fn performLoop(call: Call) -> results: list
+    const loop = call.op
+
+    # (1) run initializers
+    await(self.performInitializerSteps(call, results))
+
+    # (2) get the collection
+    const (
+      collStep = loop.getLoopCollection(call)
+      collResult = await(self.performStep(collStep, call))
+    )
+
+    results.push(collResult)
+
+    # (3) perform steps
+    const(
+      {dataset} = call
+      itemName = collStep.resultVarName ?? "i"
+      items = collResult.value
+      steps = await(loop.getSteps(call))
+    )
+
+    for each item in items do
+      dataset.setDatumValue(itemName, item)
+
+      if await(self._performSteps(steps, call, results))[0] === false then
+        return [false, results]
+
+    # (4) perform finalizers
+    await(self.performFinalizerSteps(call, results))

@@ -24,3 +24,16 @@ export struct CatalogMacro: DynamicMacro:: CatalogSteppedOp
   
   @override @hidden
   pub fn getFinalizerSteps(call: Call) = self.buildSteps(self.finalizers, call)
+
+  /**
+   * The collection to iterate.
+   * It must be a declaration of a simple operation.
+   */
+  @hidden
+  pub const forEach?: (list | text)
+
+  @override
+  pub fn isLoop() = bool(self.forEach)
+
+  @override @noParamCheck
+  pub fn getLoopCollection(call: call) = self.buildStep(self.forEach, call, "i")

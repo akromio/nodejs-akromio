@@ -76,10 +76,6 @@ suite(__filename, () => {
                 ["macro"]: "mymacro",
                 ["steps"]: []
               }, {
-                ["loop"]: "myloop",
-                ["forEach"]: ["list", 1, 2, 3, 4],
-                ["steps"]: []
-              }, {
                 ["co"]: "myco",
                 ["steps"]: []
               }]

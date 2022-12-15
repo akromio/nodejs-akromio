@@ -97,4 +97,4 @@ fn getPluginName(decl: map) = decl.plugin
 /**
  * Returns the name of a given job declaration.
  */
-fn getJobName(decl: map) = decl.macro ?? decl.loop ?? decl.co
+fn getJobName(decl: map) = decl.macro ?? decl.co

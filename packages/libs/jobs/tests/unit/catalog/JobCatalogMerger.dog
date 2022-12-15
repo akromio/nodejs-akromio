@@ -26,7 +26,7 @@ suite(__filename, proc()
             {plugin = "myplugin", impl = "plugin"}
           ]
           jobs = [
-            {loop = "myloop", steps = []}
+            {macro = "mymacro", steps = []}
             {co = "myco", steps = []}
           ]
         }
@@ -48,7 +48,7 @@ suite(__filename, proc()
         ]
 
         jobs = [
-          {loop = "myloop", steps = []}
+          {macro = "mymacro", steps = []}
           {co = "myco", steps = []}
         ]
       )

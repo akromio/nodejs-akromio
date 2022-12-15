@@ -171,5 +171,42 @@ suite(__filename, () => {
         });
       }
     });
+    suite("getLoopCollection()", () => {
+      {
+        test("when called, a list must be returned", () => {
+          {
+            const op = Action({
+              'name': "list",
+              'fun': _core.dogma.nop(),
+              'operator': ActionOperator()
+            });
+            const ops = Ops().appendOp(op);
+            const forEach = ["list", "file1", "file2"];
+            const steps = [];
+            const loop = CatalogMacro({
+              'name': "test",
+              'forEach': forEach,
+              'steps': steps,
+              'ops': ops,
+              'operator': operator
+            });
+            const call = Call({
+              'op': loop,
+              'dataset': dataset,
+              'onError': onError,
+              'title': title,
+              'log': log,
+              'ctx': ctx
+            });
+            const out = loop.getLoopCollection(call);
+            expected(out).toBeMap().toHave({
+              'args': ["file1", "file2"],
+              'onError': "carryOn",
+              'resultVarName': "i"
+            }).member("op").toBe(Action);
+          }
+        });
+      }
+    });
   }
 });
