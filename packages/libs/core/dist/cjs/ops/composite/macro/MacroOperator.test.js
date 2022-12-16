@@ -3,21 +3,17 @@
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
+  monitor,
   simulator
 } = _core.dogma.use(require("@akromio/doubles"));
 const {
   GlobalDataset,
   LocalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  monitor
-} = _core.dogma.use(require("@akromio/doubles"));
-const {
-  DynamicMacro,
-  MacroOperator,
-  StaticAction,
-  ActionOperator
-} = _core.dogma.use(require("../../../../.."));
+const DynamicMacro = _core.dogma.use(require("./DynamicMacro"));
+const MacroOperator = _core.dogma.use(require("./MacroOperator"));
+const StaticAction = _core.dogma.use(require("../../simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../../simple/action/ActionOperator"));
 suite(__filename, () => {
   {
     const globalDataset = GlobalDataset({
@@ -34,11 +30,11 @@ suite(__filename, () => {
                 /* c8 ignore start */
                 if (_ == null) _ = {};
                 /* c8 ignore stop */ /* c8 ignore start */
-                if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__(_); /* c8 ignore stop */
+                if (this._pvt_790b24bc2cc751fb15e276722215820a___init__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___init__(_); /* c8 ignore stop */
                 /* c8 ignore start */
-                if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__(); /* c8 ignore stop */
+                if (this._pvt_790b24bc2cc751fb15e276722215820a___post__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___post__(); /* c8 ignore stop */
                 /* c8 ignore start */
-                if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__(); /* c8 ignore stop */
+                if (this._pvt_790b24bc2cc751fb15e276722215820a___validate__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___validate__(); /* c8 ignore stop */
               }
             };
 
@@ -182,11 +178,11 @@ suite(__filename, () => {
                     /* c8 ignore start */
                     if (_ == null) _ = {};
                     /* c8 ignore stop */ /* c8 ignore start */
-                    if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__(_); /* c8 ignore stop */
+                    if (this._pvt_790b24bc2cc751fb15e276722215820a___init__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___init__(_); /* c8 ignore stop */
                     /* c8 ignore start */
-                    if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__(); /* c8 ignore stop */
+                    if (this._pvt_790b24bc2cc751fb15e276722215820a___post__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___post__(); /* c8 ignore stop */
                     /* c8 ignore start */
-                    if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__(); /* c8 ignore stop */
+                    if (this._pvt_790b24bc2cc751fb15e276722215820a___validate__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___validate__(); /* c8 ignore stop */
                   }
                 };
 
@@ -262,11 +258,11 @@ suite(__filename, () => {
                 /* c8 ignore start */
                 if (_ == null) _ = {};
                 /* c8 ignore stop */ /* c8 ignore start */
-                if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__(_); /* c8 ignore stop */
+                if (this._pvt_790b24bc2cc751fb15e276722215820a___init__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___init__(_); /* c8 ignore stop */
                 /* c8 ignore start */
-                if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__(); /* c8 ignore stop */
+                if (this._pvt_790b24bc2cc751fb15e276722215820a___post__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___post__(); /* c8 ignore stop */
                 /* c8 ignore start */
-                if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__(); /* c8 ignore stop */
+                if (this._pvt_790b24bc2cc751fb15e276722215820a___validate__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___validate__(); /* c8 ignore stop */
               }
             };
 
@@ -405,11 +401,11 @@ suite(__filename, () => {
                     /* c8 ignore start */
                     if (_ == null) _ = {};
                     /* c8 ignore stop */ /* c8 ignore start */
-                    if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___init__(_); /* c8 ignore stop */
+                    if (this._pvt_790b24bc2cc751fb15e276722215820a___init__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___init__(_); /* c8 ignore stop */
                     /* c8 ignore start */
-                    if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___post__(); /* c8 ignore stop */
+                    if (this._pvt_790b24bc2cc751fb15e276722215820a___post__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___post__(); /* c8 ignore stop */
                     /* c8 ignore start */
-                    if (this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__ instanceof Function) this._pvt_4e3267cac59d265ea027eb9b8df200c6___validate__(); /* c8 ignore stop */
+                    if (this._pvt_790b24bc2cc751fb15e276722215820a___validate__ instanceof Function) this._pvt_790b24bc2cc751fb15e276722215820a___validate__(); /* c8 ignore stop */
                   }
                 };
 

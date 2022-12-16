@@ -1,9 +1,11 @@
 use (
   alias://expected
-  {simulator} = alias://doubles
+  {monitor, simulator} = alias://doubles
   {GlobalDataset, LocalDataset} = alias://dataset
-  {monitor} = alias://doubles
-  {DynamicMacro, MacroOperator, StaticAction, ActionOperator} = ~
+  
+  DynamicMacro
+  MacroOperator
+  ../../simple/action/{StaticAction, ActionOperator}
 )
 
 suite(__filename, proc()

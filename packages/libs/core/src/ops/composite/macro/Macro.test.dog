@@ -1,0 +1,23 @@
+use (
+  alias://expected
+  MacroBase = Macro
+  MacroOperator
+)
+
+# Test macro.
+struct Macro: MacroBase
+
+suite(__filename, proc()
+  suite("getLoopCollection()", proc()
+    test("when non-looped macro, [] must be returned", proc()
+      # (1) act
+      const (
+        macro = Macro(name = "macro", operator = MacroOperator())
+        out = macro.getLoopCollection({})
+      )
+
+      # (2) assessment
+      expected(out).equalTo([])
+    end)
+  end)
+end)
