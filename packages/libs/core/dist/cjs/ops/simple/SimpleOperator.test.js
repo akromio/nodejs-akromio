@@ -9,11 +9,9 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  ActionOperator,
-  StaticAction,
-  Call
-} = _core.dogma.use(require("../../../.."));
+const ActionOperator = _core.dogma.use(require("./action/ActionOperator"));
+const StaticAction = _core.dogma.use(require("./action/StaticAction"));
+const Call = _core.dogma.use(require("../Call"));
 suite(__filename, () => {
   {
     const dataset = GlobalDataset({

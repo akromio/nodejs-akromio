@@ -1,0 +1,60 @@
+use (
+  alias://expected
+  dep://stream
+  {GlobalDataset, LocalDataset} = alias://dataset
+
+  CompositeOperatorBase = CompositeOperator
+  ../simple/action/{StaticAction, ActionOperator}
+  ../{Call, Context}
+)
+
+suite(__filename, proc()
+  const globalDataset = GlobalDataset(name = "global")
+
+  suite("_performSteps()", proc()
+    test("when a conditional step returning false, this must not be run", async proc()
+      # Test composite operator.
+      struct CompositeOperator: CompositeOperatorBase
+        pub fn performStep(step) = {{title} = step}
+
+      # (1) arrange
+      const (
+        optor = CompositeOperator()
+        dataset = LocalDataset(
+          name = "local"
+          parent = globalDataset
+        ).setDatumValue("isTrue", true).setDatumValue("isFalse", false)
+
+        log = native("new stream.Duplex()")
+        ctx = Context(log = nop)
+        call = Call(op = {}, title = "Conditional steps", dataset, onError = "finish", log, ctx)
+
+        steps = [
+          {
+            title = "1st step"
+            op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
+            args = 123
+            condition = "isFalse"
+            onError = "carryOn"
+          }
+
+          {
+            title = "2nd step"
+            op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+            args = 321
+            condition = "isTrue"
+            resultVarName = "2nd"
+            onError = "carryOn"
+          }
+        ]
+
+      )
+
+      # (2) act
+      const out = await(optor._performSteps(steps, call, []))
+
+      # (3) assessment
+      expected(out).equalTo([{title = "2nd step"}])
+    end)
+  end)
+end)

@@ -16,6 +16,7 @@ export struct Macro: CompositeOp
   pub fn isLoop() = false
 
   /**
-   * Returns the collection to iterate.
+   * Returns the collection to iterate using the given [call].
    */
+  @noParamCheck
   pub fn getLoopCollection(call: Call) = []

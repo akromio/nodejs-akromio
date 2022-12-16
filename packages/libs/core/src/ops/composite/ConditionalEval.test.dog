@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  ConditionalEval
+)
+
+
+suite(__filename, proc()
+  suite("eval()", proc()
+    const ceval = ConditionalEval().eval
+
+    test("when valid expression, its value must be returned", proc()
+      # (1) act
+      const (
+        ctx = {x = 2, y = 3}
+        out = ceval("x < 3", ctx)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+    end)
+  end)
+end)
