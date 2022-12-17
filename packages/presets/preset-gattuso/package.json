@@ -47,6 +47,7 @@
     "@akromio/pi-log": "^0.7.0",
     "@akromio/pi-merge": "^0.7.0",
     "@akromio/pi-path": "^0.7.0",
+    "@akromio/pi-random": "^0.7.0",
     "@akromio/pi-range": "^0.7.0",
     "@akromio/pi-select": "^0.7.0",
     "@akromio/pi-set": "^0.7.0",

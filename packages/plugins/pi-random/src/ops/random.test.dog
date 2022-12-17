@@ -1,0 +1,66 @@
+use (
+  alias://expected
+  op = random
+)
+
+const (
+  buildParams = op.parameterizer
+  buildTitle = op.title
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    test("when list, {start, stop} must be returned", proc()
+      # (1) act
+      const (
+        args = ["55000", "60000"]
+        out = buildParams(args)
+      )
+
+      # (2)  assessment
+      expected(out).equalTo(start = args[0], stop = args[1])
+    end)
+
+    test("when map, the same map must be returned", proc()
+      # (1) act
+      const (
+        args = {start = 55000, stop = 60000}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        start = 55000
+        stop = 60000
+        params = {start, stop}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"random: pseudo-random number between ${start} and ${stop}")
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when called, a pseudo-random number must be returned", proc()
+      # (1) act
+      const (
+        start = "55000"
+        stop = "60000"
+        params = {start, stop}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      expected(out).toBeNum().greaterThan(num(start)).lessThan(num(stop))
+    end)
+  end)
+end)
