@@ -11,7 +11,7 @@ const plugins = [
   "list", "log"
   "merge"
   "path"
-  "range"
+  "random", "range"
   "select", "set", "sleep"
   "text", "timestamp"
   "udp"

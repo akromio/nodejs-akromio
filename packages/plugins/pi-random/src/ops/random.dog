@@ -1,0 +1,34 @@
+export {
+  desc = "Generates a pseudo-random number."
+  title = buildTitle
+  parameterizer = buildParams
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params.start = args[0]
+      params.stop = args[1]
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {start, stop}) = $"random: pseudo-random number between ${start} and ${stop}"
+
+/**
+ * Runs the operation
+ */
+fn handle(ctx=> {params}) -> random: num
+  const (
+    start = num(params.start)
+    stop = num(params.stop)
+    len = stop - start
+  )
+
+  random = Math.ceil(Math.random() * len) + start
