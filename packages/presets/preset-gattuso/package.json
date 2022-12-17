@@ -53,6 +53,7 @@
     "@akromio/pi-sleep": "^0.7.0",
     "@akromio/pi-text": "^0.7.0",
     "@akromio/pi-timestamp": "^0.7.0",
+    "@akromio/pi-udp": "^0.7.0",
     "@akromio/pi-xdg": "^0.7.0",
     "@akromio/pi-yaml": "^0.7.0",
     "@dogmalang/core": "^1.0.0-rc18.0"

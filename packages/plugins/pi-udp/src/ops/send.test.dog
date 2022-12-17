@@ -1,0 +1,91 @@
+use (
+  alias://expected
+  dep://dgram
+
+  op = send
+)
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handle = op.fun
+  )
+
+  suite("buildParams()", proc()
+    test("when list, {msg, addr, port} must be returned", proc()
+      # (1) act
+      const (
+        msg = "hello"
+        addr = "127.0.0.1"
+        port = "65"
+        args = [msg, addr, port]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(msg=, addr, port)
+    end)
+
+    test("when map, that map must be returned", proc()
+      # (1) act
+      const (
+        msg = "hello"
+        addr = "127.0.0.1"
+        port = "65"
+        args = {msg, addr, port}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, a title must be returned", proc()
+      # (1) act
+      const (
+        params = {msg = "hello", addr = "localhost", port = 12345}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"udp: send to '${params.addr}:${params.port}'")
+    end)
+  end)
+
+  suite("handle()", proc()
+    var server
+
+    teardown(proc()
+      if server then
+        server.close()
+        server = nil
+    end)
+
+    test("when called, a message must be sent", async proc()
+      # (1) arrange
+      var (
+        out
+        msg ::= "hello!"
+        serverAddr ::= "localhost"
+        serverPort ::= 36987
+      )
+
+      server = dgram.createSocket('type' = "udp4")
+      server.bind(serverPort, serverAddr)
+      server.on("message", proc(msg) out = msg.toString() end)
+
+      # (2) act
+      const params = {msg, addr = serverAddr, port = serverPort}
+
+      await(sleep("50ms"))   # for listening
+      await(handle({params}))
+      await(sleep("50ms"))   # for receiving
+
+      # (3) assessment
+      expected(out).equalTo(msg)
+    end)
+  end)
+end)

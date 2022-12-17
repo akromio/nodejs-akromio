@@ -1,0 +1,44 @@
+use (
+  dep://dgram
+)
+
+export {
+  desc = "Sends a datagram."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params.msg = args[0]
+      params.addr = args[1]
+      params.port = args[2]
+    else
+      params = args
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {addr, port}) = $"udp: send to '${addr}:${port}'"
+
+/**
+ * Runs the operation
+ */
+async fn handle(ctx=> {params})
+  # (1) arrange
+  const (
+    {msg, addr, port} = params
+    opts = {'type' = "udp4"}
+    socket = dgram.createSocket(opts)
+  )
+
+  # (2) send
+  pawait(socket.send(msg, num(port), addr))
+  
+  async with {delay = "5ms"} # for finishing the sending
+    socket.close()
