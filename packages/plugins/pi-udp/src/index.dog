@@ -1,0 +1,7 @@
+export {
+  plugin = "udp"
+  desc = "Plugin for working with UDP."
+  tags = ["builtin", "net", "udp"]
+  ops =
+    send = use("./ops/send")
+}
