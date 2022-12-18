@@ -1,0 +1,41 @@
+use (
+  {setTimeout} = dep://timers/promises
+)
+
+export {
+  desc = "Sleeps until a given datetime."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params.datetime = timestamp(args[0])
+    if text, num then
+      params.datetime = timestamp(args)
+    else
+      params.datetime = timestamp(args.datetime)
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {datetime}) = $"sleep: until '${datetime}'"
+
+/**
+ * Runs the operation
+ */
+@async
+fn handle(ctx=> {params})
+  # (1) set delay
+  const (
+    {datetime} = params
+    delay = datetime.valueOf() - timestamp().valueOf()
+  )
+
+  # (2) wait
+  return setTimeout(delay, nop)

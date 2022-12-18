@@ -5,4 +5,5 @@ export {
   defaultOpName = "sleep"
   ops =
     sleep = use("./ops/sleep")
+    'until' = use("./ops/until")
 }

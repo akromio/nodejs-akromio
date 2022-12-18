@@ -1,0 +1,88 @@
+use (
+  alias://expected
+  op = 'until'
+)
+
+const (
+  buildParams = op.parameterizer
+  buildTitle = op.title
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    test("when list, {datetime = timestamp(args[0])} must be returned", proc()
+      # (1) act
+      const (
+        args = [text(timestamp())]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out.datetime).toBeTimestamp()
+    end)
+
+    test("when text, {datetime: timestamp} must be returned", proc()
+      # (1) act
+      const (
+        args = text(timestamp())
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out.datetime).toBeTimestamp()
+    end)
+
+    test("when num, {datetime: timestamp} must be returned", proc()
+      # (1) act
+      const (
+        args = timestamp().valueOf()
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out.datetime).toBeTimestamp()
+    end)
+
+    test("when map, {datetime: timestamp} must be returned", proc()
+      # (1) act
+      const (
+        args = {datetime = timestamp().valueOf()}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out.datetime).toBeTimestamp()
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, title must be returned", proc()
+      # (1) act
+      const (
+        params = {datetime = timestamp()}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).like("sleep: until '.{10,}'")
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when called, wait performed", async proc()
+      # (1) act
+      const (
+        now = timestamp()
+        delay = 750
+        params = {datetime = timestamp(now.valueOf() + delay)}
+      )
+
+      await(handle({params}))
+
+      # (2) assessment
+      expected(timestamp().valueOf()).greaterThanOrEqualTo(now.valueOf() + delay)
+      expected()
+    end)
+  end)
+end)
