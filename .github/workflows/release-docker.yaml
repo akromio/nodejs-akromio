@@ -40,6 +40,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./docker/alpine
-          build-args: version=${{ version }}
+          build-args: version=${{ env.version }}
           push: true
-          tags: akromio/gattuso:latest,akromio/gattuso:${{ version }}
+          tags: akromio/gattuso:latest,akromio/gattuso:${{ env.version }}
