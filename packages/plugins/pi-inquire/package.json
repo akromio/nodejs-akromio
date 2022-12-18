@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-inquire",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Plugin for doing questions to the user on Akromio.",
   "author": {
     "name": "Sia Codelabs",
@@ -33,7 +33,7 @@
     "npm": ">= 6"
   },
   "dependencies": {
-    "@akromio/inquirer": "^0.7.0",
+    "@akromio/inquirer": "^0.8.0",
     "@dogmalang/core": "^1.0.0-rc18.0"
   },
   "scripts": {
