@@ -1,16 +1,17 @@
 use (
   alias://expected
-  pkg = ~
+  index
 )
 
 suite(__filename, proc()
   test("when imported, api must be exported", proc()
-    expected(pkg).toHave(
+    expected(index).toHave(
       plugin = "sleep"
       tags = ["built-in"]
       defaultOpName = "sleep"
     ).member("ops").toHave(
       "sleep"
+      "until"
     )
   end)
 end)

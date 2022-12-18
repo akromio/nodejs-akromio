@@ -7,6 +7,7 @@ module.exports = exports = {
   ["tags"]: ["built-in"],
   ["defaultOpName"]: "sleep",
   ["ops"]: {
-    ["sleep"]: _core.dogma.use(require("./ops/sleep"))
+    ["sleep"]: _core.dogma.use(require("./ops/sleep")),
+    ["until"]: _core.dogma.use(require("./ops/until"))
   }
 };

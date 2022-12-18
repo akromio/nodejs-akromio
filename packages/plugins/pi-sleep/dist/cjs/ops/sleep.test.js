@@ -2,13 +2,12 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const pi = _core.dogma.use(require("../../.."));
+const op = _core.dogma.use(require("./sleep"));
+const buildParams = op.parameterizer;
+const buildTitle = op.title;
+const handle = op.fun;
 suite(__filename, () => {
   {
-    const op = pi.ops.sleep;
-    const buildParams = op.parameterizer;
-    const buildTitle = op.title;
-    const handler = op.fun;
     suite("buildParams()", () => {
       {
         test("when text, {duration} must be returned", () => {
@@ -56,13 +55,13 @@ suite(__filename, () => {
         });
       }
     });
-    suite("handler()", () => {
+    suite("handle()", () => {
       {
         test("when called, sleep must be performed", async () => {
           {
             const duration = "1s";
             const started = (0, _core.timestamp)();
-            const out = (0, await handler({
+            const out = (0, await handle({
               'params': {
                 ["duration"]: duration
               }

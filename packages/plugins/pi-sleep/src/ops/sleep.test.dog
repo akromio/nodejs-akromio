@@ -1,16 +1,15 @@
 use (
   alias://expected
-  pi = ~
+  op = sleep
+)
+
+const (
+  buildParams = op.parameterizer
+  buildTitle = op.title
+  handle = op.fun
 )
 
 suite(__filename, proc()
-  const (
-    op = pi.ops.sleep
-    buildParams = op.parameterizer
-    buildTitle = op.title
-    handler = op.fun
-  )
-
   suite("buildParams()", proc()
     test("when text, {duration} must be returned", proc()
       # (1) act
@@ -62,13 +61,13 @@ suite(__filename, proc()
     end)
   end)
 
-  suite("handler()", proc()
+  suite("handle()", proc()
     test("when called, sleep must be performed", async proc()
       # (1) act
       const (
         duration = "1s"
         started = timestamp()
-        out = await(handler(params = {duration}))
+        out = await(handle(params = {duration}))
         ended = timestamp()
       )
 
