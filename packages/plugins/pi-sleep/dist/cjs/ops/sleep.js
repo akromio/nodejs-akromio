@@ -5,7 +5,7 @@ module.exports = exports = {
   ["desc"]: "Sleeps.",
   ["title"]: buildTitle,
   ["parameterizer"]: buildParams,
-  ["fun"]: handler
+  ["fun"]: handle
 };
 function buildParams(args) {
   let params = {}; /* c8 ignore next */
@@ -43,7 +43,7 @@ function buildTitle(params) {
     return `sleep: for '${duration}'`;
   }
 }
-function handler(ctx) {
+function handle(ctx) {
   /* c8 ignore next */_core.dogma.expect("ctx", ctx, _core.map);
   let {
     params

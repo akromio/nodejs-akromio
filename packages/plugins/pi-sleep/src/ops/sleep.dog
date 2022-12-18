@@ -2,7 +2,7 @@ export {
   desc = "Sleeps."
   title = buildTitle
   parameterizer = buildParams
-  fun = handler
+  fun = handle
 }
 
 /**
@@ -23,4 +23,4 @@ fn buildTitle(params=> {duration}) = $"sleep: for '${duration}'"
  * Generates the hash and returns it in hexadecimal.
  */
 @async
-fn handler(ctx=> {params}) = sleep(params.duration)
+fn handle(ctx=> {params}) = sleep(params.duration)
