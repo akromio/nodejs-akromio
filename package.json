@@ -37,10 +37,9 @@
     "test": "npm run -ws test",
     "test/itg": "npm run -ws --if-present test/itg",
     "tests": "npm t; npm run test/itg",
-    "cov": "npm run -ws cov"
-  },
-  "dependencies": {
-    "@akromio/cli": "^0.0.0",
-    "term-size": "^2.2.1"
+    "cov": "npm run -ws cov",
+    "docker/build": "scripts/docker-build.sh",
+    "docker/push": "scripts/docker-push.sh",
+    "docker/login": "sudo docker login -u akromio --password-stdin < docker-hub-token.txt"
   }
 }
