@@ -38,7 +38,7 @@ function buildTitle(params) {
     return `udp: send to '${addr}:${port}'`;
   }
 }
-async function handle(ctx) {
+function handle(ctx) {
   /* c8 ignore next */_core.dogma.expect("ctx", ctx, _core.map);
   let {
     params
@@ -53,9 +53,10 @@ async function handle(ctx) {
       ["type"]: "udp4"
     };
     const socket = dgram.createSocket(opts);
-    await _core.dogma.pawait(() => socket.send(msg, (0, _core.num)(port), addr));
-    _core.dogma.asyncly(async () => {
-      socket.close();
-    }, "5ms");
+    socket.send(msg, (0, _core.num)(port), addr, () => {
+      {
+        socket.close();
+      }
+    });
   }
 }
