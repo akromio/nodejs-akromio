@@ -29,7 +29,7 @@ fn buildTitle(params=> {addr, port}) = $"udp: send to '${addr}:${port}'"
 /**
  * Runs the operation
  */
-async fn handle(ctx=> {params})
+fn handle(ctx=> {params})
   # (1) arrange
   const (
     {msg, addr, port} = params
@@ -38,7 +38,4 @@ async fn handle(ctx=> {params})
   )
 
   # (2) send
-  pawait(socket.send(msg, num(port), addr))
-  
-  async with {delay = "5ms"} # for finishing the sending
-    socket.close()
+  socket.send(msg, num(port), addr, proc() socket.close() end)
