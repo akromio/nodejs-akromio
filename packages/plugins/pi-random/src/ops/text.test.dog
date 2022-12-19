@@ -1,0 +1,86 @@
+use (
+  alias://expected
+  op = text
+)
+
+const (
+  buildParams = op.parameterizer
+  buildTitle = op.title
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    test("when text, {min = num(text), max = num(text)} must be returned", proc()
+      # (1) act
+      const (
+        args = "15"
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(min = num(args), max = num(args))
+    end)
+
+    test("when [len], {min = num(list[0]), max = num(list[0])} must be returned", proc()
+      # (1) act
+      const (
+        it = "15"
+        out = buildParams([it])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(min = num(it), max = num(it))
+    end)
+
+    test("when [min, max], {min = num(list[0]), max = num(list[1])} must be returned", proc()
+      # (1) act
+      const (
+        min = "15"
+        max = "20"
+        out = buildParams([min, max])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(min = num(min), max = num(max))
+    end)
+
+    test("when {min, max}, {min, max} must be returned", proc()
+      # (1) act
+      const (
+        min = "15"
+        max = "20"
+        out = buildParams({min, max})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(min = num(min), max = num(max))
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, title must be returned", proc()
+      # (1) act
+      const (
+        params = {min = 10, max = 15}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"random: text with len between ${params.min} and ${params.max}")
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when called, a random text must be returned", proc()
+      # (1) act
+      const (
+        params = {min = 10, max = 15}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      expected(out).toBeText().len().between(params.min, params.max)
+    end)
+  end)
+end)

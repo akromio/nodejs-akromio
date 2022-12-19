@@ -11,6 +11,7 @@ suite(__filename, proc()
       defaultOpName = "random"
     ).member("ops").toHave(
       "random"
+      "text"
     )
   end)
 end)

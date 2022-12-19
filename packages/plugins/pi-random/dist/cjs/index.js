@@ -7,6 +7,7 @@ module.exports = exports = {
   ["tags"]: ["built-in"],
   ["defaultOpName"]: "random",
   ["ops"]: {
-    ["random"]: _core.dogma.use(require("./ops/random"))
+    ["random"]: _core.dogma.use(require("./ops/random")),
+    ["text"]: _core.dogma.use(require("./ops/text"))
   }
 };

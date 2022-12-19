@@ -1,3 +1,7 @@
+use (
+  random = _random
+)
+
 export {
   desc = "Generates a pseudo-random number."
   title = buildTitle
@@ -9,12 +13,15 @@ export {
  * Builds params from args.
  */
 fn buildParams(args?) -> params: map
+  # (1) get start and stop
+  var start, stop
+
   with type(args) do
-    if list then
-      params.start = args[0]
-      params.stop = args[1]
-    else
-      params = args
+    if list then [start, stop] = args
+    else {start, stop} = args
+  
+  # (2) create params
+  params.{start = num(start), stop = num(stop)}
 
 /**
  * Builds the title from the parameters.
@@ -24,11 +31,4 @@ fn buildTitle(params=> {start, stop}) = $"random: pseudo-random number between $
 /**
  * Runs the operation
  */
-fn handle(ctx=> {params}) -> random: num
-  const (
-    start = num(params.start)
-    stop = num(params.stop)
-    len = stop - start
-  )
-
-  random = Math.ceil(Math.random() * len) + start
+fn handle(ctx=> {params}) = random(params.start, params.stop)

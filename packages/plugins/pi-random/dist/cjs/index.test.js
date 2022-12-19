@@ -11,7 +11,7 @@ suite(__filename, () => {
           'plugin': "random",
           'tags': ["built-in"],
           'defaultOpName': "random"
-        }).member("ops").toHave("random");
+        }).member("ops").toHave("random", "text");
       }
     });
   }

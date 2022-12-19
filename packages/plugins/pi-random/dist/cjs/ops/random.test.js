@@ -15,8 +15,8 @@ suite(__filename, () => {
             const args = ["55000", "60000"];
             const out = buildParams(args);
             expected(out).equalTo({
-              'start': _core.dogma.getItem(args, 0),
-              'stop': _core.dogma.getItem(args, 1)
+              'start': (0, _core.num)(_core.dogma.getItem(args, 0)),
+              'stop': (0, _core.num)(_core.dogma.getItem(args, 1))
             });
           }
         });
@@ -24,10 +24,13 @@ suite(__filename, () => {
           {
             const args = {
               ["start"]: 55000,
-              ["stop"]: 60000
+              ["stop"]: "60000"
             };
             const out = buildParams(args);
-            expected(out).sameAs(args);
+            expected(out).equalTo({
+              'start': args.start,
+              'stop': (0, _core.num)(args.stop)
+            });
           }
         });
       }
@@ -52,8 +55,8 @@ suite(__filename, () => {
       {
         test("when called, a pseudo-random number must be returned", () => {
           {
-            const start = "55000";
-            const stop = "60000";
+            const start = 55000;
+            const stop = 60000;
             const params = {
               ["start"]: start,
               ["stop"]: stop
@@ -61,7 +64,7 @@ suite(__filename, () => {
             const out = handle({
               ["params"]: params
             });
-            expected(out).toBeNum().greaterThan((0, _core.num)(start)).lessThan((0, _core.num)(stop));
+            expected(out).toBeNum().between(start, stop);
           }
         });
       }
