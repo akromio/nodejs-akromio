@@ -1,0 +1,18 @@
+use (
+  alias://expected
+  random = _random
+)
+
+suite(__filename, proc()
+  text("when called with start and stop, a number between these must be returned", proc()
+    # (1) act
+    const (
+      start = 0
+      stop = 10
+      out = random(start, stop)
+    )
+
+    # (2) assessment
+    expected(out).toBeNum().between(start, stop)
+  end)
+end)

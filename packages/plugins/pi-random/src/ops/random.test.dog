@@ -19,18 +19,18 @@ suite(__filename, proc()
       )
 
       # (2)  assessment
-      expected(out).equalTo(start = args[0], stop = args[1])
+      expected(out).equalTo(start = num(args[0]), stop = num(args[1]))
     end)
 
     test("when map, the same map must be returned", proc()
       # (1) act
       const (
-        args = {start = 55000, stop = 60000}
+        args = {start = 55000, stop = "60000"}
         out = buildParams(args)
       )
 
       # (2) assessment
-      expected(out).sameAs(args)
+      expected(out).equalTo(start = args.start, stop = num(args.stop))
     end)
   end)
 
@@ -53,14 +53,14 @@ suite(__filename, proc()
     test("when called, a pseudo-random number must be returned", proc()
       # (1) act
       const (
-        start = "55000"
-        stop = "60000"
+        start = 55000
+        stop = 60000
         params = {start, stop}
         out = handle({params})
       )
 
       # (2) assessment
-      expected(out).toBeNum().greaterThan(num(start)).lessThan(num(stop))
+      expected(out).toBeNum().between(start, stop)
     end)
   end)
 end)

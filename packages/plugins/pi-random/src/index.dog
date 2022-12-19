@@ -5,4 +5,5 @@ export {
   defaultOpName = "random"
   ops =
     random = use("./ops/random")
+    text = use("./ops/text")
 }

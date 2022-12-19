@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const random = _core.dogma.use(require("./_random"));
 module.exports = exports = {
   ["desc"]: "Generates a pseudo-random number.",
   ["title"]: buildTitle,
@@ -10,19 +11,34 @@ module.exports = exports = {
 function buildParams(args) {
   let params = {};
   {
+    let start;
+    let stop;
     {
       const _ = args;
       if (_core.dogma.is(_, _core.list)) {
         {
-          params.start = _core.dogma.getItem(args, 0);
-          params.stop = _core.dogma.getItem(args, 1);
+          [start, stop] = _core.dogma.getArrayToUnpack(args, 2);
         }
       } else {
         {
-          params = args;
+          ({
+            start: start,
+            stop: stop
+          } = args);
         }
       }
     }
+    _core.dogma.update(params, {
+      name: "start",
+      visib: ".",
+      assign: "=",
+      value: (0, _core.num)(start)
+    }, {
+      name: "stop",
+      visib: ".",
+      assign: "=",
+      value: (0, _core.num)(stop)
+    });
   }
   return params;
 }
@@ -37,16 +53,11 @@ function buildTitle(params) {
   }
 }
 function handle(ctx) {
-  let random = 0; /* c8 ignore next */
-  _core.dogma.expect("ctx", ctx, _core.map);
+  /* c8 ignore next */_core.dogma.expect("ctx", ctx, _core.map);
   let {
     params
   } = ctx;
   {
-    const start = (0, _core.num)(params.start);
-    const stop = (0, _core.num)(params.stop);
-    const len = stop - start;
-    random = Math.ceil(Math.random() * len) + start;
+    return random(params.start, params.stop);
   }
-  return random;
 }

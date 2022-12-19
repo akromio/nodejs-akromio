@@ -1,0 +1,4 @@
+/**
+ * Generates a random number between [start] and [stop].
+ */
+export fn _random(start: num, stop: num) = Math.ceil(Math.random() * (stop - start)) + start

@@ -1,0 +1,53 @@
+use (
+  random = _random
+)
+
+export {
+  desc = "Generates a random text."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handle
+}
+
+/**
+ * The alphabet to use in the generation.
+ */
+const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789"
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  # (1) get parameters
+  var min, max
+  
+  with type(args) do
+    if text then
+      min = max = args
+
+    if list then
+      with len(args) do
+        if 1 then min = max = args[0]
+        if 2 then [min, max] = args
+      
+    else
+      {min, max} = args
+  
+  # (2) create params
+  params.{min = num(min), max = num(max)}
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {min, max}) = $"random: text with len between ${min} and ${max}"
+
+/**
+ * Runs the operation
+ */
+fn handle(ctx=> {params}) -> txt: text
+  # (1) get text len
+  const size = random(params.min, params.max)
+
+  # (2) generate text
+  for i = 0; i < size; i += 1 do
+    txt += alphabet[random(0, len(alphabet) - 1)]
