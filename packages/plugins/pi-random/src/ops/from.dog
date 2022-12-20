@@ -1,0 +1,41 @@
+export {
+  desc = "Returns an item from a list randomly."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  # (1) build params
+  with type(args) do
+    if list then
+      if len(args) == 1 and args[0] is list then
+        params.array = args[0]
+      else
+        params.array = args
+    
+    else
+      params = args
+  
+  # (2) check params
+  if params.array is not list then
+    throw(TypeError("random.from: array expected."))
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {array}) = $"random: from list with len ${len(array)}"
+
+/**
+ * Runs the operation
+ */
+fn handle(ctx=> {params})
+  const (
+    {array} = params
+    i = Math.floor(Math.random() * len(array))
+  )
+
+  return array[i]
