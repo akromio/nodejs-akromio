@@ -23,14 +23,14 @@ const $CompositeOp = class CompositeOp extends Op {
       enumerable: true
     });
     /* c8 ignore start */
-    if (_['local'] != null) (0, _core.expect)('local', _['local'], _core.dogma.TypeDef({
+    if (_['dataset'] != null) (0, _core.expect)('dataset', _['dataset'], _core.dogma.TypeDef({
       name: 'inline',
       types: [_core.map],
       min: 0,
       max: null
     })); /* c8 ignore stop */
-    Object.defineProperty(this, 'local', {
-      value: (0, _core.coalesce)(_['local'], []),
+    Object.defineProperty(this, 'dataset', {
+      value: (0, _core.coalesce)(_['dataset'], []),
       writable: false,
       enumerable: true
     });

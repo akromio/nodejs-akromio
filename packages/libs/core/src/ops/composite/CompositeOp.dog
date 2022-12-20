@@ -34,7 +34,7 @@ export struct CompositeOp: Op
    * The local data declarations to create locally
    * in the dataset for each run.
    */
-  pub const local: map[] = []
+  pub const dataset: map[] = []
 
   /**
    * Returns the initializer steps.

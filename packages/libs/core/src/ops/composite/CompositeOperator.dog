@@ -23,12 +23,13 @@ export struct CompositeOperator: Operator
 
     # (2) create local dataset
     const (
-      local = [{
+      localDataset = [{
         const = "params"
         value = params
         desc = "The arguments passed to the operation."
-      }].concat(op.local)
-      dataset = DatasetParser().parse(local, name = "local", parent = opts.dataset)
+      }].concat(op.dataset)
+      
+      dataset = DatasetParser().parse(localDataset, name = "local", parent = opts.dataset)
     )
 
     # (3) create call
