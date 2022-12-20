@@ -2,6 +2,8 @@ export {
   plugin = "timestamp"
   desc = "Plugin for working with timestamps."
   tags = ["built-in"]
+  defaultOpName = "now"
   ops =
+    from = use("./ops/from")
     now = use("./ops/now")
 }

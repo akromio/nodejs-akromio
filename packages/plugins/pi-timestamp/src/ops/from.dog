@@ -1,0 +1,47 @@
+export {
+  desc = "Returns a timestamp from a given datetime."
+  parameterizer = buildParams
+  title = buildTitle
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  # (1) build
+  with type(args) do
+    if list then
+      params.datetime = args[0]
+    if text then
+      params.datetime = args
+    else
+      params = args
+  
+  # (2) check
+  if dt ::= params.datetime; dt != nil and dt is not [num, text] then
+    throw(TypeError($"timestamp.from: datetime must be nothing, num or text. Got: ${dt}."))
+
+/**
+ * Builds the title from the parameters.
+ */
+fn buildTitle(params=> {datetime}) = $"timestamp: from '${datetime}'"
+
+/**
+ * Runs the operation
+ */
+fn handle(ctx=> {params}) -> ts
+  const {datetime} = params
+  
+  with type(datetime) do
+    if num then
+      ts = timestamp(datetime).valueOf()
+    
+    if text then
+      if datetime like "^[0-9]{2}:[0-9]{2}$" then
+        ts = native("new Date([new Date().toISOString().slice(0, 10), datetime])").valueOf()
+      else
+        ts = native("new Date(datetime)").valueOf()
+
+    else
+      ts = timestamp().valueOf()

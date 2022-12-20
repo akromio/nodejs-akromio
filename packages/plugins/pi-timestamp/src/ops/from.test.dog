@@ -1,0 +1,121 @@
+use (
+  alias://expected
+  op = from
+)
+
+const (
+  buildParams = op.parameterizer
+  buildTitle = op.title
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    test("when [], {datetime = nil} must be returned", proc()
+      # (1) act
+      const (
+        args = []
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(datetime = nil)
+    end)
+
+    test("when [datetime], {datetime} must be returned", proc()
+      # (1) act
+      const (
+        args = ["2022-12-20T08:35"]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(datetime = args[0])
+    end)
+
+    test("when text, {datetime = text} must be returned", proc()
+      # (1) act
+      const (
+        args = "2022-12-20T08:36"
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(datetime = args)
+    end)
+
+    test("when {datetime is not text | num | nil}, error must be raised", proc()
+      # (1) act
+      const (
+        args = {datetime = true}
+        out = peval(buildParams(args))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(TypeError("timestamp.from: datetime must be nothing, num or text. Got: true."))
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, title must be returned", proc()
+      # (1) act
+      const (
+        params = {datetime = "2022-12-20T08:40"}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"timestamp: from '${params.datetime}'")
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when nothing, now must be returned", proc()
+      # (1) act
+      const (
+        now = timestamp().valueOf()
+        params = {}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      expected(out).toBeNum().greaterThanOrEqualTo(now)
+    end)
+
+    test("when datetime is num, its timestamp must be returned", proc()
+      # (1) act
+      const (
+        params = {datetime = 1671522130876}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(params.datetime)
+    end)
+
+    test("when hh:mm, today at the given time must be returned", proc()
+      # (1) act
+      const (
+        params = {datetime = "08:43"}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      const e = native("new Date([new Date().toISOString().slice(0, 10), '08:43'])").valueOf()
+      expected(out).equalTo(e)
+    end)
+
+    test("when datetime is text, the given time must be returned", proc()
+      # (1) act
+      const (
+        params = {datetime = "2022-12-20T09:00"}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      expected(out).equalTo(native("new Date(params.datetime).valueOf()"))
+    end)
+  end)
+end)
