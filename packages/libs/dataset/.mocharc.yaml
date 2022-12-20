@@ -1,8 +1,9 @@
+ui: tdd
+timeout: 2000
+
 extension:
   - js
+
 spec:
-  - __tests__/**/*.js
-timeout: 2000
-ui: tdd
-ignore:
-  - "**/*/__init__.js"
+  - "**/*.test.js"
+  

@@ -1,0 +1,79 @@
+use (
+  alias://expected
+  GlobalDataset
+)
+
+suite(__filename, proc()
+  suite("eval()", proc()
+    const (
+      ds = GlobalDataset(name = "global")
+    )
+
+    setup(proc()
+      ds.setDatumValue("hello", "hola")
+      ds.setDatumValue("num", 123)
+    end)
+
+    for each arg in [123, false, nop, nil, undefined] do
+      test($"when exp is ${typename(arg)}, this must be returned", proc()
+        # (1) act
+        const out = ds.eval(arg)
+
+        # (2) assessment
+        expected(out).equalTo(arg)
+      end)
+
+    suite("when text", proc()
+      test("when expressions, these must be evaluated and their values returned", proc()
+        # (1) act
+        const out = ds.eval("$(hello) != $(num)", ds)
+
+        # (2) assessment
+        expected(out).equalTo("hola != 123")
+      end)
+
+      test("when only $(*), the datasource repr must be returned", proc()
+        # (1) act
+        const out = ds.eval("$(*)", ds)
+
+        # (2) assessment
+        expected(out).equalTo(
+          hello = "hola"
+          num = 123
+        )
+      end)
+
+      test("when only $(id), its value must be returned", proc()
+        # (1) act
+        const out = ds.eval("$(num)", ds)
+
+        # (2) assessment
+        expected(out).equalTo(123)
+      end)
+
+      test("when exp contains no ref, this must be returned", proc()
+        # (1) acrt
+        const out = ds.eval("${hello} != ${num}", ds)
+
+        # (2) assessment
+        expected(out).equalTo("${hello} != ${num}")
+      end)
+    end)
+
+    test("when exp is a list, its items must be evaluated", proc()
+      # (1) act
+      const out = ds.eval(["$(num)21", 123456])
+
+      # (2) assessment
+      expected(out).equalTo(["12321", 123456])
+    end)
+
+    test("when exp is a map, its items must be evaluated", proc()
+      # (1) act
+      const out = ds.eval(x = "$(num)21", y = 123456)
+
+      # (2) assessment
+      expected(out).equalTo(x = "12321", y = 123456)
+    end)
+  end)
+end)

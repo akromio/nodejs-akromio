@@ -51,8 +51,14 @@ export struct DatasetParser
     else if "fn" in decl then
       Datum = DatumFn
       name = decl.fn
+    else if "input" in decl then
+      Datum = ConstDatum
+      name = decl.input
+      decl.value = "$(args." + name + ")"
+      decl.required = true
+      decl.tags = (decl.tags ?? []).concat("input")
     else
-      throw(TypeError($"Item of dataset declaration must contain var, const or fn. Got: ${fmt(decl)}."))
+      throw(TypeError($"Datum declaration must be 'const', 'fn', 'input' or 'var'. Got: ${fmt(decl)}."))
     
     # (2) create constraints
     const constraints = Constraints()
@@ -69,7 +75,9 @@ export struct DatasetParser
     # (3) parse value because it can contain an expression to evaluate
     var value = ds.eval(decl.value)
     if value == nil and "defaultValue" in decl then value = decl.defaultValue
-    constraints.validateValue(value)
+    
+    if [ok, err] ::= peval(constraints.validateValue(value)); not ok then
+      throw(TypeError($"Error on datum '${name}': ${err.message}"))
     
     # (4) create and add datum to datatset
     datum = Datum(decl{*, name, value, constraints})
