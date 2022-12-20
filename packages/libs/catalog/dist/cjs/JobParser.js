@@ -65,7 +65,7 @@ JobParser.prototype.parseJob = function (decl, opts) {
   _core.dogma.expect("opts", opts, ParseOpts);
   {
     {
-      const local = decl.local;
+      const local = decl.dataset;
       if (_core.dogma.is(local, _core.list)) {
         for (let i = 0; i < (0, _core.len)(local); i += 1) {
           {

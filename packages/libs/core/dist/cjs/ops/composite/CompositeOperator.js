@@ -41,12 +41,12 @@ CompositeOperator.prototype.createCall = function (op, args, opts) {
   _core.dogma.expect("opts", opts, CallOpts);
   {
     const params = opts.dataset.eval(args);
-    const local = [{
+    const localDataset = [{
       ["const"]: "params",
       ["value"]: params,
       ["desc"]: "The arguments passed to the operation."
-    }].concat(op.local);
-    const dataset = DatasetParser().parse(local, {
+    }].concat(op.dataset);
+    const dataset = DatasetParser().parse(localDataset, {
       'name': "local",
       'parent': opts.dataset
     });

@@ -1,0 +1,21 @@
+use (
+  alias://expected
+  ConstDatum, DatumError
+)
+
+suite(__filename, proc()
+  suite("setValue()", proc()
+    test("when setValue called, error must be raised", proc()
+      # (1) act
+      const (
+        datum = ConstDatum(name = "c", value = 123)
+        out = peval(datum.setValue(321))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(DatumError).like("The datum 'c' is not updatable.")
+    end)
+  end)
+end)

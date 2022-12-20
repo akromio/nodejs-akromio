@@ -1,0 +1,95 @@
+use (
+  alias://expected
+
+  ../datum/{VarDatum, ConstDatum}
+  GlobalDataset, LocalDataset, DatasetParser
+)
+
+suite(__filename, proc()
+  const (
+    inheritedDatum = ConstDatum(
+      name = "inherited"
+      value = "xyz"
+    )
+    globalDs = GlobalDataset(name = "global").setDatum(inheritedDatum)
+    parser = DatasetParser()
+  )
+
+  suite("parse()", proc()
+    test("when declaration contains valid declarations, a dataset must be returned with these", proc()
+      # (1) act
+      const (
+        args = {i1 = "input #1", i2 = "input #2"}
+        dataset = LocalDataset(name = "local", parent = globalDs).setDatum(ConstDatum(name = "args", value = args))
+        out = parser.parse(
+          [
+            {var = "v", value = 123, dataType = "num", desc = "A description."}
+            {const = "c", value = "$(v) 321", required = true}
+            {fn = "f", value = fn() = 123 end}
+            {var = "d", value = "$(unknown)", defaultValue = "this is the default"}
+            {var = "e", value = "one", options = ["one", "two", "three"]}
+            {input = "i1", desc = "input description."}
+            {input = "i2", tags = ["one"]}
+          ]
+          name = "local"
+          parent = dataset
+        )
+      )
+
+      # (2) assessment
+      expected(out).toBe("LocalDataset").toHave(name = "local")
+      expected(out.data).toHaveLen(7)
+      expected(out.data.v).toBe("VarDatum").toHave(value = 123, desc = "A description.")
+      expected(out.data.c).toBe("ConstDatum").toHave(value = "123 321")
+      expected(out.data.f).toBe("DatumFn").member("value").toBeFn()
+      expected(out.data.d).toBe("VarDatum").toHave(value = "this is the default")
+      expected(out.data.e).toBe("VarDatum").toHave(value = "one")
+      expected(out.data.i1).toBe("ConstDatum").toHave(value = "input #1", tags = ["input", "const"])
+      expected(out.data.i2).toBe("ConstDatum").toHave(value = "input #2", tags = ["one", "input", "const"])
+    end)
+
+    test("when local declaration collides with inherited data, the datum is set in local", proc()
+      # (1) act
+      const out = parser.parse(
+        [
+          {var = "inherited", value = "zyx"}
+        ]
+        name = "local"
+        parent = globalDs
+      )
+
+      # (2) assessment
+      expected(out.data.inherited).toBe(VarDatum).notSameAs(inheritedDatum)
+      expected(out.parent.data.inherited).sameAs(inheritedDatum)
+    end)
+
+    test("when declaration constains invalid item, an error must be raised", proc()
+      # (1) act
+      const out = peval(parser.parse(
+        [
+          {value = 123}
+        ]
+        name = "local"
+        parent = globalDs
+      ))
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(TypeError).like("Datum declaration must be 'const', 'fn', 'input' or 'var'. Got:")
+    end)
+
+    test("when input unset, error must be raised", proc()
+      # (1) act
+      const (
+        decl = [{input = "i"}]
+        out = peval(parser.parse(decl, name = "local", parent = globalDs))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).equalTo(TypeError("Error on datum 'i': A value is required."))
+    end)
+  end)
+end)

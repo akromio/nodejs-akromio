@@ -15,14 +15,14 @@ suite(__filename, proc()
       test("when simple macro, a macro instance must be returned", proc()
         # (1) act
         const (
-          decl = {macro = "test", local = ["v1", "v2"], steps = []}
+          decl = {macro = "test", dataset = ["v1", "v2"], steps = []}
           out = parser.parseJob(decl, ops=)
         )
 
         # (2) assessment
         expected(out).toBe("CatalogMacro").toHave(
           name = "test"
-          local = [{var = "v1"}, {var = "v2"}]
+          dataset = [{var = "v1"}, {var = "v2"}]
         )
 
         expected(out.isLoop()).equalTo(false)

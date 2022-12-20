@@ -69,8 +69,15 @@ DatasetParser.prototype.parseDatumDecl = function (decl, ds) {
     } else if (_core.dogma.includes(decl, "fn")) {
       Datum = DatumFn;
       name = decl.fn;
+    } else if (_core.dogma.includes(decl, "input")) {
+      var _decl$tags;
+      Datum = ConstDatum;
+      name = decl.input;
+      decl.value = "$(args." + name + ")";
+      decl.required = true;
+      decl.tags = ((_decl$tags = decl.tags) !== null && _decl$tags !== void 0 ? _decl$tags : []).concat("input");
     } else {
-      _core.dogma.raise(TypeError(`Item of dataset declaration must contain var, const or fn. Got: ${(0, _core.fmt)(decl)}.`));
+      _core.dogma.raise(TypeError(`Datum declaration must be 'const', 'fn', 'input' or 'var'. Got: ${(0, _core.fmt)(decl)}.`));
     }
     const constraints = Constraints();
     if (decl.required == true) {
@@ -90,7 +97,14 @@ DatasetParser.prototype.parseDatumDecl = function (decl, ds) {
     if (value == null && _core.dogma.includes(decl, "defaultValue")) {
       value = decl.defaultValue;
     }
-    constraints.validateValue(value);
+    {
+      const [ok, err] = _core.dogma.peval(() => {
+        return constraints.validateValue(value);
+      });
+      if (!ok) {
+        _core.dogma.raise(TypeError(`Error on datum '${name}': ${err.message}`));
+      }
+    }
     datum = Datum(_core.dogma.clone(decl, {
       "name": name,
       "value": value,

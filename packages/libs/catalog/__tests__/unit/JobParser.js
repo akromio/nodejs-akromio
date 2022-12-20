@@ -20,7 +20,7 @@ suite(__filename, () => {
               {
                 const decl = {
                   ["macro"]: "test",
-                  ["local"]: ["v1", "v2"],
+                  ["dataset"]: ["v1", "v2"],
                   ["steps"]: []
                 };
                 const out = parser.parseJob(decl, {
@@ -28,7 +28,7 @@ suite(__filename, () => {
                 });
                 expected(out).toBe("CatalogMacro").toHave({
                   'name': "test",
-                  'local': [{
+                  'dataset': [{
                     ["var"]: "v1"
                   }, {
                     ["var"]: "v2"

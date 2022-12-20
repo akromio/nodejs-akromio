@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  RequiredConstraint, ConstraintError
+)
+
+suite(__filename, proc()
+  suite("validateValue()", proc()
+    test("when value is nil, a constraint error must be raised", proc()
+      # (1) act
+      const out = peval(RequiredConstraint().validateValue(nil))
+
+      # (2) assessment
+      expected(out)\
+        .it(0).equalTo(false)\
+        .it(1).toBe(ConstraintError).like("A value is required.")
+    end)
+
+    test("when value is not nil, no error must be raised", proc()
+      RequiredConstraint().validateValue("hello!")
+    end)
+  end)
+end)

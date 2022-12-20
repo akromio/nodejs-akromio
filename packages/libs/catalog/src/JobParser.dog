@@ -39,7 +39,7 @@ export struct JobParser
    */
   pub fn parseJob(decl: map, opts: ParseOpts) -> job
     # (1) replace text item by map
-    if local ::= decl.local; local is list then
+    if local ::= decl.dataset; local is list then
       for i = 0; i < len(local); i += 1 do
         if datum ::= local[i]; datum is text then
           local[i] = {var = datum}

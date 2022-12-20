@@ -1,0 +1,107 @@
+use (
+  alias://expected
+
+  ../datum/VarDatum
+  GlobalDataset, LocalDataset
+)
+
+suite(__filename, proc()
+  suite("reprMap", proc()
+    test("when called, super and own data must be returned", proc()
+      # (1) act
+      const (
+        g = VarDatum(name = "g", value = 123)
+        globalDs = GlobalDataset(name = "global").setDatum(g)
+        l = VarDatum(name = "l", value = 321)
+        ds = LocalDataset(name = "local", parent = globalDs).setDatum(l)
+        out = ds.reprMap
+      )
+
+      # (2) assessment
+      expected(out).equalTo(g = 123, l = 321)
+    end)
+  end)
+
+  suite("getDatum()", proc()
+    var g, l, globalDs, ds
+
+    setup(proc()
+      g = VarDatum(name = "g", value = 123)
+      globalDs = GlobalDataset(name = "global").setDatum(g)
+      l = VarDatum(name = "l", value = 321)
+      ds = LocalDataset(name = "local", parent = globalDs).setDatum(l)
+    end)
+
+    test("when datum exists in local, this must be returned", proc()
+      # (1) act
+      const out = ds.getDatum("l")
+
+      # (2) assessment
+      expected(out).toBe(VarDatum).toHave(value = 321)
+    end)
+
+    test("when datum exists in parent, this must be returned", proc()
+      # (1) act
+      const out = ds.getDatum("g")
+
+      # (2) assessment
+      expected(out).toBe(VarDatum).toHave(value = 123)
+    end)
+
+    test("when datum unexists, nil must be returned", proc()
+      # (1) act
+      const out = ds.getDatum("unknown")
+
+      # (2) assessment
+      expected(out).toBeNil()
+    end)
+  end)
+
+  suite("setDatumValue()", proc()
+    var g, l, globalDs, ds
+
+    setup(proc()
+      g = VarDatum(name = "g", value = 123)
+      globalDs = GlobalDataset(name = "global").setDatum(g)
+      l = VarDatum(name = "l", value = 321)
+      ds = LocalDataset(name = "local", parent = globalDs).setDatum(l)
+    end)
+
+    test("when datum exists in local, this must be replaced", proc()
+      # (1) act
+      const out = ds.setDatumValue("l", 123456)
+
+      # (2) assessment
+      expected(out).sameAs(ds)
+      expected(ds.parent.data).toHaveLen(1)
+      expected(ds.parent.data.g).sameAs(g)
+      expected(ds.data).toHaveLen(1)
+      expected(ds.data.l).sameAs(l).member("value").equalTo(123456)
+    end)
+
+    test("when datum exists in parent, this must be replaced", proc()
+      # (1) act
+      const out = ds.setDatumValue("g", 123456)
+
+      # (2) assessment
+      expected(out).sameAs(ds)
+      expected(ds.parent.data).toHaveLen(1)
+      expected(ds.parent.data.g).sameAs(g).member("value").equalTo(123456)
+      expected(ds.data).toHaveLen(1)
+      expected(ds.data.l).sameAs(l)
+    end)
+
+    test("when datum unexists, this must be created in local", proc()
+      # (1) act
+      const out = ds.setDatumValue("datum", 123456)
+
+      # (2) assessment
+      expected(out).sameAs(ds)
+      expected(ds.parent.data).toHaveLen(1)
+      expected(ds.parent.data.g).sameAs(g)
+      expected(ds.data).toHaveLen(2)
+      expected(ds.data.l).sameAs(l)
+      expected(ds.data.datum).toBe(VarDatum).member("value").equalTo(123456)
+    end)
+  end)
+end)
