@@ -1,0 +1,85 @@
+use (
+  alias://expected
+  op = from
+)
+
+const (
+  buildParams = op.parameterizer
+  buildTitle = op.title
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    test("when [list], {array = list} must be returned", proc()
+      # (1) act
+      const (
+        array = [1, 2, 3]
+        args = [array]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo({array})
+    end)
+
+    test("when list, {array = list} must be returned", proc()
+      # (1) act
+      const (
+        args = [1, 2, 3]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(array = args)
+    end)
+
+    test("when {array: list}, {array} must be returned", proc()
+      # (1) act
+      const (
+        args = {array = [1, 2, 3]}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(array = args.array)
+    end)
+
+    test("when {array: !list}, error must be raised", proc()
+      # (1) act
+      const (
+        args = {array = "one two three"}
+        out =  peval(buildParams(args))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("random.from: array expected."))
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, title must be returned", proc()
+      # (1) act
+      const (
+        params = {array = [1, 2, 3]}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("random: from list with len 3")
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when called, an item must be returned", proc()
+      # (1) act
+      const (
+        params = {array = ["one", "two", "three"]}
+        out = handle({params})
+      )
+
+      # (2) assessment
+      expected(params.array).toInclude(out)
+    end)
+  end)
+end)

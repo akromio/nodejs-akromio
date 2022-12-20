@@ -4,6 +4,7 @@ export {
   tags = ["built-in"]
   defaultOpName = "random"
   ops =
+    from = use("./ops/from")
     random = use("./ops/random")
     text = use("./ops/text")
 }
