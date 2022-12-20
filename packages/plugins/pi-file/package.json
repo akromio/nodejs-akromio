@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-file",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Plugin for performing operations with files on Akromio.",
   "author": {
     "name": "Sia Codelabs",

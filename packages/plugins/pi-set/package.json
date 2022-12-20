@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-set",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Plugin for setting a field value of an object on Akromio.",
   "author": {
     "name": "Sia Codelabs",
