@@ -1,6 +1,6 @@
 {
   "name": "@akromio/trigger",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Trigger core library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
