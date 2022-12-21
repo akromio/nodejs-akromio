@@ -1,14 +1,25 @@
 use (
   {DatasetParser, DatasetDescriber} = alias://dataset
   {QuestionDescriber} = alias://inquirer
+
   {table, tableOpts} = ../../helpers/table
   ../CatalogCommandBase
 )
 
 /**
- * The options defined in the super types.
+ * Options defined in the super types.
  */
 const {baseOptions} = CatalogCommandBase
+
+/**
+ * Dataset parser to use.
+ */
+const datasetParser = DatasetParser()
+
+/**
+ * Dataset describer to use.
+ */
+const datasetDescriber = DatasetDescriber()
 
 /**
  * A dataset command.
@@ -16,13 +27,17 @@ const {baseOptions} = CatalogCommandBase
 @abstract
 export struct DatasetCommand: CatalogCommandBase
   @override
-  pub const name := ["dataset", "ds"]
+  pub const name := ["dataset [jobName]", "ds"]
 
   @override
-  pub const desc := "List the dataset of a catalog."
+  pub const desc := "List the dataset of a catalog or a job."
 
   @override
-  pub const positionals := {}
+  pub const positionals := {
+    jobName =
+      type = "string"
+      desc = "Job name to query."
+  }
 
   @override
   pub const options := {
@@ -61,51 +76,63 @@ export struct DatasetCommand: CatalogCommandBase
   }
 
   @override @hidden
-  pub async proc handle(argv=> {catalogName, registryAndCatalogName, args})
-    #(1) create the registry instances to use
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, args, jobName})
+    # (1) create the registry instances to query
     const registries = await(self.createRegistries(argv).connect())
 
     do
-      #(2) determine the catalogName
+      # (2) determine the catalogName to query
       if registryAndCatalogName then
         catalogName = registryAndCatalogName.split("://")[1]
       
-      #(3) get the catalog decl
-      var decl
-      
       catalogName = self.buildCatalogPath(catalogName)
-      decl = await(self.readCatalogDecl(catalogName, registries))
+      
+      # (3) get the catalog decl
+      const decl = await(self.readCatalogDecl(catalogName, registries))
 
       if not decl then
         print($"Catalog '${catalogName}' not found in '${registries.registryNames}'.")
         ps.exit(1)
 
-      #(4) create dataset
+      # (4) create global dataset
       const (
         {createGlobalDataset} = use("../util/dataset")
         globalDataset = await(createGlobalDataset(catalog = decl, args))
+        datum = globalDataset.getDatum("args")
+        originalArgs = datum.getValue()
       )
 
-      const localDataset = DatasetParser().parse(
+      datum.setValueWithoutUpdatableCheck(proxy(originalArgs, {
+        get = fn(_, prop) = (if prop is text and prop not in originalArgs then
+          ""
+        else
+          originalArgs[prop]
+        end)
+      }))
+
+      # (5) create local dataset
+      const localDataset = datasetParser.parse(
         decl.dataset ?? []
         name = "catalog"
         parent = globalDataset
       )
 
-      #(5) show data
+      # (6) show data
       print("\nLocation:", decl.loc)
-      listDataset(localDataset, argv)
+
+      if jobName then listJobInputs(localDataset, decl.jobs, argv)
+      else listDataset(localDataset, argv)
     finally
       await(registries.disconnect())
 
 /**
- * List the data in a given dataset.
+ * Lists the data in a given dataset.
  */
 proc listDataset(dataset, opts=> {showType, showOptions, notShowDesc})
-  #(1) get the data to show
-  const data = DatasetDescriber().describeData(dataset, opts)
+  # (1) get the data to show
+  const data = datasetDescriber.describeData(dataset, opts)
 
-  #(2) determine header
+  # (2) determine header
   const header = ["Datum"]
   
   if showType then header.push("Type")
@@ -113,7 +140,7 @@ proc listDataset(dataset, opts=> {showType, showOptions, notShowDesc})
   if showOptions then header.push("Options")
   if not notShowDesc then header.push("Desc.")
 
-  #(3) create rows to show
+  # (3) create rows to show
   const rows = [header]
 
   for each key in keys(data).sort() do
@@ -129,6 +156,62 @@ proc listDataset(dataset, opts=> {showType, showOptions, notShowDesc})
 
     rows.push(row)
 
-  #(4) show table
+  # (4) show table
   print("\nDataset:")
   print(table(rows, tableOpts))
+
+/**
+ * Lists the inputs of an input.
+ * These are these set in the catalog dataset and the given in the job.
+ */
+proc listJobInputs(dataset, jobs, opts => {jobName, showType, showOptions, notShowDesc})
+  # (1) get the dataset to use
+  const job = findJob(jobName, jobs) ?? throw(Error($"Job not found: ${jobName}."))
+
+  dataset = datasetParser.parse(
+    job.dataset ?? []
+    name = jobName
+    parent = dataset
+  )
+
+  # (2) get the data to show
+  const data = datasetDescriber.describeData(dataset, tag = "input")
+
+  # (3) determine header
+  const header = ["Input"]
+
+  if showType then header.push("Type")
+  header.push("Value")
+  if showOptions then header.push("Options")
+  if not notShowDesc then header.push("Desc.")
+
+  # (4) create rows to show
+  const rows = [header]
+
+  for each key in keys(data).sort() do
+    const (
+      datum = data[key]
+      row = [key]
+    )
+
+    if showType then row.push(datum.kind)
+    row.push(datum.value)
+    if showOptions then row.push(datum.options ?? "")
+    if not notShowDesc then row.push(datum.desc ?? "")
+
+    rows.push(row)
+
+  # (5) show table
+  printf("\nInputs of %s:", jobName)
+  print(table(rows, tableOpts))
+
+/**
+ * Finds a job declaration by its [name] in a jobs [decl]aration.
+ */
+fn findJob(name: text, decl: list): map
+  for each job := decl do
+    if job.group then
+      job = findJob(name, job.jobs) ?? {}
+    
+    if jobName ::= coalesce(job.macro, job.co, job.script); jobName == name then
+      return job
