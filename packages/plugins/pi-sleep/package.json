@@ -12,12 +12,12 @@
     "plugin"
   ],
   "bugs": {
-    "url": "https://github.com/akromio/nodejs-core/issues",
+    "url": "https://github.com/akromio/nodejs-akromio/issues",
     "email": "bugs@akromio.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/akromio/nodejs-core.git"
+    "url": "https://github.com/akromio/nodejs-akromio.git"
   },
   "preferGlobal": false,
   "publishConfig": {
