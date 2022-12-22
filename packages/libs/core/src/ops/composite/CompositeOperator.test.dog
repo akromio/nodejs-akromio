@@ -102,6 +102,13 @@ suite(__filename, proc()
             args = 531
             onError = "carryOn"
           }
+
+          {
+            title = "5th step"
+            op = StaticAction(name = "5th", fun = fn() = "action #5" end, operator = ActionOperator())
+            args = 132
+            onError = "carryOn"
+          }
         ]
 
       )

@@ -203,6 +203,19 @@ suite(__filename, () => {
               }),
               ["args"]: 531,
               ["onError"]: "carryOn"
+            }, {
+              ["title"]: "5th step",
+              ["op"]: StaticAction({
+                'name': "5th",
+                'fun': () => {
+                  {
+                    return "action #5";
+                  }
+                },
+                'operator': ActionOperator()
+              }),
+              ["args"]: 132,
+              ["onError"]: "carryOn"
             }];
             const out1 = (0, await optor._performSteps(steps, call, [], {
               'randomly': true
