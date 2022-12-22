@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-random",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Plugin for working with pseudo-random numbers.",
   "author": {
     "name": "Sia Codelabs",

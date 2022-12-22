@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-inc",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Plugin for incrementing a value on Akromio.",
   "author": {
     "name": "Sia Codelabs",

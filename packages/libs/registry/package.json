@@ -1,6 +1,6 @@
 {
   "name": "@akromio/registry",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Registry library for Akromio.",
   "author": {
     "name": "Sia Codelabs",

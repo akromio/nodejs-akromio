@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-xdg",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Plugin for opening files with default apps on Akromio.",
   "author": {
     "name": "Sia Codelabs",
