@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-json",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Plugin for encoding/decoding JSON on Akromio.",
   "author": {
     "name": "Sia Codelabs",
