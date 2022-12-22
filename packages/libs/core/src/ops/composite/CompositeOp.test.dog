@@ -1,7 +1,10 @@
 use (
   alias://expected
   {simulator} = alias://doubles
-  {CompositeOp as CompositeOpBase, Action, Call} = ~
+
+  ../Call
+  ../simple/action/Action
+  CompositeOpBase = CompositeOp
 )
 
 @concrete

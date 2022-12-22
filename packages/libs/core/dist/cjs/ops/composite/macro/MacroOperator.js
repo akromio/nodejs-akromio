@@ -31,14 +31,18 @@ MacroOperator.prototype.performWorks = async function (call) {
   {
     const macro = _core.dogma.expect('call.op', call.op, Macro);
     if (macro.isLoop()) {
-      results = this.performLoop(call);
+      results = this.performLoop(call, {
+        'randomly': macro.randomSteps
+      });
     } else {
-      results = _core.dogma.super(this, "performWorks")(call);
+      results = _core.dogma.super(this, "performWorks")(call, {
+        'randomly': macro.randomSteps
+      });
     }
   }
   return results;
 };
-MacroOperator.prototype.performLoop = async function (call) {
+MacroOperator.prototype.performLoop = async function (call, opts) {
   const self = this;
   let results = [];
   {
@@ -56,7 +60,7 @@ MacroOperator.prototype.performLoop = async function (call) {
     const steps = (0, await loop.getSteps(call));
     for (const item of items) {
       dataset.setDatumValue(itemName, item);
-      if (_core.dogma.getItem((0, await this._performSteps(steps, call, results)), 0) === false) {
+      if (_core.dogma.getItem((0, await this._performSteps(steps, call, results, opts)), 0) === false) {
         return [false, results];
       }
     }

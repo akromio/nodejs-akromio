@@ -51,7 +51,7 @@ suite(__filename, proc()
       )
 
       # (2) act
-      const out = await(optor._performSteps(steps, call, []))
+      const out = await(optor._performSteps(steps, call, [], randomly = false))
 
       # (3) assessment
       expected(out).equalTo([{title = "2nd step"}])

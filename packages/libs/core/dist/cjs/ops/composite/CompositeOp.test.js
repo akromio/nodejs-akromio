@@ -5,22 +5,20 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   simulator
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  CompositeOp: CompositeOpBase,
-  Action,
-  Call
-} = _core.dogma.use(require("../../../.."));
+const Call = _core.dogma.use(require("../Call"));
+const Action = _core.dogma.use(require("../simple/action/Action"));
+const CompositeOpBase = _core.dogma.use(require("./CompositeOp"));
 const $CompositeOp = class CompositeOp extends CompositeOpBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_6f816ead355e3d4493dac5df684b09f1___init__ instanceof Function) this._pvt_6f816ead355e3d4493dac5df684b09f1___init__(_); /* c8 ignore stop */
+    if (this._pvt_4c7b0db8f111d72f1bf84887fbbef74d___init__ instanceof Function) this._pvt_4c7b0db8f111d72f1bf84887fbbef74d___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_6f816ead355e3d4493dac5df684b09f1___post__ instanceof Function) this._pvt_6f816ead355e3d4493dac5df684b09f1___post__(); /* c8 ignore stop */
+    if (this._pvt_4c7b0db8f111d72f1bf84887fbbef74d___post__ instanceof Function) this._pvt_4c7b0db8f111d72f1bf84887fbbef74d___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_6f816ead355e3d4493dac5df684b09f1___validate__ instanceof Function) this._pvt_6f816ead355e3d4493dac5df684b09f1___validate__(); /* c8 ignore stop */
+    if (this._pvt_4c7b0db8f111d72f1bf84887fbbef74d___validate__ instanceof Function) this._pvt_4c7b0db8f111d72f1bf84887fbbef74d___validate__(); /* c8 ignore stop */
   }
 };
 

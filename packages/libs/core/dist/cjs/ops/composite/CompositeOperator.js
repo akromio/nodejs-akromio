@@ -5,6 +5,7 @@ const {
   DatasetParser,
   ConstDatum
 } = _core.dogma.use(require("@akromio/dataset"));
+const shuffle = _core.dogma.use(require("array-shuffle"));
 const Operator = _core.dogma.use(require("../Operator"));
 const Call = _core.dogma.use(require("../Call"));
 const CallOpts = _core.dogma.use(require("../CallOpts"));
@@ -95,16 +96,19 @@ CompositeOperator.prototype.perform = async function (call) {
   }
   return result;
 };
-CompositeOperator.prototype.performWorks = async function (call) {
+CompositeOperator.prototype.performWorks = async function (call, opts = {
+  ["randomly"]: false
+}) {
   const self = this; /* c8 ignore next */
-  _core.dogma.expect("call", call, Call);
+  _core.dogma.expect("call", call, Call); /* c8 ignore next */
+  if (opts != null) _core.dogma.expect("opts", opts, _core.map);
   {
     _core.dogma.expect('call.op', call.op, CompositeOp);
     let failed = false;
     let results = [];
     0, await this.performInitializerSteps(call, results);
     {
-      const [ok] = (0, await this.performSteps(call, results));
+      const [ok] = (0, await this.performSteps(call, results, opts));
       if (ok === false) {
         failed = true;
       }
@@ -135,7 +139,9 @@ CompositeOperator.prototype.performInitializerSteps = function (call, results) {
   _core.dogma.expect("call", call, Call); /* c8 ignore next */
   _core.dogma.expect("results", results, _core.list);
   {
-    return this._performSteps(call.op.getInitializerSteps(call), call, results);
+    return this._performSteps(call.op.getInitializerSteps(call), call, results, {
+      'randomly': false
+    });
   }
 };
 CompositeOperator.prototype.performFinalizerSteps = function (call, results) {
@@ -143,20 +149,31 @@ CompositeOperator.prototype.performFinalizerSteps = function (call, results) {
   _core.dogma.expect("call", call, Call); /* c8 ignore next */
   _core.dogma.expect("results", results, _core.list);
   {
-    return this._performSteps(call.op.getFinalizerSteps(call), call, results);
+    return this._performSteps(call.op.getFinalizerSteps(call), call, results, {
+      'randomly': false
+    });
   }
 };
-CompositeOperator.prototype.performSteps = async function (call, results) {
+CompositeOperator.prototype.performSteps = async function (call, results, opts = {
+  ["randomly"]: false
+}) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("call", call, Call); /* c8 ignore next */
-  _core.dogma.expect("results", results, _core.list);
+  _core.dogma.expect("results", results, _core.list); /* c8 ignore next */
+  if (opts != null) _core.dogma.expect("opts", opts, _core.map);
   {
-    return this._performSteps((0, await call.op.getSteps(call)), call, results);
+    return this._performSteps((0, await call.op.getSteps(call)), call, results, opts);
   }
 };
-CompositeOperator.prototype._performSteps = async function (steps, call, results) {
+CompositeOperator.prototype._performSteps = async function (steps, call, results, opts) {
   const self = this;
+  let {
+    randomly
+  } = opts;
   {
+    if (randomly) {
+      steps = shuffle(steps);
+    }
     const {
       dataset
     } = call;

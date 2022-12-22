@@ -8,6 +8,13 @@ const $Macro = class Macro extends CompositeOp {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
+    if (_['randomSteps'] != null) (0, _core.expect)('randomSteps', _['randomSteps'], _core.bool); /* c8 ignore stop */
+    Object.defineProperty(this, 'randomSteps', {
+      value: (0, _core.coalesce)(_['randomSteps'], false),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (this._pvt_163c79cd38cc55e51fcf9a82685f515f___init__ instanceof Function) this._pvt_163c79cd38cc55e51fcf9a82685f515f___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_163c79cd38cc55e51fcf9a82685f515f___post__ instanceof Function) this._pvt_163c79cd38cc55e51fcf9a82685f515f___post__(); /* c8 ignore stop */

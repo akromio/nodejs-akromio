@@ -96,7 +96,9 @@ suite(__filename, () => {
               ["resultVarName"]: "2nd",
               ["onError"]: "carryOn"
             }];
-            const out = (0, await optor._performSteps(steps, call, []));
+            const out = (0, await optor._performSteps(steps, call, [], {
+              'randomly': false
+            }));
             expected(out).equalTo([{
               ["title"]: "2nd step"
             }]);

@@ -15,9 +15,10 @@ updates:
       prefix-development: depbot
       include: scope
     ignore:
+      - dependency-name: array-shuffle
       - dependency-name: chalk
-      - dependency-name: inquirer
       - dependency-name: file-type
-      - dependency-name: term-size
       - dependency-name: humanize-string
       - dependency-name: indent-string
+      - dependency-name: inquirer
+      - dependency-name: term-size

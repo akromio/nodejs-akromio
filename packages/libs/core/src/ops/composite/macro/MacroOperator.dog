@@ -13,15 +13,15 @@ export struct MacroOperator: CompositeOperator
     const macro = expect(call.op, Macro)
 
     if macro.isLoop() then
-      results = self.performLoop(call)
+      results = self.performLoop(call, randomly = macro.randomSteps)
     else
-      results = super.performWorks(call)
+      results = super.performWorks(call, randomly = macro.randomSteps)
   
   /**
    * Performs this macro as a loop using the [call] passed.
    */
   @hidden @noParamCheck
-  pub async fn performLoop(call: Call) -> results: list
+  pub async fn performLoop(call: Call, opts: {randomly: bool}) -> results: list
     const loop = call.op
 
     # (1) run initializers
@@ -46,7 +46,7 @@ export struct MacroOperator: CompositeOperator
     for each item in items do
       dataset.setDatumValue(itemName, item)
 
-      if await(self._performSteps(steps, call, results))[0] === false then
+      if await(self._performSteps(steps, call, results, opts))[0] === false then
         return [false, results]
 
     # (4) perform finalizers
