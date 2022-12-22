@@ -11,12 +11,10 @@ const {
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  DynamicCo,
-  CoOperator,
-  StaticAction,
-  ActionOperator
-} = _core.dogma.use(require("../../../../.."));
+const StaticAction = _core.dogma.use(require("../../simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../../simple/action/ActionOperator"));
+const DynamicCo = _core.dogma.use(require("./DynamicCo"));
+const CoOperator = _core.dogma.use(require("./CoOperator"));
 suite(__filename, () => {
   {
     const globalDataset = GlobalDataset({
@@ -31,11 +29,11 @@ suite(__filename, () => {
             /* c8 ignore start */
             if (_ == null) _ = {};
             /* c8 ignore stop */ /* c8 ignore start */
-            if (this._pvt_4ec140ce3e4fe0b8da19b6c81dcebbc4___init__ instanceof Function) this._pvt_4ec140ce3e4fe0b8da19b6c81dcebbc4___init__(_); /* c8 ignore stop */
+            if (this._pvt_9eac97f59e200e1e6cceed8f05f19012___init__ instanceof Function) this._pvt_9eac97f59e200e1e6cceed8f05f19012___init__(_); /* c8 ignore stop */
             /* c8 ignore start */
-            if (this._pvt_4ec140ce3e4fe0b8da19b6c81dcebbc4___post__ instanceof Function) this._pvt_4ec140ce3e4fe0b8da19b6c81dcebbc4___post__(); /* c8 ignore stop */
+            if (this._pvt_9eac97f59e200e1e6cceed8f05f19012___post__ instanceof Function) this._pvt_9eac97f59e200e1e6cceed8f05f19012___post__(); /* c8 ignore stop */
             /* c8 ignore start */
-            if (this._pvt_4ec140ce3e4fe0b8da19b6c81dcebbc4___validate__ instanceof Function) this._pvt_4ec140ce3e4fe0b8da19b6c81dcebbc4___validate__(); /* c8 ignore stop */
+            if (this._pvt_9eac97f59e200e1e6cceed8f05f19012___validate__ instanceof Function) this._pvt_9eac97f59e200e1e6cceed8f05f19012___validate__(); /* c8 ignore stop */
           }
         };
 

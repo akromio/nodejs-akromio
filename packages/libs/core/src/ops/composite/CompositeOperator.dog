@@ -1,5 +1,7 @@
 use (
   {DatasetParser, ConstDatum} = alias://dataset
+  dep://array-shuffle
+
   ../{Operator, Call, CallOpts, Context, Result}
   CompositeOp
   Step
@@ -77,13 +79,15 @@ export struct CompositeOperator: Operator
   
   /**
    * Performs the works associated to a given operation.
+   * If [randomly] option set, the steps are run randomly;
+   * otherwise, in order.
    *
    * @remarks
    * If some step failed and onError is finish, the returned result
    * must contain false as index 0 and the step results as index 1.
    */
   @override @hidden
-  pub async fn performWorks(call: Call): Results
+  pub async fn performWorks(call: Call, opts := {randomly = false}): Results
     expect(call.op, CompositeOp)
 
     # (1) run steps
@@ -94,7 +98,7 @@ export struct CompositeOperator: Operator
 
     await(self.performInitializerSteps(call, results))
 
-    if [ok] ::= await(self.performSteps(call, results)); ok === false then
+    if [ok] ::= await(self.performSteps(call, results, opts)); ok === false then
       failed = true
 
     await(self.performFinalizerSteps(call, results))
@@ -102,7 +106,7 @@ export struct CompositeOperator: Operator
     # (2) return
     if failed then results = [false, results]
     return results
-
+  
   /**
    * Runs a given step.
    */
@@ -126,6 +130,7 @@ export struct CompositeOperator: Operator
     call.op.getInitializerSteps(call)
     call
     results
+    randomly = false
   )
 
   /**
@@ -136,16 +141,18 @@ export struct CompositeOperator: Operator
     call.op.getFinalizerSteps(call)
     call
     results
+    randomly = false
   )
 
   /**
    * Runs the steps associated to the operation under running.
    */
   @hidden
-  pub async fn performSteps(call: Call, results: list) = self._performSteps(
+  pub async fn performSteps(call: Call, results: list, opts := {randomly = false}) = self._performSteps(
     await(call.op.getSteps(call))
     call
     results
+    opts
   )
 
   /**
@@ -157,7 +164,12 @@ export struct CompositeOperator: Operator
    * the rest will be the step results.
    */
   @hidden @noParamCheck
-  pub async fn _performSteps(steps: Steps, call: Call, results: list) -> results
+  pub async fn _performSteps(steps: Steps, call: Call, results: list, opts:> {randomly: bool}) -> results
+    # (1) determine order of run
+    if randomly then
+      steps = shuffle(steps)
+    
+    # (2) run steps
     const {dataset} = call
 
     for each step: Step in steps do

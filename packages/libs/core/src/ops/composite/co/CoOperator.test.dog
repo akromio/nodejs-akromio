@@ -3,7 +3,9 @@ use (
   {simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
   {monitor} = alias://doubles
-  {DynamicCo, CoOperator, StaticAction, ActionOperator} = ~
+
+  ../../simple/action/{StaticAction, ActionOperator}
+  DynamicCo, CoOperator
 )
 
 suite(__filename, proc()
