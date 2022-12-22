@@ -56,5 +56,64 @@ suite(__filename, proc()
       # (3) assessment
       expected(out).equalTo([{title = "2nd step"}])
     end)
+
+    test("when random run, the steps must be run randomly", async proc()
+      # Test composite operator.
+      struct CompositeOperator: CompositeOperatorBase
+        pub fn performStep(step) = {{title} = step}
+
+      # (1) arrange
+      const (
+        optor = CompositeOperator()
+        dataset = LocalDataset(
+          name = "local"
+          parent = globalDataset
+        ).setDatumValue("isTrue", true).setDatumValue("isFalse", false)
+
+        log = native("new stream.Duplex()")
+        ctx = Context(log = nop)
+        call = Call(op = {}, title = "Conditional steps", dataset, onError = "finish", log, ctx)
+
+        steps = [
+          {
+            title = "1st step"
+            op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
+            args = 123
+            onError = "carryOn"
+          }
+
+          {
+            title = "2nd step"
+            op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+            args = 321
+            onError = "carryOn"
+          }
+
+          {
+            title = "3rd step"
+            op = StaticAction(name = "3rd", fun = fn() = "action #3" end, operator = ActionOperator())
+            args = 135
+            onError = "carryOn"
+          }
+
+          {
+            title = "4th step"
+            op = StaticAction(name = "4th", fun = fn() = "action #4" end, operator = ActionOperator())
+            args = 531
+            onError = "carryOn"
+          }
+        ]
+
+      )
+
+      # (2) act
+      const (
+        out1 = await(optor._performSteps(steps, call, [], randomly = true))
+        out2 = await(optor._performSteps(steps, call, [], randomly = true))
+      )
+
+      # (3) assessment
+      expected(out1.map(fn(i) = i.title end)).notEqualTo(out2.map(fn(i) = i.title end))
+    end)
   end)
 end)

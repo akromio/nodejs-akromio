@@ -13,7 +13,7 @@ export struct Macro: CompositeOp
   /**
    * Must the steps be run randomly?
    */
-  pub const randomSteps := false
+  pub const random := false
 
   /**
    * Checks whether the macro is a loop.

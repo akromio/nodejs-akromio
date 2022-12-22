@@ -13,9 +13,9 @@ export struct MacroOperator: CompositeOperator
     const macro = expect(call.op, Macro)
 
     if macro.isLoop() then
-      results = self.performLoop(call, randomly = macro.randomSteps)
+      results = self.performLoop(call, randomly = macro.random)
     else
-      results = super.performWorks(call, randomly = macro.randomSteps)
+      results = super.performWorks(call, randomly = macro.random)
   
   /**
    * Performs this macro as a loop using the [call] passed.

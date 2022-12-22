@@ -8,9 +8,9 @@ const $Macro = class Macro extends CompositeOp {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (_['randomSteps'] != null) (0, _core.expect)('randomSteps', _['randomSteps'], _core.bool); /* c8 ignore stop */
-    Object.defineProperty(this, 'randomSteps', {
-      value: (0, _core.coalesce)(_['randomSteps'], false),
+    if (_['random'] != null) (0, _core.expect)('random', _['random'], _core.bool); /* c8 ignore stop */
+    Object.defineProperty(this, 'random', {
+      value: (0, _core.coalesce)(_['random'], false),
       writable: false,
       enumerable: true
     });

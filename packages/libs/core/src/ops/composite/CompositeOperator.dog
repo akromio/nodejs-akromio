@@ -166,8 +166,9 @@ export struct CompositeOperator: Operator
   @hidden @noParamCheck
   pub async fn _performSteps(steps: Steps, call: Call, results: list, opts:> {randomly: bool}) -> results
     # (1) determine order of run
-    if randomly then steps = shuffle(steps)
-
+    if randomly then
+      steps = shuffle(steps)
+    
     # (2) run steps
     const {dataset} = call
 

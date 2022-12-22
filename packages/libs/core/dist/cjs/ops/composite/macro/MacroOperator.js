@@ -32,11 +32,11 @@ MacroOperator.prototype.performWorks = async function (call) {
     const macro = _core.dogma.expect('call.op', call.op, Macro);
     if (macro.isLoop()) {
       results = this.performLoop(call, {
-        'randomly': macro.randomSteps
+        'randomly': macro.random
       });
     } else {
       results = _core.dogma.super(this, "performWorks")(call, {
-        'randomly': macro.randomSteps
+        'randomly': macro.random
       });
     }
   }
