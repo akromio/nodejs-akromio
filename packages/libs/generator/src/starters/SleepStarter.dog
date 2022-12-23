@@ -1,0 +1,11 @@
+use (
+  Starter
+)
+
+/**
+ * A starter to do nothing. It represents a pause.
+ */
+export struct SleepStarter: Starter
+  @override
+  pub proc generateBlankSheets()
+    nop

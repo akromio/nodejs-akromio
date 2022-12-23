@@ -1,0 +1,24 @@
+use (
+  alias://expected
+  {simulator} = alias://doubles
+  Assigner
+)
+
+suite(__filename, proc()
+  suite("constructor", proc()
+    test("when total weight is not 100, error must be raised", proc()
+      # (1) act
+      const (
+        registry = "fs:///my/registry"
+        catalog = "catalog-name"
+        job = "job-name"
+        jobs = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
+        opts = {input = simulator.stream.duplex(), output = simulator.stream.duplex(), jobs}
+        out = peval(Assigner(opts))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Sum of job weights must be 100. Got: 110."))
+    end)
+  end)
+end)

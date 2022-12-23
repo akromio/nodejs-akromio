@@ -1,0 +1,64 @@
+/**
+ * Info on a job to set by the assigners.
+ */
+intf JobInfo
+  /**
+   * Registry where the job catalog is.
+   */
+  registry: text
+
+  /**
+   * Catalog name where the job is.
+   */
+  catalog: text
+
+  /**
+   * Job name.
+   */
+  job: text
+
+  /**
+   * Arguments to pass to the job run.
+   */
+  args?: any
+
+  /**
+   * Weight of this job in %.
+   */
+  weight: num
+
+/**
+ * An assigner is the responsible for setting the job
+ * to every blank sheet received for an input stream.
+ */
+export struct Assigner
+  /**
+   * Input stream where the blank sheets are.
+   */
+  pub const input
+
+  /**
+   * Output stream where to let the assignations.
+   */
+  pub const output
+
+  /**
+   * Job infos to use.
+   */
+  pub const jobs: JobInfo[]
+
+  /**
+   * @dev
+   * The job weights must sum 100.
+   */
+  @post
+  pvt proc post()
+    # (1) calculate the total weight
+    var total = 0
+
+    for each job in self.jobs do
+      total += job.weight
+    
+    # (2) check total weight
+    if total != 100 then
+      throw(TypeError($"Sum of job weights must be 100. Got: ${total}."))

@@ -1,0 +1,42 @@
+{
+  "name": "@akromio/generator",
+  "version": "0.10.2",
+  "description": "Run-request generator library for Akromio.",
+  "author": {
+    "name": "Sia Codelabs",
+    "email": "hello@siacodelabs.com",
+    "url": "https://siacodelabs.com"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/akromio/nodejs-akromio/issues",
+    "email": "bugs@akromio.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akromio/nodejs-akromio.git"
+  },
+  "preferGlobal": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "main": "dist/cjs/index.js",
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 18",
+    "npm": ">= 8"
+  },
+  "dependencies": {
+    "@dogmalang/core": "^1.0.0-rc18.0"
+  },
+  "scripts": {
+    "lint": "dogmac check src",
+    "build": "npm run build/src",
+    "build/src": "rm -rf dist/ && dogmac js -o dist/cjs src && babel -d dist dist",
+    "test": "mocha --config .mocharc.yaml",
+    "cov": "c8 mocha --config .mocharc.yaml"
+  }
+}

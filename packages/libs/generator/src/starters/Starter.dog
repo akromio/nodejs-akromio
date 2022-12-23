@@ -1,0 +1,80 @@
+use (
+  {setInterval, clearInterval} = dep://timers
+  StarterState
+)
+
+/**
+ * A starter is a component for generating periodically blank sheets.
+ * A blank sheet is a paper where to assign a job to run in a botnet.
+ */
+@abstract
+export struct Starter
+  /**
+   * Interval, in ms, for generating the blank sheets in the stream.
+   */
+  pub const interval: num
+
+  /**
+   * Number of times to generate blank sheets.
+   */
+  pub const times: num
+
+  /**
+   * Number of iterations performed currently.
+   */
+  @hidden
+  pub var iterations := 0
+
+  /**
+   * Timer to use.
+   */
+  @hidden
+  pub var timer?
+
+  /**
+   * Current state.
+   */
+  pub var state = StarterState.created
+
+  /**
+   * Output stream where the starter must let the blank sheets generated.
+   *
+   * When ended, its end() method is called.
+   */
+  pub const output
+
+  /**
+   * Starts to work.
+   */
+  pub fn start() -> self
+    # (1) set state to idle
+    self.state =~ idle
+
+    # (2) configure
+    self.timer = setInterval(proc()
+      self.handle()
+    end, self.interval)
+    
+  /**
+   * Handles an interval event.
+   */
+  @hidden
+  pub proc handle()
+    # (1) handle
+    self.iterations += 1
+    self.state =~ busy
+    self.generateBlankSheets()
+    self.state =~ idle
+    
+    # (2) clear if end reached
+    if self.iterations >= self.times then
+      self.state =~ stopped
+      clearInterval(self.timer)
+      self.timer = nil
+      self.output.end("<end>")
+
+  /**
+   * Generates a batch of blank sheets.
+   */
+  @abstract
+  pub proc generateBlankSheets()

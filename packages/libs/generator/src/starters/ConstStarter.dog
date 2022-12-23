@@ -1,0 +1,18 @@
+use (
+  Starter
+)
+
+/**
+ * A starter for generating the same number of blank sheets
+ * in every event.
+ */
+export struct ConstLoadStarter: Starter
+  /**
+   * Number of blank sheets to generate per event.
+   */
+  pub const blankSheets: num
+
+  @override
+  pub proc generateBlankSheets()
+    for i = 0; i < self.blankSheets; i += 1 do
+      self.output.write("")
