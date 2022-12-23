@@ -70,7 +70,7 @@ suite(__filename, () => {
             const assigner = Assigner(opts);
             const out = [];
             assigner.start();
-            0, await (0, _core.sleep)("400ms");
+            0, await (0, _core.sleep)("500ms");
             expected(out).equalTo([]);
             expected(input.readable).equalTo(false);
             expected(output.writable).equalTo(false);

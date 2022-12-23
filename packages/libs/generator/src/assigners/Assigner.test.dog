@@ -42,7 +42,7 @@ suite(__filename, proc()
       )
 
       assigner.start()
-      await(sleep("400ms"))
+      await(sleep("500ms"))
 
       # (2) assessment
       expected(out).equalTo([])
