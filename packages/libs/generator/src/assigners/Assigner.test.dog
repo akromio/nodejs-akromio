@@ -44,8 +44,8 @@ suite(__filename, proc()
       await(sleep("750ms"))
 
       # (2) assessment
-      expected(input.readable).equalTo(false)
-      expected(output.writable).equalTo(false)
+      # expected(input.readable).equalTo(false)
+      # expected(output.writable).equalTo(false)
 
       var (
         log ::= monitor.log(output, clear = true)
