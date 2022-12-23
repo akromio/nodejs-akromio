@@ -41,11 +41,11 @@ suite(__filename, proc()
       )
 
       assigner.start()
-      await(sleep("750ms"))
+      await(sleep("1500ms"))
 
       # (2) assessment
-      # expected(input.readable).equalTo(false)
-      # expected(output.writable).equalTo(false)
+      expected(input.readable).equalTo(false)
+      expected(output.writable).equalTo(false)
 
       var (
         log ::= monitor.log(output, clear = true)
