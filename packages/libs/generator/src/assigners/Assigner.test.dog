@@ -38,14 +38,12 @@ suite(__filename, proc()
         output = monitor(sim.stream.writable(), method = "write")
         opts = {input, output, jobs}
         assigner = Assigner(opts)
-        out = []
       )
 
       assigner.start()
-      await(sleep("500ms"))
+      await(sleep("750ms"))
 
       # (2) assessment
-      expected(out).equalTo([])
       expected(input.readable).equalTo(false)
       expected(output.writable).equalTo(false)
 

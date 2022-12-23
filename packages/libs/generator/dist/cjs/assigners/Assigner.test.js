@@ -68,10 +68,8 @@ suite(__filename, () => {
               ["jobs"]: jobs
             };
             const assigner = Assigner(opts);
-            const out = [];
             assigner.start();
-            0, await (0, _core.sleep)("500ms");
-            expected(out).equalTo([]);
+            0, await (0, _core.sleep)("750ms");
             expected(input.readable).equalTo(false);
             expected(output.writable).equalTo(false);
             const log = monitor.log(output, {
