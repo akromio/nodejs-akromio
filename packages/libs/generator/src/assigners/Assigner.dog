@@ -1,31 +1,6 @@
-/**
- * Info on a job to set by the assigners.
- */
-intf JobInfo
-  /**
-   * Registry where the job catalog is.
-   */
-  registry: text
-
-  /**
-   * Catalog name where the job is.
-   */
-  catalog: text
-
-  /**
-   * Job name.
-   */
-  job: text
-
-  /**
-   * Arguments to pass to the job run.
-   */
-  args?: any
-
-  /**
-   * Weight of this job in %.
-   */
-  weight: num
+use (
+  JobInfo
+)
 
 /**
  * An assigner is the responsible for setting the job
@@ -62,3 +37,13 @@ export struct Assigner
     # (2) check total weight
     if total != 100 then
       throw(TypeError($"Sum of job weights must be 100. Got: ${total}."))
+
+  /**
+   * Starts the assigner, reading from the input stream, assigning
+   * and writing to the output stream.
+   *
+   * When the input stream is ended, this assigner ends too.
+   */
+  pub async proc start()
+    await for each blankSheet in self.input do
+      nop

@@ -3,4 +3,6 @@ pub use (
   starters/Starter
   starters/SleepStarter
   starters/ConstStarter
+
+  assigners/Assigner
 )

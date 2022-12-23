@@ -1,0 +1,28 @@
+/**
+ * Info on a job to set by the assigners.
+ */
+export intf JobInfo
+  /**
+   * Registry where the job catalog is.
+   */
+  registry: text
+
+  /**
+   * Catalog name where the job is.
+   */
+  catalog: text
+
+  /**
+   * Job name.
+   */
+  job: text
+
+  /**
+   * Arguments to pass to the job run.
+   */
+  args?: any
+
+  /**
+   * Weight of this job in %.
+   */
+  weight: num

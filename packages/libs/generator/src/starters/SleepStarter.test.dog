@@ -1,6 +1,6 @@
 use (
   alias://expected
-  {simulator} = alias://doubles
+  {sim} = alias://doubles
   SleepStarter, StarterState
 )
 
@@ -10,7 +10,7 @@ suite(__filename, proc()
     test("when called, nothing must be added to the stream", async proc()
       # (1) act
       const (
-        opts = {interval = 100, times = 5, output = simulator.stream.duplex()}
+        opts = {interval = 100, times = 5, output = sim.stream.duplex()}
         starter = SleepStarter(opts).start()
       )
 

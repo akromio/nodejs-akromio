@@ -1,6 +1,6 @@
 use (
   alias://expected
-  {simulator} = alias://doubles
+  {sim} = alias://doubles
   ConstStarter, StarterState
 )
 
@@ -8,7 +8,7 @@ suite(__filename, proc()
   test("generateBlankSheets()", async proc()
     # (1) act
     const (
-      opts = {interval = 100, times = 5, blankSheets = 11, output = simulator.stream.duplex()}
+      opts = {interval = 100, times = 5, blankSheets = 11, output = sim.stream.duplex()}
       starter = ConstStarter(opts).start()
     )
 

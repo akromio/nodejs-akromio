@@ -3,7 +3,7 @@
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
-  simulator
+  sim
 } = _core.dogma.use(require("@akromio/doubles"));
 const SleepStarter = _core.dogma.use(require("./SleepStarter"));
 const StarterState = _core.dogma.use(require("./StarterState"));
@@ -16,7 +16,7 @@ suite(__filename, () => {
             const opts = {
               ["interval"]: 100,
               ["times"]: 5,
-              ["output"]: simulator.stream.duplex()
+              ["output"]: sim.stream.duplex()
             };
             const starter = SleepStarter(opts).start();
             0, await (0, _core.sleep)("1s");

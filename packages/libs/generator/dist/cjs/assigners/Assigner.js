@@ -1,28 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const JobInfo = _core.dogma.intf('JobInfo', {
-  registry: {
-    optional: false,
-    type: _core.text
-  },
-  catalog: {
-    optional: false,
-    type: _core.text
-  },
-  job: {
-    optional: false,
-    type: _core.text
-  },
-  args: {
-    optional: true,
-    type: _core.any
-  },
-  weight: {
-    optional: false,
-    type: _core.num
-  }
-});
+const JobInfo = _core.dogma.use(require("./JobInfo"));
 const $Assigner = class Assigner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -78,3 +57,11 @@ Assigner.prototype._pvt_ab27666e79a50c9410a9e2a9d2bac25d_post = function () {
   }
 };
 Assigner.prototype._pvt_ab27666e79a50c9410a9e2a9d2bac25d___post__ = Assigner.prototype._pvt_ab27666e79a50c9410a9e2a9d2bac25d_post;
+Assigner.prototype.start = async function () {
+  const self = this;
+  {
+    for await (const blankSheet of this.input) {
+      _core.dogma.nop();
+    }
+  }
+};
