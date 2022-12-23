@@ -1,6 +1,6 @@
 use (
   alias://expected
-  {sim} = alias://doubles
+  {sim, monitor} = alias://doubles
   Assigner
 )
 
@@ -16,7 +16,7 @@ suite(__filename, proc()
       # (1) act
       const (
         jobs = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
-        opts = {input = sim.stream.readable(), output = sim.stream.duplex(), jobs}
+        opts = {input = sim.stream.readable(), output = sim.stream.writable(), jobs}
         out = peval(Assigner(opts))
       )
 
@@ -29,18 +29,42 @@ suite(__filename, proc()
     test("when started, run requests must be generated", async proc()
       # (1) act
       const (
-        blankSheets = ["one", "two", "three"]
-        jobs = [{registry, catalog, job, weight = 25}, {registry, catalog, job, weight = 75}]
-        opts = {input = sim.stream.readable(data = blankSheets), output = sim.stream.duplex(), jobs}
+        blankSheets = "b ".repeat(100).split(" ")[0, -2]
+        jobs = [
+          {registry, catalog, job = "#1", weight = 25},
+          {registry, catalog, job = "#2", weight = 75}
+        ]
+        input = sim.stream.readable(data = blankSheets)
+        output = monitor(sim.stream.writable(), method = "write")
+        opts = {input, output, jobs}
         assigner = Assigner(opts)
         out = []
       )
 
       assigner.start()
-      await(sleep("1s"))
+      await(sleep("400ms"))
 
       # (2) assessment
       expected(out).equalTo([])
+      expected(input.readable).equalTo(false)
+      expected(output.writable).equalTo(false)
+
+      var (
+        log ::= monitor.log(output, clear = true)
+        job1 = 0
+        job2 = 0
+      )
+
+      expected(log.calls).equalTo(100)
+      
+      for i = 0; i < log.calls; i += 1 do
+        const job = json.decode(log.getCall(i).args)
+        
+        if job.job == "#1" then job1 += 1
+        else job2 += 1
+      
+      expected(job1).equalTo(25)
+      expected(job2).equalTo(75)
     end)
   end)
 end)

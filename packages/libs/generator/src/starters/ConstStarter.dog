@@ -15,4 +15,4 @@ export struct ConstLoadStarter: Starter
   @override
   pub proc generateBlankSheets()
     for i = 0; i < self.blankSheets; i += 1 do
-      self.output.write("blank sheet")
+      self.generateBlankSheet()

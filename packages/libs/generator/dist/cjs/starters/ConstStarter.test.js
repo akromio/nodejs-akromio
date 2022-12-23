@@ -11,18 +11,20 @@ suite(__filename, () => {
   {
     test("generateBlankSheets()", async () => {
       {
+        const output = sim.stream.writable();
         const opts = {
-          ["interval"]: 100,
+          ["interval"]: 50,
           ["times"]: 5,
           ["blankSheets"]: 11,
-          ["output"]: sim.stream.duplex()
+          ["output"]: output
         };
         const starter = ConstStarter(opts).start();
-        0, await (0, _core.sleep)("1s");
+        0, await (0, _core.sleep)("400ms");
         expected(starter).toHave({
           'state': StarterState.stopped,
           'iterations': 5
         });
+        expected(output.writable).equalTo(false);
       }
     });
   }

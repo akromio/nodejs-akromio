@@ -33,7 +33,7 @@ ConstLoadStarter.prototype.generateBlankSheets = function () {
   const self = this;
   {
     for (let i = 0; i < this.blankSheets; i += 1) {
-      this.output.write("blank sheet");
+      this.generateBlankSheet();
     }
   }
 };

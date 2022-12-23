@@ -71,10 +71,17 @@ export struct Starter
       self.state =~ stopped
       clearInterval(self.timer)
       self.timer = nil
-      self.output.end("<end>")
+      self.output.end()
 
   /**
    * Generates a batch of blank sheets.
    */
   @abstract
   pub proc generateBlankSheets()
+  
+  /**
+   * Appends a blank sheet to the output stream.
+   */
+  @hidden
+  pub proc generateBlankSheet()
+    self.output.write("bs")

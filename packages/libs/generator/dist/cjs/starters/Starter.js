@@ -83,7 +83,7 @@ Starter.prototype.handle = function () {
       this.state = _core.dogma.enumGet(this.state, "stopped");
       clearInterval(this.timer);
       this.timer = null;
-      this.output.end("<end>");
+      this.output.end();
     }
   }
 };
@@ -91,3 +91,9 @@ Starter.prototype.handle = function () {
 Starter.prototype.generateBlankSheets = function () {
   (0, _core.abstract)();
 }; /* c8 ignore stop */
+Starter.prototype.generateBlankSheet = function () {
+  const self = this;
+  {
+    this.output.write("bs");
+  }
+};

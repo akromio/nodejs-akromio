@@ -8,13 +8,15 @@ suite(__filename, proc()
   test("generateBlankSheets()", async proc()
     # (1) act
     const (
-      opts = {interval = 100, times = 5, blankSheets = 11, output = sim.stream.duplex()}
+      output = sim.stream.writable()
+      opts = {interval = 50, times = 5, blankSheets = 11, output}
       starter = ConstStarter(opts).start()
     )
 
-    await(sleep("1s"))
+    await(sleep("400ms"))
 
     # (2) assessment
     expected(starter).toHave(state = StarterState.stopped, iterations = 5)
+    expected(output.writable).equalTo(false)
   end)
 end)

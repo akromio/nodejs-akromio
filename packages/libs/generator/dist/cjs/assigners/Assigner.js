@@ -2,6 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const JobInfo = _core.dogma.use(require("./JobInfo"));
+const shuffle = _core.dogma.use(require("array-shuffle"));
 const $Assigner = class Assigner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -60,8 +61,37 @@ Assigner.prototype._pvt_ab27666e79a50c9410a9e2a9d2bac25d___post__ = Assigner.pro
 Assigner.prototype.start = async function () {
   const self = this;
   {
-    for await (const blankSheet of this.input) {
-      _core.dogma.nop();
+    const {
+      input,
+      output
+    } = this;
+    let assignationOrder = [];
+    let job;
+    for await (const blankSheet of input) {
+      if ((0, _core.len)(assignationOrder) == 0) {
+        assignationOrder = this.generateAssignationOrder();
+      }
+      if (Math.round(Math.random()) == 0) {
+        job = assignationOrder.shift();
+      } else {
+        job = assignationOrder.pop();
+      }
+      output.write(_core.json.encode(job));
     }
+    output.end();
   }
+};
+Assigner.prototype.generateAssignationOrder = function () {
+  const self = this;
+  let order = [];
+  {
+    const jobs = shuffle(this.jobs);
+    for (const job of jobs) {
+      for (let i = 0; i < job.weight; i += 1) {
+        order.push(job);
+      }
+    }
+    order = shuffle(order);
+  }
+  return order;
 };

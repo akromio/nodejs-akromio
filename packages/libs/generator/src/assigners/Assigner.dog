@@ -1,5 +1,6 @@
 use (
   JobInfo
+  dep://array-shuffle
 )
 
 /**
@@ -45,5 +46,38 @@ export struct Assigner
    * When the input stream is ended, this assigner ends too.
    */
   pub async proc start()
-    await for each blankSheet in self.input do
-      nop
+    # (1) perform assignation for each blank sheet
+    var (
+      {input, output} ::= self
+      assignationOrder = []
+      job
+    )
+
+    await for each blankSheet in input do
+      if len(assignationOrder) == 0 then
+        assignationOrder = self.generateAssignationOrder()
+      
+      if Math.round(Math.random())  == 0 then job = assignationOrder.shift()
+      else job = assignationOrder.pop()
+
+      output.write(json.encode(job))
+    
+    # (2) set end for the output stream
+    output.end()
+
+  /**
+   * Generates an assignation order for 100 assignations,
+   * attending to the weights.
+   */
+  @hidden
+  pub fn generateAssignationOrder() -> order: list
+    # (1) generate random jobs
+    const jobs = shuffle(self.jobs)
+
+    # (2) generate order
+    for each job in jobs do
+      for i = 0; i < job.weight; i += 1 do
+        order.push(job)
+
+    # (3) perform final shuffle
+    order = shuffle(order)
