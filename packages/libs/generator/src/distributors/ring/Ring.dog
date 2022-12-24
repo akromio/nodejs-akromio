@@ -1,0 +1,32 @@
+/**
+ * A ring is a collection of things to return.
+ *
+ * @dev
+ * Every ring point represents something.
+ * When next() ncalled, the ring returns the next point.
+ * When a cycle reached, the cycle starts at the first point.
+ */
+export struct Ring
+  /**
+   * Collection of things to return in ring.
+   */
+  @inject
+  pub const points: list
+
+  /**
+   * Next position to return from the ring.
+   */
+  @hidden @strict
+  pub var position = 0
+
+  /**
+   * Returns the next thing and updates the current position.
+   */
+  pub fn 'next'() -> point: any
+    # (1) restart ring if needed
+    if self.position >= len(points) then
+      self.position = 0
+
+    # (2) determine point
+    point = points[self.position]
+    self.position += 1
