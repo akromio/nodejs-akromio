@@ -1,0 +1,68 @@
+use (
+  {DatasetParser, Dataset} = alias://dataset
+)
+
+/**
+ * Dataset parser to use.
+ */
+const datasetParser = DatasetParser()
+
+/**
+ * The parse options.
+ */
+intf ParseOpts
+  /**
+   * The dataset parent.
+   */
+  parentDataset: Dataset
+
+/**
+ * Base for the catalog parsers.
+ */
+@abstract
+export struct CatalogParser
+  /**
+   * Creates a catalog with the data passed.
+   */
+  @abstract
+  pub fn createCatalog(decl: map): Catalog
+
+  /**
+   * Parses a catalog [decl]aration and returns a catalog object
+   * if everything is alright. Otherwise, it raises an error.
+   */
+  pub async fn parse(decl: map, opts: ParseOpts) -> catalog: Catalog
+    # (1) parse
+    decl = self.parseCommon(decl, opts)
+    decl = await(self.parseSpecific(decl, opts))
+
+    # (2) create catalog instance
+    catalog = self.createCatalog(decl)
+
+  /**
+   * Parses the common [decl]aration, returning a new declaration parsed.
+   */
+  @hidden
+  pub fn parseCommon(decl: map, opts: ParseOpts): map
+    if spec ::= decl.spec; spec != "v1.0" then
+      throw(TypeError($"spec must be v1.0. Got: ${spec}."))
+    
+    const dataset = self.parseDataset(decl.dataset ?? [], opts{*, name = "catalog"})
+    return decl{*, dataset}
+  
+  /**
+   * Parses the dataset [decl]arations, returning its corresponding dataset
+   * with the data already evaluated.
+   */
+  @hidden
+  pub fn parseDataset(decl: map[], opts: map) = datasetParser.parse(
+    decl
+    name = opts.name
+    parent = opts.parentDataset
+  )
+
+  /**
+   * Parses the common [decl]aration, returning a new declaration parsed.
+   */
+  @hidden
+  pub async fn parseSpecific(decl: map, opts: ParseOpts) = decl

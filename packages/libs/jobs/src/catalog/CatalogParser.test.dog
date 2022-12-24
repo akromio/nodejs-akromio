@@ -1,0 +1,77 @@
+use (
+  alias://expected
+  {GlobalDataset} = alias://dataset
+
+  CatalogParserBase = CatalogParser
+  CatalogBase = Catalog
+)
+
+# Test catalog to use.
+struct Catalog: CatalogBase
+
+# Test catalog parser to use.
+struct CatalogParser: CatalogParserBase
+  @override @hidden
+  pub fn createCatalog(decl: map) = Catalog(decl)
+
+suite(__filename, proc()
+  const (
+    parentDataset = GlobalDataset(name = "global")
+    parser = CatalogParser()
+  )
+
+  suite("parseCommon()", proc()
+    test("when spec != v1.0, error must be raised", async proc()
+      # (1) act
+      const (
+        decl = {
+          spec = "1.0"
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+        }
+
+        out = pawait(parser.parse(decl, parentDataset=))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("spec must be v1.0. Got: 1.0."))
+    end)
+
+    test("when dataset is unset, empty dataset must be used", async proc()
+    # (1) act
+      const (
+        decl = {
+          spec = "v1.0"
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+        }
+
+        out = await(parser.parse(decl, parentDataset=))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Catalog).toHave(
+        spec = "v1.0"
+        loc = "test:///stages/catalogs/test-catalog"
+        cty = "text/yaml"
+      )
+    end)
+
+    test("when declaration is ok, catalog must be returned", async proc()
+      # (1) act
+      const (
+        decl = {
+          spec = "v1.0"
+          dataset = []
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+        }
+
+        out = await(parser.parse(decl, parentDataset=))
+      )
+
+      # (2) assessment
+      expected(out).toBe(Catalog)
+    end)
+  end)
+end)

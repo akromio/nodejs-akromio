@@ -1,5 +1,7 @@
 use (
-  CatalogParser
+  {Dataset} = alias://dataset
+  CatalogParser, ParseOpts
+
   StageCatalog
   ../stages/{ConstStageParser, SleepStageParser}
 )
@@ -15,6 +17,11 @@ const constStageParser = ConstStageParser()
 const sleepStageParser = SleepStageParser()
 
 /**
+ * Stage catalog parse options.
+ */
+type StageCatalogParseOpts = ParseOpts
+
+/**
  * A parser to parse stage catalog declarations.
  */
 export struct StageCatalogParser: CatalogParser
@@ -22,7 +29,7 @@ export struct StageCatalogParser: CatalogParser
   pub fn createCatalog(decl: map) = StageCatalog(decl)
 
   @override @hidden
-  pub fn parseSpecific(decl: map, opts) = decl{
+  pub fn parseSpecific(decl: map, opts: StageCatalogParseOpts) = decl{
     *
     stages = self.parseStages(decl.stages, decl.dataset)
   }
@@ -31,7 +38,7 @@ export struct StageCatalogParser: CatalogParser
    * Parses the stage [decl]arations.
    */
   @hidden
-  pub fn parseStages(decl: map[], dataset#[: Dataset]) -> stages: map
+  pub fn parseStages(decl: map[], dataset: Dataset) -> stages: map
     for each stage := decl do
       with i ::= stage.impl do
         if "const" then stage = constStageParser.parse(stage, dataset)

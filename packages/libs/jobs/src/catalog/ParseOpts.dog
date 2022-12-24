@@ -1,0 +1,12 @@
+use (
+  {Dataset} = alias://dataset
+)
+
+/**
+ * Parse options.
+ */
+export intf ParseOpts
+  /**
+   * Dataset parent.
+   */
+  parentDataset: Dataset
