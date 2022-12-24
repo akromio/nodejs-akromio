@@ -8,4 +8,8 @@ pub use (
   starters/ConstStarter
 
   assigners/Assigner
+
+  distributors/Distributor
+  distributors/ring/Ring
+  distributors/impl/redis/RedisStreamsDistributor
 )

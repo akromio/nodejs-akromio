@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, api must be exported", () => {
       {
-        expected(index).toHave(["StarterState", "Starter", "ConstStarter", "SleepStarter", "Assigner"]);
+        expected(index).toHave(["StarterState", "Starter", "ConstStarter", "SleepStarter", "Assigner", "Distributor", "Ring", "RedisStreamsDistributor"]);
       }
     });
   }

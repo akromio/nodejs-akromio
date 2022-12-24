@@ -10,7 +10,12 @@ suite(__filename, proc()
       "Starter"
       "ConstStarter"
       "SleepStarter"
+      
       "Assigner"
+
+      "Distributor"
+      "Ring"
+      "RedisStreamsDistributor"
     ])
   end)
 end)
