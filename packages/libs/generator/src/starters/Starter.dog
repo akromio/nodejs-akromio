@@ -1,5 +1,7 @@
 use (
   {setInterval, clearInterval} = dep://timers
+
+  ../BlankSheetStream
   StarterState
 )
 
@@ -41,7 +43,7 @@ export struct Starter
    *
    * When ended, its end() method is called.
    */
-  pub const output
+  pub const output: BlankSheetStream
 
   /**
    * Starts to work.
@@ -83,5 +85,5 @@ export struct Starter
    * Appends a blank sheet to the output stream.
    */
   @hidden
-  pub proc generateBlankSheet()
-    self.output.write("bs")
+  pub proc appendBlankSheet()
+    self.output.appendBlankSheet()

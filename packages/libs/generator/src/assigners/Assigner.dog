@@ -1,6 +1,8 @@
 use (
   dep://array-shuffle
-  ../RunReqStream
+  {Readable} = dep://stream
+  
+  ../{RunReqStream}
   JobInfo
 )
 
@@ -12,7 +14,7 @@ export struct Assigner
   /**
    * Input stream where the blank sheets are.
    */
-  pub const input
+  pub const input: Readable
 
   /**
    * Output stream where to let the assignations.

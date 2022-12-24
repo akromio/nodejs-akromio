@@ -5,6 +5,7 @@ const {
   setInterval,
   clearInterval
 } = _core.dogma.use(require("timers"));
+const BlankSheetStream = _core.dogma.use(require("../BlankSheetStream"));
 const StarterState = _core.dogma.use(require("./StarterState"));
 const $Starter = class Starter {
   constructor(_) {
@@ -39,7 +40,7 @@ const $Starter = class Starter {
       writable: true,
       enumerable: true
     });
-    (0, _core.expect)('output', _['output'], null);
+    (0, _core.expect)('output', _['output'], BlankSheetStream);
     Object.defineProperty(this, 'output', {
       value: (0, _core.coalesce)(_['output'], null),
       writable: false,
@@ -91,9 +92,9 @@ Starter.prototype.handle = function () {
 Starter.prototype.generateBlankSheets = function () {
   (0, _core.abstract)();
 }; /* c8 ignore stop */
-Starter.prototype.generateBlankSheet = function () {
+Starter.prototype.appendBlankSheet = function () {
   const self = this;
   {
-    this.output.write("bs");
+    this.output.appendBlankSheet();
   }
 };

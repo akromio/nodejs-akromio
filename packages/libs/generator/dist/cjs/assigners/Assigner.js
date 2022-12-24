@@ -2,13 +2,16 @@
 
 var _core = require("@dogmalang/core");
 const shuffle = _core.dogma.use(require("array-shuffle"));
+const {
+  Readable
+} = _core.dogma.use(require("stream"));
 const RunReqStream = _core.dogma.use(require("../RunReqStream"));
 const JobInfo = _core.dogma.use(require("./JobInfo"));
 const $Assigner = class Assigner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */
-    (0, _core.expect)('input', _['input'], null);
+    (0, _core.expect)('input', _['input'], Readable);
     Object.defineProperty(this, 'input', {
       value: (0, _core.coalesce)(_['input'], null),
       writable: false,

@@ -3,8 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.ConstStarter = exports.Assigner = void 0;
+exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.ConstStarter = exports.BlankSheetStream = exports.Assigner = void 0;
 var _core = require("@dogmalang/core");
+const BlankSheetStream = _core.dogma.use(require("./BlankSheetStream"));
+exports.BlankSheetStream = BlankSheetStream;
 const RunReq = _core.dogma.use(require("./RunReq"));
 exports.RunReq = RunReq;
 const RunReqStream = _core.dogma.use(require("./RunReqStream"));

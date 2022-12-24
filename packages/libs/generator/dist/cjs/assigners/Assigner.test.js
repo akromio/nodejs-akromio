@@ -6,6 +6,7 @@ const {
   sim,
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
+const BlankSheetStream = _core.dogma.use(require("../BlankSheetStream"));
 const RunReqStream = _core.dogma.use(require("../RunReqStream"));
 const Assigner = _core.dogma.use(require("./Assigner"));
 suite(__filename, () => {
@@ -28,9 +29,10 @@ suite(__filename, () => {
               ["job"]: job,
               ["weight"]: 20
             }];
+            const input = BlankSheetStream();
             const output = RunReqStream();
             const opts = {
-              ["input"]: sim.stream.readable(),
+              ["input"]: input,
               ["output"]: output,
               ["jobs"]: jobs
             };

@@ -2,7 +2,7 @@ use (
   alias://expected
   {sim, monitor} = alias://doubles
 
-  ../RunReqStream
+  ../{BlankSheetStream, RunReqStream}
   Assigner
 )
 
@@ -18,8 +18,9 @@ suite(__filename, proc()
       # (1) act
       const (
         jobs = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
+        input = BlankSheetStream()
         output = RunReqStream()
-        opts = {input = sim.stream.readable(), output, jobs}
+        opts = {input, output, jobs}
         out = peval(Assigner(opts))
       )
 
