@@ -1,0 +1,50 @@
+use (
+  alias://expected
+  {sim, fun} = alias://doubles
+
+  ConstStageParser
+)
+
+suite(__filename, proc()
+  const parser = ConstStageParser()
+
+  suite("_parse()", proc()
+    test("when declaration is not valid, error must be raised", proc()
+      # (1) act
+      const (
+        decl = {stage = "warmup", impl = "const", duration = 120}
+        out = peval(parser.parse(decl, sim(eval = fun.invokes(fn(decl) = decl end))))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Const stage schema not valid: {")
+    end)
+
+    test("when declaration is valid, this must be returned", proc()
+      # (1) act
+      const (
+        jobs = []
+        decl = {
+          stage = "warmup"
+          impl = "const"
+          duration = "2m"
+          interval = "2s"
+          requests = 100
+          jobs
+        }
+
+        out = parser.parse(decl, sim(eval = fun.invokes(fn(decl) = decl end)))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        stage = "warmup"
+        'impl' = "const"
+        duration = 120000
+        interval = 2000
+        requests = 100
+        jobs
+      )
+    end)
+  end)
+end)

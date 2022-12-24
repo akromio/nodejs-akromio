@@ -1,0 +1,13 @@
+/**
+ * Common schema for the stages.
+ */
+export intf Stage
+  /**
+   * Stage name.
+   */
+  stage: text
+
+  /**
+   * Stage duration.
+   */
+  duration: num

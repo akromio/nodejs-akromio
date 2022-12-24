@@ -1,0 +1,43 @@
+spec: v1.0
+desc: An example of stage catalog.
+
+dataset:
+  - const: c
+    value: value
+
+stages:
+  - stage: warmup
+    impl: const
+    duration: 2m
+    interval: 1s
+    requests: 50
+    jobs:
+      - registry: local
+        catalog: performance
+        job: web-app
+        weight: 55
+      
+      - registry: local
+        catalog: stages
+        job: mobile-app
+        weight: 45
+  
+  - stage: sleep30s
+    impl: sleep
+    duration: 30s
+
+  - stage: load
+    impl: const
+    duration: 10m
+    interval: 1s  # default: 1s
+    requests: 100
+    jobs:
+      - registry: local
+        catalog: performance
+        job: web-app
+        weight: 60
+      
+      - registry: local
+        catalog: stages
+        job: mobile-app
+        weight: 40

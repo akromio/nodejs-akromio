@@ -1,0 +1,12 @@
+use (
+  Catalog
+)
+
+/**
+ * A catalog of stages.
+ */
+export struct StageCatalog: Catalog
+  /**
+   * Stages defined into this catalog.
+   */
+  pub const stages := {}

@@ -1,0 +1,21 @@
+use (
+  {ms} = util
+)
+
+/**
+ * Base for the stage parsers.
+ */
+@abstract
+export struct StageParser
+  /**
+   * Parses a given [decl]aration, using a given [dataset].
+   */
+  pub fn parse(decl: map, dataset) -> stage: map
+    decl = dataset.eval(decl)
+    stage = self._parse(decl{*, duration = ms(decl.duration)})
+  
+  /**
+   * Parses a given [decl]aration.
+   */
+  @hidden
+  pub fn _parse(decl: map) -> decl

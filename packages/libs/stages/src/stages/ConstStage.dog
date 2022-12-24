@@ -1,0 +1,51 @@
+use (
+  Stage
+)
+
+/**
+ * Info on a job to run.
+ */
+intf JobInfo
+  /**
+   * Registry where the catalog is.
+   */
+  registry: text
+
+  /**
+   * Catalog name where the job is.
+   */
+  catalog: text
+
+  /**
+   * Job name to run.
+   */
+  job: text
+
+  /**
+   * Arguments to pass.
+   */
+  args?: any
+
+  /**
+   * Weight of this job into the stage.
+   */
+  weight: num
+
+/**
+ * Schema for the const stages.
+ */
+export intf ConstStage: Stage
+  /**
+   * Interval.
+   */
+  interval: num
+
+  /**
+   * Number of requests to generate per interval.
+   */
+  requests: num
+
+  /**
+   * Info on the jobs to run.
+   */
+  jobs: JobInfo[]

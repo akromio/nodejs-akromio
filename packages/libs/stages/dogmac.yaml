@@ -1,0 +1,18 @@
+uses:
+  catalog:
+    js: "@akromio/catalog"
+    
+  core:
+    js: "@akromio/core"
+    
+  dataset:
+    js: "@akromio/dataset"
+  
+  doubles:
+    js: "@akromio/doubles"
+    
+  expected:
+    js: "@akromio/expected"
+  
+  registry:
+    js: "@akromio/registry"

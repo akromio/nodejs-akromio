@@ -1,0 +1,86 @@
+use (
+  alias://expected
+  {GlobalDataset} = alias://dataset
+
+  StageCatalog
+  StageCatalogParser
+)
+
+suite(__filename, proc()
+  const (
+    parser = StageCatalogParser()
+    parentDataset = GlobalDataset(name = "global")
+  )
+
+  suite("parseStages()", proc()
+    test("when unknown stage, error must be raised", async proc()
+      # (1) act
+      const (
+        decl = {
+          spec = "v1.0"
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+          dataset = [{const = "duration", value = "10m"}]
+          stages = [
+            {stage = "warmup", impl = "xconstx", duration = "2m", requests = 1000, jobs = []}
+            {stage = "pause", impl = "sleep", duration = "1m"}
+            {stage = "load", impl = "const", duration = "$(duration)", requests = 2000, jobs = []}
+          ]
+        }
+
+        out = pawait(parser.parse(decl, parentDataset=))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Unknown stage impl: xconstx."))
+    end)
+
+    test("when declaration is ok, stage catalog must be raised", async proc()
+      # (1) act
+      const (
+        decl = {
+          spec = "v1.0"
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+          dataset = [{const = "duration", value = "10m"}]
+          stages = [
+            {stage = "warmup", impl = "const", duration = "2m", requests = 1000, jobs = []}
+            {stage = "pause", impl = "sleep", duration = "1m"}
+            {stage = "load", impl = "const", duration = "$(duration)", requests = 2000, jobs = []}
+          ]
+        }
+
+        out = await(parser.parse(decl, parentDataset=))
+      )
+
+      # (2) assessment
+      expected(out).toBe(StageCatalog).toHave(
+        spec = "v1.0"
+        loc = "test:///stages/catalogs/test-catalog"
+        cty = "text/yaml"
+        stages = {
+          warmup =
+            stage = "warmup"
+            impl = "const"
+            duration = 120000
+            requests = 1000
+            jobs = []
+            interval = 1000
+          
+          pause =
+            stage = "pause"
+            impl = "sleep"
+            duration = 60000
+          
+          load =
+            stage = "load"
+            impl = "const"
+            duration = 600000
+            requests = 2000
+            jobs = []
+            interval = 1000
+        }
+      )
+    end)
+  end)
+end)

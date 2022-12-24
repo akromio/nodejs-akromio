@@ -1,0 +1,9 @@
+use (
+  SleepStage
+  StageParser
+)
+
+/**
+ * A parser for parsing stages associated a const starters.
+ */
+export struct ConstStageParser: StageParser

@@ -1,0 +1,12 @@
+use (
+  milliseconds = dep://ms
+)
+
+/**
+ * Returns the milliseconds for a given [interval].
+ */
+pub fn ms(interval: (text | num)) = if interval is num then
+  1000
+else
+  milliseconds(interval)
+end

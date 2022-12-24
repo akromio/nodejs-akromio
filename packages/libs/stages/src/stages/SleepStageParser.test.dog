@@ -1,0 +1,44 @@
+use (
+  alias://expected
+  {sim, fun} = alias://doubles
+
+  SleepStageParser
+)
+
+suite(__filename, proc()
+  const parser = SleepStageParser()
+
+  suite("_parse()", proc()
+    test("when declaration is not valid, error must be raised", proc()
+      # (1) act
+      const (
+        decl = {stage = "warmup", impl = "sleep", duration = true}
+        out = peval(parser.parse(decl, sim(eval = fun.invokes(fn(decl) = decl end))))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).toBe(TypeError)
+    end)
+
+    test("when declaration is valid, this must be returned", proc()
+      # (1) act
+      const (
+        jobs = []
+        decl = {
+          stage = "pause"
+          impl = "sleep"
+          duration = "2m"
+        }
+
+        out = parser.parse(decl, sim(eval = fun.invokes(fn(decl) = decl end)))
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        stage = "pause"
+        'impl' = "sleep"
+        duration = 120000
+      )
+    end)
+  end)
+end)
