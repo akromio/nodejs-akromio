@@ -6,6 +6,7 @@ const {
   sim,
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
+const RunReqStream = _core.dogma.use(require("../RunReqStream"));
 const Assigner = _core.dogma.use(require("./Assigner"));
 suite(__filename, () => {
   {
@@ -27,9 +28,10 @@ suite(__filename, () => {
               ["job"]: job,
               ["weight"]: 20
             }];
+            const output = RunReqStream();
             const opts = {
               ["input"]: sim.stream.readable(),
-              ["output"]: sim.stream.writable(),
+              ["output"]: output,
               ["jobs"]: jobs
             };
             const out = _core.dogma.peval(() => {
@@ -59,8 +61,8 @@ suite(__filename, () => {
             const input = sim.stream.readable({
               'data': blankSheets
             });
-            const output = monitor(sim.stream.writable(), {
-              'method': "write"
+            const output = monitor(RunReqStream(), {
+              'method': "append"
             });
             const opts = {
               ["input"]: input,
@@ -79,7 +81,7 @@ suite(__filename, () => {
             let job2 = 0;
             expected(log.calls).equalTo(100);
             for (let i = 0; i < log.calls; i += 1) {
-              const job = _core.json.decode(log.getCall(i).args);
+              const job = _core.dogma.getItem(log.getCall(i).args, 0);
               if (job.job == "#1") {
                 job1 += 1;
               } else {

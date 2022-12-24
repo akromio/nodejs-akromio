@@ -1,6 +1,7 @@
 use (
-  JobInfo
   dep://array-shuffle
+  ../RunReqStream
+  JobInfo
 )
 
 /**
@@ -16,7 +17,7 @@ export struct Assigner
   /**
    * Output stream where to let the assignations.
    */
-  pub const output
+  pub const output: RunReqStream
 
   /**
    * Job infos to use.
@@ -60,7 +61,7 @@ export struct Assigner
       if Math.round(Math.random())  == 0 then job = assignationOrder.shift()
       else job = assignationOrder.pop()
 
-      output.write(json.encode(job))
+      output.append(job)
     
     # (2) set end for the output stream
     output.end()

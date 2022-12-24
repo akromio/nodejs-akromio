@@ -1,6 +1,8 @@
 use (
   alias://expected
   {sim, monitor} = alias://doubles
+
+  ../RunReqStream
   Assigner
 )
 
@@ -16,7 +18,8 @@ suite(__filename, proc()
       # (1) act
       const (
         jobs = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
-        opts = {input = sim.stream.readable(), output = sim.stream.writable(), jobs}
+        output = RunReqStream()
+        opts = {input = sim.stream.readable(), output, jobs}
         out = peval(Assigner(opts))
       )
 
@@ -35,7 +38,7 @@ suite(__filename, proc()
           {registry, catalog, job = "#2", weight = 75}
         ]
         input = sim.stream.readable(data = blankSheets)
-        output = monitor(sim.stream.writable(), method = "write")
+        output = monitor(RunReqStream(), method = "append")
         opts = {input, output, jobs}
         assigner = Assigner(opts)
       )
@@ -56,7 +59,7 @@ suite(__filename, proc()
       expected(log.calls).equalTo(100)
       
       for i = 0; i < log.calls; i += 1 do
-        const job = json.decode(log.getCall(i).args)
+        const job = log.getCall(i).args[0]
         
         if job.job == "#1" then job1 += 1
         else job2 += 1

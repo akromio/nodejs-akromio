@@ -1,4 +1,4 @@
-# `@akromio/run-request-generator`
+# `@akromio/generator`
 
 Run-request generator lib for Akromio.
 

@@ -1,8 +1,9 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const JobInfo = _core.dogma.use(require("./JobInfo"));
 const shuffle = _core.dogma.use(require("array-shuffle"));
+const RunReqStream = _core.dogma.use(require("../RunReqStream"));
+const JobInfo = _core.dogma.use(require("./JobInfo"));
 const $Assigner = class Assigner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -13,7 +14,7 @@ const $Assigner = class Assigner {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('output', _['output'], null);
+    (0, _core.expect)('output', _['output'], RunReqStream);
     Object.defineProperty(this, 'output', {
       value: (0, _core.coalesce)(_['output'], null),
       writable: false,
@@ -76,7 +77,7 @@ Assigner.prototype.start = async function () {
       } else {
         job = assignationOrder.pop();
       }
-      output.write(_core.json.encode(job));
+      output.append(job);
     }
     output.end();
   }
