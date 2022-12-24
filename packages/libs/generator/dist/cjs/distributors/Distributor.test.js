@@ -77,10 +77,10 @@ suite(__filename, () => {
               'clear': true
             });
             expected(deliver.calls).equalTo(4);
-            expected((0, _core.text)(deliver.getCall(0).args)).toInclude("#1");
-            expected((0, _core.text)(deliver.getCall(1).args)).toInclude("#2");
-            expected((0, _core.text)(deliver.getCall(2).args)).toInclude("#1");
-            expected((0, _core.text)(deliver.getCall(3).args)).toInclude("#3");
+            expected(deliver.getCall(0).args).get("[0].job").equalTo("#1");
+            expected(deliver.getCall(1).args).get("[0].job").equalTo("#2");
+            expected(deliver.getCall(2).args).get("[0].job").equalTo("#1");
+            expected(deliver.getCall(3).args).get("[0].job").equalTo("#3");
           }
         });
       }

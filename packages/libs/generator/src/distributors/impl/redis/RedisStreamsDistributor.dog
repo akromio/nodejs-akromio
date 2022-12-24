@@ -1,0 +1,19 @@
+use (
+  ../../Distributor
+  ../../../RunReq
+  Destination
+)
+
+/**
+ * A distributor to deliver run requests to Redis streams.
+ */
+export struct RedisStreamsDistributor: Distributor
+  /**
+   * Redis client to use.
+   */
+  @inject
+  pub const redis
+
+  @override @hidden
+  pub async proc deliver(req: RunReq, dst: Destination)
+    redis.xadd(dst.stream, "*", "req", json.encode(req))

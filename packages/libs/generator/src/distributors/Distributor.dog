@@ -27,11 +27,12 @@ export struct Distributor
    * Delivers the run requests among the ring destinations.
    */
   pub async proc start()
-    await for each req in input do
+    await for each req := input do
+      if req is Buffer then req = json.decode(req)
       self.deliver(req, ring.next())
   
   /**
    * Deliver a given run [req]uest to a given destination.
    */
-  @abstract
+  @abstract @hidden
   pub proc deliver(req: RunReq, destination: Destination)

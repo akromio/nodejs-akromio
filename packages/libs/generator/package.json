@@ -33,6 +33,9 @@
     "@dogmalang/core": "^1.0.0-rc18.0",
     "array-shuffle": "^2.0.0"
   },
+  "devDependencies": {
+    "redis": "^4.5.1"
+  },
   "scripts": {
     "lint": "dogmac check src",
     "build": "npm run build/src",
