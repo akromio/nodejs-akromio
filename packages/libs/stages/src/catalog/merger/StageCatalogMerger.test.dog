@@ -1,0 +1,66 @@
+use (
+  alias://expected
+  StageCatalogMerger
+)
+
+suite(__filename, proc()
+  const (
+    merger = StageCatalogMerger()
+  )
+
+  suite("mergeStages()", proc()
+    test("when called, extensor stages are appended at the end of the extended one, removing the extended", proc()
+      # (1) act
+      const (
+        extended = {
+          stages = [
+            {sleep = "x", duration = "1m"}
+            {const = "y", duration = "1m", requests = 1000}
+            {sleep = "z", duration = "1m"}
+          ]
+        }
+
+        extensor = {
+          stages = [
+            {sleep = "y", duration = "2m"}
+            {sleep = "a", duration = "2m"}
+          ]
+        }
+
+        out = merger.merge(extensor, extended)
+      )
+
+      # (2) assessment
+      expected(out.stages).equalTo([
+        {sleep = "x", duration = "1m"}
+        {sleep = "z", duration = "1m"}
+        {sleep = "y", duration = "2m"}
+        {sleep = "a", duration = "2m"}
+      ])
+    end)
+
+    test("when stages unset, empty list must be used", proc()
+      # (1) act
+      const (
+        extensor = {}
+        extended1 = {}
+        extended2 = {
+          stages = [
+            {sleep = "x", duration = "1m"}
+            {sleep = "y", duration = "1m"}
+            {sleep = "z", duration = "1m"}
+          ]
+        }
+
+        out = merger.merge(extensor, extended1, extended2)
+      )
+
+      # (2) assessment
+      expected(out.stages).equalTo([
+        {sleep = "x", duration = "1m"}
+        {sleep = "y", duration = "1m"}
+        {sleep = "z", duration = "1m"}
+      ])
+    end)
+  end)
+end)

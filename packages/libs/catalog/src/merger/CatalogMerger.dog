@@ -27,7 +27,7 @@ export struct CatalogMerger
    * not merge.
    */
   @hidden
-  pub fn isSpeciailizedField(name: text) = false
+  pub fn isSpecializedField(name: text) = false
   
   /**
    * Merges specialization fields of a given [decl]aration with the given [extensions].

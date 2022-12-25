@@ -15,8 +15,7 @@ suite(__filename, () => {
         test("when declaration is not valid, error must be raised", () => {
           {
             const decl = {
-              ["stage"]: "warmup",
-              ["impl"]: "sleep",
+              ["sleep"]: "warmup",
               ["duration"]: true
             };
             const out = _core.dogma.peval(() => {
@@ -36,8 +35,7 @@ suite(__filename, () => {
           {
             const jobs = [];
             const decl = {
-              ["stage"]: "pause",
-              ["impl"]: "sleep",
+              ["sleep"]: "pause",
               ["duration"]: "2m"
             };
             const out = parser.parse(decl, sim({
@@ -49,7 +47,7 @@ suite(__filename, () => {
               })
             }));
             expected(out).equalTo({
-              'stage': "pause",
+              'name': "pause",
               'impl': "sleep",
               'duration': 120000
             });

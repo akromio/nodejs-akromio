@@ -54,7 +54,7 @@ CatalogMerger.prototype.mergeCommon = function (decl, extensions) {
   }
   return decl;
 };
-CatalogMerger.prototype.isSpeciailizedField = function (name) {
+CatalogMerger.prototype.isSpecializedField = function (name) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("name", name, _core.text);
   {

@@ -4,6 +4,8 @@ use (
 )
 
 /**
- * A parser for parsing stages associated a const starters.
+ * A parser for parsing stages associated a sleep starters.
  */
-export struct ConstStageParser: StageParser
+export struct SleepStageParser: StageParser
+  @override @hidden
+  pub fn _parse(decl: map) = decl{*, -sleep, name = decl.sleep, impl = "sleep"}

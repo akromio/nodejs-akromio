@@ -5,7 +5,7 @@ export intf Stage
   /**
    * Stage name.
    */
-  stage: text
+  name: text
 
   /**
    * Stage duration.

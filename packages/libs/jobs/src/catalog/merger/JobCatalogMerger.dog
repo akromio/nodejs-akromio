@@ -3,8 +3,7 @@ use (
 )
 
 /**
- * A mixer of catalog declarations.
- * Used for extending a catalog from another.
+ * A mixer of job catalog declarations.
  */
 export struct JobCatalogMerger: CatalogMerger
   @override @hidden

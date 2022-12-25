@@ -63,28 +63,14 @@ StageCatalogParser.prototype.parseStages = function (decl, dataset) {
   _core.dogma.expect("dataset", dataset, Dataset);
   {
     for (let stage of decl) {
-      {
-        const i = stage.impl;
-        switch (i) {
-          case "const":
-            {
-              stage = constStageParser.parse(stage, dataset);
-            } /* c8 ignore start */
-            break;
-          /* c8 ignore stop */
-          case "sleep":
-            {
-              stage = sleepStageParser.parse(stage, dataset);
-            } /* c8 ignore start */
-            break;
-          /* c8 ignore stop */
-          default:
-            {
-              _core.dogma.raise(TypeError(`Unknown stage impl: ${i}.`));
-            }
-        }
+      if (_core.dogma.includes(stage, "const")) {
+        stage = constStageParser.parse(stage, dataset);
+      } else if (_core.dogma.includes(stage, "sleep")) {
+        stage = sleepStageParser.parse(stage, dataset);
+      } else {
+        _core.dogma.raise(TypeError(`Unknown stage: ${(0, _core.fmt)(stage)}.`));
       }
-      _core.dogma.setItem("=", stages, stage.stage, stage);
+      _core.dogma.setItem("=", stages, stage.name, stage);
     }
   }
   return stages;

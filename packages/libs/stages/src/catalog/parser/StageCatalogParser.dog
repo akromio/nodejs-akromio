@@ -40,9 +40,8 @@ export struct StageCatalogParser: CatalogParser
   @hidden
   pub fn parseStages(decl: map[], dataset: Dataset) -> stages: map
     for each stage := decl do
-      with i ::= stage.impl do
-        if "const" then stage = constStageParser.parse(stage, dataset)
-        if "sleep" then stage = sleepStageParser.parse(stage, dataset)
-        else throw(TypeError($"Unknown stage impl: ${i}."))
+      if "const" in stage then stage = constStageParser.parse(stage, dataset)
+      else if "sleep" in stage then stage = sleepStageParser.parse(stage, dataset)
+      else throw(TypeError($"Unknown stage: ${fmt(stage)}."))
       
-      stages[stage.stage] = stage
+      stages[stage.name] = stage

@@ -32,10 +32,12 @@ ConstStageParser.prototype._parse = function (decl) {
   _core.dogma.expect("decl", decl, _core.map);
   {
     stage = _core.dogma.clone(decl, {
+      "name": decl.const,
+      "impl": "const",
       "interval": ms(decl.interval || "1s")
-    }, {}, [], []);
+    }, {}, ["const"], []);
     if (_core.dogma.isNot(stage, ConstStage)) {
-      _core.dogma.raise(TypeError(`Const stage schema not valid: ${(0, _core.fmt)(decl)}.`));
+      _core.dogma.raise(TypeError(`Const stage schema not valid: ${(0, _core.fmt)(stage)}.`));
     }
   }
   return stage;

@@ -22,9 +22,9 @@ suite(__filename, proc()
           cty = "text/yaml"
           dataset = [{const = "duration", value = "10m"}]
           stages = [
-            {stage = "warmup", impl = "xconstx", duration = "2m", requests = 1000, jobs = []}
-            {stage = "pause", impl = "sleep", duration = "1m"}
-            {stage = "load", impl = "const", duration = "$(duration)", requests = 2000, jobs = []}
+            {xconstx = "warmup", duration = "2m", requests = 1000, jobs = []}
+            {sleep = "pause", duration = "1m"}
+            {'const' = "load", duration = "$(duration)", requests = 2000, jobs = []}
           ]
         }
 
@@ -32,7 +32,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Unknown stage impl: xconstx."))
+      expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Unknown stage:.+xconstx")
     end)
 
     test("when declaration is ok, stage catalog must be raised", async proc()
@@ -44,9 +44,9 @@ suite(__filename, proc()
           cty = "text/yaml"
           dataset = [{const = "duration", value = "10m"}]
           stages = [
-            {stage = "warmup", impl = "const", duration = "2m", requests = 1000, jobs = []}
-            {stage = "pause", impl = "sleep", duration = "1m"}
-            {stage = "load", impl = "const", duration = "$(duration)", requests = 2000, jobs = []}
+            {'const' = "warmup", duration = "2m", requests = 1000, jobs = []}
+            {sleep = "pause", duration = "1m"}
+            {'const' = "load", duration = "$(duration)", requests = 2000, jobs = []}
           ]
         }
 
@@ -60,7 +60,7 @@ suite(__filename, proc()
         cty = "text/yaml"
         stages = {
           warmup =
-            stage = "warmup"
+            name = "warmup"
             impl = "const"
             duration = 120000
             requests = 1000
@@ -68,12 +68,12 @@ suite(__filename, proc()
             interval = 1000
           
           pause =
-            stage = "pause"
+            name = "pause"
             impl = "sleep"
             duration = 60000
           
           load =
-            stage = "load"
+            name = "load"
             impl = "const"
             duration = 600000
             requests = 2000

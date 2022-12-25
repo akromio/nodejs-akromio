@@ -3,7 +3,7 @@
 var _core = require("@dogmalang/core");
 const SleepStage = _core.dogma.use(require("./SleepStage"));
 const StageParser = _core.dogma.use(require("./StageParser"));
-const $ConstStageParser = class ConstStageParser extends StageParser {
+const $SleepStageParser = class SleepStageParser extends StageParser {
   constructor(_) {
     super(_);
     /* c8 ignore start */
@@ -17,9 +17,19 @@ const $ConstStageParser = class ConstStageParser extends StageParser {
   }
 };
 
-const ConstStageParser = new Proxy($ConstStageParser, {
+const SleepStageParser = new Proxy($SleepStageParser, {
   apply(receiver, self, args) {
-    return new $ConstStageParser(...args);
+    return new $SleepStageParser(...args);
   }
 });
-module.exports = exports = ConstStageParser;
+module.exports = exports = SleepStageParser;
+SleepStageParser.prototype._parse = function (decl) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map);
+  {
+    return _core.dogma.clone(decl, {
+      "name": decl.sleep,
+      "impl": "sleep"
+    }, {}, ["sleep"], []);
+  }
+};

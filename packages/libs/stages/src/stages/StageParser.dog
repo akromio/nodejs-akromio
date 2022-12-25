@@ -17,5 +17,5 @@ export struct StageParser
   /**
    * Parses a given [decl]aration.
    */
-  @hidden
-  pub fn _parse(decl: map) -> decl
+  @abstract @hidden
+  pub fn _parse(decl: map): map

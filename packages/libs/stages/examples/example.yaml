@@ -6,8 +6,7 @@ dataset:
     value: value
 
 stages:
-  - stage: warmup
-    impl: const
+  - const: warmup
     duration: 2m
     interval: 1s
     requests: 50
@@ -22,12 +21,10 @@ stages:
         job: mobile-app
         weight: 45
   
-  - stage: sleep30s
-    impl: sleep
+  - sleep: sleep30s
     duration: 30s
 
-  - stage: load
-    impl: const
+  - const: load
     duration: 10m
     interval: 1s  # default: 1s
     requests: 100

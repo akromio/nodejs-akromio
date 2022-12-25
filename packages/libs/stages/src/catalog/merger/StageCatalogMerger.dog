@@ -1,0 +1,42 @@
+use (
+  {CatalogMerger} = alias://catalog
+)
+
+/**
+ * A mixer of stage catalog declarations.
+ */
+export struct StageCatalogMerger: CatalogMerger
+  @override @hidden
+  pub fn isSpecializedField(name: text) = name in ["stages"]
+
+  @override @hidden
+  pub fn mergeSpecialization(decl: map, extensions: map[]) -> decl
+    for each ext in extensions do
+      if "stages" in ext then decl = self.mergeStages(ext.stages, decl)
+
+  /**
+   * Mixes a given [stages] declaration into a catalog [decl]aration.
+   */
+  @hidden
+  pub fn mergeStages(stages: any[], decl: map) -> decl
+    # (1) prepare stages in declaration to extend
+    decl.stages ?= []
+
+    # (2) mix stages into declaration
+    for each stage in stages do
+      # remove stage if already exists
+      const (
+        stageName = getStageName(stage)
+        ix = decl.stages.findIndex(fn(decl) = getStageName(decl) == stageName end)
+      )
+
+      if ix >= 0 then
+        decl.stages.splice(ix, 1)
+
+      # add stage to current stages
+      decl.stages.push(stage)
+
+/**
+ * Returns the name of a given stage [decl]aration.
+ */
+fn getStageName(decl: map) = decl.const ?? decl.sleep

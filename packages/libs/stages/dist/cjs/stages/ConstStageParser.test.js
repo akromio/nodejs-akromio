@@ -36,8 +36,7 @@ suite(__filename, () => {
           {
             const jobs = [];
             const decl = {
-              ["stage"]: "warmup",
-              ["impl"]: "const",
+              ["const"]: "warmup",
               ["duration"]: "2m",
               ["interval"]: "2s",
               ["requests"]: 100,
@@ -52,7 +51,7 @@ suite(__filename, () => {
               })
             }));
             expected(out).equalTo({
-              'stage': "warmup",
+              'name': "warmup",
               'impl': "const",
               'duration': 120000,
               'interval': 2000,

@@ -11,8 +11,8 @@ export struct ConstStageParser: StageParser
   @override @hidden
   pub fn _parse(decl: map) -> stage: map
     # (1) parse base
-    stage = decl{*, interval = ms(decl.interval or "1s")}
+    stage = decl{*, -const, name = decl.const, impl = "const", interval = ms(decl.interval or "1s")}
 
     # (2) check schema
     if stage is not ConstStage then
-      throw(TypeError($"Const stage schema not valid: ${fmt(decl)}."))
+      throw(TypeError($"Const stage schema not valid: ${fmt(stage)}."))

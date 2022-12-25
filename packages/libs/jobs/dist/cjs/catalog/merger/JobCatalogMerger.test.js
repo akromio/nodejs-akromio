@@ -143,7 +143,7 @@ suite(__filename, () => {
             }]);
           }
         });
-        test("when jobs are unavailable, empty list must be used", () => {
+        test("when jobs unset, empty list must be used", () => {
           {
             const extensor = {};
             const extended1 = {};

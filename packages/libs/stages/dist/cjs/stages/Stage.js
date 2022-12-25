@@ -2,7 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const Stage = _core.dogma.intf('Stage', {
-  stage: {
+  name: {
     optional: false,
     type: _core.text
   },

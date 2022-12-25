@@ -35,9 +35,7 @@ StageParser.prototype.parse = function (decl, dataset) {
   }
   return stage;
 };
-StageParser.prototype._parse = function (decl) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.map);
-  {}
-  return decl;
-};
+/* c8 ignore start */
+StageParser.prototype._parse = function () {
+  (0, _core.abstract)();
+}; /* c8 ignore stop */

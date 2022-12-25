@@ -25,8 +25,7 @@ suite(__filename, proc()
       const (
         jobs = []
         decl = {
-          stage = "warmup"
-          impl = "const"
+          'const' = "warmup"
           duration = "2m"
           interval = "2s"
           requests = 100
@@ -38,7 +37,7 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).equalTo(
-        stage = "warmup"
+        name = "warmup"
         'impl' = "const"
         duration = 120000
         interval = 2000

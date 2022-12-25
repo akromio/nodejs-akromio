@@ -96,7 +96,7 @@ suite(__filename, proc()
       ])
     end)
 
-    test("when jobs are unavailable, empty list must be used", proc()
+    test("when jobs unset, empty list must be used", proc()
       # (1) act
       const (
         extensor = {}

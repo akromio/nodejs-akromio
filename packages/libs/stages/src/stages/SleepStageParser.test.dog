@@ -12,7 +12,7 @@ suite(__filename, proc()
     test("when declaration is not valid, error must be raised", proc()
       # (1) act
       const (
-        decl = {stage = "warmup", impl = "sleep", duration = true}
+        decl = {sleep = "warmup", duration = true}
         out = peval(parser.parse(decl, sim(eval = fun.invokes(fn(decl) = decl end))))
       )
 
@@ -25,8 +25,7 @@ suite(__filename, proc()
       const (
         jobs = []
         decl = {
-          stage = "pause"
-          impl = "sleep"
+          sleep = "pause"
           duration = "2m"
         }
 
@@ -35,7 +34,7 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).equalTo(
-        stage = "pause"
+        name = "pause"
         'impl' = "sleep"
         duration = 120000
       )

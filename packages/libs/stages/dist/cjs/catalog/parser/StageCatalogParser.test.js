@@ -26,18 +26,15 @@ suite(__filename, () => {
                 ["value"]: "10m"
               }],
               ["stages"]: [{
-                ["stage"]: "warmup",
-                ["impl"]: "xconstx",
+                ["xconstx"]: "warmup",
                 ["duration"]: "2m",
                 ["requests"]: 1000,
                 ["jobs"]: []
               }, {
-                ["stage"]: "pause",
-                ["impl"]: "sleep",
+                ["sleep"]: "pause",
                 ["duration"]: "1m"
               }, {
-                ["stage"]: "load",
-                ["impl"]: "const",
+                ["const"]: "load",
                 ["duration"]: "$(duration)",
                 ["requests"]: 2000,
                 ["jobs"]: []
@@ -46,7 +43,7 @@ suite(__filename, () => {
             const out = await _core.dogma.pawait(() => parser.parse(decl, {
               'parentDataset': parentDataset
             }));
-            expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Unknown stage impl: xconstx."));
+            expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Unknown stage:.+xconstx");
           }
         });
         test("when declaration is ok, stage catalog must be raised", async () => {
@@ -60,18 +57,15 @@ suite(__filename, () => {
                 ["value"]: "10m"
               }],
               ["stages"]: [{
-                ["stage"]: "warmup",
-                ["impl"]: "const",
+                ["const"]: "warmup",
                 ["duration"]: "2m",
                 ["requests"]: 1000,
                 ["jobs"]: []
               }, {
-                ["stage"]: "pause",
-                ["impl"]: "sleep",
+                ["sleep"]: "pause",
                 ["duration"]: "1m"
               }, {
-                ["stage"]: "load",
-                ["impl"]: "const",
+                ["const"]: "load",
                 ["duration"]: "$(duration)",
                 ["requests"]: 2000,
                 ["jobs"]: []
@@ -86,7 +80,7 @@ suite(__filename, () => {
               'cty': "text/yaml",
               'stages': {
                 ["warmup"]: {
-                  ["stage"]: "warmup",
+                  ["name"]: "warmup",
                   ["impl"]: "const",
                   ["duration"]: 120000,
                   ["requests"]: 1000,
@@ -94,12 +88,12 @@ suite(__filename, () => {
                   ["interval"]: 1000
                 },
                 ["pause"]: {
-                  ["stage"]: "pause",
+                  ["name"]: "pause",
                   ["impl"]: "sleep",
                   ["duration"]: 60000
                 },
                 ["load"]: {
-                  ["stage"]: "load",
+                  ["name"]: "load",
                   ["impl"]: "const",
                   ["duration"]: 600000,
                   ["requests"]: 2000,
