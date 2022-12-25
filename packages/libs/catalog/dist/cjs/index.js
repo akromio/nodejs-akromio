@@ -7,11 +7,11 @@ exports.CatalogParser = exports.CatalogParseOpts = exports.CatalogMerger = expor
 var _core = require("@dogmalang/core");
 const Catalog = _core.dogma.use(require("./Catalog"));
 exports.Catalog = Catalog;
-const CatalogMerger = _core.dogma.use(require("./CatalogMerger"));
+const CatalogMerger = _core.dogma.use(require("./merger/CatalogMerger"));
 exports.CatalogMerger = CatalogMerger;
-const CatalogParser = _core.dogma.use(require("./CatalogParser"));
+const CatalogParser = _core.dogma.use(require("./parser/CatalogParser"));
 exports.CatalogParser = CatalogParser;
-const CatalogParseOpts = _core.dogma.use(require("./CatalogParseOpts"));
+const CatalogParseOpts = _core.dogma.use(require("./parser/CatalogParseOpts"));
 exports.CatalogParseOpts = CatalogParseOpts;
 const CatalogMacro = _core.dogma.use(require("./ops/impl/macro/CatalogMacro"));
 exports.CatalogMacro = CatalogMacro;

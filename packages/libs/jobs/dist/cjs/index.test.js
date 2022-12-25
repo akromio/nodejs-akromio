@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, api must be exported", () => {
       {
-        expected(index).members("JobDescriber", "JobEngine", "JobCatalog", "JobCatalogParser", "JobCatalogMerger", "JobParser").toBeCallable();
+        expected(index).members("JobDescriber", "JobEngine", "JobCatalog", "JobCatalogParser", "JobParser", "JobCatalogMerger").toBeCallable();
       }
     });
   }

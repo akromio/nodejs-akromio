@@ -8,9 +8,9 @@ const {
   CatalogParser,
   CatalogParseOpts
 } = _core.dogma.use(require("@akromio/catalog"));
-const StageCatalog = _core.dogma.use(require("./StageCatalog"));
-const ConstStageParser = _core.dogma.use(require("../stages/ConstStageParser"));
-const SleepStageParser = _core.dogma.use(require("../stages/SleepStageParser"));
+const StageCatalog = _core.dogma.use(require("../StageCatalog"));
+const ConstStageParser = _core.dogma.use(require("../../stages/ConstStageParser"));
+const SleepStageParser = _core.dogma.use(require("../../stages/SleepStageParser"));
 const constStageParser = ConstStageParser();
 const sleepStageParser = SleepStageParser();
 const StageCatalogParseOpts = CatalogParseOpts;
@@ -20,11 +20,11 @@ const $StageCatalogParser = class StageCatalogParser extends CatalogParser {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_d550216eae826686dfc10064e5164fa5___init__ instanceof Function) this._pvt_d550216eae826686dfc10064e5164fa5___init__(_); /* c8 ignore stop */
+    if (this._pvt_69aa687001198ce51cdbead6fa9f8f36___init__ instanceof Function) this._pvt_69aa687001198ce51cdbead6fa9f8f36___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_d550216eae826686dfc10064e5164fa5___post__ instanceof Function) this._pvt_d550216eae826686dfc10064e5164fa5___post__(); /* c8 ignore stop */
+    if (this._pvt_69aa687001198ce51cdbead6fa9f8f36___post__ instanceof Function) this._pvt_69aa687001198ce51cdbead6fa9f8f36___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_d550216eae826686dfc10064e5164fa5___validate__ instanceof Function) this._pvt_d550216eae826686dfc10064e5164fa5___validate__(); /* c8 ignore stop */
+    if (this._pvt_69aa687001198ce51cdbead6fa9f8f36___validate__ instanceof Function) this._pvt_69aa687001198ce51cdbead6fa9f8f36___validate__(); /* c8 ignore stop */
   }
 };
 

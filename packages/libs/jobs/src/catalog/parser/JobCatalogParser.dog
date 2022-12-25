@@ -3,7 +3,8 @@ use (
   {Ops, CatalogParser, CatalogParseOpts} = alias://catalog
   {Plugin, Plugins, PluginParser, PluginLoader} = alias://core
 
-  JobCatalog, JobParser
+  ../JobCatalog
+  JobParser
 )
 
 /**

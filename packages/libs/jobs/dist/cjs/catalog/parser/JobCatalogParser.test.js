@@ -18,7 +18,7 @@ const {
   Plugins,
   Plugin
 } = _core.dogma.use(require("@akromio/core"));
-const JobCatalog = _core.dogma.use(require("./JobCatalog"));
+const JobCatalog = _core.dogma.use(require("../JobCatalog"));
 const JobCatalogParser = _core.dogma.use(require("./JobCatalogParser"));
 suite(__filename, () => {
   {

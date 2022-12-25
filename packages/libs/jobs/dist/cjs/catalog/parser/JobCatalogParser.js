@@ -15,7 +15,7 @@ const {
   PluginParser,
   PluginLoader
 } = _core.dogma.use(require("@akromio/core"));
-const JobCatalog = _core.dogma.use(require("./JobCatalog"));
+const JobCatalog = _core.dogma.use(require("../JobCatalog"));
 const JobParser = _core.dogma.use(require("./JobParser"));
 const jobParser = JobParser();
 const JobCatalogParseOpts = _core.dogma.intf('JobCatalogParseOpts', {
@@ -47,11 +47,11 @@ const $JobCatalogParser = class JobCatalogParser extends CatalogParser {
       enumerable: true
     });
     /* c8 ignore start */
-    if (this._pvt_9eb134306e7270ca5efb424f4db58c7e___init__ instanceof Function) this._pvt_9eb134306e7270ca5efb424f4db58c7e___init__(_); /* c8 ignore stop */
+    if (this._pvt_cef4d83965cd083f9e93e20e818fa863___init__ instanceof Function) this._pvt_cef4d83965cd083f9e93e20e818fa863___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_9eb134306e7270ca5efb424f4db58c7e___post__ instanceof Function) this._pvt_9eb134306e7270ca5efb424f4db58c7e___post__(); /* c8 ignore stop */
+    if (this._pvt_cef4d83965cd083f9e93e20e818fa863___post__ instanceof Function) this._pvt_cef4d83965cd083f9e93e20e818fa863___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_9eb134306e7270ca5efb424f4db58c7e___validate__ instanceof Function) this._pvt_9eb134306e7270ca5efb424f4db58c7e___validate__(); /* c8 ignore stop */
+    if (this._pvt_cef4d83965cd083f9e93e20e818fa863___validate__ instanceof Function) this._pvt_cef4d83965cd083f9e93e20e818fa863___validate__(); /* c8 ignore stop */
   }
 };
 

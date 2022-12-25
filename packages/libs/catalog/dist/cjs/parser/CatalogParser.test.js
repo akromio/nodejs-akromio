@@ -6,18 +6,18 @@ const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
 const CatalogParserBase = _core.dogma.use(require("./CatalogParser"));
-const CatalogBase = _core.dogma.use(require("./Catalog"));
+const CatalogBase = _core.dogma.use(require("../Catalog"));
 const $Catalog = class Catalog extends CatalogBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__(_); /* c8 ignore stop */
+    if (this._pvt_5cac13a2eaa366bfa1403d46a096c47b___init__ instanceof Function) this._pvt_5cac13a2eaa366bfa1403d46a096c47b___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__(); /* c8 ignore stop */
+    if (this._pvt_5cac13a2eaa366bfa1403d46a096c47b___post__ instanceof Function) this._pvt_5cac13a2eaa366bfa1403d46a096c47b___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__(); /* c8 ignore stop */
+    if (this._pvt_5cac13a2eaa366bfa1403d46a096c47b___validate__ instanceof Function) this._pvt_5cac13a2eaa366bfa1403d46a096c47b___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -32,11 +32,11 @@ const $CatalogParser = class CatalogParser extends CatalogParserBase {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__(_); /* c8 ignore stop */
+    if (this._pvt_5cac13a2eaa366bfa1403d46a096c47b___init__ instanceof Function) this._pvt_5cac13a2eaa366bfa1403d46a096c47b___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__(); /* c8 ignore stop */
+    if (this._pvt_5cac13a2eaa366bfa1403d46a096c47b___post__ instanceof Function) this._pvt_5cac13a2eaa366bfa1403d46a096c47b___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__(); /* c8 ignore stop */
+    if (this._pvt_5cac13a2eaa366bfa1403d46a096c47b___validate__ instanceof Function) this._pvt_5cac13a2eaa366bfa1403d46a096c47b___validate__(); /* c8 ignore stop */
   }
 };
 

@@ -5,7 +5,7 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const StageCatalog = _core.dogma.use(require("./StageCatalog"));
+const StageCatalog = _core.dogma.use(require("../StageCatalog"));
 const StageCatalogParser = _core.dogma.use(require("./StageCatalogParser"));
 suite(__filename, () => {
   {

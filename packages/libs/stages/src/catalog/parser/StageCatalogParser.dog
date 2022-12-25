@@ -2,8 +2,8 @@ use (
   {Dataset} = alias://dataset
   {CatalogParser, CatalogParseOpts} = alias://catalog
 
-  StageCatalog
-  ../stages/{ConstStageParser, SleepStageParser}
+  ../StageCatalog
+  ../../stages/{ConstStageParser, SleepStageParser}
 )
 
 /**

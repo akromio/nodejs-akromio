@@ -5,5 +5,5 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.StageCatalogParser = void 0;
 var _core = require("@dogmalang/core");
-const StageCatalogParser = _core.dogma.use(require("./catalog/StageCatalogParser"));
+const StageCatalogParser = _core.dogma.use(require("./catalog/parser/StageCatalogParser"));
 exports.StageCatalogParser = StageCatalogParser;

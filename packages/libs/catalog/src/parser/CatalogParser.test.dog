@@ -3,7 +3,7 @@ use (
   {GlobalDataset} = alias://dataset
 
   CatalogParserBase = CatalogParser
-  CatalogBase = Catalog
+  CatalogBase = ../Catalog
 )
 
 # Test catalog to use.

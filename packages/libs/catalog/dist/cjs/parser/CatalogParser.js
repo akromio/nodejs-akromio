@@ -16,11 +16,11 @@ const $CatalogParser = class CatalogParser {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_9b16b136dd8130527796b0661b87bc48___init__ instanceof Function) this._pvt_9b16b136dd8130527796b0661b87bc48___init__(_); /* c8 ignore stop */
+    if (this._pvt_9f5fb1e172aa68135799c462e7f54281___init__ instanceof Function) this._pvt_9f5fb1e172aa68135799c462e7f54281___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_9b16b136dd8130527796b0661b87bc48___post__ instanceof Function) this._pvt_9b16b136dd8130527796b0661b87bc48___post__(); /* c8 ignore stop */
+    if (this._pvt_9f5fb1e172aa68135799c462e7f54281___post__ instanceof Function) this._pvt_9f5fb1e172aa68135799c462e7f54281___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_9b16b136dd8130527796b0661b87bc48___validate__ instanceof Function) this._pvt_9b16b136dd8130527796b0661b87bc48___validate__(); /* c8 ignore stop */
+    if (this._pvt_9f5fb1e172aa68135799c462e7f54281___validate__ instanceof Function) this._pvt_9f5fb1e172aa68135799c462e7f54281___validate__(); /* c8 ignore stop */
   }
 };
 

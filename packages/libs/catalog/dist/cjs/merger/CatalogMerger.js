@@ -5,11 +5,11 @@ const $CatalogMerger = class CatalogMerger {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_13e0d1dbe60435daa93d06093e438d64___init__ instanceof Function) this._pvt_13e0d1dbe60435daa93d06093e438d64___init__(_); /* c8 ignore stop */
+    if (this._pvt_9196f081df3581c4f1e462fcbf1fdbff___init__ instanceof Function) this._pvt_9196f081df3581c4f1e462fcbf1fdbff___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_13e0d1dbe60435daa93d06093e438d64___post__ instanceof Function) this._pvt_13e0d1dbe60435daa93d06093e438d64___post__(); /* c8 ignore stop */
+    if (this._pvt_9196f081df3581c4f1e462fcbf1fdbff___post__ instanceof Function) this._pvt_9196f081df3581c4f1e462fcbf1fdbff___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_13e0d1dbe60435daa93d06093e438d64___validate__ instanceof Function) this._pvt_13e0d1dbe60435daa93d06093e438d64___validate__(); /* c8 ignore stop */
+    if (this._pvt_9196f081df3581c4f1e462fcbf1fdbff___validate__ instanceof Function) this._pvt_9196f081df3581c4f1e462fcbf1fdbff___validate__(); /* c8 ignore stop */
   }
 };
 

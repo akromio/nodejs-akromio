@@ -2,7 +2,7 @@ use (
   alias://expected
   {GlobalDataset} = alias://dataset
 
-  StageCatalog
+  ../StageCatalog
   StageCatalogParser
 )
 

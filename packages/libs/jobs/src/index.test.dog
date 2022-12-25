@@ -10,8 +10,8 @@ suite(__filename, proc()
       "JobEngine"
       "JobCatalog"
       "JobCatalogParser"
-      "JobCatalogMerger"
       "JobParser"
+      "JobCatalogMerger"
     ).toBeCallable()
   end)
 end)

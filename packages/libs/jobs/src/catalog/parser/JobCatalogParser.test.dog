@@ -4,7 +4,8 @@ use (
   {Dataset, GlobalDataset, LocalDataset} = alias://dataset
   {Ops, PluginParser, PluginLoader, Plugins, Plugin} = alias://core
 
-  JobCatalog, JobCatalogParser
+  ../JobCatalog
+  JobCatalogParser
 )
 
 suite(__filename, proc()
