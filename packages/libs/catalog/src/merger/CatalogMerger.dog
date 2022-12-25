@@ -9,14 +9,32 @@ export struct CatalogMerger
    */
   pub fn merge(extensor: map, ...extendeds: map) -> decl: map
     decl = copy(extendeds[0])
-
-    for each ext in extendeds[1, -1].concat(extensor) do
+    decl = self.mergeCommon(decl, extendeds[1, -1].concat(extensor))
+    decl = self.mergeSpecialization(decl, extendeds[1, -1].concat(extensor))
+  
+  /**
+   * Merges common fields of a given [decl]aration with the given [extensions].
+   */
+  @hidden
+  pub fn mergeCommon(decl: map, extensions: map[]) -> decl
+    for each ext in extensions do
       for each field, value in ext do
-        with field do
-          if "dataset" then self.mergeDataset(value, decl)
-          if "plugins" then self.mergePlugins(value, decl)
-          if "jobs" then self.mergeJobs(value, decl)
-          else decl[field] = value
+        if field == "dataset" then self.mergeDataset(value, decl)
+        else if not self.isSpecializedField(field) then decl[field] = value
+  
+  /**
+   * Checks whether a field is a specialized that the common merger must
+   * not merge.
+   */
+  @hidden
+  pub fn isSpeciailizedField(name: text) = false
+  
+  /**
+   * Merges specialization fields of a given [decl]aration with the given [extensions].
+   */
+  @hidden
+  pub fn mergeSpecialization(decl: map, extensions: map[]) -> decl
+    nop
 
   /**
    * Mixes a given dataset declaration into a catalog declaration.
@@ -40,61 +58,7 @@ export struct CatalogMerger
       #add datum to current dataset
       decl.dataset.push(datum)
   
-  /**
-   * Mixes a given plugins declaration into a catalog declaration.
-   */
-  @hidden
-  pub fn mergePlugins(pis: any[], decl: map) -> decl
-    # (1) prepare plugins in declaration to extend
-    decl.plugins ?= []
-
-    # (2) mix plugins into declaration
-    for each pi in pis do
-      #remove plugin if already exists
-      const (
-        piName = getPluginName(pi)
-        ix = decl.plugins.findIndex(fn(decl) = getPluginName(decl) == piName end)
-      )
-
-      if ix >= 0 then
-        decl.plugins.splice(ix, 1)
-
-      #add plugin to current plugins
-      decl.plugins.push(pi)
-  
-  /**
-   * Mixes a given jobs declaration into a catalog declaration.
-   */
-  @hidden
-  pub fn mergeJobs(jobs: any[], decl: map) -> decl
-    # (1) prepare jobs in declaration to extend
-    decl.jobs ?= []
-
-    # (2) mix jobs into declaration
-    for each job in jobs do
-      #remove job if already exists
-      const (
-        jobName = getJobName(job)
-        ix = decl.jobs.findIndex(fn(decl) = getJobName(decl) == jobName end)
-      )
-
-      if ix >= 0 then
-        decl.jobs.splice(ix, 1)
-
-      #add job to current jobs
-      decl.jobs.push(job)
-  
 /**
  * Returns the name of a given datum declaration.
  */
 fn getDatumName(decl: map) = decl.var ?? decl.const ?? decl.fn
-
-/**
- * Returns the name of a given plugin declaration.
- */
-fn getPluginName(decl: map) = decl.plugin
-
-/**
- * Returns the name of a given job declaration.
- */
-fn getJobName(decl: map) = decl.macro ?? decl.co

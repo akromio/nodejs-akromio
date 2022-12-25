@@ -8,26 +8,22 @@ suite(__filename, proc()
     merger = JobCatalogMerger()
   )
 
-  suite("merge()", proc()
-    test("when called, mix must be performed and returned", proc()
+  suite("mergePlugins()", proc()
+    test("when available plugins, extensor plugins are appended at the end of the extended one, removing the extended", proc()
       # (1) act
       const (
         extended = {
-
+          plugins = [
+            {plugin = "x", impl = "plugin", desc = "extended"}
+            {plugin = "y", impl = "plugin", desc = "extended"}
+            {plugin = "z", impl = "plugin", desc = "extended"}
+          ]
         }
 
         extensor = {
-          spec = "v1.0"
-          dataset = [
-            {const = "myconst"}
-            {fn = "myfn"}
-          ]
           plugins = [
-            {plugin = "myplugin", impl = "plugin"}
-          ]
-          jobs = [
-            {macro = "mymacro", steps = []}
-            {co = "myco", steps = []}
+            {plugin = "y", impl = "plugin", desc = "extensor"}
+            {plugin = "a", impl = "plugin", desc = "extensor"}
           ]
         }
 
@@ -35,23 +31,93 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).equalTo(
-        spec = "v1.0"
+      expected(out.plugins).equalTo([
+        {plugin = "x", impl = "plugin", desc = "extended"}
+        {plugin = "z", impl = "plugin", desc = "extended"}
+        {plugin = "y", impl = "plugin", desc = "extensor"}
+        {plugin = "a", impl = "plugin", desc = "extensor"}
+      ])
+    end)
 
-        dataset = [
-          {const = "myconst"}
-          {fn = "myfn"}
-        ]
+    test("when plugins are unavailable, empty list must be used", proc()
+      # (1) act
+      const (
+        extended1 = {}
 
-        plugins = [
-          {plugin = "myplugin", impl = "plugin"}
-        ]
+        extended2 = {
+          plugins = [
+            {plugin = "x", impl = "plugin", desc = "extended2"}
+            {plugin = "y", impl = "plugin", desc = "extended2"}
+            {plugin = "z", impl = "plugin", desc = "extended2"}
+          ]
+        }
 
-        jobs = [
-          {macro = "mymacro", steps = []}
-          {co = "myco", steps = []}
-        ]
+        extensor = {}
+        out = merger.merge(extensor, extended1, extended2)
       )
+
+      # (2) assessment
+      expected(out.plugins).equalTo([
+        {plugin = "x", impl = "plugin", desc = "extended2"}
+        {plugin = "y", impl = "plugin", desc = "extended2"}
+        {plugin = "z", impl = "plugin", desc = "extended2"}
+      ])
+    end)
+  end)
+
+  suite("mergeJobs()", proc()
+    test("when called, extensor jobs are appended at the end of the extended one, removing the extended", proc()
+      # (1) act
+      const (
+        extended = {
+          jobs = [
+            {macro = "x", desc = "extended", steps = []}
+            {macro = "y", desc = "extended", steps = []}
+            {macro = "z", desc = "extended", steps = []}
+          ]
+        }
+
+        extensor = {
+          jobs = [
+            {macro = "y", desc = "extensor", steps = []}
+            {macro = "a", desc = "extensor", steps = []}
+          ]
+        }
+
+        out = merger.merge(extensor, extended)
+      )
+
+      # (2) assessment
+      expected(out.jobs).equalTo([
+        {macro = "x", desc = "extended", steps = []}
+        {macro = "z", desc = "extended", steps = []}
+        {macro = "y", desc = "extensor", steps = []}
+        {macro = "a", desc = "extensor", steps = []}
+      ])
+    end)
+
+    test("when jobs are unavailable, empty list must be used", proc()
+      # (1) act
+      const (
+        extensor = {}
+        extended1 = {}
+        extended2 = {
+          jobs = [
+            {macro = "x", desc = "extended2", steps = []}
+            {macro = "y", desc = "extended2", steps = []}
+            {co = "z", desc = "extended2", steps = []}
+          ]
+        }
+
+        out = merger.merge(extensor, extended1, extended2)
+      )
+
+      # (2) assessment
+      expected(out.jobs).equalTo([
+        {macro = "x", desc = "extended2", steps = []}
+        {macro = "y", desc = "extended2", steps = []}
+        {co = "z", desc = "extended2", steps = []}
+      ])
     end)
   end)
 end)

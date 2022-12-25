@@ -25,39 +25,53 @@ CatalogMerger.prototype.merge = function (extensor, ...extendeds) {
   _core.dogma.expect("extensor", extensor, _core.map);
   {
     decl = _core.dogma.copy(_core.dogma.getItem(extendeds, 0));
-    for (const ext of _core.dogma.getSlice(extendeds, 1, -1).concat(extensor)) {
+    decl = this.mergeCommon(decl, _core.dogma.getSlice(extendeds, 1, -1).concat(extensor));
+    decl = this.mergeSpecialization(decl, _core.dogma.getSlice(extendeds, 1, -1).concat(extensor));
+  }
+  return decl;
+};
+CatalogMerger.prototype.mergeCommon = function (decl, extensions) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
+  _core.dogma.expect("extensions", extensions, _core.dogma.TypeDef({
+    name: 'inline',
+    types: [_core.map],
+    min: 0,
+    max: null
+  }));
+  {
+    for (const ext of extensions) {
       for (const [field, value] of Object.entries(ext)) {
         {
-          {
-            const _ = field;
-            switch (_) {
-              case "dataset":
-                {
-                  this.mergeDataset(value, decl);
-                } /* c8 ignore start */
-                break;
-              /* c8 ignore stop */
-              case "plugins":
-                {
-                  this.mergePlugins(value, decl);
-                } /* c8 ignore start */
-                break;
-              /* c8 ignore stop */
-              case "jobs":
-                {
-                  this.mergeJobs(value, decl);
-                } /* c8 ignore start */
-                break;
-              /* c8 ignore stop */
-              default:
-                {
-                  _core.dogma.setItem("=", decl, field, value);
-                }
-            }
+          if (field == "dataset") {
+            this.mergeDataset(value, decl);
+          } else if (!this.isSpecializedField(field)) {
+            _core.dogma.setItem("=", decl, field, value);
           }
         }
       }
     }
+  }
+  return decl;
+};
+CatalogMerger.prototype.isSpeciailizedField = function (name) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("name", name, _core.text);
+  {
+    return false;
+  }
+};
+CatalogMerger.prototype.mergeSpecialization = function (decl, extensions) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
+  _core.dogma.expect("extensions", extensions, _core.dogma.TypeDef({
+    name: 'inline',
+    types: [_core.map],
+    min: 0,
+    max: null
+  }));
+  {
+    _core.dogma.nop();
   }
   return decl;
 };
@@ -89,79 +103,10 @@ CatalogMerger.prototype.mergeDataset = function (dataset, decl) {
   }
   return decl;
 };
-CatalogMerger.prototype.mergePlugins = function (pis, decl) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("pis", pis, _core.dogma.TypeDef({
-    name: 'inline',
-    types: [_core.any],
-    min: 0,
-    max: null
-  })); /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.map);
-  {
-    var _decl$plugins;
-    decl.plugins = (_decl$plugins = decl.plugins) !== null && _decl$plugins !== void 0 ? _decl$plugins : [];
-    for (const pi of pis) {
-      const piName = getPluginName(pi);
-      const ix = decl.plugins.findIndex(decl => {
-        /* c8 ignore next */_core.dogma.expect("decl", decl);
-        {
-          return getPluginName(decl) == piName;
-        }
-      });
-      if (ix >= 0) {
-        decl.plugins.splice(ix, 1);
-      }
-      decl.plugins.push(pi);
-    }
-  }
-  return decl;
-};
-CatalogMerger.prototype.mergeJobs = function (jobs, decl) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("jobs", jobs, _core.dogma.TypeDef({
-    name: 'inline',
-    types: [_core.any],
-    min: 0,
-    max: null
-  })); /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.map);
-  {
-    var _decl$jobs;
-    decl.jobs = (_decl$jobs = decl.jobs) !== null && _decl$jobs !== void 0 ? _decl$jobs : [];
-    for (const job of jobs) {
-      const jobName = getJobName(job);
-      const ix = decl.jobs.findIndex(decl => {
-        /* c8 ignore next */_core.dogma.expect("decl", decl);
-        {
-          return getJobName(decl) == jobName;
-        }
-      });
-      if (ix >= 0) {
-        decl.jobs.splice(ix, 1);
-      }
-      decl.jobs.push(job);
-    }
-  }
-  return decl;
-};
 function getDatumName(decl) {
   /* c8 ignore next */_core.dogma.expect("decl", decl, _core.map);
   {
     var _ref, _decl$var;
     return (_ref = (_decl$var = decl.var) !== null && _decl$var !== void 0 ? _decl$var : decl.const) !== null && _ref !== void 0 ? _ref : decl.fn;
-  }
-}
-function getPluginName(decl) {
-  /* c8 ignore next */_core.dogma.expect("decl", decl, _core.map);
-  {
-    return decl.plugin;
-  }
-}
-function getJobName(decl) {
-  /* c8 ignore next */_core.dogma.expect("decl", decl, _core.map);
-  {
-    var _decl$macro;
-    return (_decl$macro = decl.macro) !== null && _decl$macro !== void 0 ? _decl$macro : decl.co;
   }
 }

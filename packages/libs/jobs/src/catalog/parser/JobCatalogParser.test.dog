@@ -238,10 +238,7 @@ suite(__filename, proc()
         pluginLoader = sim(
           PluginLoader
           loadPreset = method.returns(preset)
-          loadPlugin = method.invokes(fn(...args)
-            printf(args)
-            return args[0]
-          end)
+          loadPlugin = method.invokes(fn(...args) = args[0] end)
         )
         parser = JobCatalogParser(pluginLoader=, pluginParser)
         out = await(parser.parse(
@@ -292,7 +289,6 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      printf(out)
       expected(out).equalTo(trg1=, trg2)
     end)
   end)

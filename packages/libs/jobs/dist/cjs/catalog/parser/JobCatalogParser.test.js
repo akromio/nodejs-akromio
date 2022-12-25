@@ -290,7 +290,6 @@ suite(__filename, () => {
               'loadPreset': method.returns(preset),
               'loadPlugin': method.invokes((...args) => {
                 {
-                  (0, _core.printf)(args);
                   return _core.dogma.getItem(args, 0);
                 }
               })
@@ -356,7 +355,6 @@ suite(__filename, () => {
               'parentDataset': parentDataset,
               'ops': ops
             })).triggers;
-            (0, _core.printf)(out);
             expected(out).equalTo({
               'trg1': trg1,
               'trg2': trg2

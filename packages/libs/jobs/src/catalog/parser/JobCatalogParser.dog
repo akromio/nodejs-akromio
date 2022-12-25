@@ -83,17 +83,17 @@ export struct JobCatalogParser: CatalogParser
 
     for each def in decl do
       if "preset" in def then
-        #get preset declaration
+        # get preset declaration
         const psDecl = loader.loadPreset(def.preset)
 
-        #create plugin instances from preset
+        # create plugin instances from preset
         for each plugin: Plugin in await(parser.parsePreset(psDecl)) do
           plugins.appendPlugin(plugin)
       else if "plugin" in def then
-        #get plugin declaration
+        # get plugin declaration
         const piDecl = loader.loadPlugin(def.impl)
 
-        #create new plugin instance
+        # create new plugin instance
         const name = def.name ?? def.plugin
         plugins.appendPlugin(await(parser.parsePlugin(piDecl{*, plugin = name}, def.ini)))
       else

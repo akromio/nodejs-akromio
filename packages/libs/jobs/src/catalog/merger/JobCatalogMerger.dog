@@ -7,3 +7,65 @@ use (
  * Used for extending a catalog from another.
  */
 export struct JobCatalogMerger: CatalogMerger
+  @override @hidden
+  pub fn isSpecializedField(name: text) = name in ["plugins", "jobs"]
+
+  @override @hidden
+  pub fn mergeSpecialization(decl: map, extensions: map[]) -> decl
+    for each ext in extensions do
+      if "plugins" in ext then decl = self.mergePlugins(ext.plugins, decl)
+      if "jobs" in ext then decl = self.mergeJobs(ext.jobs, decl)
+
+  /**
+   * Mixes a given plugins declaration into a catalog declaration.
+   */
+  @hidden
+  pub fn mergePlugins(pis: any[], decl: map) -> decl
+    # (1) prepare plugins in declaration to extend
+    decl.plugins ?= []
+
+    # (2) mix plugins into declaration
+    for each pi in pis do
+      # remove plugin if already exists
+      const (
+        piName = getPluginName(pi)
+        ix = decl.plugins.findIndex(fn(decl) = getPluginName(decl) == piName end)
+      )
+
+      if ix >= 0 then
+        decl.plugins.splice(ix, 1)
+
+      # add plugin to current plugins
+      decl.plugins.push(pi)
+  
+  /**
+   * Mixes a given jobs declaration into a catalog declaration.
+   */
+  @hidden
+  pub fn mergeJobs(jobs: any[], decl: map) -> decl
+    # (1) prepare jobs in declaration to extend
+    decl.jobs ?= []
+
+    # (2) mix jobs into declaration
+    for each job in jobs do
+      # remove job if already exists
+      const (
+        jobName = getJobName(job)
+        ix = decl.jobs.findIndex(fn(decl) = getJobName(decl) == jobName end)
+      )
+
+      if ix >= 0 then
+        decl.jobs.splice(ix, 1)
+
+      # add job to current jobs
+      decl.jobs.push(job)
+
+/**
+ * Returns the name of a given plugin declaration.
+ */
+fn getPluginName(decl: map) = decl.plugin
+
+/**
+ * Returns the name of a given job declaration.
+ */
+fn getJobName(decl: map) = decl.macro ?? decl.co
