@@ -1,6 +1,6 @@
 use (
   alias://expected
-  ~/dist/cjs/ops/StepParser
+  StepParser
 )
 
 suite(__filename, proc()

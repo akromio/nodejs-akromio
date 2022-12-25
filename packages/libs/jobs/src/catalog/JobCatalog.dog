@@ -1,6 +1,6 @@
 use (
   {Plugins} = alias://core
-  Catalog
+  {Catalog} = alias://catalog
 )
 
 /**

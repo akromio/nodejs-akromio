@@ -3,7 +3,8 @@ use (
   {simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
   {Ops, StaticAction as Action, ActionOperator, MacroOperator, Call, Context} = alias://core
-  {CatalogMacro} = ~
+  
+  CatalogMacro
 )
 
 suite(__filename, proc()
@@ -15,6 +16,35 @@ suite(__filename, proc()
     onError = "carryOn"
     title = "testing"
   )
+
+  suite("isLoop()", proc()
+    test("when forEach set, true must be returned", proc()
+      # (1) act
+      const (
+        ops = Ops()
+        forEach = "list onw two three"
+        steps = []
+        macro = CatalogMacro(name = "test", forEach, steps, ops, operator)
+        out = macro.isLoop()
+      )
+
+      # (2) assessment
+      expected(out).equalTo(true)
+    end)
+
+    test("when forEach unset, false must be returned", proc()
+      # (1) act
+      const (
+        ops = Ops()
+        steps = []
+        macro = CatalogMacro(name = "test", steps, ops, operator)
+        out = macro.isLoop()
+      )
+
+      # (2) assessment
+      expected(out).equalTo(false)
+    end)
+  end)
 
   suite("buildSteps()", proc()
     test("when decls are alright, a list with the steps must be returned", proc()

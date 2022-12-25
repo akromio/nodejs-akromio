@@ -1,6 +1,6 @@
 use (
   alias://expected
-  {CatalogMerger as CatalogMergerBase} = ~
+  CatalogMergerBase = CatalogMerger
 )
 
 /**

@@ -4,7 +4,9 @@ var _core = require("@dogmalang/core");
 const {
   Plugins
 } = _core.dogma.use(require("@akromio/core"));
-const Catalog = _core.dogma.use(require("./Catalog"));
+const {
+  Catalog
+} = _core.dogma.use(require("@akromio/catalog"));
 const $JobCatalog = class JobCatalog extends Catalog {
   constructor(_) {
     super(_);

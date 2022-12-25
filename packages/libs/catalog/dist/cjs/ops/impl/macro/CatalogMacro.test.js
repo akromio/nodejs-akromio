@@ -16,9 +16,7 @@ const {
   Call,
   Context
 } = _core.dogma.use(require("@akromio/core"));
-const {
-  CatalogMacro
-} = _core.dogma.use(require("../../../.."));
+const CatalogMacro = _core.dogma.use(require("./CatalogMacro"));
 suite(__filename, () => {
   {
     const operator = MacroOperator();
@@ -31,6 +29,40 @@ suite(__filename, () => {
     });
     const onError = "carryOn";
     const title = "testing";
+    suite("isLoop()", () => {
+      {
+        test("when forEach set, true must be returned", () => {
+          {
+            const ops = Ops();
+            const forEach = "list onw two three";
+            const steps = [];
+            const macro = CatalogMacro({
+              'name': "test",
+              'forEach': forEach,
+              'steps': steps,
+              'ops': ops,
+              'operator': operator
+            });
+            const out = macro.isLoop();
+            expected(out).equalTo(true);
+          }
+        });
+        test("when forEach unset, false must be returned", () => {
+          {
+            const ops = Ops();
+            const steps = [];
+            const macro = CatalogMacro({
+              'name': "test",
+              'steps': steps,
+              'ops': ops,
+              'operator': operator
+            });
+            const out = macro.isLoop();
+            expected(out).equalTo(false);
+          }
+        });
+      }
+    });
     suite("buildSteps()", () => {
       {
         test("when decls are alright, a list with the steps must be returned", () => {

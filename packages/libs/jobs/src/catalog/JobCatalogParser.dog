@@ -1,8 +1,7 @@
 use (
   {Dataset} = alias://dataset
-  {Ops} = alias://catalog
+  {Ops, CatalogParser, CatalogParseOpts} = alias://catalog
   {Plugin, Plugins, PluginParser, PluginLoader} = alias://core
-  CatalogParser, ParseOpts
 
   JobCatalog, JobParser
 )
@@ -15,7 +14,7 @@ const jobParser = JobParser()
 /**
  * Parse options.
  */
-intf JobCatalogParseOpts: ParseOpts
+intf JobCatalogParseOpts: CatalogParseOpts
   /**
    * The dataset parent.
    */
@@ -114,7 +113,7 @@ export struct JobCatalogParser: CatalogParser
    * returning a list with the job instances.
    */
   @hidden
-  pub fn parseJobs(decl: map[], opts: ParseOpts) = jobParser.parse(
+  pub fn parseJobs(decl: map[], opts: JobCatalogParseOpts) = jobParser.parse(
     decl
     opts
   )

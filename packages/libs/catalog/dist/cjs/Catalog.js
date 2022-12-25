@@ -4,9 +4,6 @@ var _core = require("@dogmalang/core");
 const {
   Dataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  Plugins
-} = _core.dogma.use(require("@akromio/core"));
 const $Catalog = class Catalog {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -42,12 +39,6 @@ const $Catalog = class Catalog {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('plugins', _['plugins'], Plugins);
-    Object.defineProperty(this, 'plugins', {
-      value: (0, _core.coalesce)(_['plugins'], null),
-      writable: false,
-      enumerable: true
-    });
     /* c8 ignore start */
     if (_['extends'] != null) (0, _core.expect)('extends', _['extends'], [_core.text, _core.dogma.TypeDef({
       name: 'inline',
@@ -57,34 +48,6 @@ const $Catalog = class Catalog {
     })]); /* c8 ignore stop */
     Object.defineProperty(this, 'extends', {
       value: (0, _core.coalesce)(_['extends'], null),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
-    if (_['defaultJobName'] != null) (0, _core.expect)('defaultJobName', _['defaultJobName'], _core.text); /* c8 ignore stop */
-    Object.defineProperty(this, 'defaultJobName', {
-      value: (0, _core.coalesce)(_['defaultJobName'], null),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
-    if (_['jobs'] != null) (0, _core.expect)('jobs', _['jobs'], _core.map); /* c8 ignore stop */
-    Object.defineProperty(this, 'jobs', {
-      value: (0, _core.coalesce)(_['jobs'], {}),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
-    if (_['defaultTriggerName'] != null) (0, _core.expect)('defaultTriggerName', _['defaultTriggerName'], _core.text); /* c8 ignore stop */
-    Object.defineProperty(this, 'defaultTriggerName', {
-      value: (0, _core.coalesce)(_['defaultTriggerName'], null),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
-    if (_['triggers'] != null) (0, _core.expect)('triggers', _['triggers'], _core.map); /* c8 ignore stop */
-    Object.defineProperty(this, 'triggers', {
-      value: (0, _core.coalesce)(_['triggers'], {}),
       writable: false,
       enumerable: true
     });
@@ -103,9 +66,3 @@ const Catalog = new Proxy($Catalog, {
   } /* c8 ignore stop */
 });
 module.exports = exports = Catalog;
-Catalog.prototype.finalize = function () {
-  const self = this;
-  {
-    return this.plugins.finalize();
-  }
-};

@@ -13,11 +13,11 @@ const $Catalog = class Catalog extends CatalogBase {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_8f63cef61422cd6539f9028222592756___init__ instanceof Function) this._pvt_8f63cef61422cd6539f9028222592756___init__(_); /* c8 ignore stop */
+    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_8f63cef61422cd6539f9028222592756___post__ instanceof Function) this._pvt_8f63cef61422cd6539f9028222592756___post__(); /* c8 ignore stop */
+    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_8f63cef61422cd6539f9028222592756___validate__ instanceof Function) this._pvt_8f63cef61422cd6539f9028222592756___validate__(); /* c8 ignore stop */
+    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -32,11 +32,11 @@ const $CatalogParser = class CatalogParser extends CatalogParserBase {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_8f63cef61422cd6539f9028222592756___init__ instanceof Function) this._pvt_8f63cef61422cd6539f9028222592756___init__(_); /* c8 ignore stop */
+    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_8f63cef61422cd6539f9028222592756___post__ instanceof Function) this._pvt_8f63cef61422cd6539f9028222592756___post__(); /* c8 ignore stop */
+    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_8f63cef61422cd6539f9028222592756___validate__ instanceof Function) this._pvt_8f63cef61422cd6539f9028222592756___validate__(); /* c8 ignore stop */
+    if (this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__ instanceof Function) this._pvt_d936fe1be5dcf084fba2c0a3b25259a0___validate__(); /* c8 ignore stop */
   }
 };
 

@@ -4,14 +4,16 @@ var _core = require("@dogmalang/core");
 const {
   Dataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const CatalogParser = _core.dogma.use(require("./CatalogParser"));
-const ParseOpts = _core.dogma.use(require("./ParseOpts"));
+const {
+  CatalogParser,
+  CatalogParseOpts
+} = _core.dogma.use(require("@akromio/catalog"));
 const StageCatalog = _core.dogma.use(require("./StageCatalog"));
 const ConstStageParser = _core.dogma.use(require("../stages/ConstStageParser"));
 const SleepStageParser = _core.dogma.use(require("../stages/SleepStageParser"));
 const constStageParser = ConstStageParser();
 const sleepStageParser = SleepStageParser();
-const StageCatalogParseOpts = ParseOpts;
+const StageCatalogParseOpts = CatalogParseOpts;
 const $StageCatalogParser = class StageCatalogParser extends CatalogParser {
   constructor(_) {
     super(_);

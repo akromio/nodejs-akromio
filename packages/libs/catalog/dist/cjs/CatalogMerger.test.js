@@ -2,20 +2,18 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const {
-  CatalogMerger: CatalogMergerBase
-} = _core.dogma.use(require("../.."));
+const CatalogMergerBase = _core.dogma.use(require("./CatalogMerger"));
 const $CatalogMerger = class CatalogMerger extends CatalogMergerBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_ac55bdd097c96d344ff2ab1564796577___init__ instanceof Function) this._pvt_ac55bdd097c96d344ff2ab1564796577___init__(_); /* c8 ignore stop */
+    if (this._pvt_b43dc2f25f90a93b3609941821a9d95b___init__ instanceof Function) this._pvt_b43dc2f25f90a93b3609941821a9d95b___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_ac55bdd097c96d344ff2ab1564796577___post__ instanceof Function) this._pvt_ac55bdd097c96d344ff2ab1564796577___post__(); /* c8 ignore stop */
+    if (this._pvt_b43dc2f25f90a93b3609941821a9d95b___post__ instanceof Function) this._pvt_b43dc2f25f90a93b3609941821a9d95b___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_ac55bdd097c96d344ff2ab1564796577___validate__ instanceof Function) this._pvt_ac55bdd097c96d344ff2ab1564796577___validate__(); /* c8 ignore stop */
+    if (this._pvt_b43dc2f25f90a93b3609941821a9d95b___validate__ instanceof Function) this._pvt_b43dc2f25f90a93b3609941821a9d95b___validate__(); /* c8 ignore stop */
   }
 };
 

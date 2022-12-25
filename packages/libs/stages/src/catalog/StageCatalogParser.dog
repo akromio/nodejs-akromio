@@ -1,6 +1,6 @@
 use (
   {Dataset} = alias://dataset
-  CatalogParser, ParseOpts
+  {CatalogParser, CatalogParseOpts} = alias://catalog
 
   StageCatalog
   ../stages/{ConstStageParser, SleepStageParser}
@@ -19,7 +19,7 @@ const sleepStageParser = SleepStageParser()
 /**
  * Stage catalog parse options.
  */
-type StageCatalogParseOpts = ParseOpts
+type StageCatalogParseOpts = CatalogParseOpts
 
 /**
  * A parser to parse stage catalog declarations.

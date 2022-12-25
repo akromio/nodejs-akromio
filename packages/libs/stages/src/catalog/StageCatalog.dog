@@ -1,5 +1,5 @@
 use (
-  Catalog
+  {Catalog} = alias://catalog
 )
 
 /**

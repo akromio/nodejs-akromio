@@ -4,10 +4,10 @@ var _core = require("@dogmalang/core");
 const {
   Dataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const ParseOpts = _core.dogma.intf('ParseOpts', {
+const CatalogParseOpts = _core.dogma.intf('CatalogParseOpts', {
   parentDataset: {
     optional: false,
     type: Dataset
   }
 });
-module.exports = exports = ParseOpts;
+module.exports = exports = CatalogParseOpts;

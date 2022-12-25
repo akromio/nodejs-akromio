@@ -3,9 +3,9 @@ use (
 )
 
 /**
- * Parse options.
+ * Options for a catalog parsing.
  */
-export intf ParseOpts
+export intf CatalogParseOpts
   /**
    * Dataset parent.
    */

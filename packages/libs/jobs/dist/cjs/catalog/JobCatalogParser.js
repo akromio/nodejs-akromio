@@ -5,7 +5,9 @@ const {
   Dataset
 } = _core.dogma.use(require("@akromio/dataset"));
 const {
-  Ops
+  Ops,
+  CatalogParser,
+  CatalogParseOpts
 } = _core.dogma.use(require("@akromio/catalog"));
 const {
   Plugin,
@@ -13,8 +15,6 @@ const {
   PluginParser,
   PluginLoader
 } = _core.dogma.use(require("@akromio/core"));
-const CatalogParser = _core.dogma.use(require("./CatalogParser"));
-const ParseOpts = _core.dogma.use(require("./ParseOpts"));
 const JobCatalog = _core.dogma.use(require("./JobCatalog"));
 const JobParser = _core.dogma.use(require("./JobParser"));
 const jobParser = JobParser();
@@ -27,7 +27,7 @@ const JobCatalogParseOpts = _core.dogma.intf('JobCatalogParseOpts', {
     optional: false,
     type: Ops
   }
-}, ParseOpts);
+}, CatalogParseOpts);
 const $JobCatalogParser = class JobCatalogParser extends CatalogParser {
   constructor(_) {
     super(_);
@@ -166,7 +166,7 @@ JobCatalogParser.prototype.parseJobs = function (decl, opts) {
     min: 0,
     max: null
   })); /* c8 ignore next */
-  _core.dogma.expect("opts", opts, ParseOpts);
+  _core.dogma.expect("opts", opts, JobCatalogParseOpts);
   {
     return jobParser.parse(decl, opts);
   }
