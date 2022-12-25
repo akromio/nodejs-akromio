@@ -12,9 +12,7 @@ const {
   Runner,
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
-const {
-  JobEngine: Engine
-} = _core.dogma.use(require("../../.."));
+const Engine = _core.dogma.use(require("./JobEngine"));
 suite(__filename, () => {
   {
     suite("constructor", () => {

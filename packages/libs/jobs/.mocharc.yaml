@@ -6,4 +6,3 @@ extension:
 
 spec:
   - "**/*.test.js"
-  - __tests__/**/*.js

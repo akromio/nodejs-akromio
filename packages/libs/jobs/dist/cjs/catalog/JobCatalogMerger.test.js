@@ -2,9 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const {
-  JobCatalogMerger
-} = _core.dogma.use(require("../../.."));
+const JobCatalogMerger = _core.dogma.use(require("./JobCatalogMerger"));
 suite(__filename, () => {
   {
     const merger = JobCatalogMerger();

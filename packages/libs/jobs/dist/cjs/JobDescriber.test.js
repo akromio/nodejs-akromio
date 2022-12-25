@@ -14,20 +14,18 @@ const {
   Script,
   ScriptOperator
 } = _core.dogma.use(require("@akromio/core"));
-const {
-  JobDescriber
-} = _core.dogma.use(require("../.."));
+const JobDescriber = _core.dogma.use(require("./JobDescriber"));
 const $Macro = class Macro extends MacroBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___init__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___init__(_); /* c8 ignore stop */
+    if (this._pvt_24c36891544c3517c92cc40802a42211___init__ instanceof Function) this._pvt_24c36891544c3517c92cc40802a42211___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___post__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___post__(); /* c8 ignore stop */
+    if (this._pvt_24c36891544c3517c92cc40802a42211___post__ instanceof Function) this._pvt_24c36891544c3517c92cc40802a42211___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___validate__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___validate__(); /* c8 ignore stop */
+    if (this._pvt_24c36891544c3517c92cc40802a42211___validate__ instanceof Function) this._pvt_24c36891544c3517c92cc40802a42211___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -42,11 +40,11 @@ const $Co = class Co extends CoBase {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___init__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___init__(_); /* c8 ignore stop */
+    if (this._pvt_24c36891544c3517c92cc40802a42211___init__ instanceof Function) this._pvt_24c36891544c3517c92cc40802a42211___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___post__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___post__(); /* c8 ignore stop */
+    if (this._pvt_24c36891544c3517c92cc40802a42211___post__ instanceof Function) this._pvt_24c36891544c3517c92cc40802a42211___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_0759c44c6ee04afac5d9d51f6e618674___validate__ instanceof Function) this._pvt_0759c44c6ee04afac5d9d51f6e618674___validate__(); /* c8 ignore stop */
+    if (this._pvt_24c36891544c3517c92cc40802a42211___validate__ instanceof Function) this._pvt_24c36891544c3517c92cc40802a42211___validate__(); /* c8 ignore stop */
   }
 };
 

@@ -1,11 +1,11 @@
 use (
   alias://expected
-  pkg = ~
+  index
 )
 
 suite(__filename, proc()
-  test("when imported, its API must be exported", proc()
-    expected(pkg).members(
+  test("when imported, api must be exported", proc()
+    expected(index).members(
       "createCommands"
       "table"
       "CatalogCommand"

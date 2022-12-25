@@ -1,6 +1,6 @@
 use (
   alias://expected
-  {JobCatalogMerger} = ~
+  JobCatalogMerger
 )
 
 suite(__filename, proc()

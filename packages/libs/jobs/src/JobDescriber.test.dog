@@ -3,7 +3,8 @@ use (
   {DynamicMacro as MacroBase, MacroOperator} = alias://core
   {DynamicCo as CoBase, CoOperator} = alias://core
   {Script, ScriptOperator} = alias://core
-  {JobDescriber} = ~
+  
+  JobDescriber
 )
 
 struct Macro: MacroBase

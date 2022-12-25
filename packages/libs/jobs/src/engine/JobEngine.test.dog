@@ -3,7 +3,7 @@ use (
   {simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
   {Runner, PluginParser} = alias://core
-  {JobEngine as Engine} = ~
+  Engine = JobEngine
 )
 
 suite(__filename, proc()
