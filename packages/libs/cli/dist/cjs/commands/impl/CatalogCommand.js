@@ -132,7 +132,7 @@ CatalogCommand.prototype.listJobDecls = function (decls, defaultJobName, tag, al
   {
     const data = {};
     const jobParser = this.createJobParser();
-    const jobs = jobParser.parseJobs(decls, {
+    const jobs = jobParser.parse(decls, {
       'ops': Ops()
     });
     for (const [name, job] of Object.entries(jobs)) {

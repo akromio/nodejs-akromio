@@ -89,10 +89,7 @@ export struct CatalogCommand: CatalogCommandBase
     const (
       data = {}
       jobParser = self.createJobParser()
-      jobs = jobParser.parseJobs(
-        decls
-        ops = Ops()
-      )
+      jobs = jobParser.parse(decls, ops = Ops())
     )
 
     for each name, job in jobs do

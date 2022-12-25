@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.JobParser = exports.JobEngine = exports.JobDescriber = exports.JobCatalogParser = exports.JobCatalogMerger = exports.JobCatalog = void 0;
 var _core = require("@dogmalang/core");
-const {
-  JobParser
-} = _core.dogma.use(require("@akromio/catalog"));
-exports.JobParser = JobParser;
 const JobDescriber = _core.dogma.use(require("./JobDescriber"));
 exports.JobDescriber = JobDescriber;
 const JobEngine = _core.dogma.use(require("./engine/JobEngine"));
@@ -19,3 +15,5 @@ const JobCatalogParser = _core.dogma.use(require("./catalog/JobCatalogParser"));
 exports.JobCatalogParser = JobCatalogParser;
 const JobCatalogMerger = _core.dogma.use(require("./catalog/JobCatalogMerger"));
 exports.JobCatalogMerger = JobCatalogMerger;
+const JobParser = _core.dogma.use(require("./catalog/JobParser"));
+exports.JobParser = JobParser;
