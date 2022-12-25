@@ -13,7 +13,7 @@
     "npm": ">= 8"
   },
   "devDependencies": {
-    "@akromio/doubles": "^0.4.1",
+    "@akromio/doubles": "^0.5.2",
     "@akromio/expected": "^0.6.0",
     "@akromio/expected-fs": "^0.6.0",
     "@akromio/expected-path": "^0.6.0",
