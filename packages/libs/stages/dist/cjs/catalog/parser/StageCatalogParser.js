@@ -41,7 +41,7 @@ StageCatalogParser.prototype.createCatalog = function (decl) {
     return StageCatalog(decl);
   }
 };
-StageCatalogParser.prototype.parseSpecific = function (decl, opts) {
+StageCatalogParser.prototype.parseSpecialization = function (decl, opts) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, StageCatalogParseOpts);

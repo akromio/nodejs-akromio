@@ -41,7 +41,7 @@ CatalogParser.prototype.parse = async function (decl, opts) {
   _core.dogma.expect("opts", opts, ParseOpts);
   {
     decl = this.parseCommon(decl, opts);
-    decl = (0, await this.parseSpecific(decl, opts));
+    decl = (0, await this.parseSpecialization(decl, opts));
     catalog = this.createCatalog(decl);
   }
   return catalog;
@@ -82,7 +82,7 @@ CatalogParser.prototype.parseDataset = function (decl, opts) {
     });
   }
 };
-CatalogParser.prototype.parseSpecific = async function (decl, opts) {
+CatalogParser.prototype.parseSpecialization = async function (decl, opts) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);

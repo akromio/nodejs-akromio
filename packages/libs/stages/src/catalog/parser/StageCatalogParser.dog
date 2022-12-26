@@ -29,7 +29,7 @@ export struct StageCatalogParser: CatalogParser
   pub fn createCatalog(decl: map) = StageCatalog(decl)
 
   @override @hidden
-  pub fn parseSpecific(decl: map, opts: StageCatalogParseOpts) = decl{
+  pub fn parseSpecialization(decl: map, opts: StageCatalogParseOpts) = decl{
     *
     stages = self.parseStages(decl.stages, decl.dataset)
   }

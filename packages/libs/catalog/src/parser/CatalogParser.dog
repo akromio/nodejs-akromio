@@ -34,7 +34,7 @@ export struct CatalogParser
   pub async fn parse(decl: map, opts: ParseOpts) -> catalog: Catalog
     # (1) parse
     decl = self.parseCommon(decl, opts)
-    decl = await(self.parseSpecific(decl, opts))
+    decl = await(self.parseSpecialization(decl, opts))
 
     # (2) create catalog instance
     catalog = self.createCatalog(decl)
@@ -62,7 +62,7 @@ export struct CatalogParser
   )
 
   /**
-   * Parses the common [decl]aration, returning a new declaration parsed.
+   * Parses the speciaklization [decl]aration, returning a new declaration parsed.
    */
   @hidden
-  pub async fn parseSpecific(decl: map, opts: ParseOpts) = decl
+  pub async fn parseSpecialization(decl: map, opts: ParseOpts) = decl

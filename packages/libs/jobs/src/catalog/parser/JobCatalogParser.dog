@@ -45,7 +45,7 @@ export struct JobCatalogParser: CatalogParser
   pub fn createCatalog(decl: map) = JobCatalog(decl)
 
   @override @hidden
-  pub async fn parseSpecific(decl: map, opts: JobCatalogParseOpts) -> decl
+  pub async fn parseSpecialization(decl: map, opts: JobCatalogParseOpts) -> decl
     # (1) parse base components
     const (
       {dataset} = decl
