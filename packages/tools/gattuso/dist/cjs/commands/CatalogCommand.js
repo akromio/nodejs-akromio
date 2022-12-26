@@ -49,3 +49,27 @@ CatalogCommand.prototype.createItemParser = function () {
     return JobParser();
   }
 };
+CatalogCommand.prototype.getTypeNameOf = function (item) {
+  const self = this;
+  let typeName = ""; /* c8 ignore next */
+  _core.dogma.expect("item", item);
+  {
+    {
+      const _ = item;
+      if (_core.dogma.is(_, "Macro")) {
+        {
+          typeName = "macro";
+        }
+      } else if (_core.dogma.is(_, "Co")) {
+        {
+          typeName = "co";
+        }
+      } else if (_core.dogma.is(_, "Script")) {
+        {
+          typeName = "script";
+        }
+      }
+    }
+  }
+  return typeName;
+};

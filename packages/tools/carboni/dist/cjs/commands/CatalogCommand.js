@@ -49,3 +49,23 @@ CatalogCommand.prototype.createItemParser = function () {
     return StageParser();
   }
 };
+CatalogCommand.prototype.getTypeNameOf = function (item) {
+  const self = this;
+  let typeName = ""; /* c8 ignore next */
+  _core.dogma.expect("item", item);
+  {
+    {
+      const _ = item;
+      if (_core.dogma.is(_, "ConstStage")) {
+        {
+          typeName = "const";
+        }
+      } else if (_core.dogma.is(_, "SleepStage")) {
+        {
+          typeName = "sleep";
+        }
+      }
+    }
+  }
+  return typeName;
+};

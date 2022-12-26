@@ -14,5 +14,12 @@ export struct CatalogCommand: CatalogCommandBase:: _JobCommand
   @override
   pub const itemName = "job"
 
-  @override
+  @override @hidden
   pub fn createItemParser() = JobParser()
+
+  @override @hidden
+  pub fn getTypeNameOf(item) -> typeName: text
+    with type(item) do
+      if "Macro" then typeName = "macro"
+      if "Co" then typeName = "co"
+      if "Script" then typeName = "script"

@@ -14,5 +14,11 @@ export struct CatalogCommand: CatalogCommandBase:: _StageCommand
   @override
   pub const itemName = "stage"
 
-  @override
+  @override @hidden
   pub fn createItemParser() = StageParser()
+
+  @override @hidden
+  pub fn getTypeNameOf(item) -> typeName: text
+    with type(item) do
+      if "ConstStage" then typeName = "const"
+      if "SleepStage" then typeName = "sleep"

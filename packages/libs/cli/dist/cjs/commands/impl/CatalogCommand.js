@@ -159,30 +159,18 @@ CatalogCommand.prototype.listItemDecls = function (decls, defaultItemName, tag, 
     for (const key of (0, _core.keys)(data).sort()) {
       const item = _core.dogma.getItem(data, key);
       const name = key + (key == defaultItemName ? "*" : "");
-      let opType;
-      {
-        const _ = item;
-        if (_core.dogma.is(_, "Macro")) {
-          {
-            opType = "macro";
-          }
-        } else if (_core.dogma.is(_, "Co")) {
-          {
-            opType = "co";
-          }
-        } else if (_core.dogma.is(_, "Script")) {
-          {
-            opType = "script";
-          }
-        }
-      }
-      rows.push([name, opType, item.tags, item.desc || item.title]);
+      const typeName = this.getTypeNameOf(item);
+      rows.push([name, typeName, item.tags, item.desc || item.title]);
     }
     (0, _core.print)(`
 ${itemName}s:`);
     (0, _core.print)(table(rows, tableOpts));
   }
 };
+/* c8 ignore start */
+CatalogCommand.prototype.getTypeNameOf = function () {
+  (0, _core.abstract)();
+}; /* c8 ignore stop */
 function showCatalogDesc(catalog, show) {
   /* c8 ignore next */_core.dogma.expect("catalog", catalog, _core.map); /* c8 ignore next */
   _core.dogma.expect("show", show, _core.bool);
