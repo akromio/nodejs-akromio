@@ -3,23 +3,22 @@ use (
   {CatalogParser, CatalogParseOpts} = alias://catalog
 
   ../StageCatalog
-  ../../stages/{ConstStageParser, SleepStageParser}
+  ../../stages/StageParser
 )
 
 /**
- * The const stage parser to use.
+ * The stage parser to use.
  */
-const constStageParser = ConstStageParser()
-
-/**
- * The sleep stage parser to use.
- */
-const sleepStageParser = SleepStageParser()
+const stageParser = StageParser()
 
 /**
  * Stage catalog parse options.
  */
-type StageCatalogParseOpts = CatalogParseOpts
+intf StageCatalogParseOpts: CatalogParseOpts
+  /**
+   * Dataset parent to use.
+   */
+  parentDataset: Dataset
 
 /**
  * A parser to parse stage catalog declarations.
@@ -29,19 +28,18 @@ export struct StageCatalogParser: CatalogParser
   pub fn createCatalog(decl: map) = StageCatalog(decl)
 
   @override @hidden
-  pub fn parseSpecialization(decl: map, opts: StageCatalogParseOpts) = decl{
-    *
-    stages = self.parseStages(decl.stages, decl.dataset)
-  }
+  pub fn parseSpecialization(decl: map, opts: StageCatalogParseOpts) -> decl
+    # (1) parse stages
+    const stages = self.parseStages(decl.stages, opts)
+
+    # (2) adapt declaration
+    decl.{stages}
   
   /**
    * Parses the stage [decl]arations.
    */
   @hidden
-  pub fn parseStages(decl: map[], dataset: Dataset) -> stages: map
-    for each stage := decl do
-      if "const" in stage then stage = constStageParser.parse(stage, dataset)
-      else if "sleep" in stage then stage = sleepStageParser.parse(stage, dataset)
-      else throw(TypeError($"Unknown stage: ${fmt(stage)}."))
-      
-      stages[stage.name] = stage
+  pub fn parseStages(decl: map[], opts: StageCatalogParseOpts) -> stages: map
+    for each stageDecl in decl do
+      for each name, stage in stageParser.parse(stageDecl, opts) do
+        stages[name] = stage

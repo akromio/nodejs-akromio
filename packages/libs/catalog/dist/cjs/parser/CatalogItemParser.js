@@ -23,23 +23,16 @@ module.exports = exports = CatalogItemParser;
 CatalogItemParser.prototype.parse = function (decl, opts) {
   const self = this;
   let items = {}; /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.dogma.TypeDef({
-    name: 'inline',
-    types: [_core.map],
-    min: 0,
-    max: null
-  })); /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, CatalogItemParseOpts);
   {
-    for (let item of decl) {
-      if (_core.dogma.includes(item, "group")) {
-        for (const aux of this.parseGroup(item, opts)) {
-          _core.dogma.setItem("=", items, aux.name, aux);
-        }
-      } else {
-        item = this.parseItem(item, opts);
+    if (_core.dogma.includes(decl, "group")) {
+      for (const item of this.parseGroup(decl, opts)) {
         _core.dogma.setItem("=", items, item.name, item);
       }
+    } else {
+      const item = this.parseItem(decl, opts);
+      _core.dogma.setItem("=", items, item.name, item);
     }
   }
   return items;

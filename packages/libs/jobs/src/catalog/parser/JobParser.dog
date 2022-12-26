@@ -24,11 +24,7 @@ export struct JobParser: CatalogItemParser
   pub fn parseItem(decl: map, opts: ParseOpts) = self.parseJob(decl, opts)
 
   /**
-   * Parses a job declaration, returning its job instance.
-   *
-   * @remarks
-   * When a group parsed, a list of instances is returned.
-   * Otherwise, the job instance is returned.
+   * Parses a job [decl]aration, returning its job instance.
    */
   pub fn parseJob(decl: map, opts: ParseOpts) -> job
     # (1) replace text item by map
@@ -44,19 +40,14 @@ export struct JobParser: CatalogItemParser
     else job = self.parseAddOnJob(decl, opts)
   
   /**
-   * Parses an add-on job, that is, a specific job of the
-   * package in use.
-   *
-   * @remarks
-   * For example, this is used by the tests package
-   * for supporting the test jobs.
+   * Parses an add-on job, that is, a specific job of the package in use.
    */
   @hidden
   pub fn parseAddOnJob(decl: map, opts: ParseOpts)
-    throw(Error($"Invalid job declaration: ${fmt(decl)}."))
+    throw(TypeError($"Invalid job declaration: ${fmt(decl)}."))
   
   /**
-   * Parses a macro declaration.
+   * Parses a macro [decl]aration, using the given [opts].
    */
   @hidden
   pub fn parseMacro(decl: map, opts: ParseOpts) = CatalogMacro(
@@ -71,7 +62,7 @@ export struct JobParser: CatalogItemParser
   )
 
   /**
-   * Parses a concurrent declaration.
+   * Parses a concurrent [decl]aration, using the given [opts].
    */
   @hidden
   pub fn parseCo(decl: map, opts: ParseOpts) = CatalogCo(
@@ -84,10 +75,10 @@ export struct JobParser: CatalogItemParser
   )
 
   /**
-   * Parses a script declaration.
+   * Parses a script [decl]aration
    */
   @hidden
-  pub fn parseScript(decl: map, opts: ParseOpts) = Script(
+  pub fn parseScript(decl: map, _: ParseOpts) = Script(
     decl{
       *
       name = decl.script
@@ -96,7 +87,7 @@ export struct JobParser: CatalogItemParser
   )
 
 /**
- * Parses the ini field of a declaration.
+ * Parses the ini field of a [decl]aration.
  *
  * @dev
  * This field must be a list, but only one inline step is accepted too.
@@ -108,7 +99,7 @@ else
 end
 
 /**
- * Parses the fin field of a declaration.
+ * Parses the fin field of a [decl]aration.
  *
  * @dev
  * Similar to parseIni().

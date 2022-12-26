@@ -1,21 +1,61 @@
 use (
   {ms} = util
+  {CatalogItemParser, CatalogItemParseOpts} = alias://catalog
+
+  ConstStage, SleepStage
 )
 
 /**
- * Base for the stage parsers.
+ * Parse options.
  */
-@abstract
-export struct StageParser
-  /**
-   * Parses a given [decl]aration, using a given [dataset].
-   */
-  pub fn parse(decl: map, dataset) -> stage: map
-    decl = dataset.eval(decl)
-    stage = self._parse(decl{*, duration = ms(decl.duration)})
+type ParseOpts = CatalogItemParseOpts
+
+/**
+ * A parser of stage declarations.
+ */
+export struct StageParser: CatalogItemParser
+  @override
+  pub const itemName = "stage"
+
+  @override
+  pub fn parseItem(decl: map, opts: ParseOpts) = self.parseStage(decl, opts)
   
   /**
-   * Parses a given [decl]aration.
+   * Parses a stage [decl]aration, returning its stage instance.
    */
-  @abstract @hidden
-  pub fn _parse(decl: map): map
+  pub fn parseStage(decl: map, opts: ParseOpts) -> stage: Stage
+    if "const" in decl then stage = self.parseConstStage(decl, opts)
+    else if "sleep" in decl then stage = self.parseSleepStage(decl, opts)
+    else stage = self.parseAddOnStage(decl, opts)
+  
+  /**
+   * Parses an add-on stage, that is, a specific job of the package in use.
+   */
+  @hidden
+  pub fn parseAddOnStage(decl: map, _: ParseOpts)
+    throw(TypeError($"Invalid stage declaration: ${fmt(decl)}."))
+  
+  /**
+   * Parses a const stage [decl]aration.
+   */
+  @hidden
+  pub fn parseConstStage(decl: map, _: ParseOpts) = ConstStage(
+    decl{
+      *
+      name = decl.const
+      duration = ms(decl.duration)
+      interval = ms(decl.interval or "1s")
+    }
+  )
+
+  /**
+   * Parses a sleep stage [decl]aration.
+   */
+  @hidden
+  pub fn parseSleepStage(decl: map, _: ParseOpts) = SleepStage(
+    decl{
+      *
+      name = decl.sleep
+      duration = ms(decl.duration)
+    }
+  )

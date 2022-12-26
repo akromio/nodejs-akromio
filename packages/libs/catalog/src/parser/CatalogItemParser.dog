@@ -17,16 +17,19 @@ export struct CatalogItemParser
   pub const itemName: text
 
   /**
-   * Parses the catalog item declarations, returning a list with their instances.
+   * Parses a catalog item [decl]aration, returning a map with its item(s).
+   *
+   * Remember a group is an item to define several items with a same tag.
+   * For this reason, this method returns a map of items, where each field
+   * of this map represents an item.
    */
-  pub fn parse(decl: map[], opts: CatalogItemParseOpts) -> items: map
-    for each item := decl do
-      if "group" in item then
-        for each aux in self.parseGroup(item, opts) do
-          items[aux.name] = aux
-      else
-        item = self.parseItem(item, opts)
+  pub fn parse(decl: map, opts: CatalogItemParseOpts) -> items: map
+    if "group" in decl then
+      for each item in self.parseGroup(decl, opts) do
         items[item.name] = item
+    else
+      const item = self.parseItem(decl, opts)
+      items[item.name] = item
   
   /**
    * Parses a given item [decl]aration, returning its instance.

@@ -92,7 +92,7 @@ JobParser.prototype.parseAddOnJob = function (decl, opts) {
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
-    _core.dogma.raise(Error(`Invalid job declaration: ${(0, _core.fmt)(decl)}.`));
+    _core.dogma.raise(TypeError(`Invalid job declaration: ${(0, _core.fmt)(decl)}.`));
   }
 };
 JobParser.prototype.parseMacro = function (decl, opts) {
@@ -121,10 +121,10 @@ JobParser.prototype.parseCo = function (decl, opts) {
     }, {}, [], []));
   }
 };
-JobParser.prototype.parseScript = function (decl, opts) {
+JobParser.prototype.parseScript = function (decl, _) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
-  _core.dogma.expect("opts", opts, ParseOpts);
+  _core.dogma.expect("_", _, ParseOpts);
   {
     return Script(_core.dogma.clone(decl, {
       "name": decl.script,

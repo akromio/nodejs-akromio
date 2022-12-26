@@ -6,7 +6,7 @@ use (
  * Returns the milliseconds for a given [interval].
  */
 pub fn ms(interval: (text | num)) = if interval is num then
-  1000
+  interval
 else
   milliseconds(interval)
 end

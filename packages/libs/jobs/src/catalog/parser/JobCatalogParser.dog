@@ -17,7 +17,7 @@ const jobParser = JobParser()
  */
 intf JobCatalogParseOpts: CatalogParseOpts
   /**
-   * The dataset parent.
+   * Dataset parent to use.
    */
   parentDataset: Dataset
 
@@ -114,7 +114,7 @@ export struct JobCatalogParser: CatalogParser
    * returning a list with the job instances.
    */
   @hidden
-  pub fn parseJobs(decl: map[], opts: JobCatalogParseOpts) = jobParser.parse(
-    decl
-    opts
-  )
+  pub fn parseJobs(decl: map[], opts: JobCatalogParseOpts) -> jobs: map
+    for each jobDecl in decl do
+      for each name, job in jobParser.parse(jobDecl, opts) do
+        jobs[name] = job

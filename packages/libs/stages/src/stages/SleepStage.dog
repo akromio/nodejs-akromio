@@ -5,4 +5,4 @@ use (
 /**
  * A stage for nothing to do.
  */
-export type SleepStage = Stage
+export struct SleepStage: Stage

@@ -1,10 +1,10 @@
 use (
   alias://expected
   {monitor} = alias://doubles
-  {'impl' as TriggerImpl} = ~
+  TriggerImpl = IntervalTriggerImpl
 )
 
-suite.only(__filename, proc()
+suite(__filename, proc()
   const interval = "10s"
 
   setup(proc()

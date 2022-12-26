@@ -34,18 +34,18 @@ intf JobInfo
 /**
  * Schema for the const stages.
  */
-export intf ConstStage: Stage
+export struct ConstStage: Stage
   /**
    * Interval.
    */
-  interval: num
+  pub const interval: num
 
   /**
    * Number of requests to generate per interval.
    */
-  requests: num
+  pub const requests: num
 
   /**
    * Info on the jobs to run.
    */
-  jobs: JobInfo[]
+  pub const jobs: JobInfo[]

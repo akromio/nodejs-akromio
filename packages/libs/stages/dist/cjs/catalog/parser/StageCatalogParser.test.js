@@ -13,6 +13,9 @@ suite(__filename, () => {
     const parentDataset = GlobalDataset({
       'name': "global"
     });
+    const parseOpts = {
+      ["parentDataset"]: parentDataset
+    };
     suite("parseStages()", () => {
       {
         test("when unknown stage, error must be raised", async () => {
@@ -40,10 +43,8 @@ suite(__filename, () => {
                 ["jobs"]: []
               }]
             };
-            const out = await _core.dogma.pawait(() => parser.parse(decl, {
-              'parentDataset': parentDataset
-            }));
-            expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Unknown stage:.+xconstx");
+            const out = await _core.dogma.pawait(() => parser.parse(decl, parseOpts));
+            expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Invalid stage declaration:.+xconstx");
           }
         });
         test("when declaration is ok, stage catalog must be raised", async () => {
@@ -66,14 +67,12 @@ suite(__filename, () => {
                 ["duration"]: "1m"
               }, {
                 ["const"]: "load",
-                ["duration"]: "$(duration)",
+                ["duration"]: "10m",
                 ["requests"]: 2000,
                 ["jobs"]: []
               }]
             };
-            const out = (0, await parser.parse(decl, {
-              'parentDataset': parentDataset
-            }));
+            const out = (0, await parser.parse(decl, parseOpts));
             expected(out).toBe(StageCatalog).toHave({
               'spec': "v1.0",
               'loc': "test:///stages/catalogs/test-catalog",
@@ -81,24 +80,27 @@ suite(__filename, () => {
               'stages': {
                 ["warmup"]: {
                   ["name"]: "warmup",
-                  ["impl"]: "const",
+                  ["desc"]: null,
+                  ["tags"]: [],
                   ["duration"]: 120000,
+                  ["interval"]: 1000,
                   ["requests"]: 1000,
-                  ["jobs"]: [],
-                  ["interval"]: 1000
+                  ["jobs"]: []
                 },
                 ["pause"]: {
                   ["name"]: "pause",
-                  ["impl"]: "sleep",
+                  ["desc"]: null,
+                  ["tags"]: [],
                   ["duration"]: 60000
                 },
                 ["load"]: {
                   ["name"]: "load",
-                  ["impl"]: "const",
+                  ["desc"]: null,
+                  ["tags"]: [],
                   ["duration"]: 600000,
+                  ["interval"]: 1000,
                   ["requests"]: 2000,
-                  ["jobs"]: [],
-                  ["interval"]: 1000
+                  ["jobs"]: []
                 }
               }
             });

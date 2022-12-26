@@ -13,7 +13,7 @@ suite(__filename, () => {
     const parseOpts = {
       ["ops"]: ops
     };
-    suite("pareJob()", () => {
+    suite("parseJob()", () => {
       {
         suite("macro", () => {
           {
@@ -24,7 +24,7 @@ suite(__filename, () => {
                   ["dataset"]: ["v1", "v2"],
                   ["steps"]: []
                 };
-                const out = parser.parse([decl], parseOpts);
+                const out = parser.parse(decl, parseOpts);
                 expected(out.test).toBe("CatalogMacro").toHave({
                   'name': "test",
                   'dataset': [{
@@ -44,7 +44,7 @@ suite(__filename, () => {
                   ["steps"]: [],
                   ["forEach"]: []
                 };
-                const out = parser.parse([decl], parseOpts);
+                const out = parser.parse(decl, parseOpts);
                 expected(out.test).toBe("CatalogMacro").toHave({
                   'name': "test"
                 });
@@ -59,7 +59,7 @@ suite(__filename, () => {
                   ["steps"]: [],
                   ["fin"]: []
                 };
-                const out = parser.parse([decl], parseOpts);
+                const out = parser.parse(decl, parseOpts);
                 expected(out.test).toBe("CatalogMacro").member("initializers").equalTo([]).member("finalizers").equalTo([]);
               }
             });
@@ -71,7 +71,7 @@ suite(__filename, () => {
                   ["steps"]: [],
                   ["fin"]: "log fin"
                 };
-                const out = parser.parse([decl], parseOpts);
+                const out = parser.parse(decl, parseOpts);
                 expected(out.test.initializers).equalTo(["log ini"]);
                 expected(out.test.finalizers).equalTo(["log fin"]);
               }
@@ -86,7 +86,7 @@ suite(__filename, () => {
                   ["co"]: "test",
                   ["steps"]: []
                 };
-                const out = parser.parse([decl], parseOpts);
+                const out = parser.parse(decl, parseOpts);
                 expected(out.test).toBe("CatalogCo").toHave({
                   'name': "test"
                 });
@@ -102,7 +102,7 @@ suite(__filename, () => {
                   ["script"]: "test",
                   ["code"]: ""
                 };
-                const out = parser.parse([decl], parseOpts);
+                const out = parser.parse(decl, parseOpts);
                 expected(out.test).toBe("Script").toHave({
                   'name': "test"
                 });
@@ -117,11 +117,11 @@ suite(__filename, () => {
               ["steps"]: []
             };
             const out = _core.dogma.peval(() => {
-              return parser.parseJob(decl, {
+              return parser.parse(decl, {
                 'ops': ops
               });
             });
-            expected(out).it(0).equalTo(false).it(1).equalTo(Error("Invalid job declaration: { macr: 'test', steps: [] }."));
+            expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Invalid job declaration:.+macr.+");
           }
         });
       }

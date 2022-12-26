@@ -22,12 +22,6 @@ intf ParseOpts
 @abstract
 export struct CatalogParser
   /**
-   * Creates a catalog with the data passed.
-   */
-  @abstract
-  pub fn createCatalog(decl: map): Catalog
-
-  /**
    * Parses a catalog [decl]aration and returns a catalog object
    * if everything is alright. Otherwise, it raises an error.
    */
@@ -66,3 +60,9 @@ export struct CatalogParser
    */
   @hidden
   pub async fn parseSpecialization(decl: map, opts: ParseOpts) = decl
+
+  /**
+   * Creates a catalog with the data passed.
+   */
+  @abstract
+  pub fn createCatalog(decl: map): Catalog

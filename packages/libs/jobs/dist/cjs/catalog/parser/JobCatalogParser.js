@@ -159,7 +159,8 @@ JobCatalogParser.prototype.parseTriggers = function (decl, ds) {
   return triggers;
 };
 JobCatalogParser.prototype.parseJobs = function (decl, opts) {
-  const self = this; /* c8 ignore next */
+  const self = this;
+  let jobs = {}; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.dogma.TypeDef({
     name: 'inline',
     types: [_core.map],
@@ -168,6 +169,13 @@ JobCatalogParser.prototype.parseJobs = function (decl, opts) {
   })); /* c8 ignore next */
   _core.dogma.expect("opts", opts, JobCatalogParseOpts);
   {
-    return jobParser.parse(decl, opts);
+    for (const jobDecl of decl) {
+      for (const [name, job] of Object.entries(jobParser.parse(jobDecl, opts))) {
+        {
+          _core.dogma.setItem("=", jobs, name, job);
+        }
+      }
+    }
   }
+  return jobs;
 };

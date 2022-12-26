@@ -9,11 +9,14 @@ const {
   CatalogParseOpts
 } = _core.dogma.use(require("@akromio/catalog"));
 const StageCatalog = _core.dogma.use(require("../StageCatalog"));
-const ConstStageParser = _core.dogma.use(require("../../stages/ConstStageParser"));
-const SleepStageParser = _core.dogma.use(require("../../stages/SleepStageParser"));
-const constStageParser = ConstStageParser();
-const sleepStageParser = SleepStageParser();
-const StageCatalogParseOpts = CatalogParseOpts;
+const StageParser = _core.dogma.use(require("../../stages/StageParser"));
+const stageParser = StageParser();
+const StageCatalogParseOpts = _core.dogma.intf('StageCatalogParseOpts', {
+  parentDataset: {
+    optional: false,
+    type: Dataset
+  }
+}, CatalogParseOpts);
 const $StageCatalogParser = class StageCatalogParser extends CatalogParser {
   constructor(_) {
     super(_);
@@ -46,12 +49,17 @@ StageCatalogParser.prototype.parseSpecialization = function (decl, opts) {
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, StageCatalogParseOpts);
   {
-    return _core.dogma.clone(decl, {
-      "stages": this.parseStages(decl.stages, decl.dataset)
-    }, {}, [], []);
+    const stages = this.parseStages(decl.stages, opts);
+    _core.dogma.update(decl, {
+      name: "stages",
+      visib: ".",
+      assign: "=",
+      value: stages
+    });
   }
+  return decl;
 };
-StageCatalogParser.prototype.parseStages = function (decl, dataset) {
+StageCatalogParser.prototype.parseStages = function (decl, opts) {
   const self = this;
   let stages = {}; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.dogma.TypeDef({
@@ -60,17 +68,14 @@ StageCatalogParser.prototype.parseStages = function (decl, dataset) {
     min: 0,
     max: null
   })); /* c8 ignore next */
-  _core.dogma.expect("dataset", dataset, Dataset);
+  _core.dogma.expect("opts", opts, StageCatalogParseOpts);
   {
-    for (let stage of decl) {
-      if (_core.dogma.includes(stage, "const")) {
-        stage = constStageParser.parse(stage, dataset);
-      } else if (_core.dogma.includes(stage, "sleep")) {
-        stage = sleepStageParser.parse(stage, dataset);
-      } else {
-        _core.dogma.raise(TypeError(`Unknown stage: ${(0, _core.fmt)(stage)}.`));
+    for (const stageDecl of decl) {
+      for (const [name, stage] of Object.entries(stageParser.parse(stageDecl, opts))) {
+        {
+          _core.dogma.setItem("=", stages, name, stage);
+        }
       }
-      _core.dogma.setItem("=", stages, stage.name, stage);
     }
   }
   return stages;

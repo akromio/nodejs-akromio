@@ -129,23 +129,25 @@ CatalogCommand.prototype.listItemDecls = function (decls, defaultItemName, tag, 
   _core.dogma.expect("all", all, _core.bool);
   {
     const data = {};
+    const ops = Ops();
     const itemParser = this.createItemParser();
-    const items = itemParser.parse(decls, {
-      'ops': Ops()
-    });
-    for (const [name, item] of Object.entries(items)) {
-      {
-        if (all) {
-          _core.dogma.setItem("=", data, name, item);
-        } else if (tag) {
-          if (item.tags.includes(tag)) {
+    for (const decl of decls) {
+      for (const [name, item] of Object.entries(itemParser.parse(decl, {
+        'ops': ops
+      }))) {
+        {
+          if (all) {
             _core.dogma.setItem("=", data, name, item);
-          }
-        } else {
-          if (item.tags.includes("hidden")) {
-            _core.dogma.nop();
+          } else if (tag) {
+            if (item.tags.includes(tag)) {
+              _core.dogma.setItem("=", data, name, item);
+            }
           } else {
-            _core.dogma.setItem("=", data, name, item);
+            if (item.tags.includes("hidden")) {
+              _core.dogma.nop();
+            } else {
+              _core.dogma.setItem("=", data, name, item);
+            }
           }
         }
       }

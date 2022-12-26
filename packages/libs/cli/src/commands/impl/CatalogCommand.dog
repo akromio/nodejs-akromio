@@ -98,19 +98,20 @@ export struct CatalogCommand: CatalogCommandBase
     #(1) get the data to show
     const (
       data = {}
+      ops = Ops()
       itemParser = self.createItemParser()
-      items = itemParser.parse(decls, ops = Ops())
     )
 
-    for each name, item in items do
-      if all then
-        data[name] = item
-      else if tag then
-        if item.tags.includes(tag) then
+    for each decl in decls do
+      for each name, item in itemParser.parse(decl, ops=) do
+        if all then
           data[name] = item
-      else
-        if item.tags.includes("hidden") then nop
-        else data[name] = item
+        else if tag then
+          if item.tags.includes(tag) then
+            data[name] = item
+        else
+          if item.tags.includes("hidden") then nop
+          else data[name] = item
     
     #(2) create rows to show
     const (

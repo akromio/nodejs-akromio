@@ -5,10 +5,8 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  impl: TriggerImpl
-} = _core.dogma.use(require("../.."));
-suite.only(__filename, () => {
+const TriggerImpl = _core.dogma.use(require("./IntervalTriggerImpl"));
+suite(__filename, () => {
   {
     const interval = "10s";
     setup(() => {

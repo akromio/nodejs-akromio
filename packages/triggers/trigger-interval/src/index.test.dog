@@ -1,11 +1,11 @@
 use (
   alias://expected
-  pkg = ~
+  index
 )
 
 suite(__filename, proc()
   test("when imported, api must be exported", proc()
-    expected(pkg)\
+    expected(index)\
       .toHave(name = "interval")\
       .member("desc").toBeText()\
       .member("impl").toBeCallable()

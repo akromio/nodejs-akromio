@@ -12,13 +12,13 @@ suite(__filename, proc()
     parseOpts = {ops}
   )
 
-  suite("pareJob()", proc()
+  suite("parseJob()", proc()
     suite("macro", proc()
       test("when simple macro, a macro instance must be returned", proc()
         # (1) act
         const (
           decl = {macro = "test", dataset = ["v1", "v2"], steps = []}
-          out = parser.parse([decl], parseOpts)
+          out = parser.parse(decl, parseOpts)
         )
 
         # (2) assessment
@@ -34,7 +34,7 @@ suite(__filename, proc()
         # (1) act
         const (
           decl = {macro = "test", forEach = "range 1 5", steps = [], forEach = []}
-          out = parser.parse([decl], parseOpts)
+          out = parser.parse(decl, parseOpts)
         )
 
         # (2) assessment
@@ -46,7 +46,7 @@ suite(__filename, proc()
         # (1) act
         const (
           decl = {macro = "test", ini = [], steps = [], fin = []}
-          out = parser.parse([decl], parseOpts)
+          out = parser.parse(decl, parseOpts)
         )
 
         # (2) assessment
@@ -59,7 +59,7 @@ suite(__filename, proc()
         # (1) act
         const (
           decl = {macro = "test", ini = "log ini", steps = [], fin = "log fin"}
-          out = parser.parse([decl], parseOpts)
+          out = parser.parse(decl, parseOpts)
         )
 
         # (2) assessment
@@ -73,7 +73,7 @@ suite(__filename, proc()
         # (1) act
         const (
           decl = {co = "test", steps = []}
-          out = parser.parse([decl], parseOpts)
+          out = parser.parse(decl, parseOpts)
         )
         
         # (2) assessment
@@ -86,7 +86,7 @@ suite(__filename, proc()
         # (1) act
         const (
           decl = {script = "test", code = ""}
-          out = parser.parse([decl], parseOpts)
+          out = parser.parse(decl, parseOpts)
         )
 
         # (2) assessment
@@ -98,13 +98,13 @@ suite(__filename, proc()
       # (1) act
       const (
         decl = {macr = "test", steps = []}
-        out = peval(parser.parseJob(decl, ops=))
+        out = peval(parser.parse(decl, ops=))
       )
 
       # (2) assessment
       expected(out)\
         .it(0).equalTo(false)\
-        .it(1).equalTo(Error("Invalid job declaration: { macr: 'test', steps: [] }."))
+        .it(1).toBe(TypeError).like("Invalid job declaration:.+macr.+")
     end)
   end)
 end)

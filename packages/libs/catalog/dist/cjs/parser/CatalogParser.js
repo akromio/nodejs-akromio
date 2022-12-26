@@ -30,10 +30,6 @@ const CatalogParser = new Proxy($CatalogParser, {
   } /* c8 ignore stop */
 });
 module.exports = exports = CatalogParser;
-/* c8 ignore start */
-CatalogParser.prototype.createCatalog = function () {
-  (0, _core.abstract)();
-}; /* c8 ignore stop */
 CatalogParser.prototype.parse = async function (decl, opts) {
   const self = this;
   let catalog; /* c8 ignore next */
@@ -90,3 +86,7 @@ CatalogParser.prototype.parseSpecialization = async function (decl, opts) {
     return decl;
   }
 };
+/* c8 ignore start */
+CatalogParser.prototype.createCatalog = function () {
+  (0, _core.abstract)();
+}; /* c8 ignore stop */

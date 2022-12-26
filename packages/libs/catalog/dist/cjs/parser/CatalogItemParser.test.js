@@ -2,8 +2,28 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
+const CatalogItemBase = _core.dogma.use(require("./CatalogItem"));
 const CatalogItemParseOpts = _core.dogma.use(require("./CatalogItemParseOpts"));
 const CatalogItemParserBase = _core.dogma.use(require("./CatalogItemParser"));
+const $CatalogItem = class CatalogItem extends CatalogItemBase {
+  constructor(_) {
+    super(_);
+    /* c8 ignore start */
+    if (_ == null) _ = {};
+    /* c8 ignore stop */ /* c8 ignore start */
+    if (this._pvt_8ab00b20cff63ad569160857bdbc3f35___init__ instanceof Function) this._pvt_8ab00b20cff63ad569160857bdbc3f35___init__(_); /* c8 ignore stop */
+    /* c8 ignore start */
+    if (this._pvt_8ab00b20cff63ad569160857bdbc3f35___post__ instanceof Function) this._pvt_8ab00b20cff63ad569160857bdbc3f35___post__(); /* c8 ignore stop */
+    /* c8 ignore start */
+    if (this._pvt_8ab00b20cff63ad569160857bdbc3f35___validate__ instanceof Function) this._pvt_8ab00b20cff63ad569160857bdbc3f35___validate__(); /* c8 ignore stop */
+  }
+};
+
+const CatalogItem = new Proxy($CatalogItem, {
+  apply(receiver, self, args) {
+    return new $CatalogItem(...args);
+  }
+});
 const $CatalogItemParser = class CatalogItemParser extends CatalogItemParserBase {
   constructor(_) {
     super(_);
@@ -30,22 +50,14 @@ const CatalogItemParser = new Proxy($CatalogItemParser, {
   }
 });
 CatalogItemParser.prototype.parseItem = function (decl, opts) {
-  const self = this;
-  let item; /* c8 ignore next */
+  const self = this; /* c8 ignore next */
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, CatalogItemParseOpts);
   {
-    if (decl.macro) {
-      item = _core.dogma.clone(decl, {
-        "name": decl.macro
-      }, {}, [], []);
-    } else {
-      item = _core.dogma.clone(decl, {
-        "name": decl.group
-      }, {}, [], []);
-    }
+    return CatalogItem(_core.dogma.clone(decl, {
+      "name": decl.macro
+    }, {}, [], []));
   }
-  return item;
 };
 suite(__filename, () => {
   {
@@ -55,15 +67,14 @@ suite(__filename, () => {
       {
         test("when called, a map with the item instances must be returned", () => {
           {
-            const macro = {
+            const decl = {
               ["macro"]: "test",
               ["steps"]: []
             };
-            const out = parser.parse([macro], parseOpts);
-            expected(out).equalTo({
-              'test': _core.dogma.clone(macro, {
-                "name": macro.macro
-              }, {}, [], [])
+            const out = parser.parse(decl, parseOpts);
+            expected(out.test).toBe(CatalogItem).toHave({
+              'name': "test",
+              'tags': []
             });
           }
         });
@@ -78,16 +89,14 @@ suite(__filename, () => {
               ["tags"]: [],
               ["steps"]: []
             };
-            const group = {
+            const decl = {
               ["group"]: "grp",
               ["jobs"]: [macro]
             };
-            const out = parser.parse([group], parseOpts);
-            expected(out).equalTo({
-              'test': _core.dogma.clone(macro, {
-                "name": macro.macro,
-                "tags": ["grp"]
-              }, {}, [], [])
+            const out = parser.parse(decl, parseOpts);
+            expected(out.test).toBe(CatalogItem).toHave({
+              'name': "test",
+              'tags': ["grp"]
             });
           }
         });
