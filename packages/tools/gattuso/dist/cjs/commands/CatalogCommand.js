@@ -16,6 +16,18 @@ const $CatalogCommand = class CatalogCommand extends CatalogCommandBase {
     /* c8 ignore stop */ /* c8 ignore next */
     if (_JobCommand.prototype._constructor instanceof Function) _JobCommand.prototype._constructor.bind(this)(_);
     /* c8 ignore start */
+    if (_['desc'] != null) (0, _core.expect)('desc', _['desc'], _core.text); /* c8 ignore stop */
+    Object.defineProperty(this, 'desc', {
+      value: (0, _core.coalesce)(_['desc'], "List the items of a job catalog."),
+      writable: false,
+      enumerable: true
+    });
+    Object.defineProperty(this, 'itemName', {
+      value: (0, _core.coalesce)(_['itemName'], "job"),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (this._pvt_f79b96f884341e5884eb8533126057d7___init__ instanceof Function) this._pvt_f79b96f884341e5884eb8533126057d7___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_f79b96f884341e5884eb8533126057d7___post__ instanceof Function) this._pvt_f79b96f884341e5884eb8533126057d7___post__(); /* c8 ignore stop */
@@ -31,7 +43,7 @@ const CatalogCommand = new Proxy($CatalogCommand, {
   }
 });
 module.exports = exports = CatalogCommand;
-CatalogCommand.prototype.createJobParser = function () {
+CatalogCommand.prototype.createItemParser = function () {
   const self = this;
   {
     return JobParser();

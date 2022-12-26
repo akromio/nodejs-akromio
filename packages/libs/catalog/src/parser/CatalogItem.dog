@@ -1,0 +1,5 @@
+/**
+ * Base for the catalog items such as, for example, a job
+ * or a stage.
+ */
+export intf CatalogItem

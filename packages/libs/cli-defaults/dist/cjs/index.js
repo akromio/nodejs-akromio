@@ -15,6 +15,11 @@ module.exports = exports = {
       ["path"]: "/jobs/catalogs/"
     }
   },
+  ["stages"]: {
+    ["catalogs"]: {
+      ["path"]: "/stages/catalogs/"
+    }
+  },
   ["registry"]: {
     ["git"]: {
       ["host"]: "raw.githubusercontent.com",

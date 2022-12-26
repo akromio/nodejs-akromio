@@ -9,4 +9,10 @@ use (
  */
 export struct CatalogCommand: CatalogCommandBase:: _JobCommand
   @override
-  pub fn createJobParser() = JobParser()
+  pub const desc := "List the items of a job catalog."
+
+  @override
+  pub const itemName = "job"
+
+  @override
+  pub fn createItemParser() = JobParser()

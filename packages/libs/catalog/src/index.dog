@@ -1,6 +1,9 @@
 pub use (
   Catalog
   merger/CatalogMerger
+  parser/CatalogItem
+  parser/CatalogItemParseOpts
+  parser/CatalogItemParser
   parser/CatalogParser
   parser/CatalogParseOpts
   ops/impl/macro/CatalogMacro

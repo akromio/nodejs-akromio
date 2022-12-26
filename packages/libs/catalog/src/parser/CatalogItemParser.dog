@@ -1,0 +1,49 @@
+use (
+  CatalogItemParseOpts
+)
+
+/**
+ * Base for the items of a catalog.
+ *
+ * These items can be, attending to the catalog type, for example,
+ * jobs or stages.
+ */
+@abstract
+export struct CatalogItemParser
+  /**
+   * Returns the name of the catalog items such as, for example, job o stage.
+   */
+  @abstract
+  pub const itemName: text
+
+  /**
+   * Parses the catalog item declarations, returning a list with their instances.
+   */
+  pub fn parse(decl: map[], opts: CatalogItemParseOpts) -> items: map
+    for each item := decl do
+      if "group" in item then
+        for each aux in self.parseGroup(item, opts) do
+          items[aux.name] = aux
+      else
+        item = self.parseItem(item, opts)
+        items[item.name] = item
+  
+  /**
+   * Parses a given item [decl]aration, returning its instance.
+   */
+  @abstract
+  pub fn parseItem(decl: map, opts: CatalogItemParseOpts): CatalogItem
+  
+  /**
+   * Parses a group declaration, returning a list with the items.
+   */
+  @hidden
+  pub fn parseGroup(decl: map, opts: CatalogItemParseOpts) -> items: list
+    # (1) get tag to set in the items
+    const tag = decl.group
+
+    # (2) parse the items
+    for each item := decl[self.itemName + "s"] do
+      item = self.parseItem(item, opts)
+      item.tags.push(tag)
+      items.push(item)

@@ -7,8 +7,9 @@ use (
 
 suite(__filename, proc()
   const (
-    parser = JobParser()
     ops = Ops()
+    parser = JobParser()
+    parseOpts = {ops}
   )
 
   suite("pareJob()", proc()
@@ -17,71 +18,80 @@ suite(__filename, proc()
         # (1) act
         const (
           decl = {macro = "test", dataset = ["v1", "v2"], steps = []}
-          out = parser.parseJob(decl, ops=)
+          out = parser.parse([decl], parseOpts)
         )
 
         # (2) assessment
-        expected(out).toBe("CatalogMacro").toHave(
+        expected(out.test).toBe("CatalogMacro").toHave(
           name = "test"
           dataset = [{var = "v1"}, {var = "v2"}]
         )
 
-        expected(out.isLoop()).equalTo(false)
+        expected(out.test.isLoop()).equalTo(false)
       end)
 
       test("when looped macro, a macro instance must be returned", proc()
         # (1) act
         const (
           decl = {macro = "test", forEach = "range 1 5", steps = [], forEach = []}
-          out = parser.parseJob(decl, ops=)
+          out = parser.parse([decl], parseOpts)
         )
 
         # (2) assessment
-        expected(out).toBe("CatalogMacro").toHave(name = "test")
-        expected(out.isLoop()).equalTo(true)
+        expected(out.test).toBe("CatalogMacro").toHave(name = "test")
+        expected(out.test.isLoop()).equalTo(true)
+      end)
+
+      test("when jobs, these must be parsed and returned as a map", proc()
+        # (1) act
+        const (
+          decl = {macro = "test", ini = [], steps = [], fin = []}
+          out = parser.parse([decl], parseOpts)
+        )
+
+        # (2) assessment
+        expected(out.test).toBe("CatalogMacro")\
+          .member("initializers").equalTo([])\
+          .member("finalizers").equalTo([])
+      end)
+
+      test("when inline ini or fin set, [step] must be returned", proc()
+        # (1) act
+        const (
+          decl = {macro = "test", ini = "log ini", steps = [], fin = "log fin"}
+          out = parser.parse([decl], parseOpts)
+        )
+
+        # (2) assessment
+        expected(out.test.initializers).equalTo(["log ini"])
+        expected(out.test.finalizers).equalTo(["log fin"])
       end)
     end)
 
-    test("when co, a co instance must be returned", proc()
-      # (1) act
-      const (
-        decl = {co = "test", steps = []}
-        out = parser.parseJob(decl, ops=)
-      )
-      
-      # (2) assessment
-      expected(out).toBe("CatalogCo").toHave(name = "test")
+    suite("co", proc()
+      test("when co, a co instance must be returned", proc()
+        # (1) act
+        const (
+          decl = {co = "test", steps = []}
+          out = parser.parse([decl], parseOpts)
+        )
+        
+        # (2) assessment
+        expected(out.test).toBe("CatalogCo").toHave(name = "test")
+      end)
     end)
 
-    test("when script, a script instance must be returned", proc()
-      # (1) act
-      const (
-        decl = {script = "test", code = ""}
-        out = parser.parseJob(decl, ops=)
-      )
+    suite("script", proc()
+      test("when script, a script instance must be returned", proc()
+        # (1) act
+        const (
+          decl = {script = "test", code = ""}
+          out = parser.parse([decl], parseOpts)
+        )
 
-      # (2) assessment
-      expected(out).toBe("Script").toHave(name = "test")
-    end)
-
-    test("when group, a job list with the group tag must be returned", proc()
-      # (1) act
-      const (
-        decl = {
-          group = "testing"
-          jobs = [
-            {macro = "test1", tags = ["test"], steps = []}
-            {macro = "test2", tags = ["test"], steps = []}
-          ]
-        }
-        out = parser.parseJob(decl, ops=)
-      )
-
-      # (2) assessment
-      expected(out)\
-        .toHaveLen(2)\
-        .it(0).toBe("CatalogMacro").toHave(name = "test1", tags = ["test", "testing"])\
-        .it(1).toBe("CatalogMacro").toHave(name = "test2", tags = ["test", "testing"])
+        # (2) assessment
+        expected(out.test).toBe("Script").toHave(name = "test")
+      end)
     end)
 
     test("when other task and parseAddOnJob() not impemented, error must be raised", proc()
@@ -95,40 +105,6 @@ suite(__filename, proc()
       expected(out)\
         .it(0).equalTo(false)\
         .it(1).equalTo(Error("Invalid job declaration: { macr: 'test', steps: [] }."))
-    end)
-  end)
-
-  suite("parse()", proc()
-    test("when jobs, these must be parsed and returned as a map", proc()
-      # (1) act
-      const (
-        macro1 = {macro = "test1", ini = [], steps = [], fin = []}
-        macro2 = {macro = "test2", ini = [], steps = [], fin = [], forEach = []}
-        macro3 = {macro = "test3", steps = []}
-        group = {group = "testing", jobs = [macro1, macro2]}
-        decl = [group, macro3]
-        out = parser.parse(decl, ops=)
-      )
-
-      # (2) assessment
-      expected(out)\
-        .toHaveLen(3)\
-        .member("test1").toBe("CatalogMacro").toHave(name = "test1", tags = ["testing"])\
-        .member("test2").toBe("CatalogMacro").toHave(name = "test2", tags = ["testing"])\
-        .member("test3").toBe("CatalogMacro").toHave(name = "test3")
-    end)
-
-    test("when inline ini or fin, [step] must be parsed", proc()
-      # (1) act
-      const (
-        macro = {macro = "test", ini = "log ini", steps = [], fin = "log fin"}
-        decl = [macro]
-        out = parser.parse(decl, ops=)
-      )
-
-      # (2) assessment
-      expected(out.test.initializers).equalTo(["log ini"])
-      expected(out.test.finalizers).equalTo(["log fin"])
     end)
   end)
 end)

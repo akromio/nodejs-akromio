@@ -1,0 +1,4 @@
+/**
+ * Options for the parsing of the catalog items.
+ */
+export intf CatalogItemParseOpts

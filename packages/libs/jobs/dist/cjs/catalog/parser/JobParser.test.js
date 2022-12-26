@@ -8,8 +8,11 @@ const {
 const JobParser = _core.dogma.use(require("./JobParser"));
 suite(__filename, () => {
   {
-    const parser = JobParser();
     const ops = Ops();
+    const parser = JobParser();
+    const parseOpts = {
+      ["ops"]: ops
+    };
     suite("pareJob()", () => {
       {
         suite("macro", () => {
@@ -21,10 +24,8 @@ suite(__filename, () => {
                   ["dataset"]: ["v1", "v2"],
                   ["steps"]: []
                 };
-                const out = parser.parseJob(decl, {
-                  'ops': ops
-                });
-                expected(out).toBe("CatalogMacro").toHave({
+                const out = parser.parse([decl], parseOpts);
+                expected(out.test).toBe("CatalogMacro").toHave({
                   'name': "test",
                   'dataset': [{
                     ["var"]: "v1"
@@ -32,7 +33,7 @@ suite(__filename, () => {
                     ["var"]: "v2"
                   }]
                 });
-                expected(out.isLoop()).equalTo(false);
+                expected(out.test.isLoop()).equalTo(false);
               }
             });
             test("when looped macro, a macro instance must be returned", () => {
@@ -43,68 +44,69 @@ suite(__filename, () => {
                   ["steps"]: [],
                   ["forEach"]: []
                 };
-                const out = parser.parseJob(decl, {
-                  'ops': ops
-                });
-                expected(out).toBe("CatalogMacro").toHave({
+                const out = parser.parse([decl], parseOpts);
+                expected(out.test).toBe("CatalogMacro").toHave({
                   'name': "test"
                 });
-                expected(out.isLoop()).equalTo(true);
+                expected(out.test.isLoop()).equalTo(true);
+              }
+            });
+            test("when jobs, these must be parsed and returned as a map", () => {
+              {
+                const decl = {
+                  ["macro"]: "test",
+                  ["ini"]: [],
+                  ["steps"]: [],
+                  ["fin"]: []
+                };
+                const out = parser.parse([decl], parseOpts);
+                expected(out.test).toBe("CatalogMacro").member("initializers").equalTo([]).member("finalizers").equalTo([]);
+              }
+            });
+            test("when inline ini or fin set, [step] must be returned", () => {
+              {
+                const decl = {
+                  ["macro"]: "test",
+                  ["ini"]: "log ini",
+                  ["steps"]: [],
+                  ["fin"]: "log fin"
+                };
+                const out = parser.parse([decl], parseOpts);
+                expected(out.test.initializers).equalTo(["log ini"]);
+                expected(out.test.finalizers).equalTo(["log fin"]);
               }
             });
           }
         });
-        test("when co, a co instance must be returned", () => {
+        suite("co", () => {
           {
-            const decl = {
-              ["co"]: "test",
-              ["steps"]: []
-            };
-            const out = parser.parseJob(decl, {
-              'ops': ops
-            });
-            expected(out).toBe("CatalogCo").toHave({
-              'name': "test"
+            test("when co, a co instance must be returned", () => {
+              {
+                const decl = {
+                  ["co"]: "test",
+                  ["steps"]: []
+                };
+                const out = parser.parse([decl], parseOpts);
+                expected(out.test).toBe("CatalogCo").toHave({
+                  'name': "test"
+                });
+              }
             });
           }
         });
-        test("when script, a script instance must be returned", () => {
+        suite("script", () => {
           {
-            const decl = {
-              ["script"]: "test",
-              ["code"]: ""
-            };
-            const out = parser.parseJob(decl, {
-              'ops': ops
-            });
-            expected(out).toBe("Script").toHave({
-              'name': "test"
-            });
-          }
-        });
-        test("when group, a job list with the group tag must be returned", () => {
-          {
-            const decl = {
-              ["group"]: "testing",
-              ["jobs"]: [{
-                ["macro"]: "test1",
-                ["tags"]: ["test"],
-                ["steps"]: []
-              }, {
-                ["macro"]: "test2",
-                ["tags"]: ["test"],
-                ["steps"]: []
-              }]
-            };
-            const out = parser.parseJob(decl, {
-              'ops': ops
-            });
-            expected(out).toHaveLen(2).it(0).toBe("CatalogMacro").toHave({
-              'name': "test1",
-              'tags': ["test", "testing"]
-            }).it(1).toBe("CatalogMacro").toHave({
-              'name': "test2",
-              'tags': ["test", "testing"]
+            test("when script, a script instance must be returned", () => {
+              {
+                const decl = {
+                  ["script"]: "test",
+                  ["code"]: ""
+                };
+                const out = parser.parse([decl], parseOpts);
+                expected(out.test).toBe("Script").toHave({
+                  'name': "test"
+                });
+              }
             });
           }
         });
@@ -120,64 +122,6 @@ suite(__filename, () => {
               });
             });
             expected(out).it(0).equalTo(false).it(1).equalTo(Error("Invalid job declaration: { macr: 'test', steps: [] }."));
-          }
-        });
-      }
-    });
-    suite("parse()", () => {
-      {
-        test("when jobs, these must be parsed and returned as a map", () => {
-          {
-            const macro1 = {
-              ["macro"]: "test1",
-              ["ini"]: [],
-              ["steps"]: [],
-              ["fin"]: []
-            };
-            const macro2 = {
-              ["macro"]: "test2",
-              ["ini"]: [],
-              ["steps"]: [],
-              ["fin"]: [],
-              ["forEach"]: []
-            };
-            const macro3 = {
-              ["macro"]: "test3",
-              ["steps"]: []
-            };
-            const group = {
-              ["group"]: "testing",
-              ["jobs"]: [macro1, macro2]
-            };
-            const decl = [group, macro3];
-            const out = parser.parse(decl, {
-              'ops': ops
-            });
-            expected(out).toHaveLen(3).member("test1").toBe("CatalogMacro").toHave({
-              'name': "test1",
-              'tags': ["testing"]
-            }).member("test2").toBe("CatalogMacro").toHave({
-              'name': "test2",
-              'tags': ["testing"]
-            }).member("test3").toBe("CatalogMacro").toHave({
-              'name': "test3"
-            });
-          }
-        });
-        test("when inline ini or fin, [step] must be parsed", () => {
-          {
-            const macro = {
-              ["macro"]: "test",
-              ["ini"]: "log ini",
-              ["steps"]: [],
-              ["fin"]: "log fin"
-            };
-            const decl = [macro];
-            const out = parser.parse(decl, {
-              'ops': ops
-            });
-            expected(out.test.initializers).equalTo(["log ini"]);
-            expected(out.test.finalizers).equalTo(["log fin"]);
           }
         });
       }

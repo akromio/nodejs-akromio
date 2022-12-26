@@ -1,12 +1,12 @@
 use (
   {Ops, MacroOperator, CoOperator, Script, ScriptOperator} = alias://core
-  {CatalogMacro, CatalogCo} = alias://catalog
+  {CatalogMacro, CatalogCo, CatalogItemParser, CatalogItemParseOpts} = alias://catalog
 )
 
 /**
- * Pparse options.
+ * Parse options.
  */
-intf ParseOpts
+intf ParseOpts: CatalogItemParseOpts
   /**
    * Ops registry to use with the cataloged ops such as,
    * for example, the macros.
@@ -16,17 +16,12 @@ intf ParseOpts
 /**
  * A parser of job declarations.
  */
-export struct JobParser
-  /**
-   * Parses the job declarations, returning a list with the job instances.
-   */
-  pub fn parse(decl: map[], opts: ParseOpts) -> jobs: map
-    for each job := decl do
-      if (job = self.parseJob(job, opts)); job is list then
-        for each aux in job do
-          jobs[aux.name] = aux
-      else
-        jobs[job.name] = job
+export struct JobParser: CatalogItemParser
+  @override
+  pub const itemName = "job"
+
+  @override
+  pub fn parseItem(decl: map, opts: ParseOpts) = self.parseJob(decl, opts)
 
   /**
    * Parses a job declaration, returning its job instance.
@@ -43,26 +38,11 @@ export struct JobParser
           local[i] = {var = datum}
     
     # (2) parse job
-    if "group" in decl then job = self.parseGroup(decl, opts)
-    else if "macro" in decl then job = self.parseMacro(decl, opts)
+    if "macro" in decl then job = self.parseMacro(decl, opts)
     else if "co" in decl then job = self.parseCo(decl, opts)
     else if "script" in decl then job = self.parseScript(decl, opts)
     else job = self.parseAddOnJob(decl, opts)
   
-  /**
-   * Parses a group declaration, returning a list with the jobs.
-   */
-  @hidden
-  pub fn parseGroup(decl: map, opts: ParseOpts) -> jobs: list
-    # (1) get tag to set in the jobs
-    const tag = decl.group
-
-    # (2) parse jobs
-    for each job := decl.jobs do
-      job = self.parseJob(job, opts)
-      job.tags.push(tag)
-      jobs.push(job)
-    
   /**
    * Parses an add-on job, that is, a specific job of the
    * package in use.

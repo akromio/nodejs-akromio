@@ -10,18 +10,28 @@ const {
 } = _core.dogma.use(require("@akromio/core"));
 const {
   CatalogMacro,
-  CatalogCo
+  CatalogCo,
+  CatalogItemParser,
+  CatalogItemParseOpts
 } = _core.dogma.use(require("@akromio/catalog"));
 const ParseOpts = _core.dogma.intf('ParseOpts', {
   ops: {
     optional: false,
     type: Ops
   }
-});
-const $JobParser = class JobParser {
+}, CatalogItemParseOpts);
+const $JobParser = class JobParser extends CatalogItemParser {
   constructor(_) {
-    /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
+    super(_);
+    /* c8 ignore start */
+    if (_ == null) _ = {};
+    /* c8 ignore stop */
+    Object.defineProperty(this, 'itemName', {
+      value: (0, _core.coalesce)(_['itemName'], "job"),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (this._pvt_3f2f6b1f28978e7479def7898d1c20f1___init__ instanceof Function) this._pvt_3f2f6b1f28978e7479def7898d1c20f1___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_3f2f6b1f28978e7479def7898d1c20f1___post__ instanceof Function) this._pvt_3f2f6b1f28978e7479def7898d1c20f1___post__(); /* c8 ignore stop */
@@ -36,29 +46,13 @@ const JobParser = new Proxy($JobParser, {
   }
 });
 module.exports = exports = JobParser;
-JobParser.prototype.parse = function (decl, opts) {
-  const self = this;
-  let jobs = {}; /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.dogma.TypeDef({
-    name: 'inline',
-    types: [_core.map],
-    min: 0,
-    max: null
-  })); /* c8 ignore next */
+JobParser.prototype.parseItem = function (decl, opts) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, ParseOpts);
   {
-    for (let job of decl) {
-      job = this.parseJob(job, opts);
-      if (_core.dogma.is(job, _core.list)) {
-        for (const aux of job) {
-          _core.dogma.setItem("=", jobs, aux.name, aux);
-        }
-      } else {
-        _core.dogma.setItem("=", jobs, job.name, job);
-      }
-    }
+    return this.parseJob(decl, opts);
   }
-  return jobs;
 };
 JobParser.prototype.parseJob = function (decl, opts) {
   const self = this;
@@ -81,9 +75,7 @@ JobParser.prototype.parseJob = function (decl, opts) {
         }
       }
     }
-    if (_core.dogma.includes(decl, "group")) {
-      job = this.parseGroup(decl, opts);
-    } else if (_core.dogma.includes(decl, "macro")) {
+    if (_core.dogma.includes(decl, "macro")) {
       job = this.parseMacro(decl, opts);
     } else if (_core.dogma.includes(decl, "co")) {
       job = this.parseCo(decl, opts);
@@ -94,21 +86,6 @@ JobParser.prototype.parseJob = function (decl, opts) {
     }
   }
   return job;
-};
-JobParser.prototype.parseGroup = function (decl, opts) {
-  const self = this;
-  let jobs = []; /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
-  _core.dogma.expect("opts", opts, ParseOpts);
-  {
-    const tag = decl.group;
-    for (let job of decl.jobs) {
-      job = this.parseJob(job, opts);
-      job.tags.push(tag);
-      jobs.push(job);
-    }
-  }
-  return jobs;
 };
 JobParser.prototype.parseAddOnJob = function (decl, opts) {
   const self = this; /* c8 ignore next */
