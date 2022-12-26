@@ -1,0 +1,18 @@
+use (
+  {CatalogCommand as CatalogCommandBase} = alias://cli
+  {StageParser} = alias://stages
+  _StageCommand
+)
+
+/**
+ * The catalog command.
+ */
+export struct CatalogCommand: CatalogCommandBase:: _StageCommand
+  @override
+  pub const desc := "List the items of a stage catalog."
+
+  @override
+  pub const itemName = "stage"
+
+  @override
+  pub fn createItemParser() = StageParser()

@@ -13,13 +13,13 @@ struct CatalogReader: CatalogReaderBase
 suite(__filename, proc()
   const (
     akromioDirName = ".akromio"
-    akromioJobCatalogsPath = "/jobs/catalogs"
+    akromioCatalogsPath = "/jobs/catalogs"
   )
 
   suite("readCatalogDecl()", proc()
     const (
       merger = {}
-      reader = CatalogReader(merger=, akromioDirName, akromioJobCatalogsPath)
+      reader = CatalogReader(merger=, akromioDirName, akromioCatalogsPath)
     )
 
     test("when catalog unexists, nil must be returned", async proc()
@@ -191,7 +191,7 @@ suite(__filename, proc()
   suite("extendCatalogDecl()", proc()
     const (
       merger = {}
-      reader = CatalogReader(merger=, akromioDirName, akromioJobCatalogsPath)
+      reader = CatalogReader(merger=, akromioDirName, akromioCatalogsPath)
     )
 
     teardown(proc()
@@ -242,7 +242,7 @@ suite(__filename, proc()
       # (1) act
       const (
         merger = simulator(merge = method.returns(merged = true))
-        reader = CatalogReader(merger=, akromioDirName, akromioJobCatalogsPath)
+        reader = CatalogReader(merger=, akromioDirName, akromioCatalogsPath)
 
         jobsItem = Item(
           registryName = "test"
@@ -315,7 +315,7 @@ suite(__filename, proc()
       const (
         dirSearcher = simulator(DirSearcher, searchDirWith = method.resolves(nil))
         regs = await(Registries().connect())
-        reader = CatalogReader(merger = {}, akromioDirName, akromioJobCatalogsPath, dirSearcher)
+        reader = CatalogReader(merger = {}, akromioDirName, akromioCatalogsPath, dirSearcher)
       )
 
       # (2) act
@@ -332,7 +332,7 @@ suite(__filename, proc()
       const (
         dirSearcher = simulator(DirSearcher, searchDirWith = method.resolves("../.."))
         regs = await(Registries().connect())
-        reader = CatalogReader(merger = {}, akromioDirName, akromioJobCatalogsPath, dirSearcher)
+        reader = CatalogReader(merger = {}, akromioDirName, akromioCatalogsPath, dirSearcher)
       )
 
       # (2) act

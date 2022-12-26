@@ -17,7 +17,7 @@ export struct StageParser: CatalogItemParser
   @override
   pub const itemName = "stage"
 
-  @override
+  @override @hidden
   pub fn parseItem(decl: map, opts: ParseOpts) = self.parseStage(decl, opts)
   
   /**

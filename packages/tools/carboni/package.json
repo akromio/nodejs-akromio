@@ -1,0 +1,64 @@
+{
+  "name": "@akromio/carboni",
+  "version": "0.10.2",
+  "description": "Tool for generating run requests on Akromio.",
+  "years": "2022",
+  "author": {
+    "name": "Sia Codelabs",
+    "email": "hello@siacodelabs.com",
+    "url": "https://siacodelabs.com"
+  },
+  "keywords": [
+    "automation"
+  ],
+  "bugs": {
+    "url": "https://github.com/akromio/nodejs-akromio/issues",
+    "email": "bugs@akromio.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akromio/nodejs-akromio.git"
+  },
+  "preferGlobal": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "bin": {
+    "carboni": "./dist/cjs/carboni.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 14",
+    "npm": ">= 6"
+  },
+  "dependencies": {
+    "@akromio/args": "^0.10.2",
+    "@akromio/catalog-reader": "^0.10.2",
+    "@akromio/cli": "^0.10.2",
+    "@akromio/cli-defaults": "^0.10.2",
+    "@akromio/core": "^0.10.2",
+    "@akromio/dataset": "^0.10.2",
+    "@akromio/registry": "^0.10.2",
+    "@akromio/reporter": "^0.10.2",
+    "@akromio/stages": "^0.10.2",
+    "@akromio/trigger": "^0.10.2",
+    "@dogmalang/core": "^1.0.0-rc18.0",
+    "dotenv": "^16.0.3",
+    "fs-extra": "^11.1.0",
+    "luxon": "^3.1.1",
+    "yaml": "^2.1.3",
+    "yargs": "^17.6.2"
+  },
+  "scripts": {
+    "local": "npm i -g",
+    "lint": "dogmac check src",
+    "build": "npm run build/src && npm run build/chmod",
+    "build/src": "rm -rf dist/ && dogmac js -o dist/cjs src && babel -d dist dist",
+    "build/chmod": "chmod u+x dist/cjs/carboni.js",
+    "test": "mocha --config .mocharc.yaml",
+    "cov": "c8 mocha --config .mocharc.yaml"
+  }
+}
