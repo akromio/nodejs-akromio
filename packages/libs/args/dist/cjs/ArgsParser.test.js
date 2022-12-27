@@ -5,9 +5,7 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   simulator
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  ArgsParser
-} = _core.dogma.use(require("../.."));
+const ArgsParser = _core.dogma.use(require("./ArgsParser"));
 suite(__filename, () => {
   {
     const parser = ArgsParser({

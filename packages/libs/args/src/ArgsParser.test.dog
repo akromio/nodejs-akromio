@@ -1,7 +1,7 @@
 use (
   alias://expected
   {simulator} = alias://doubles
-  {ArgsParser} = ~
+  ArgsParser
 )
 
 suite(__filename, proc()
