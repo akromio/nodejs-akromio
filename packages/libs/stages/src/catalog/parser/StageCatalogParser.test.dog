@@ -1,0 +1,90 @@
+use (
+  alias://expected
+  {GlobalDataset} = alias://dataset
+
+  ../StageCatalog
+  StageCatalogParser
+)
+
+suite(__filename, proc()
+  const (
+    parser = StageCatalogParser()
+    parentDataset = GlobalDataset(name = "global")
+    parseOpts = {parentDataset}
+  )
+
+  suite("parseStages()", proc()
+    test("when unknown stage, error must be raised", async proc()
+      # (1) act
+      const (
+        decl = {
+          spec = "v1.0"
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+          dataset = [{const = "duration", value = "10m"}]
+          stages = [
+            {xconstx = "warmup", duration = "2m", requests = 1000, jobs = []}
+            {sleep = "pause", duration = "1m"}
+            {'const' = "load", duration = "$(duration)", requests = 2000, jobs = []}
+          ]
+        }
+
+        out = pawait(parser.parse(decl, parseOpts))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Invalid stage declaration:.+xconstx")
+    end)
+
+    test("when declaration is ok, stage catalog must be raised", async proc()
+      # (1) act
+      const (
+        decl = {
+          spec = "v1.0"
+          loc = "test:///stages/catalogs/test-catalog"
+          cty = "text/yaml"
+          dataset = [{const = "duration", value = "10m"}]
+          stages = [
+            {'const' = "warmup", duration = "2m", requests = 1000, jobs = []}
+            {sleep = "pause", duration = "1m"}
+            {'const' = "load", duration = "10m", requests = 2000, jobs = []}
+          ]
+        }
+
+        out = await(parser.parse(decl, parseOpts))
+      )
+
+      # (2) assessment
+      expected(out).toBe(StageCatalog).toHave(
+        spec = "v1.0"
+        loc = "test:///stages/catalogs/test-catalog"
+        cty = "text/yaml"
+        stages = {
+          warmup =
+            name = "warmup"
+            desc = nil
+            tags = []
+            duration = 120000
+            interval = 1000
+            requests = 1000
+            jobs = []
+          
+          pause =
+            name = "pause"
+            desc = nil
+            tags = []
+            duration = 60000
+          
+          load =
+            name = "load"
+            desc = nil
+            tags = []
+            duration = 600000
+            interval = 1000
+            requests = 2000
+            jobs = []
+        }
+      )
+    end)
+  end)
+end)

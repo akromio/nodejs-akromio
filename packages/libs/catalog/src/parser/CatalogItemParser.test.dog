@@ -1,0 +1,52 @@
+use (
+  alias://expected
+
+  CatalogItemBase = CatalogItem
+  CatalogItemParseOpts
+  CatalogItemParserBase = CatalogItemParser
+)
+
+# Test catalog item to use.
+struct CatalogItem: CatalogItemBase
+
+# Test ìtem parser to use.
+struct CatalogItemParser: CatalogItemParserBase
+  @override
+  pub const itemName = "job"
+
+  @override
+  pub fn parseItem(decl: map, opts: CatalogItemParseOpts) = CatalogItem(decl{*, name = decl.macro})
+
+suite(__filename, proc()
+  const (
+    parser = CatalogItemParser()
+    parseOpts = {}
+  )
+
+  suite("parse()", proc()
+    test("when called, a map with the item instances must be returned", proc()
+      # (1) act
+      const (
+        decl = {macro = "test", steps = []}
+        out = parser.parse(decl, parseOpts)
+      )
+
+      # (2) assessment
+      expected(out.test).toBe(CatalogItem).toHave(name = "test", tags = [])
+    end)
+  end)
+
+  suite("parseGroup()", proc()
+    test("when group, the items must have the group name as tag", proc()
+      # (1) act
+      const (
+        macro = {macro = "test", tags = [], steps = []}
+        decl = {group = "grp", jobs = [macro]}
+        out = parser.parse(decl, parseOpts)
+      )
+
+      # (2) assessment
+      expected(out.test).toBe(CatalogItem).toHave(name = "test", tags = ["grp"])
+    end)
+  end)
+end)

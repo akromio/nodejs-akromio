@@ -1,0 +1,12 @@
+use (
+  {Dataset} = alias://dataset
+)
+
+/**
+ * Options for a catalog parsing.
+ */
+export intf CatalogParseOpts
+  /**
+   * Dataset parent.
+   */
+  parentDataset: Dataset

@@ -1,0 +1,64 @@
+/**
+ * A mixer of catalog declarations, that is,
+ * a component to merge several catalog declarations.
+ */
+@abstract
+export struct CatalogMerger
+  /**
+   * Mixes a given extensor declaration from an other extended declarations.
+   */
+  pub fn merge(extensor: map, ...extendeds: map) -> decl: map
+    decl = copy(extendeds[0])
+    decl = self.mergeCommon(decl, extendeds[1, -1].concat(extensor))
+    decl = self.mergeSpecialization(decl, extendeds[1, -1].concat(extensor))
+  
+  /**
+   * Merges common fields of a given [decl]aration with the given [extensions].
+   */
+  @hidden
+  pub fn mergeCommon(decl: map, extensions: map[]) -> decl
+    for each ext in extensions do
+      for each field, value in ext do
+        if field == "dataset" then self.mergeDataset(value, decl)
+        else if not self.isSpecializedField(field) then decl[field] = value
+  
+  /**
+   * Checks whether a field is a specialized that the common merger must
+   * not merge.
+   */
+  @hidden
+  pub fn isSpecializedField(name: text) = false
+  
+  /**
+   * Merges specialization fields of a given [decl]aration with the given [extensions].
+   */
+  @hidden
+  pub fn mergeSpecialization(decl: map, extensions: map[]) -> decl
+    nop
+
+  /**
+   * Mixes a given dataset declaration into a catalog declaration.
+   */
+  @hidden
+  pub fn mergeDataset(dataset: any[], decl: map) -> decl
+    # (1) prepare dataset in declaration to extend
+    decl.dataset ?= []
+
+    # (2) mix data into declaration
+    for each datum in dataset do
+      #remove datum if already exists
+      const (
+        datumName = getDatumName(datum)
+        ix = decl.dataset.findIndex(fn(decl) = getDatumName(decl) == datumName end)
+      )
+
+      if ix >= 0 then
+        decl.dataset.splice(ix, 1)
+      
+      #add datum to current dataset
+      decl.dataset.push(datum)
+  
+/**
+ * Returns the name of a given datum declaration.
+ */
+fn getDatumName(decl: map) = decl.var ?? decl.const ?? decl.fn

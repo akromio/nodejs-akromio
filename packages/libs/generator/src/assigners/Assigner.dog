@@ -1,0 +1,86 @@
+use (
+  dep://array-shuffle
+  {Readable} = dep://stream
+  
+  ../{RunReqStream}
+  JobInfo
+)
+
+/**
+ * An assigner is the responsible for setting the job
+ * to every blank sheet received for an input stream.
+ */
+export struct Assigner
+  /**
+   * Input stream where the blank sheets are.
+   */
+  pub const input: Readable
+
+  /**
+   * Output stream where to let the assignations.
+   */
+  pub const output: RunReqStream
+
+  /**
+   * Job infos to use.
+   */
+  pub const jobs: JobInfo[]
+
+  /**
+   * @dev
+   * The job weights must sum 100.
+   */
+  @post
+  pvt proc post()
+    # (1) calculate the total weight
+    var total = 0
+
+    for each job in self.jobs do
+      total += job.weight
+    
+    # (2) check total weight
+    if total != 100 then
+      throw(TypeError($"Sum of job weights must be 100. Got: ${total}."))
+
+  /**
+   * Starts the assigner, reading from the input stream, assigning
+   * and writing to the output stream.
+   *
+   * When the input stream is ended, this assigner ends too.
+   */
+  pub async proc start()
+    # (1) perform assignation for each blank sheet
+    var (
+      {input, output} ::= self
+      assignationOrder = []
+      job
+    )
+
+    await for each blankSheet in input do
+      if len(assignationOrder) == 0 then
+        assignationOrder = self.generateAssignationOrder()
+      
+      if Math.round(Math.random())  == 0 then job = assignationOrder.shift()
+      else job = assignationOrder.pop()
+
+      output.append(job)
+    
+    # (2) set end for the output stream
+    output.end()
+
+  /**
+   * Generates an assignation order for 100 assignations,
+   * attending to the weights.
+   */
+  @hidden
+  pub fn generateAssignationOrder() -> order: list
+    # (1) generate random jobs
+    const jobs = shuffle(self.jobs)
+
+    # (2) generate order
+    for each job in jobs do
+      for i = 0; i < job.weight; i += 1 do
+        order.push(job)
+
+    # (3) perform final shuffle
+    order = shuffle(order)

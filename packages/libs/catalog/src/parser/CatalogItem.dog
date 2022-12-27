@@ -1,0 +1,20 @@
+/**
+ * Base for the catalog items such as, for example, a job
+ * or a stage.
+ */
+@abstract
+export struct CatalogItem
+  /**
+   * Catalog item name.
+   */
+  pub const name: text
+
+  /**
+   * Catalog item description.
+   */
+  pub const desc?: text
+
+  /**
+   * Catalog item tags.
+   */
+  pub const tags = []

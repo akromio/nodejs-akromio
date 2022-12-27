@@ -1,0 +1,12 @@
+use (
+  {ShowCommand as ShowCommandBase} = alias://cli
+  {StageParser} = alias://stages
+  _StageCommand
+)
+
+/**
+ * The show command.
+ */
+export struct ShowCommand: ShowCommandBase:: _StageCommand
+  @override
+  pub fn createItemParser() = StageParser()

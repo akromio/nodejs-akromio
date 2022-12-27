@@ -79,85 +79,85 @@ export struct EnvCommand: Command
    */
   @hidden
   pub fn buildRows(pattern: text) -> rows: list
-    # (1) build var descriptions
-    const vars = {
-      'ARG_*' =
-        desc = "The arguments to pass from environment variables."
-      
-      'ANSWER_*' =
-        desc = "The answers to pass from environment variables."
-
-      ANSWERS_LOG =
-        desc = "Print the answers for their reuse: options or file."
-
-      DIR_NAME =
-        desc = "Dir name where the akromio data is."
-      
-      ENV_FILE =
-        desc = ".env file to load when started. Relative to $DIR_NAME."
-      
-      PRIVATE_ENV_FILE =
-        desc = ".private.env file to load when started. Relative to $DIRNAME."
-      
-      APM_DIR_NAME =
-        desc = "Dir name where the apm catalogs are installed. Relative to $DIR_NAME."
-        
-      JOB_CATALOGS_PATH =
-        desc = "Dir path to prefix when root job catalog name is relative."
-      
-      JOB_CATALOG_NAME =
-        desc = "Catalog name to use when unset."
-      
-      JOB_NAME =
-        desc = "Default job name to run when unset."
-
-      REGISTRIES =
-        desc = "Available registries to use in order, separated by commas."
-      
-      REGISTRY_GIT_HOST =
-        desc = "Host where the Git repository is."
-      
-      REGISTRY_GIT_USER =
-        desc = "User name where the Git repository is."
-      
-      REGISTRY_GIT_REPO =
-        desc = "Repository name to use as registry."
-      
-      REGISTRY_GIT_BRANCH =
-        desc = "Branch name to use."
-      
-      REGISTRY_GIT_PREFIX =
-        desc = "Path prefix to use."
-      
-      REGISTRY_SKYNET_PORTAL =
-        desc = "Skynet portal (w/o https://) to use when unset."
-      
-      REGISTRY_SKYNET_SKYLINK =
-        desc = "Skylink to use when unset."
-      
-      REGISTRY_SNS_PORTAL =
-        desc = "Skynet portal (w/o https://) to use when unset."
-      
-      REGISTRY_SNS_PUBLIC_KEY =
-        desc = "Skynet registry public key to use when unset."
-      
-      REGISTRY_SNS_NAME =
-        desc = "SNS name to use when unset."
-      
-      REGISTRY_HTTP_HOST =
-        desc = "Host (w/o https://) to use when unset."
-      
-      REGISTRY_HTTP_BASE =
-        desc = "Base path to prefix when HTTP registry used."
-      
-      NODE_PATH =
-        desc = "Paths where the assets (plugins, catalogs...) are installed with NPM."
-    }
+    # (1) build variables
+    const (
+      commonVars = self.buildCommonVars()
+      specializationVars = self.buildSpecializationVars()
+      vars = {...commonVars, ...specializationVars}
+    )
 
     # (2) build rows
+    pattern = re($"${pattern}".replace("*", ".*"))
     rows = [["Variable", "Value", "Desc."]]
+    printf(pattern)
 
-    pattern = re($"^${pattern}$".replace("*", ".*"))
-    for each name, item := vars do
-      if pattern.test((name = prefix + name)) then
-        rows.push([name, ps.env[name] ?? "", item.desc])
+    for each name in keys(vars).sort() do
+      if prefixedName ::= prefix + name; pattern.test(prefixedName) then
+        const {desc} = vars[name]
+        rows.push([prefixedName, ps.env[prefixedName] ?? "", desc])
+
+  @hidden
+  pub fn buildCommonVars() = {
+    'ARG_*' =
+      desc = "Arguments to pass from environment variables."
+    
+    DIR_NAME =
+      desc = "Dir name where the akromio data is."
+    
+    ENV_FILE =
+      desc = ".env file to load when started. Relative to $DIR_NAME."
+    
+    PRIVATE_ENV_FILE =
+      desc = ".private.env file to load when started. Relative to $DIRNAME."
+    
+    APM_DIR_NAME =
+      desc = "Dir name where the apm catalogs are installed. Relative to $DIR_NAME."
+      
+    REGISTRIES =
+      desc = "Available registries to use in order, separated by commas."
+    
+    REGISTRY_GIT_HOST =
+      desc = "Host where the Git repository is."
+    
+    REGISTRY_GIT_USER =
+      desc = "User name where the Git repository is."
+    
+    REGISTRY_GIT_REPO =
+      desc = "Repository name to use as registry."
+    
+    REGISTRY_GIT_BRANCH =
+      desc = "Branch name to use."
+    
+    REGISTRY_GIT_PREFIX =
+      desc = "Path prefix to use."
+    
+    REGISTRY_SKYNET_PORTAL =
+      desc = "Skynet portal (w/o https://) to use when unset."
+    
+    REGISTRY_SKYNET_SKYLINK =
+      desc = "Skylink to use when unset."
+    
+    REGISTRY_SNS_PORTAL =
+      desc = "Skynet portal (w/o https://) to use when unset."
+    
+    REGISTRY_SNS_PUBLIC_KEY =
+      desc = "Skynet registry public key to use when unset."
+    
+    REGISTRY_SNS_NAME =
+      desc = "SNS name to use when unset."
+    
+    REGISTRY_HTTP_HOST =
+      desc = "Host (w/o https://) to use when unset."
+    
+    REGISTRY_HTTP_BASE =
+      desc = "Base path to prefix when HTTP registry used."
+    
+    NODE_PATH =
+      desc = "Paths where the assets (plugins, catalogs...) are installed with NPM."
+  }
+
+  /**
+   * Returns the specialization variables.
+   */
+  @hidden
+  pub fn buildSpecializationVars() = {}

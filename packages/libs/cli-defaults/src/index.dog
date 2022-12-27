@@ -11,6 +11,10 @@ export {
   jobs =
     catalogs =
       path = "/jobs/catalogs/"
+  
+  stages =
+    catalogs =
+      path = "/stages/catalogs/"
 
   registry =
     git =

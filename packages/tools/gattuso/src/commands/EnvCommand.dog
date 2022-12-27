@@ -1,0 +1,25 @@
+use (
+  {EnvCommand as EnvCommandBase} = alias://cli
+)
+
+/**
+ * The env command.
+ */
+export struct EnvCommand: EnvCommandBase
+  @override @hidden
+  pub fn buildSpecializationVars() = {
+    'ANSWER_*' =
+      desc = "Answers to pass from environment variables."
+    
+    ANSWERS_LOG =
+      desc = "Print the answers for their reuse: options or file."
+
+    JOB_CATALOGS_PATH =
+      desc = "Dir path to prefix when root job catalog name is relative."
+    
+    JOB_CATALOG_NAME =
+      desc = "Job catalog name to use when unset."
+    
+    JOB_NAME =
+      desc = "Default job name to run when unset."
+  }

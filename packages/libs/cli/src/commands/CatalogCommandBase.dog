@@ -25,7 +25,7 @@ export struct CatalogCommandBase: RegistryCommandBase
       type = "string"
       alias = ["c", "catalog"]
       desc = "The catalog to use: catalogName or registryName://catalogName."
-      default = $KRM_JOB_CATALOG_NAME
+      default = $KRM_CATALOG_NAME
     }
 
     registryAndCatalogName = {
@@ -71,4 +71,4 @@ export struct CatalogCommandBase: RegistryCommandBase
   @hidden
   pub fn buildCatalogPath(catalogPath: text) -> catalogPath
     if not catalogPath.startsWith("/") then
-      catalogPath = path.join("/", $KRM_JOB_CATALOGS_PATH, catalogPath)
+      catalogPath = path.join("/", $KRM_CATALOGS_PATH, catalogPath)

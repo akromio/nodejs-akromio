@@ -1,4 +1,5 @@
 use (
+  {Plugins} = alias://core
   {Catalog} = alias://catalog
 )
 
@@ -6,3 +7,34 @@ use (
  * A catalog of jobs.
  */
 export struct JobCatalog: Catalog
+  /**
+   * The plugin declarations.
+   */
+  pub const plugins: Plugins
+
+  /**
+   * The default job to run when not indicated explicitly.
+   */
+  pub const defaultJobName?: text
+
+  /**
+   * The cataloged jobs.
+   */
+  pub const jobs := {}
+
+  /**
+   * The default trigger name, used when not indicated explicitly.
+   */
+  pub const defaultTriggerName?: text
+
+  /**
+   * The triggers defined into the catalog.
+   */
+  pub const triggers := {}
+
+  /**
+   * Performs the final actions associated to this catalog
+   * such as, for example, the plugin finalizers.
+   */
+  @async
+  pub fn finalize() = self.plugins.finalize()

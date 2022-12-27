@@ -85,7 +85,7 @@ RegistryCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Registry '${registryName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      0, await listCatalogs(registry, path.join("/", _core.ps.env.KRM_JOB_CATALOGS_PATH));
+      0, await listCatalogs(registry, path.join("/", _core.ps.env.KRM_CATALOGS_PATH));
     } finally {
       0, await registries.disconnect();
     }

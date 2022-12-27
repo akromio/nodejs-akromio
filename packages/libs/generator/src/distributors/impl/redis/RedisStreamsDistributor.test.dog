@@ -1,0 +1,44 @@
+use (
+  alias://expected
+  {sim, monitor, method} = alias://doubles
+
+  ../../ring/Ring
+  RedisStreamsDistributor
+)
+
+suite(__filename, proc()
+  const (
+    registry = "registry"
+    catalog = "catalog-name"
+  )
+
+  suite("deliver()", proc()
+    test("when called, message must be sent to stream", async proc()
+      # (1) act
+      const (
+        reqs = [
+          json.encode({registry, catalog, job = "job1"})
+          json.encode({registry, catalog, job = "job2"})
+          json.encode({registry, catalog, job = "job3"})
+        ]
+        input = sim.stream.readable(data = reqs)
+
+        points = [{stream = "runner1"}, {stream = "runner2"}]
+        ring = Ring(points=)
+        
+        redis = monitor(sim(xadd = method.resolves()), method = "xadd")
+        distributor = RedisStreamsDistributor(input=, ring, redis)
+      )
+
+      distributor.start()
+      await(sleep("100ms"))
+
+      # (2) assessment
+      const xadd = monitor.log(redis, clear = true)
+      expected(xadd.calls).equalTo(3)
+      expected(xadd.getCall(0).args).equalTo([points[0].stream, "*", "req", reqs[0]])
+      expected(xadd.getCall(1).args).equalTo([points[1].stream, "*", "req", reqs[1]])
+      expected(xadd.getCall(2).args).equalTo([points[0].stream, "*", "req", reqs[2]])
+    end)
+  end)
+end)

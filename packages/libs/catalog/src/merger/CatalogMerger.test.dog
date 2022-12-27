@@ -1,0 +1,94 @@
+use (
+  alias://expected
+  CatalogMergerBase = CatalogMerger
+)
+
+# Merger to use in these tests.
+struct CatalogMerger: CatalogMergerBase
+
+suite(__filename, proc()
+  const (
+    merger = CatalogMerger()
+  )
+
+  suite("merge()", proc()
+    test("when other, this is overwritten", proc()
+      # (1) act
+      const (
+        extensor = {desc = "extensor"}
+        extended1 = {desc = "extended1"}
+        extended2 = {desc = "extended2"}
+        out = merger.merge(extensor, extended1, extended2)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        desc = "extensor"
+      )
+    end)
+  end)
+
+  suite("mergeDataset()", proc()
+    test("when available dataset, this is removed and the replacer is appended in the end", proc()
+      # (1) act
+      const (
+        extensor = {
+          dataset = [
+            {const = "y", desc = "extensor"}
+            {var = "a", desc = "extensor"}
+          ]
+        }
+
+        extended1 = {
+          dataset = [
+            {var = "x", desc = "extended1"}
+            {var = "y", desc = "extended1"}
+          ]
+        }
+
+        extended2 = {
+          dataset = [
+            {var = "y", desc = "extended2"}
+            {var = "z", desc = "extended2"}
+            {fn = "f", desc = "extended2"}
+          ]
+        }
+
+        out = merger.merge(extensor, extended1, extended2)
+      )
+
+      # (2) assessment
+      expected(out.dataset).equalTo([
+        {var = "x", desc = "extended1"}
+        {var = "z", desc = "extended2"}
+        {fn = "f", desc = "extended2"}
+        {const = "y", desc = "extensor"}
+        {var = "a", desc = "extensor"}
+      ])
+    end)
+
+    test("when dataset unavailable, empty list must be used", proc()
+      # (1) act
+      const (
+        extended1 = {}
+
+        extended2 = {
+          dataset = [
+            {var = "y", desc = "extended2"}
+            {var = "z", desc = "extended2"}
+          ]
+        }
+
+        extensor = {}
+
+        out = merger.merge(extensor, extended1, extended2)
+      )
+
+      # (2) assessment
+      expected(out.dataset).equalTo([
+        {var = "y", desc = "extended2"}
+        {var = "z", desc = "extended2"}
+      ])
+    end)
+  end)
+end)

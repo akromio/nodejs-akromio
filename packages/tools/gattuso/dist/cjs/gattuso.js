@@ -6,7 +6,6 @@ const pkg = _core.dogma.use(require("../../package"));
 const env = _core.dogma.use(require("./env"));
 const {
   DescCommand,
-  EnvCommand,
   SysCommand,
   createCommands,
   handleErrors
@@ -16,6 +15,7 @@ const RegistryCommand = _core.dogma.use(require("./commands/RegistryCommand"));
 const RunCommand = _core.dogma.use(require("./commands/RunCommand"));
 const ShowCommand = _core.dogma.use(require("./commands/ShowCommand"));
 const TriggerCommand = _core.dogma.use(require("./commands/TriggerCommand"));
+const EnvCommand = _core.dogma.use(require("./commands/EnvCommand"));
 const DatasetCommand = _core.dogma.use(require("./commands/DatasetCommand"));
 const QuestionsCommand = _core.dogma.use(require("./commands/QuestionsCommand"));
 const yargs = require("yargs");

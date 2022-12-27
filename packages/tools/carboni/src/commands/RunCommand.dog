@@ -1,0 +1,9 @@
+use (
+  {RunCommand as RunCommandBase} = alias://cli
+  _StageCommand
+)
+
+/**
+ * The run command.
+ */
+export struct RunCommand: RunCommandBase:: _StageCommand

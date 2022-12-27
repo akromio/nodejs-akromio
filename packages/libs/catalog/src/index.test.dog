@@ -1,0 +1,17 @@
+use (
+  alias://expected
+  index
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(index).toHave([
+      "Catalog"
+      "CatalogMerger"
+      "CatalogParser"
+      "CatalogParseOpts"
+      "CatalogCo"
+      "CatalogMacro"
+    ])
+  end)
+end)

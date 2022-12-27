@@ -116,15 +116,36 @@ EnvCommand.prototype.buildRows = function (pattern) {
   let rows = []; /* c8 ignore next */
   _core.dogma.expect("pattern", pattern, _core.text);
   {
+    const commonVars = this.buildCommonVars();
+    const specializationVars = this.buildSpecializationVars();
     const vars = {
+      ...commonVars,
+      ...specializationVars
+    };
+    pattern = (0, _core.re)(`${pattern}`.replace("*", ".*"));
+    rows = [["Variable", "Value", "Desc."]];
+    (0, _core.printf)(pattern);
+    for (const name of (0, _core.keys)(vars).sort()) {
+      {
+        const prefixedName = prefix + name;
+        if (pattern.test(prefixedName)) {
+          var _dogma$getItem;
+          const {
+            desc
+          } = _core.dogma.getItem(vars, name);
+          rows.push([prefixedName, (_dogma$getItem = _core.dogma.getItem(_core.ps.env, prefixedName)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : "", desc]);
+        }
+      }
+    }
+  }
+  return rows;
+};
+EnvCommand.prototype.buildCommonVars = function () {
+  const self = this;
+  {
+    return {
       ["ARG_*"]: {
-        ["desc"]: "The arguments to pass from environment variables."
-      },
-      ["ANSWER_*"]: {
-        ["desc"]: "The answers to pass from environment variables."
-      },
-      ["ANSWERS_LOG"]: {
-        ["desc"]: "Print the answers for their reuse: options or file."
+        ["desc"]: "Arguments to pass from environment variables."
       },
       ["DIR_NAME"]: {
         ["desc"]: "Dir name where the akromio data is."
@@ -137,15 +158,6 @@ EnvCommand.prototype.buildRows = function (pattern) {
       },
       ["APM_DIR_NAME"]: {
         ["desc"]: "Dir name where the apm catalogs are installed. Relative to $DIR_NAME."
-      },
-      ["JOB_CATALOGS_PATH"]: {
-        ["desc"]: "Dir path to prefix when root job catalog name is relative."
-      },
-      ["JOB_CATALOG_NAME"]: {
-        ["desc"]: "Catalog name to use when unset."
-      },
-      ["JOB_NAME"]: {
-        ["desc"]: "Default job name to run when unset."
       },
       ["REGISTRIES"]: {
         ["desc"]: "Available registries to use in order, separated by commas."
@@ -190,16 +202,11 @@ EnvCommand.prototype.buildRows = function (pattern) {
         ["desc"]: "Paths where the assets (plugins, catalogs...) are installed with NPM."
       }
     };
-    rows = [["Variable", "Value", "Desc."]];
-    pattern = (0, _core.re)(`^${pattern}$`.replace("*", ".*"));
-    for (let [name, item] of Object.entries(vars)) {
-      {
-        if (pattern.test(name = prefix + name)) {
-          var _dogma$getItem;
-          rows.push([name, (_dogma$getItem = _core.dogma.getItem(_core.ps.env, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : "", item.desc]);
-        }
-      }
-    }
   }
-  return rows;
+};
+EnvCommand.prototype.buildSpecializationVars = function () {
+  const self = this;
+  {
+    return {};
+  }
 };

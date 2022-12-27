@@ -1,0 +1,13 @@
+use (
+  {CatalogItem} = alias://catalog
+)
+
+/**
+ * Common schema for the stages.
+ */
+@abstract
+export struct Stage: CatalogItem
+  /**
+   * Stage duration.
+   */
+  pub const duration: num

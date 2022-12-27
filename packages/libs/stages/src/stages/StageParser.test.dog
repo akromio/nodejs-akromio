@@ -1,0 +1,57 @@
+use (
+  alias://expected
+  StageParser
+)
+
+suite(__filename, proc()
+  const (
+    parser = StageParser()
+    parseOpts = {}
+  )
+
+  suite("parseStage()", proc()
+    suite("const", proc()
+      test("when valid declaration, a ConstStage must be returned", proc()
+        # (1) act
+        const (
+          jobs = []
+          decl = {
+            'const' = "warmup"
+            duration = "2m"
+            interval = "2s"
+            requests = 100
+            jobs
+          }
+
+          out = parser.parse(decl, parseOpts)
+        )
+
+        # (2) assessment
+        expected(out.warmup).toBe("ConstStage").toHave(
+          name = "warmup"
+          duration = 120000
+          interval = 2000
+          requests = 100
+          jobs
+        )
+      end)
+    end)
+
+    suite("sleep", proc()
+      test("when valid declaration, a SleepStage must be returned", proc()
+        # (1) act
+        const (
+          jobs = []
+          decl = {sleep = "pause", duration = 120000}
+          out = parser.parse(decl, parseOpts)
+        )
+
+        # (2) assessment
+        expected(out.pause).toBe("SleepStage").toHave(
+          name = "pause"
+          duration = 120000
+        )
+      end)
+    end)
+  end)
+end)

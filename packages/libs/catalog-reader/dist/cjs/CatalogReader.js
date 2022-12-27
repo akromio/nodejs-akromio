@@ -25,9 +25,9 @@ const $CatalogReader = class CatalogReader {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('akromioJobCatalogsPath', _['akromioJobCatalogsPath'], _core.text);
-    Object.defineProperty(this, 'akromioJobCatalogsPath', {
-      value: (0, _core.coalesce)(_['akromioJobCatalogsPath'], null),
+    (0, _core.expect)('akromioCatalogsPath', _['akromioCatalogsPath'], _core.text);
+    Object.defineProperty(this, 'akromioCatalogsPath', {
+      value: (0, _core.coalesce)(_['akromioCatalogsPath'], null),
       writable: false,
       enumerable: true
     });
@@ -52,12 +52,12 @@ CatalogReader.prototype.searchBaseRegistry = async function () {
   {
     const {
       akromioDirName,
-      akromioJobCatalogsPath
+      akromioCatalogsPath
     } = this;
     {
       let basePath = (0, await this.dirSearcher.searchDirWith(akromioDirName));
       if (basePath) {
-        basePath = path.join(basePath, akromioDirName, akromioJobCatalogsPath);
+        basePath = path.join(basePath, akromioDirName, akromioCatalogsPath);
         base = Registry({
           'name': "base",
           'client': FsConnector({

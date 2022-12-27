@@ -1,0 +1,19 @@
+use (
+  {EnvCommand as EnvCommandBase} = alias://cli
+)
+
+/**
+ * The env command.
+ */
+export struct EnvCommand: EnvCommandBase
+  @override @hidden
+  pub fn buildSpecializationVars() = {
+    STAGE_CATALOGS_PATH =
+      desc = "Dir path to prefix when root stage catalog name is relative."
+    
+    STAGE_CATALOG_NAME =
+      desc = "Stage catalog name to use when unset."
+    
+    STAGE_NAME =
+      desc = "Default stage name to run when unset."
+  }

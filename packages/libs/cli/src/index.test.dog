@@ -1,0 +1,21 @@
+use (
+  alias://expected
+  index
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(index).members(
+      "createCommands"
+      "table"
+      "CatalogCommand"
+      "DatasetCommand"
+      "DescCommand"
+      "EnvCommand"
+      "RegistryCommandBase"
+      "RunCommand"
+      "ShowCommand"
+      "TriggerCommand"
+    ).toBeCallable()
+  end)
+end)

@@ -1,0 +1,36 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {Plugins} = alias://core
+
+  JobCatalog
+)
+
+suite(__filename, proc()
+  const (
+    globalDataset = GlobalDataset(name = "global")
+  )
+
+  suite("finalize()", proc()
+    test("when called, plugins.finalize() must be called", async proc()
+      # (1) act
+      const (
+        plugins = monitor(Plugins(), method = "finalize")
+        catalog = JobCatalog(
+          spec = "v1.0"
+          loc = "file:///my/catalog.yaml"
+          cty = "text/yaml"
+          desc = "A test catalog."
+          dataset = globalDataset
+          plugins
+        )
+        out = await(catalog.finalize())
+      )
+
+      # (2) assessment
+      const pis = monitor.log(plugins, clear = true)
+      expected(pis.calls).equalTo(1)
+    end)
+  end)
+end)

@@ -1,0 +1,40 @@
+use (
+  alias://expected
+  Ring
+)
+
+suite(__filename, proc()
+  suite("next()", proc()
+    test("when called and end not reached, the next point must be returned", proc()
+      # (1) act
+      const (
+        points = ["zero", "one", "two", "three"]
+        ring = Ring(points=)
+        out1 = ring.next()
+        out2 = ring.next()
+      )
+
+      # (2) assessment
+      expected(out1).equalTo(points[0])
+      expected(out2).equalTo(points[1])
+      expected(ring.position).equalTo(2)
+    end)
+
+    test("when end reached, restart must be performed", proc()
+# (1) act
+      const (
+        points = ["zero", "one"]
+        ring = Ring(points=)
+        out1 = ring.next()
+        out2 = ring.next()
+        out3 = ring.next()
+      )
+
+      # (2) assessment
+      expected(out1).equalTo(points[0])
+      expected(out2).equalTo(points[1])
+      expected(out3).equalTo(points[0])
+      expected(ring.position).equalTo(1)    
+    end)
+  end)
+end)

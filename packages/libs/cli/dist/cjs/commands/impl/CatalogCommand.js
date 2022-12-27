@@ -25,13 +25,6 @@ const $CatalogCommand = class CatalogCommand extends CatalogCommandBase {
       enumerable: true
     });
     /* c8 ignore start */
-    if (_['desc'] != null) (0, _core.expect)('desc', _['desc'], _core.text); /* c8 ignore stop */
-    Object.defineProperty(this, 'desc', {
-      value: (0, _core.coalesce)(_['desc'], "List the content of a jobs catalog."),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
     if (_['positionals'] != null) (0, _core.expect)('positionals', _['positionals'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'positionals', {
       value: (0, _core.coalesce)(_['positionals'], {}),
@@ -54,13 +47,13 @@ const $CatalogCommand = class CatalogCommand extends CatalogCommandBase {
         ["all"]: {
           ["type"]: "boolean",
           ["alias"]: ["l"],
-          ["desc"]: "Show all the jobs, including these with hidden tag.",
+          ["desc"]: "Show all the items, including these with hidden tag.",
           ["default"]: false
         },
         ["tag"]: {
           ["type"]: "string",
           ["alias"]: ["t"],
-          ["desc"]: "Show the jobs with a given tag."
+          ["desc"]: "Show the items with a given tag."
         }
       }),
       writable: false,
@@ -82,7 +75,7 @@ const CatalogCommand = new Proxy($CatalogCommand, {
 });
 module.exports = exports = CatalogCommand;
 /* c8 ignore start */
-CatalogCommand.prototype.createJobParser = function () {
+CatalogCommand.prototype.createItemParser = function () {
   (0, _core.abstract)();
 }; /* c8 ignore stop */
 CatalogCommand.prototype.handle = async function (argv) {
@@ -99,7 +92,7 @@ CatalogCommand.prototype.handle = async function (argv) {
   {
     const registries = (0, await this.createRegistries(argv).connect());
     try {
-      var _decl$jobs;
+      var _dogma$getItem;
       if (registryAndCatalogName) {
         catalogName = _core.dogma.getItem(registryAndCatalogName.split("://"), 1);
       }
@@ -107,18 +100,23 @@ CatalogCommand.prototype.handle = async function (argv) {
       catalogName = this.buildCatalogPath(catalogName);
       decl = (0, await this.readCatalogDecl(catalogName, registries));
       if (!decl) {
-        (0, _core.print)(`Job catalog '${catalogName}' not found in '${registries.registryNames}'.`);
+        (0, _core.print)(`Catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      (0, _core.print)("\nLocation:", decl.loc);
+      const {
+        itemName
+      } = this;
+      const itemsField = itemName + "s";
+      const defaultItemNameField = "default" + _core.dogma.getItem(itemName, 0).toUpperCase() + _core.dogma.getSlice(itemName, 1, -1) + "Name";
+      (0, _core.print)("\nlocation:", decl.loc);
       showCatalogDesc(decl, desc);
-      this.listJobDecls((_decl$jobs = decl.jobs) !== null && _decl$jobs !== void 0 ? _decl$jobs : [], decl.defaultJobName, tag, all);
+      this.listItemDecls((_dogma$getItem = _core.dogma.getItem(decl, itemsField)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : [], _core.dogma.getItem(decl, defaultItemNameField), tag, all);
     } finally {
       0, await registries.disconnect();
     }
   }
 };
-CatalogCommand.prototype.listJobDecls = function (decls, defaultJobName, tag, all) {
+CatalogCommand.prototype.listItemDecls = function (decls, defaultItemName, tag, all) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("decls", decls, _core.dogma.TypeDef({
     name: 'inline',
@@ -126,59 +124,53 @@ CatalogCommand.prototype.listJobDecls = function (decls, defaultJobName, tag, al
     min: 0,
     max: null
   })); /* c8 ignore next */
-  if (defaultJobName != null) _core.dogma.expect("defaultJobName", defaultJobName, _core.text); /* c8 ignore next */
+  if (defaultItemName != null) _core.dogma.expect("defaultItemName", defaultItemName, _core.text); /* c8 ignore next */
   if (tag != null) _core.dogma.expect("tag", tag, _core.text); /* c8 ignore next */
   _core.dogma.expect("all", all, _core.bool);
   {
     const data = {};
-    const jobParser = this.createJobParser();
-    const jobs = jobParser.parseJobs(decls, {
-      'ops': Ops()
-    });
-    for (const [name, job] of Object.entries(jobs)) {
-      {
-        if (all) {
-          _core.dogma.setItem("=", data, name, job);
-        } else if (tag) {
-          if (job.tags.includes(tag)) {
-            _core.dogma.setItem("=", data, name, job);
-          }
-        } else {
-          if (job.tags.includes("hidden")) {
-            _core.dogma.nop();
+    const ops = Ops();
+    const itemParser = this.createItemParser();
+    for (const decl of decls) {
+      for (const [name, item] of Object.entries(itemParser.parse(decl, {
+        'ops': ops
+      }))) {
+        {
+          if (all) {
+            _core.dogma.setItem("=", data, name, item);
+          } else if (tag) {
+            if (item.tags.includes(tag)) {
+              _core.dogma.setItem("=", data, name, item);
+            }
           } else {
-            _core.dogma.setItem("=", data, name, job);
+            if (item.tags.includes("hidden")) {
+              _core.dogma.nop();
+            } else {
+              _core.dogma.setItem("=", data, name, item);
+            }
           }
         }
       }
     }
-    const rows = [["Job", "Type", "Tags", "Desc."]];
+    const {
+      itemName
+    } = this;
+    const rows = [[itemName, "type", "tags", "desc."]];
     for (const key of (0, _core.keys)(data).sort()) {
-      const job = _core.dogma.getItem(data, key);
-      const name = key + (key == defaultJobName ? "*" : "");
-      let opType;
-      {
-        const _ = job;
-        if (_core.dogma.is(_, "Macro")) {
-          {
-            opType = "macro";
-          }
-        } else if (_core.dogma.is(_, "Co")) {
-          {
-            opType = "co";
-          }
-        } else if (_core.dogma.is(_, "Script")) {
-          {
-            opType = "script";
-          }
-        }
-      }
-      rows.push([name, opType, job.tags, job.desc || job.title]);
+      const item = _core.dogma.getItem(data, key);
+      const name = key + (key == defaultItemName ? "*" : "");
+      const typeName = this.getTypeNameOf(item);
+      rows.push([name, typeName, item.tags, item.desc || item.title]);
     }
-    (0, _core.print)("\nJobs:");
+    (0, _core.print)(`
+${itemName}s:`);
     (0, _core.print)(table(rows, tableOpts));
   }
 };
+/* c8 ignore start */
+CatalogCommand.prototype.getTypeNameOf = function () {
+  (0, _core.abstract)();
+}; /* c8 ignore stop */
 function showCatalogDesc(catalog, show) {
   /* c8 ignore next */_core.dogma.expect("catalog", catalog, _core.map); /* c8 ignore next */
   _core.dogma.expect("show", show, _core.bool);

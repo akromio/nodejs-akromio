@@ -1,13 +1,8 @@
-use (
-  {JobParser} = alias://catalog
-)
-
 pub use (
   JobDescriber
   engine/JobEngine
   catalog/JobCatalog
-  catalog/JobCatalogParser
-  catalog/JobCatalogMerger
+  catalog/parser/JobCatalogParser
+  catalog/parser/JobParser
+  catalog/merger/JobCatalogMerger
 )
-
-pub JobParser

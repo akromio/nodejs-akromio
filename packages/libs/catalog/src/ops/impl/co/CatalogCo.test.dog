@@ -1,0 +1,23 @@
+use (
+  alias://expected
+  {Ops, CoOperator} = alias://core
+
+  CatalogCo
+)
+
+suite(__filename, proc()
+  suite("constructor", proc()
+    test("when instantiation, new instance must be returned", proc()
+      # (1) act
+      const (
+        operator = CoOperator()
+        ops = Ops()
+        steps = []
+        out = CatalogCo(name = "test", steps, ops, operator)
+      )
+
+      # (2) assessment
+      expected(out).toBe(CatalogCo)
+    end)
+  end)
+end)

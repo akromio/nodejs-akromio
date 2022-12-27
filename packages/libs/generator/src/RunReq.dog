@@ -1,0 +1,23 @@
+/**
+ * A request for querying the execution of a job.
+ */
+export intf RunReq
+  /**
+   * Registry where the job catalog is.
+   */
+  registry: text
+
+  /**
+   * Catalog name where the job to run is.
+   */
+  catalog: text
+
+  /**
+   * Job name to run.
+   */
+  job: text
+
+  /**
+   * Arguments to pass for the execution.
+   */
+  args?: any

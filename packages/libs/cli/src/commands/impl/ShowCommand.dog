@@ -18,7 +18,7 @@ export struct CatalogCommand: CatalogCommandBase
   pub const name := ["show"]
 
   @override
-  pub const desc := "Show a job catalog declaration."
+  pub const desc := "Show a catalog declaration."
 
   @override
   pub const hidden := true
@@ -34,10 +34,10 @@ export struct CatalogCommand: CatalogCommandBase
   }
 
   /**
-   * Creates the job parser to use.
+   * Creates the item parser to use.
    */
   @abstract
-  pub fn createJobParser(): JobParser
+  pub fn createItemParser(): CatalogItemParser
 
   @override @hidden
   pub async proc handle(argv=> {catalogName, registryAndCatalogName, all, tag, args, desc})
@@ -56,7 +56,7 @@ export struct CatalogCommand: CatalogCommandBase
       decl = await(self.readCatalogDecl(catalogName, registries))
 
       if not decl then
-        print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        print($"Catalog '${catalogName}' not found in '${registries.registryNames}'.")
         ps.exit(1)
 
       #(4) show

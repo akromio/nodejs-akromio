@@ -1,0 +1,17 @@
+use (
+  alias://expected
+  index
+)
+
+suite(__filename, proc()
+  test("when imported, api must be exported", proc()
+    expected(index).members(
+      "JobDescriber"
+      "JobEngine"
+      "JobCatalog"
+      "JobCatalogParser"
+      "JobParser"
+      "JobCatalogMerger"
+    ).toBeCallable()
+  end)
+end)

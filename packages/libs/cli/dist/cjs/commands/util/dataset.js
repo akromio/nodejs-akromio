@@ -140,7 +140,7 @@ async function createGlobalDataset(data) {
         ["dirName"]: _core.ps.env.KRM_DIR_NAME,
         ["jobs"]: {
           ["catalogs"]: {
-            ["path"]: _core.ps.env.KRM_JOB_CATALOGS_PATH
+            ["path"]: _core.ps.env.KRM_CATALOGS_PATH
           }
         }
       }

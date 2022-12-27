@@ -34,7 +34,7 @@ export struct CatalogReader
    * Akromio job catalogs path such as, for example, /jobs/catalogs.
    * Used when root registry searched.
    */
-  pub const akromioJobCatalogsPath: text
+  pub const akromioCatalogsPath: text
 
   /**
    * Searches and returns the base registry.
@@ -42,10 +42,10 @@ export struct CatalogReader
    */
   @hidden
   pub async fn searchBaseRegistry() -> base: Registry
-    const {akromioDirName, akromioJobCatalogsPath} = self
+    const {akromioDirName, akromioCatalogsPath} = self
 
     if basePath := await(self.dirSearcher.searchDirWith(akromioDirName)) then
-      basePath = path.join(basePath, akromioDirName, akromioJobCatalogsPath)
+      basePath = path.join(basePath, akromioDirName, akromioCatalogsPath)
       base = Registry(name = "base", client = FsConnector(basePath=))
   
   /**

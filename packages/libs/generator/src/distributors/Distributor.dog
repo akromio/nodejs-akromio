@@ -1,0 +1,38 @@
+use (
+  {Readable} = dep://stream
+  ring/Ring
+)
+
+/**
+ * A distributor is the responsible of saving the run requests
+ * in any place such as, for example, a Redis stream.
+ *
+ * It receives a RunReqStream and reads from it the requests.
+ */
+@abstract
+export struct Distributor
+  /**
+   * Ring with the destinations to use.
+   */
+  @inject
+  pub const ring: Ring
+
+  /**
+   * Input stream with the run requests to deliver.
+   */
+  @inject
+  pub const input: Readable
+
+  /**
+   * Delivers the run requests among the ring destinations.
+   */
+  pub async proc start()
+    await for each req := input do
+      if req is Buffer then req = json.decode(req)
+      self.deliver(req, ring.next())
+  
+  /**
+   * Deliver a given run [req]uest to a given destination.
+   */
+  @abstract @hidden
+  pub proc deliver(req: RunReq, destination: Destination)

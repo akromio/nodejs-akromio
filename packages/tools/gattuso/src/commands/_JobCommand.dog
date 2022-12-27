@@ -35,7 +35,7 @@ export struct _JobCommand
   @override
   pub fn createCatalogReader() = CatalogReader(
     akromioDirName = $KRM_DIR_NAME
-    akromioJobCatalogsPath = $KRM_JOB_CATALOGS_PATH
+    akromioCatalogsPath = $KRM_JOB_CATALOGS_PATH
   )
   
   @override

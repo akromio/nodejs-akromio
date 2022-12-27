@@ -62,7 +62,7 @@ _JobCommand.prototype.createCatalogReader = function () {
   {
     return CatalogReader({
       'akromioDirName': _core.ps.env.KRM_DIR_NAME,
-      'akromioJobCatalogsPath': _core.ps.env.KRM_JOB_CATALOGS_PATH
+      'akromioCatalogsPath': _core.ps.env.KRM_JOB_CATALOGS_PATH
     });
   }
 };

@@ -1,0 +1,15 @@
+use (
+  {PassThrough} = dep://stream
+  RunReq
+)
+
+/**
+ * A stream where the assigners let the run requests and
+ * are read, for example, by the distributors.
+ */
+export struct RunReqStream: PassThrough
+  /**
+   * Adds a new request
+   */
+  pub fn append(req: RunReq) -> self
+    self.write(json.encode(req))

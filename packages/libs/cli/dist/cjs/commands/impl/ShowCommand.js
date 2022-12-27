@@ -27,7 +27,7 @@ const $CatalogCommand = class CatalogCommand extends CatalogCommandBase {
     /* c8 ignore start */
     if (_['desc'] != null) (0, _core.expect)('desc', _['desc'], _core.text); /* c8 ignore stop */
     Object.defineProperty(this, 'desc', {
-      value: (0, _core.coalesce)(_['desc'], "Show a job catalog declaration."),
+      value: (0, _core.coalesce)(_['desc'], "Show a catalog declaration."),
       writable: false,
       enumerable: true
     });
@@ -72,7 +72,7 @@ const CatalogCommand = new Proxy($CatalogCommand, {
 });
 module.exports = exports = CatalogCommand;
 /* c8 ignore start */
-CatalogCommand.prototype.createJobParser = function () {
+CatalogCommand.prototype.createItemParser = function () {
   (0, _core.abstract)();
 }; /* c8 ignore stop */
 CatalogCommand.prototype.handle = async function (argv) {
@@ -96,7 +96,7 @@ CatalogCommand.prototype.handle = async function (argv) {
       catalogName = this.buildCatalogPath(catalogName);
       decl = (0, await this.readCatalogDecl(catalogName, registries));
       if (!decl) {
-        (0, _core.print)(`Job catalog '${catalogName}' not found in '${registries.registryNames}'.`);
+        (0, _core.print)(`Catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
       (0, _core.printf)(decl);

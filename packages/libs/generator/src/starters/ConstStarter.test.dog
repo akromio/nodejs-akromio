@@ -1,0 +1,27 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+
+  ../BlankSheetStream
+  ConstStarter, StarterState
+)
+
+suite(__filename, proc()
+  test("generateBlankSheets()", async proc()
+    # (1) act
+    const (
+      output = monitor(BlankSheetStream(), method = "appendBlankSheet")
+      opts = {interval = 50, times = 5, blankSheets = 11, output}
+      starter = ConstStarter(opts).start()
+    )
+
+    await(sleep("400ms"))
+
+    # (2) assessment
+    expected(starter).toHave(state = StarterState.stopped, iterations = 5)
+    expected(output.writable).equalTo(false)
+    
+    const log = monitor.log(output, clear = true)
+    expected(log.calls).equalTo(opts.times * opts.blankSheets)
+  end)
+end)

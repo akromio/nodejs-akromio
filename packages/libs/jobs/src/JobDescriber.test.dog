@@ -1,0 +1,106 @@
+use (
+  alias://expected
+  {DynamicMacro as MacroBase, MacroOperator} = alias://core
+  {DynamicCo as CoBase, CoOperator} = alias://core
+  {Script, ScriptOperator} = alias://core
+  
+  JobDescriber
+)
+
+struct Macro: MacroBase
+struct Co: CoBase
+
+suite(__filename, proc()
+  const describer = JobDescriber()
+
+  suite("describeJob()", proc()
+    test("when macro, a macro description object must be returned", proc()
+      # (1) act
+      const (
+        op = Macro(
+          name = "mymacro"
+          tags = ["tag1", "tag2"]
+          desc = "The description."
+          operator = MacroOperator()
+        )
+        out = describer.describeJob(op)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = "mymacro"
+        tags = ["tag1", "tag2"]
+        desc = "The description."
+        opType = "macro"
+      )
+    end)
+
+    test("when co, a co description object must be returned", proc()
+      # (1) act
+      const (
+        op = Co(
+          name = "myco"
+          tags = ["tag1", "tag2"]
+          desc = "The description."
+          operator = CoOperator()
+        )
+        out = describer.describeJob(op)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = "myco"
+        tags = ["tag1", "tag2"]
+        desc = "The description."
+        opType = "co"
+      )
+    end)
+
+    test("when script, a script description object must be returned", proc()
+      # (1) act
+      const (
+        op = Script(
+          name = "myscript"
+          tags = ["tag1", "tag2"]
+          desc = "The description."
+          code = ""
+          operator = ScriptOperator()
+        )
+        out = describer.describeJob(op)
+      )
+
+      # (2) assessment
+      expected(out).toHave(
+        name = "myscript"
+        tags = ["tag1", "tag2"]
+        desc = "The description."
+        opType = "script"
+      )
+    end)
+  end)
+
+  suite("describe()", proc()
+    test("when jobs passed, a list of description objects must be returned", proc()
+      # (1) act
+      const (
+        op = Macro(
+          name = "mymacro"
+          tags = ["tag1", "tag2"]
+          desc = "The description."
+          operator = MacroOperator()
+        )
+        out = describer.describe([op])
+      )
+
+      # (2) assessment
+      expected(out).equalTo(
+        mymacro = {
+          name = "mymacro"
+          opType = "macro"
+          tags = ["tag1", "tag2"]
+          desc = "The description."
+        }
+      )
+    end)
+  end)
+end)

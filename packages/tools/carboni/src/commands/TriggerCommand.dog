@@ -1,0 +1,9 @@
+use (
+  {TriggerCommand as TriggerCommandBase} = alias://cli
+  _StageCommand
+)
+
+/**
+ * The trigger command.
+ */
+export struct TriggerCommand: TriggerCommandBase:: _StageCommand

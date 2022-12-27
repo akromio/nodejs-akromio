@@ -1,0 +1,72 @@
+use (
+  alias://expected
+  {sim, monitor} = alias://doubles
+
+  ../{BlankSheetStream, RunReqStream}
+  Assigner
+)
+
+suite(__filename, proc()
+  const (
+    registry = "fs:///my/registry"
+    catalog = "catalog-name"
+    job = "job-name"
+  )
+
+  suite("constructor", proc()
+    test("when total weight is not 100, error must be raised", proc()
+      # (1) act
+      const (
+        jobs = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
+        input = BlankSheetStream()
+        output = RunReqStream()
+        opts = {input, output, jobs}
+        out = peval(Assigner(opts))
+      )
+
+      # (2) assessment
+      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Sum of job weights must be 100. Got: 110."))
+    end)
+  end)
+
+  suite("start()", proc()
+    test("when started, run requests must be generated", async proc()
+      # (1) act
+      const (
+        blankSheets = "b ".repeat(100).split(" ")[0, -2]
+        jobs = [
+          {registry, catalog, job = "#1", weight = 25},
+          {registry, catalog, job = "#2", weight = 75}
+        ]
+        input = sim.stream.readable(data = blankSheets)
+        output = monitor(RunReqStream(), method = "append")
+        opts = {input, output, jobs}
+        assigner = Assigner(opts)
+      )
+
+      assigner.start()
+      await(sleep("1500ms"))
+
+      # (2) assessment
+      expected(input.readable).equalTo(false)
+      expected(output.writable).equalTo(false)
+
+      var (
+        log ::= monitor.log(output, clear = true)
+        job1 = 0
+        job2 = 0
+      )
+
+      expected(log.calls).equalTo(100)
+      
+      for i = 0; i < log.calls; i += 1 do
+        const job = log.getCall(i).args[0]
+        
+        if job.job == "#1" then job1 += 1
+        else job2 += 1
+      
+      expected(job1).equalTo(25)
+      expected(job2).equalTo(75)
+    end)
+  end)
+end)

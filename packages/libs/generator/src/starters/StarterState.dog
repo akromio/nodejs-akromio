@@ -1,0 +1,9 @@
+/**
+ * Possible states for a starter.
+ * created -> idle <-> busy -> stopped
+ */
+export enum StarterState
+  created
+  idle
+  busy
+  stopped

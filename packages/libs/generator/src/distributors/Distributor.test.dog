@@ -1,0 +1,49 @@
+use (
+  alias://expected
+  {sim, monitor} = alias://doubles
+
+  ring/Ring
+  DistributorBase = Distributor
+)
+
+# Distributor for the tests.
+struct Distributor: DistributorBase
+  @override
+  pub proc deliver(req)
+    nop
+
+suite(__filename, proc()
+  const (
+    registry = "registry"
+    catalog = "catalog-name"
+  )
+
+  suite("deliver()", proc()
+    test("when called, input stream read and _delivery() run for each request", async proc()
+      # (1) act
+      const (
+        ring = Ring(points = ["one", "two", "three"])
+        reqs = [
+          json.encode({registry, catalog, job = "#1"})
+          json.encode({registry, catalog, job = "#2"})
+          json.encode({registry, catalog, job = "#1"})
+          json.encode({registry, catalog, job = "#3"})
+        ]
+        input = sim.stream.readable(data = reqs)
+        distributor = monitor(Distributor(input=, ring), method = "deliver")
+      )
+
+      distributor.start()
+      await(sleep("100ms"))
+
+      # (2) assessment
+      const deliver = monitor.log(distributor, clear = true)
+      
+      expected(deliver.calls).equalTo(4)
+      expected(deliver.getCall(0).args).get("[0].job").equalTo("#1")
+      expected(deliver.getCall(1).args).get("[0].job").equalTo("#2")
+      expected(deliver.getCall(2).args).get("[0].job").equalTo("#1")
+      expected(deliver.getCall(3).args).get("[0].job").equalTo("#3")
+    end)
+  end)
+end)

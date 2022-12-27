@@ -1,0 +1,13 @@
+use (
+  {PassThrough} = dep://stream
+)
+
+/**
+ * A stream for exchanging blank sheets.
+ */
+export struct BlankSheetStream: PassThrough
+  /**
+   * Adds a new blank sheet.
+   */
+  pub fn appendBlankSheet() -> self
+    self.write("bs")

@@ -1,0 +1,9 @@
+use (
+  {DatasetCommand as DatasetCommandBase} = alias://cli
+  _StageCommand
+)
+
+/**
+ * The dataset command.
+ */
+export struct DatasetCommand: DatasetCommandBase:: _StageCommand

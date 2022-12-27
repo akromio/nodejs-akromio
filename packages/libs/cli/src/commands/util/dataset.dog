@@ -125,7 +125,7 @@ pub async fn createGlobalDataset(data:> {args?: text[], answers?: text[], catalo
         dirName = $KRM_DIR_NAME
         jobs =
           catalogs =
-            path = $KRM_JOB_CATALOGS_PATH
+            path = $KRM_CATALOGS_PATH
       }
     )
   )

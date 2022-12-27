@@ -1,9 +1,0 @@
-use (
-  {CatalogMerger} = alias://catalog
-)
-
-/**
- * A mixer of catalog declarations.
- * Used for extending a catalog from another.
- */
-export struct JobCatalogMerger: CatalogMerger

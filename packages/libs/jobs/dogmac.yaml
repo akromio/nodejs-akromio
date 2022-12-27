@@ -13,6 +13,3 @@ uses:
     
   expected:
     js: "@akromio/expected"
-  
-  registry:
-    js: "@akromio/registry"

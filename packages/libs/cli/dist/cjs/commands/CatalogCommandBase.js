@@ -42,7 +42,7 @@ Object.defineProperty(CatalogCommandBase, 'baseOptions', {
       ["type"]: "string",
       ["alias"]: ["c", "catalog"],
       ["desc"]: "The catalog to use: catalogName or registryName://catalogName.",
-      ["default"]: _core.ps.env.KRM_JOB_CATALOG_NAME
+      ["default"]: _core.ps.env.KRM_CATALOG_NAME
     },
     "registryAndCatalogName": {
       ["type"]: "string",
@@ -75,7 +75,7 @@ CatalogCommandBase.prototype.buildCatalogPath = function (catalogPath) {
   _core.dogma.expect("catalogPath", catalogPath, _core.text);
   {
     if (!catalogPath.startsWith("/")) {
-      catalogPath = path.join("/", _core.ps.env.KRM_JOB_CATALOGS_PATH, catalogPath);
+      catalogPath = path.join("/", _core.ps.env.KRM_CATALOGS_PATH, catalogPath);
     }
   }
   return catalogPath;

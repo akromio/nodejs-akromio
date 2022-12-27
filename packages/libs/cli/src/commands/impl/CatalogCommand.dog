@@ -10,15 +10,13 @@ use (
 const {baseOptions} = CatalogCommandBase
 
 /**
- * A catalog command.
+ * Base for the catalog command, that is, a command to show
+ * its items such as, for example, jobs or stages.
  */
 @abstract
 export struct CatalogCommand: CatalogCommandBase
   @override
   pub const name := ["catalog", "cat", "c", "*"]
-
-  @override
-  pub const desc := "List the content of a jobs catalog."
 
   @override
   pub const positionals := {}
@@ -38,21 +36,27 @@ export struct CatalogCommand: CatalogCommandBase
     all =
       type = "boolean"
       alias = ["l"]
-      desc = "Show all the jobs, including these with hidden tag."
+      desc = "Show all the items, including these with hidden tag."
       default = false
     
     tag =
       type = "string"
       alias = ["t"]
-      desc = "Show the jobs with a given tag."
+      desc = "Show the items with a given tag."
   }
 
   /**
-   * Creates the job parser to use.
+   * Item name.
    */
   @abstract
-  pub fn createJobParser(): JobParser
+  pub const itemName: text
 
+  /**
+   * Creates the item parser to use.
+   */
+  @abstract
+  pub fn createItemParser(): CatalogItemParser
+  
   @override @hidden
   pub async proc handle(argv=> {catalogName, registryAndCatalogName, all, tag, args, desc})
     #(1) create the registry instances to use
@@ -70,61 +74,69 @@ export struct CatalogCommand: CatalogCommandBase
       decl = await(self.readCatalogDecl(catalogName, registries))
 
       if not decl then
-        print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        print($"Catalog '${catalogName}' not found in '${registries.registryNames}'.")
         ps.exit(1)
 
       #(4) list
-      print("\nLocation:", decl.loc)
+      const (
+        {itemName} = self
+        itemsField = itemName + "s"
+        defaultItemNameField = "default" + itemName[0].toUpperCase() + itemName[1, -1] + "Name"
+      )
+
+      print("\nlocation:", decl.loc)
       showCatalogDesc(decl, desc)
-      self.listJobDecls(decl.jobs ?? [], decl.defaultJobName, tag, all)
+      self.listItemDecls(decl[itemsField] ?? [], decl[defaultItemNameField], tag, all)
     finally
       await(registries.disconnect())
 
   /**
-  * Lists the job declarations.
+  * Lists the item declarations.
   */
   @hidden
-  pub proc listJobDecls(decls: map[], defaultJobName?: text, tag?: text, all: bool)
+  pub proc listItemDecls(decls: map[], defaultItemName?: text, tag?: text, all: bool)
     #(1) get the data to show
     const (
       data = {}
-      jobParser = self.createJobParser()
-      jobs = jobParser.parseJobs(
-        decls
-        ops = Ops()
-      )
+      ops = Ops()
+      itemParser = self.createItemParser()
     )
 
-    for each name, job in jobs do
-      if all then
-        data[name] = job
-      else if tag then
-        if job.tags.includes(tag) then
-          data[name] = job
-      else
-        if job.tags.includes("hidden") then nop
-        else data[name] = job
+    for each decl in decls do
+      for each name, item in itemParser.parse(decl, ops=) do
+        if all then
+          data[name] = item
+        else if tag then
+          if item.tags.includes(tag) then
+            data[name] = item
+        else
+          if item.tags.includes("hidden") then nop
+          else data[name] = item
     
     #(2) create rows to show
-    const rows = [["Job", "Type", "Tags", "Desc."]]
+    const (
+      {itemName} = self
+      rows = [[itemName, "type", "tags", "desc."]]
+    )
 
     for each key in keys(data).sort() do
-      var (
-        job ::= data[key]
-        name ::= key + if key == defaultJobName then "*" else "" end
-        opType
+      const (
+        item = data[key]
+        name = key + if key == defaultItemName then "*" else "" end
+        typeName = self.getTypeNameOf(item)
       )
-
-      with type(job) do
-        if "Macro" then opType = "macro"
-        if "Co" then opType = "co"
-        if "Script" then opType = "script"
       
-      rows.push([name, opType, job.tags, job.desc or job.title])
+      rows.push([name, typeName, item.tags, item.desc or item.title])
 
     #(3) show table
-    print("\nJobs:")
+    print($"\n${itemName}s:")
     print(table(rows, tableOpts))
+
+  /**
+   * Returns the type name of a given [item].
+   */
+  @abstract @hidden
+  pub fn getTypeNameOf(item): text
 
 /**
  * Shows a given catalog description if requested.

@@ -43,14 +43,14 @@ const CatalogReader = new Proxy($CatalogReader, {
 suite(__filename, () => {
   {
     const akromioDirName = ".akromio";
-    const akromioJobCatalogsPath = "/jobs/catalogs";
+    const akromioCatalogsPath = "/jobs/catalogs";
     suite("readCatalogDecl()", () => {
       {
         const merger = {};
         const reader = CatalogReader({
           'merger': merger,
           'akromioDirName': akromioDirName,
-          'akromioJobCatalogsPath': akromioJobCatalogsPath
+          'akromioCatalogsPath': akromioCatalogsPath
         });
         test("when catalog unexists, nil must be returned", async () => {
           {
@@ -217,7 +217,7 @@ suite(__filename, () => {
         const reader = CatalogReader({
           'merger': merger,
           'akromioDirName': akromioDirName,
-          'akromioJobCatalogsPath': akromioJobCatalogsPath
+          'akromioCatalogsPath': akromioCatalogsPath
         });
         teardown(() => {
           {
@@ -272,7 +272,7 @@ suite(__filename, () => {
             const reader = CatalogReader({
               'merger': merger,
               'akromioDirName': akromioDirName,
-              'akromioJobCatalogsPath': akromioJobCatalogsPath
+              'akromioCatalogsPath': akromioCatalogsPath
             });
             const jobsItem = Item({
               'registryName': "test",
@@ -357,7 +357,7 @@ suite(__filename, () => {
             const reader = CatalogReader({
               'merger': {},
               'akromioDirName': akromioDirName,
-              'akromioJobCatalogsPath': akromioJobCatalogsPath,
+              'akromioCatalogsPath': akromioCatalogsPath,
               'dirSearcher': dirSearcher
             });
             const out = await _core.dogma.pawait(() => reader.readCatalogDecl("base:///my/catalog.yaml", regs));
@@ -373,7 +373,7 @@ suite(__filename, () => {
             const reader = CatalogReader({
               'merger': {},
               'akromioDirName': akromioDirName,
-              'akromioJobCatalogsPath': akromioJobCatalogsPath,
+              'akromioCatalogsPath': akromioCatalogsPath,
               'dirSearcher': dirSearcher
             });
             const out = (0, await reader.readCatalogDecl("base:///my/catalog.yaml", regs));

@@ -31,7 +31,7 @@ const ShowCommand = new Proxy($ShowCommand, {
   }
 });
 module.exports = exports = ShowCommand;
-ShowCommand.prototype.createJobParser = function () {
+ShowCommand.prototype.createItemParser = function () {
   const self = this;
   {
     return JobParser();

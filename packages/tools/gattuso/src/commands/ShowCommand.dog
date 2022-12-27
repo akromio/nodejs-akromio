@@ -9,4 +9,4 @@ use (
  */
 export struct ShowCommand: ShowCommandBase:: _JobCommand
   @override
-  pub fn createJobParser() = JobParser()
+  pub fn createItemParser() = JobParser()

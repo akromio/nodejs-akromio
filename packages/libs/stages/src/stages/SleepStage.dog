@@ -1,0 +1,8 @@
+use (
+  Stage
+)
+
+/**
+ * A stage for nothing to do.
+ */
+export struct SleepStage: Stage

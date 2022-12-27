@@ -1,0 +1,45 @@
+use (
+  {Dataset} = alias://dataset
+  {CatalogParser, CatalogParseOpts} = alias://catalog
+
+  ../StageCatalog
+  ../../stages/StageParser
+)
+
+/**
+ * The stage parser to use.
+ */
+const stageParser = StageParser()
+
+/**
+ * Stage catalog parse options.
+ */
+intf StageCatalogParseOpts: CatalogParseOpts
+  /**
+   * Dataset parent to use.
+   */
+  parentDataset: Dataset
+
+/**
+ * A parser to parse stage catalog declarations.
+ */
+export struct StageCatalogParser: CatalogParser
+  @override @hidden
+  pub fn createCatalog(decl: map) = StageCatalog(decl)
+
+  @override @hidden
+  pub fn parseSpecialization(decl: map, opts: StageCatalogParseOpts) -> decl
+    # (1) parse stages
+    const stages = self.parseStages(decl.stages, opts)
+
+    # (2) adapt declaration
+    decl.{stages}
+  
+  /**
+   * Parses the stage [decl]arations.
+   */
+  @hidden
+  pub fn parseStages(decl: map[], opts: StageCatalogParseOpts) -> stages: map
+    for each stageDecl in decl do
+      for each name, stage in stageParser.parse(stageDecl, opts) do
+        stages[name] = stage
