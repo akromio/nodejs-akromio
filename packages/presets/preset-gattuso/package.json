@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@akromio/pi-banner": "^0.10.3",
+    "@akromio/pi-base64": "^0.10.3",
     "@akromio/pi-env": "^0.10.3",
     "@akromio/pi-exec": "^0.10.3",
     "@akromio/pi-file": "^0.10.3",

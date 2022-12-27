@@ -2,7 +2,7 @@
  * The built-in plugins associated to this preset.
  */
 const plugins = [
-  "banner"
+  "banner", "base64"
   "env", "exec"
   "file", "fs"
   "hbs", "http"

@@ -1,0 +1,8 @@
+export {
+  plugin = "base64"
+  desc = "Plugin for working with base64."
+  tags = ["built-in"]
+  ops =
+    encode = use("./ops/encode")
+    decode = use("./ops/decode")
+}

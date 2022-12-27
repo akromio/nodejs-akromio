@@ -1,0 +1,45 @@
+{
+  "name": "@akromio/pi-base64",
+  "version": "0.10.3",
+  "description": "Plugin for working with base64 on Akromio.",
+  "author": {
+    "name": "Sia Codelabs",
+    "email": "hello@siacodelabs.com",
+    "url": "https://siacodelabs.com"
+  },
+  "keywords": [
+    "akromio",
+    "plugin"
+  ],
+  "bugs": {
+    "url": "https://github.com/akromio/nodejs-akromio/issues",
+    "email": "bugs@akromio.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akromio/nodejs-akromio.git"
+  },
+  "preferGlobal": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "main": "dist/cjs/index.js",
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">= 14",
+    "npm": ">= 6"
+  },
+  "dependencies": {
+    "@dogmalang/core": "^1.0.0-rc18.0"
+  },
+  "scripts": {
+    "lint": "dogmac check src",
+    "build": "npm run build/src",
+    "build/src": "rm -rf dist/ && dogmac js -o dist/cjs src && babel -d dist dist",
+    "test": "mocha --config .mocharc.yaml",
+    "cov": "c8 mocha --config .mocharc.yaml"
+  }
+}

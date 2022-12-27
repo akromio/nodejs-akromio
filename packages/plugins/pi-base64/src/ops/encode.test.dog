@@ -1,0 +1,62 @@
+use (
+  alias://expected
+  op = encode
+)
+
+const (
+  buildParams = op.parameterizer
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  suite("buildParams()", proc()
+    test("when text, {value: text} must be returned", proc()
+      # (1) act
+      const (
+        value = "ciao mondo!"
+        args = value
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo({value})
+    end)
+
+    test("when list, {value: list[0]} must be returned", proc()
+      # (1) act
+      const (
+        value = "ciao mondo!"
+        args = [value]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo({value})
+    end)
+
+    test("when map, {value: fmt(map)} must be returned", proc()
+      # (1) act
+      const (
+        value = {x = 0, y = 1}
+        args = {value}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(value = fmt(value))
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when called, base64 text must be returned", proc()
+      # (1) act
+      const (
+        value = "ciao mondo!"
+        out = handle(params = {value})
+      )
+
+      # (2) assessment
+      expected(out).equalTo("Y2lhbyBtb25kbyE=")
+    end)
+  end)
+end)

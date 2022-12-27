@@ -1,0 +1,63 @@
+use (
+  alias://expected
+  op = decode
+)
+
+const (
+  buildParams = op.parameterizer
+  handle = op.fun
+)
+
+suite(__filename, proc()
+  const (
+    encoded = "Y2lhbyBtb25kbyE="
+    decoded = "ciao mondo!"
+  )
+
+  suite("buildParams()", proc()
+    test("when text, {value: text} must be returned", proc()
+      # (1) act
+      const (
+        value = encoded
+        args = value
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo({value})
+    end)
+
+    test("when list, {value: list[0]} must be returned", proc()
+      # (1) act
+      const (
+        value = encoded
+        args = [value]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo({value})
+    end)
+
+    test("when map, map must be returned", proc()
+      # (1) act
+      const (
+        args = {value = encoded}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(args)
+    end)
+  end)
+
+  suite("handle()", proc()
+    test("when encoded text, decoded text must be returned", proc()
+      # (1) act
+      const out = handle(params = {value = encoded})
+
+      # (2) assessment
+      expected(out).equalTo(decoded)
+    end)
+  end)
+end)

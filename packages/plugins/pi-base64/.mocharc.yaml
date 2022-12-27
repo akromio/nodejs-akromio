@@ -1,0 +1,9 @@
+ui: tdd
+timeout: 2000
+
+extension:
+  - js
+
+spec:
+  - "**/*.test.js"
+  
