@@ -8,6 +8,7 @@ pub use (
   starters/ConstStarter
 
   assigners/Assigner
+  assigners/RandomAssigner
 
   distributors/Distributor
   distributors/ring/Ring

@@ -3,7 +3,7 @@ use (
   {sim, monitor} = alias://doubles
 
   ../{BlankSheetStream, RunReqStream}
-  Assigner
+  RandomAssigner
 )
 
 suite(__filename, proc()
@@ -21,7 +21,7 @@ suite(__filename, proc()
         input = BlankSheetStream()
         output = RunReqStream()
         opts = {input, output, jobs}
-        out = peval(Assigner(opts))
+        out = peval(RandomAssigner(opts))
       )
 
       # (2) assessment
@@ -41,7 +41,7 @@ suite(__filename, proc()
         input = sim.stream.readable(data = blankSheets)
         output = monitor(RunReqStream(), method = "append")
         opts = {input, output, jobs}
-        assigner = Assigner(opts)
+        assigner = RandomAssigner(opts)
       )
 
       assigner.start()

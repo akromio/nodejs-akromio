@@ -12,6 +12,7 @@ suite(__filename, proc()
       "SleepStarter"
       
       "Assigner"
+      "RandomAssigner"
 
       "Distributor"
       "Ring"
