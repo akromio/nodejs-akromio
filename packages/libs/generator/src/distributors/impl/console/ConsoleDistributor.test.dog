@@ -1,0 +1,43 @@
+use (
+  alias://expected
+  {sim, monitor, fun, method} = alias://doubles
+
+  ../../ring/Ring
+  ConsoleDistributor
+)
+
+suite(__filename, proc()
+  const (
+    registry = "registry"
+    catalog = "catalog-name"
+  )
+
+  suite("deliver()", proc()
+    test("when called, message must be sent to stream", async proc()
+      # (1) act
+      const (
+        reqs = [
+          json.encode({registry, catalog, job = "job1"})
+          json.encode({registry, catalog, job = "job2"})
+          json.encode({registry, catalog, job = "job3"})
+        ]
+        input = sim.stream.readable(data = reqs)
+
+        points = [{id = "cavani1"}, {id = "cavani2"}]
+        ring = Ring(points=)
+        
+        console = monitor(fun())
+        distributor = ConsoleDistributor(console=, input, ring)
+      )
+
+      distributor.start()
+      await(sleep("1s"))
+
+      # (2) assessment
+      const clog = monitor.log(console, clear = true)
+      expected(clog.calls).equalTo(3)
+      for i = 0; i < clog.calls; i += 1 do
+        expected(clog.getCall(i).args[0]).like("\\[.+\\] cavani. registry:.+ catalog:.+ job:job.")
+    end)
+  end)
+end)
