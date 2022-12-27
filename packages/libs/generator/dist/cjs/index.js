@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.Distributor = exports.ConstStarter = exports.BlankSheetStream = exports.Assigner = void 0;
+exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RandomAssigner = exports.Distributor = exports.ConstStarter = exports.BlankSheetStream = exports.Assigner = void 0;
 var _core = require("@dogmalang/core");
 const BlankSheetStream = _core.dogma.use(require("./BlankSheetStream"));
 exports.BlankSheetStream = BlankSheetStream;
@@ -21,6 +21,8 @@ const ConstStarter = _core.dogma.use(require("./starters/ConstStarter"));
 exports.ConstStarter = ConstStarter;
 const Assigner = _core.dogma.use(require("./assigners/Assigner"));
 exports.Assigner = Assigner;
+const RandomAssigner = _core.dogma.use(require("./assigners/RandomAssigner"));
+exports.RandomAssigner = RandomAssigner;
 const Distributor = _core.dogma.use(require("./distributors/Distributor"));
 exports.Distributor = Distributor;
 const Ring = _core.dogma.use(require("./distributors/ring/Ring"));

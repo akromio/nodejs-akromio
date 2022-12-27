@@ -8,7 +8,7 @@ const {
 } = _core.dogma.use(require("@akromio/doubles"));
 const BlankSheetStream = _core.dogma.use(require("../BlankSheetStream"));
 const RunReqStream = _core.dogma.use(require("../RunReqStream"));
-const Assigner = _core.dogma.use(require("./Assigner"));
+const RandomAssigner = _core.dogma.use(require("./RandomAssigner"));
 suite(__filename, () => {
   {
     const registry = "fs:///my/registry";
@@ -37,7 +37,7 @@ suite(__filename, () => {
               ["jobs"]: jobs
             };
             const out = _core.dogma.peval(() => {
-              return Assigner(opts);
+              return RandomAssigner(opts);
             });
             expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Sum of job weights must be 100. Got: 110."));
           }
@@ -71,7 +71,7 @@ suite(__filename, () => {
               ["output"]: output,
               ["jobs"]: jobs
             };
-            const assigner = Assigner(opts);
+            const assigner = RandomAssigner(opts);
             assigner.start();
             0, await (0, _core.sleep)("1500ms");
             expected(input.readable).equalTo(false);
