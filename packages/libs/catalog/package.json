@@ -1,6 +1,6 @@
 {
   "name": "@akromio/catalog",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "Core catalog library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
@@ -30,8 +30,8 @@
     "npm": ">= 8"
   },
   "dependencies": {
-    "@akromio/core": "^0.10.3",
-    "@akromio/dataset": "^0.10.3",
+    "@akromio/core": "^0.11.0",
+    "@akromio/dataset": "^0.11.0",
     "@dogmalang/core": "^1.0.0-rc18.0"
   },
   "scripts": {

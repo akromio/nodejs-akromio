@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-udp",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "Plugin for working with UDP.",
   "author": {
     "name": "Sia Codelabs",

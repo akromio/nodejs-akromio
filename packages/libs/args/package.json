@@ -1,6 +1,6 @@
 {
   "name": "@akromio/args",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "Args library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
