@@ -1,0 +1,30 @@
+# use (
+#   
+# )
+
+export {
+  desc = "Encodes a value to base64."
+  parameterizer = buildParams
+  title = "base64: encode value"
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params.value = args[0]
+    if text then
+      params.value = args
+    else
+      params = args
+  
+  if params.value is not text then
+    params.value = fmt(params.value)
+
+/**
+ * Runs the operation.
+ */
+fn handle(ctx=> {params}) = Buffer.from(params.value).toString("base64")

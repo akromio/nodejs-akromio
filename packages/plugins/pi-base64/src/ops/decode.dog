@@ -1,0 +1,23 @@
+export {
+  desc = "Decodes a base64 text."
+  parameterizer = buildParams
+  title = "base64: decode base64 text"
+  fun = handle
+}
+
+/**
+ * Builds params from args.
+ */
+fn buildParams(args?) -> params: map
+  with type(args) do
+    if list then
+      params.value = args[0]
+    if text then
+      params.value = args
+    else
+      params = args
+  
+/**
+ * Runs the operation.
+ */
+fn handle(ctx=> {params}) = text(Buffer.from(params.value, "base64"))
