@@ -59,7 +59,7 @@ ArgsParser.prototype.parseEnvVars = function (env, prefix, args) {
   {
     for (const name of (0, _core.keys)(env)) {
       if (name.startsWith(prefix)) {
-        _core.dogma.setItem("=", args, name.replace((0, _core.re)("^" + prefix), ""), _core.dogma.getItem(env, name));
+        _core.dogma.setItem("=", args, name.replace((0, _core.re)("^" + prefix), ""), decode(_core.dogma.getItem(env, name)));
       }
     }
   }
@@ -69,8 +69,10 @@ ArgsParser.prototype.parseArgLines = function (lines, args) {
   const self = this;
   {
     for (const arg of lines) {
-      const [name, value] = _core.dogma.getArrayToUnpack(arg.split("="), 2);
-      _core.dogma.setItem("=", args, name.trim(), value.trim());
+      const equalAt = arg.indexOf("=");
+      const name = _core.dogma.getSlice(arg, 0, equalAt - 1);
+      const value = _core.dogma.getSlice(arg, equalAt + 1, -1);
+      _core.dogma.setItem("=", args, name.trim(), decode(value.trim()));
     }
   }
   return args;
@@ -85,3 +87,16 @@ ArgsParser.prototype.parseArgFiles = async function (filePaths, resolver, args) 
   }
   return args;
 };
+function decode(value) {
+  /* c8 ignore next */_core.dogma.expect("value", value, _core.any);
+  {
+    if (_core.dogma.is(value, _core.text)) {
+      if (value.startsWith("json://")) {
+        value = _core.json.decode(_core.dogma.getSlice(value, 7, -1));
+      } else if (value.startsWith("json+base64://")) {
+        value = _core.json.decode((0, _core.text)(Buffer.from(_core.dogma.getSlice(value, 14, -1), "base64")));
+      }
+    }
+  }
+  return value;
+}

@@ -1,11 +1,11 @@
 use (
   alias://expected
-  pkg = ~
+  index
 )
 
 suite(__filename, proc()
   test("when imported, api must be exported", proc()
-    expected(pkg).members(
+    expected(index).members(
       "ArgsParser"
     ).toBeCallable()
   end)

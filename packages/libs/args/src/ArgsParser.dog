@@ -27,7 +27,7 @@ export struct ArgsParser
   pub fn parseEnvVars(env: map, prefix: text, args: map) -> args
     for each name in keys(env) do
       if name.startsWith(prefix) then
-        args[name.replace(re("^" + prefix), "")] = env[name]
+        args[name.replace(re("^" + prefix), "")] = decode(env[name])
   
   /**
    * Parses arguments where each argument has the following format: name=value.
@@ -35,8 +35,13 @@ export struct ArgsParser
   @hidden @noParamCheck
   pub fn parseArgLines(lines: text[], args: map) -> args
     for each arg in lines do
-      const [name, value] = arg.split("=")
-      args[name.trim()] = value.trim()
+      const (
+        equalAt = arg.indexOf("=")
+        name = arg[0, equalAt - 1]
+        value = arg[equalAt + 1, -1]
+      )
+
+      args[name.trim()] = decode(value.trim())
 
   /**
    * Parses arguments from a file.
@@ -46,3 +51,13 @@ export struct ArgsParser
     for each filePath in filePaths do
       const importedArgs = await(resolver(filePath))
       args = args{*, ...importedArgs}
+  
+/**
+ * Decodes a argument [value] if encoded.
+ */
+fn decode(value: any) -> value
+  if value is text then
+    if value.startsWith("json://") then
+      value = json.decode(value[7, -1])
+    else if value.startsWith("json+base64://") then
+      value = json.decode(text(Buffer.from(value[14, -1], "base64")))
