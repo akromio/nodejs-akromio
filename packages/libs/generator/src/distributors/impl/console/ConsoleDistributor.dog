@@ -1,0 +1,19 @@
+use (
+  ../../Distributor
+  ../../../RunReq
+  Destination
+)
+
+/**
+ * A distributor to show run requests in console.
+ */
+export struct ConsoleDistributor: Distributor
+  /**
+   * Console output to use.
+   */
+  pub const console = print
+
+  @override @hidden
+  pub async proc deliver(req: RunReq, dst: Destination)
+    const now = timestamp().toISOString()
+    self.console($"[${now}] ${dst.id} registry:${req.registry} catalog:${req.catalog} job:${req.job}")

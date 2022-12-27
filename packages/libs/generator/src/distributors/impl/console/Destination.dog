@@ -1,0 +1,8 @@
+/**
+ * A destination for a console.
+ */
+export intf ConsoleDestination
+  /**
+   * Destination identifier.
+   */
+  id: text

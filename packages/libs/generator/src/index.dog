@@ -12,5 +12,6 @@ pub use (
 
   distributors/Distributor
   distributors/ring/Ring
+  distributors/impl/console/ConsoleDistributor
   distributors/impl/redis/RedisStreamsDistributor
 )
