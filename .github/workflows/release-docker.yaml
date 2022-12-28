@@ -27,8 +27,13 @@ jobs:
       
       - name: Determine version to publish
         run: |
+          # (1) latest version
           version=$(npm pkg --workspace @akromio/gattuso get version | grep gattuso | grep -o -E "[[:digit:]]+.[[:digit:]]+.[[:digit:]]")
           echo "version=$version" >> $GITHUB_ENV
+
+          # (2) major.minor version
+          mmVersion=$(npm pkg --workspace @akromio/gattuso get version | grep gattuso | grep -o -E "[[:digit:]]+.[[:digit:]]+")
+          echo "mmVersion=$mmVersion" >> $GITHUB_ENV
       
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -39,7 +44,7 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v3
         with:
-          context: ./docker/alpine
+          context: ./docker/gattuso/alpine
           build-args: version=${{ env.version }}
           push: true
-          tags: akromio/gattuso:latest,akromio/gattuso:${{ env.version }}
+          tags: akromio/gattuso:latest,akromio/gattuso:${{ env.mmVersion}},akromio/gattuso:${{ env.version }}
