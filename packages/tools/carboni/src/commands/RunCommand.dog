@@ -1,6 +1,6 @@
 use (
   {RunCommand as RunCommandBase} = alias://cli
-  {ConstStage} = alias://stages
+  {Stage, ConstStage, SleepStage} = alias://stages
   {ConstStarter, SleepStarter, BlankSheetStream} = alias://generator
   {RandomAssigner, Ring, RunReqStream} = alias://generator
   {ConsoleDistributor, RedisDistributor} = alias://generator
@@ -18,16 +18,16 @@ const {baseOptions} = RunCommandBase
  */
 export struct RunCommand: RunCommandBase:: _StageCommand
   @override
-  pub const name := ["run [stageName]", "r"]
+  pub const name := ["run [stages..]", "r"]
 
   @override
   pub const desc := "Run a stage from a catalog."
 
   @override
   pub const positionals := {
-    stageName =
+    stages =
       type = "string"
-      desc = "Stage name to run. If unset, defaultStageName used."
+      desc = "stage or stage:botnet to run. If unset, defaultStageName:botnet used."
   }
 
   @override
@@ -39,7 +39,7 @@ export struct RunCommand: RunCommandBase:: _StageCommand
   }
 
   @override @hidden
-  pub async proc handle(argv=> {catalogName, registryAndCatalogName, stageName, args})
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, stages, args})
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
 
@@ -66,22 +66,43 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       # (5) create catalog instance
       const catalog = await(self.createCatalog(decl, dataset))
 
-      # (6) run stage
-      if not (stageName ?= catalog.defaultStageName) then
-        console.error("Catalog doesn't contain default stage name.")
-        code = 2
-      else
-        if stage ::= catalog.stages[stageName]; not stage then
-          console.error($"Stage not found: ${stageName}.")
+      # (6) get stage and botnet
+      const stagenets#[: list<{stageName, botnetName}>] = []
+
+      # use default stage?
+      if len(stages) == 0 then
+        if not catalog.defaultStageName then
+          console.error("Catalog doesn't contain default stage name.")
           code = 2
         else
-          const args = dataset.getDatumValue("args")
+          stages = [catalog.defaultStageName + ":botnet"]
+      
+      # extract stage and botnet names for each given stage
+      if code != 2 then
+        const args = dataset.getDatumValue("args")
 
-          if [ok, value] ::= pawait(self.runStage(stage, args.botnet)); ok then
-            code = 0
+        for each stage in stages do
+          var [stageName, botnetName] = stage.split(":")
+          botnetName ?= "botnet"
+
+          if stage ::= catalog.stages[stageName] then
+            if botnet ::= args[botnetName]; not botnet then
+              console.log($"Botnet not found: ${botnetName}.")
+              code = 2
+              break
+            else
+              stagenets.push({stage, botnet})
           else
-            code = 1
-            if value then printf(value)
+            console.error($"Stage not found: ${stageName}.")
+            code = 2
+            break
+
+      # (7) run stages
+      for each stagenet in stagenets do
+        const {stage, botnet} = stagenet
+
+        print($"Stage: ${stage.name} (duration: ${stage.duration}ms)")
+        await(self.runStage(stage, botnet))
     finally
       pawait(registries.disconnect())
     
@@ -98,25 +119,30 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       decl
       parentDataset = globalDataset
     ))
-
+  
   /**
-   * Run stage.
+   * Run a [stage].
    */
   @hidden @async
-  pub fn runStage(stage, botnet: {impl: text, bots: map[]})
-    # (1) create starter
-    var (
-      starter: Starter
-      starterOutput ::= BlankSheetStream()
-      times ::= stage.duration / stage.interval
-      blankSheets ::= stage.requests
-      starterProps ::= stage{*, output = starterOutput, times, blankSheets}
-    )
-      
+  pub fn runStage(stage: Stage, botnet?: {impl: text, bots: map[]}) -> promise
     with type(stage) do
-      if ConstStage then starter = ConstStarter(starterProps)
-      if SleepStage then starter = SleepStarter(starterProps)
+      if ConstStage then promise = self.runConstStage(stage, botnet)
+      if SleepStage then promise = self.runSleepStage(stage)
       else throw(Error($"Unknown stage: ${fmt(stage)}."))
+
+  /**
+   * Run a [stage].
+   */
+  @hidden @async
+  pub fn runConstStage(stage: ConstStage, botnet: {impl: text, bots: map[]})
+    # (1) create starter
+    const (
+      starterOutput = BlankSheetStream()
+      times = stage.duration / stage.interval
+      blankSheets = stage.requests
+      starterProps = stage{*, output = starterOutput, times, blankSheets}
+      starter = ConstStarter(starterProps)
+    )
     
     # (2) create assigner
     const (
@@ -145,3 +171,17 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       assigner.start()
       distributor.start()
     ])
+
+  /**
+   * Runs a sleep stage.
+   */
+  @hidden @async
+  pub proc runSleepStage(stage: SleepStage)
+    const (
+      starterOutput = BlankSheetStream()
+      times = stage.duration / 1000
+      starterProps = stage{*, output = starterOutput, times}
+      starter = SleepStarter(starterProps)
+    )
+      
+    return starter.start()

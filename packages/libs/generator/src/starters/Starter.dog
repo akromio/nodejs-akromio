@@ -12,7 +12,7 @@ export struct Starter
   /**
    * Interval, in ms, for generating the blank sheets in the stream.
    */
-  pub const interval: num
+  pub const interval := 1000
 
   /**
    * Number of times to generate blank sheets.

@@ -5,7 +5,9 @@ const {
   RunCommand: RunCommandBase
 } = _core.dogma.use(require("@akromio/cli"));
 const {
-  ConstStage
+  Stage,
+  ConstStage,
+  SleepStage
 } = _core.dogma.use(require("@akromio/stages"));
 const {
   ConstStarter,
@@ -35,7 +37,7 @@ const $RunCommand = class RunCommand extends RunCommandBase {
     /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["run [stageName]", "r"]),
+      value: (0, _core.coalesce)(_['name'], ["run [stages..]", "r"]),
       writable: false,
       enumerable: true
     });
@@ -50,9 +52,9 @@ const $RunCommand = class RunCommand extends RunCommandBase {
     if (_['positionals'] != null) (0, _core.expect)('positionals', _['positionals'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'positionals', {
       value: (0, _core.coalesce)(_['positionals'], {
-        ["stageName"]: {
+        ["stages"]: {
           ["type"]: "string",
-          ["desc"]: "Stage name to run. If unset, defaultStageName used."
+          ["desc"]: "stage or stage:botnet to run. If unset, defaultStageName:botnet used."
         }
       }),
       writable: false,
@@ -92,14 +94,13 @@ RunCommand.prototype.handle = async function (argv) {
   let {
     catalogName,
     registryAndCatalogName,
-    stageName,
+    stages,
     args
   } = argv;
   {
     const registries = (0, await this.createRegistries(argv).connect());
     let code;
     try {
-      var _stageName;
       if (registryAndCatalogName) {
         catalogName = _core.dogma.getItem(registryAndCatalogName.split("://"), 1);
       }
@@ -110,30 +111,52 @@ RunCommand.prototype.handle = async function (argv) {
       }
       const dataset = (0, await this.createGlobalDataset(decl, args));
       const catalog = (0, await this.createCatalog(decl, dataset));
-      if (!(stageName = (_stageName = stageName) !== null && _stageName !== void 0 ? _stageName : catalog.defaultStageName)) {
-        console.error("Catalog doesn't contain default stage name.");
-        code = 2;
-      } else {
-        {
-          const stage = _core.dogma.getItem(catalog.stages, stageName);
-          if (!stage) {
-            console.error(`Stage not found: ${stageName}.`);
-            code = 2;
-          } else {
-            const args = dataset.getDatumValue("args");
-            {
-              const [ok, value] = await _core.dogma.pawait(() => this.runStage(stage, args.botnet));
-              if (ok) {
-                code = 0;
-              } else {
-                code = 1;
-                if (value) {
-                  (0, _core.printf)(value);
+      const stagenets = [];
+      if ((0, _core.len)(stages) == 0) {
+        if (!catalog.defaultStageName) {
+          console.error("Catalog doesn't contain default stage name.");
+          code = 2;
+        } else {
+          stages = [catalog.defaultStageName + ":botnet"];
+        }
+      }
+      if (code != 2) {
+        const args = dataset.getDatumValue("args");
+        for (const stage of stages) {
+          var _botnetName;
+          let [stageName, botnetName] = _core.dogma.getArrayToUnpack(stage.split(":"), 2);
+          botnetName = (_botnetName = botnetName) !== null && _botnetName !== void 0 ? _botnetName : "botnet";
+          {
+            const stage = _core.dogma.getItem(catalog.stages, stageName);
+            if (stage) {
+              {
+                const botnet = _core.dogma.getItem(args, botnetName);
+                if (!botnet) {
+                  console.log(`Botnet not found: ${botnetName}.`);
+                  code = 2;
+                  break;
+                } else {
+                  stagenets.push({
+                    ["stage"]: stage,
+                    ["botnet"]: botnet
+                  });
                 }
               }
+            } else {
+              console.error(`Stage not found: ${stageName}.`);
+              code = 2;
+              break;
             }
           }
         }
+      }
+      for (const stagenet of stagenets) {
+        const {
+          stage,
+          botnet
+        } = stagenet;
+        (0, _core.print)(`Stage: ${stage.name} (duration: ${stage.duration}ms)`);
+        0, await this.runStage(stage, botnet);
       }
     } finally {
       await _core.dogma.pawait(() => registries.disconnect());
@@ -155,8 +178,47 @@ RunCommand.prototype.createCatalog = async function (decl, globalDataset) {
   return catalog;
 };
 RunCommand.prototype.runStage = function (stage, botnet) {
+  const self = this;
+  let promise; /* c8 ignore next */
+  _core.dogma.expect("stage", stage, Stage); /* c8 ignore next */
+  if (botnet != null) _core.dogma.expect("botnet", botnet, _core.dogma.intf("inline", {
+    impl: {
+      optional: false,
+      type: _core.text
+    },
+    bots: {
+      optional: false,
+      type: _core.dogma.TypeDef({
+        name: 'inline',
+        types: [_core.map],
+        min: 0,
+        max: null
+      })
+    }
+  }));
+  {
+    {
+      const _ = stage;
+      if (_core.dogma.is(_, ConstStage)) {
+        {
+          promise = this.runConstStage(stage, botnet);
+        }
+      } else if (_core.dogma.is(_, SleepStage)) {
+        {
+          promise = this.runSleepStage(stage);
+        }
+      } else {
+        {
+          _core.dogma.raise(Error(`Unknown stage: ${(0, _core.fmt)(stage)}.`));
+        }
+      }
+    }
+  }
+  return promise;
+};
+RunCommand.prototype.runConstStage = function (stage, botnet) {
   const self = this; /* c8 ignore next */
-  _core.dogma.expect("stage", stage); /* c8 ignore next */
+  _core.dogma.expect("stage", stage, ConstStage); /* c8 ignore next */
   _core.dogma.expect("botnet", botnet, _core.dogma.intf("inline", {
     impl: {
       optional: false,
@@ -173,7 +235,6 @@ RunCommand.prototype.runStage = function (stage, botnet) {
     }
   }));
   {
-    let starter;
     const starterOutput = BlankSheetStream();
     const times = stage.duration / stage.interval;
     const blankSheets = stage.requests;
@@ -182,22 +243,7 @@ RunCommand.prototype.runStage = function (stage, botnet) {
       "times": times,
       "blankSheets": blankSheets
     }, {}, [], []);
-    {
-      const _ = stage;
-      if (_core.dogma.is(_, ConstStage)) {
-        {
-          starter = ConstStarter(starterProps);
-        }
-      } else if (_core.dogma.is(_, SleepStage)) {
-        {
-          starter = SleepStarter(starterProps);
-        }
-      } else {
-        {
-          _core.dogma.raise(Error(`Unknown stage: ${(0, _core.fmt)(stage)}.`));
-        }
-      }
-    }
+    const starter = ConstStarter(starterProps);
     const assignerOutput = RunReqStream();
     const assignations = stage.jobs;
     const ring = Ring({
@@ -242,5 +288,19 @@ RunCommand.prototype.runStage = function (stage, botnet) {
       }
     }
     return Promise.all([starter.start(), assigner.start(), distributor.start()]);
+  }
+};
+RunCommand.prototype.runSleepStage = function (stage) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("stage", stage, SleepStage);
+  {
+    const starterOutput = BlankSheetStream();
+    const times = stage.duration / 1000;
+    const starterProps = _core.dogma.clone(stage, {
+      "output": starterOutput,
+      "times": times
+    }, {}, [], []);
+    const starter = SleepStarter(starterProps);
+    return starter.start();
   }
 };

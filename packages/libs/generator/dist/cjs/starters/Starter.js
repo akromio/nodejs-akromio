@@ -10,10 +10,10 @@ const StarterState = _core.dogma.use(require("./StarterState"));
 const $Starter = class Starter {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */
-    (0, _core.expect)('interval', _['interval'], _core.num);
+    /* c8 ignore stop */ /* c8 ignore start */
+    if (_['interval'] != null) (0, _core.expect)('interval', _['interval'], _core.num); /* c8 ignore stop */
     Object.defineProperty(this, 'interval', {
-      value: (0, _core.coalesce)(_['interval'], null),
+      value: (0, _core.coalesce)(_['interval'], 1000),
       writable: false,
       enumerable: true
     });
