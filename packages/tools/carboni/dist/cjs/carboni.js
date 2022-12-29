@@ -14,7 +14,6 @@ const CatalogCommand = _core.dogma.use(require("./commands/CatalogCommand"));
 const RegistryCommand = _core.dogma.use(require("./commands/RegistryCommand"));
 const RunCommand = _core.dogma.use(require("./commands/RunCommand"));
 const ShowCommand = _core.dogma.use(require("./commands/ShowCommand"));
-const TriggerCommand = _core.dogma.use(require("./commands/TriggerCommand"));
 const EnvCommand = _core.dogma.use(require("./commands/EnvCommand"));
 const DatasetCommand = _core.dogma.use(require("./commands/DatasetCommand"));
 const yargs = require("yargs");
@@ -29,6 +28,6 @@ yargs.help("help");
 yargs.epilogue(`Copyright © ${years} ${author}. All rights reserved.
 Product of Spain, EU, made in Valencia.`);
 yargs.fail(handleErrors);
-const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand(), TriggerCommand()];
+const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand()];
 createCommands(yargs, commands);
 yargs.argv;
