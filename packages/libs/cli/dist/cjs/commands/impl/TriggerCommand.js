@@ -115,10 +115,7 @@ TriggerCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Job catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      const {
-        createGlobalDataset
-      } = _core.dogma.use(require("../util/dataset"));
-      const globalDataset = (0, await createGlobalDataset({
+      const globalDataset = (0, await this.createGlobalDataset({
         'catalog': decl,
         'args': args,
         'answers': answers

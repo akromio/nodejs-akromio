@@ -96,8 +96,7 @@ export struct DatasetCommand: CatalogCommandBase
 
       # (4) create global dataset
       const (
-        {createGlobalDataset} = use("../util/dataset")
-        globalDataset = await(createGlobalDataset(catalog = decl, args))
+        globalDataset = await(self.createGlobalDataset(decl, args))
         datum = globalDataset.getDatum("args")
         originalArgs = datum.getValue()
       )

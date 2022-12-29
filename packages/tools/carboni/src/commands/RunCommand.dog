@@ -1,9 +1,97 @@
 use (
+  {Duplex} = dep://stream
   {RunCommand as RunCommandBase} = alias://cli
+
   _StageCommand
 )
 
 /**
+ * Options defined in the super types.
+ */
+const {baseOptions} = RunCommandBase
+
+/**
  * The run command.
  */
-export struct RunCommand: RunCommandBase:: _StageCommand
+export struct RunCommand: RunCommandBase:: _JobCommand
+  @override
+  pub const desc := "Run a stage from a catalog."
+
+  @override
+  pub const positionals := {
+    name =
+      alias = ["stageName"]
+      type = "string"
+      desc = "Stage name to run. If unset, defaultStageName into catalog will be used."
+  }
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+  }
+
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, stageName, args})
+    # (1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    var code  # ps exit code
+
+    do
+      # (2) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+
+      # (3) get the catalog decl
+      const decl = await(self.readCatalogDecl(
+        (catalogName = self.buildCatalogPath(catalogName))
+        registries
+      ))
+
+      if not decl then
+        print($"Stage catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+      
+      # (4) create global dataset
+      const globalDataset = await(self.createGlobalDataset(decl, args, answers))
+
+      # (5) create catalog instance
+      const catalog = await(self.createCatalog(decl, pluginParser, globalDataset, ops))
+
+      # (6) create engine
+      const (
+        log = native("new Duplex({emitClose: true, read() {}, write() {}})")
+        engine = await(self.createEngine(
+          {
+            dataset = catalog.dataset
+            onError = catalog.onError or onError
+            runner = Runner(log=)
+            pluginParser
+            ops
+          }
+
+          registries.getRegistry(decl.registryName)
+        ))
+      )
+
+      reporters = self.createReporters(reporters, log).connect()
+      ops.appendOps(...values(catalog.jobs))
+
+      # (7) run stage
+      do
+        if not (stageName ?= catalog.defaultStageName) then
+          console.error("Catalog doesn't contain default stage name.")
+          code = 2
+        else
+          if [ok, value] ::= pawait(engine.run(jobName)); not ok then
+            code = 1
+            if value then printf(value)
+      finally
+        await(catalog.finalize())
+    finally
+      pawait(registries.disconnect())
+    
+    ps.exit(code)

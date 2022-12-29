@@ -76,10 +76,7 @@ export struct TriggerCommand: RunCommandBase
         ps.exit(1)
 
       # (5) create global dataset
-      const (
-        {createGlobalDataset} = use("../util/dataset")
-        globalDataset = await(createGlobalDataset(catalog = decl, args, answers))
-      )
+      const globalDataset = await(self.createGlobalDataset(catalog = decl, args, answers))
 
       # (6) create catalog instance
       const (
