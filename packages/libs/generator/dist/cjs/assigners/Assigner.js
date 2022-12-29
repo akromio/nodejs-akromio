@@ -4,8 +4,8 @@ var _core = require("@dogmalang/core");
 const {
   Readable
 } = _core.dogma.use(require("stream"));
-const RunReqStream = _core.dogma.use(require("../RunReqStream"));
-const JobInfo = _core.dogma.use(require("./JobInfo"));
+const Assignation = _core.dogma.use(require("./Assignation"));
+const RunReqStream = _core.dogma.use(require("./RunReqStream"));
 const $Assigner = class Assigner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -22,14 +22,14 @@ const $Assigner = class Assigner {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('jobs', _['jobs'], _core.dogma.TypeDef({
+    (0, _core.expect)('assignations', _['assignations'], _core.dogma.TypeDef({
       name: 'inline',
-      types: [JobInfo],
+      types: [Assignation],
       min: 0,
       max: null
     }));
-    Object.defineProperty(this, 'jobs', {
-      value: (0, _core.coalesce)(_['jobs'], null),
+    Object.defineProperty(this, 'assignations', {
+      value: (0, _core.coalesce)(_['assignations'], null),
       writable: false,
       enumerable: true
     });
@@ -56,7 +56,7 @@ Assigner.prototype.start = async function () {
       output
     } = this;
     for await (const blankSheet of input) {
-      output.append(this.assign());
+      output.append(this.assign(_core.json.decode(blankSheet)));
     }
     output.end();
   }

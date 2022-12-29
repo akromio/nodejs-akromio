@@ -33,7 +33,9 @@ ConstLoadStarter.prototype.generateBlankSheets = function () {
   const self = this;
   {
     for (let i = 0; i < this.blankSheets; i += 1) {
-      this.appendBlankSheet();
+      this.output.append({
+        'ts': (0, _core.timestamp)().valueOf()
+      });
     }
   }
 };

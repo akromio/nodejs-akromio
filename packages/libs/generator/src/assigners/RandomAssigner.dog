@@ -22,12 +22,12 @@ export struct RandomAssigner: Assigner
     # (1) calculate the total weight
     var total = 0
 
-    for each job in self.jobs do
-      total += job.weight
+    for each assign in self.assignations do
+      total += assign.weight
     
     # (2) check total weight
     if total != 100 then
-      throw(TypeError($"Sum of job weights must be 100. Got: ${total}."))
+      throw(TypeError($"Sum of assignation weights must be 100. Got: ${total}."))
 
   /**
    * Starts the assigner, reading from the input stream, assigning
@@ -35,18 +35,15 @@ export struct RandomAssigner: Assigner
    *
    * When the input stream is ended, this assigner ends too.
    */
-  @override
-  pub fn assign(): RunReq
+  @override @noParamCheck
+  pub fn assign(blankSheet: BlankSheet): RunReq
     # (1) generate a new assignation batch if needed
     if len(self.assignationOrder) == 0 then
       self.assignationOrder = self.generateAssignationOrder()
     
     # (2) determine assignation
-    return if Math.round(Math.random()) == 0 then
-      self.assignationOrder.shift()
-    else
-      self.assignationOrder.pop()
-    end
+    const assignation = self.assignationOrder.pop()
+    return assignation{*, -weight, ...blankSheet, assignTs = timestamp().valueOf()}
 
   /**
    * Generates an assignation order for 100 assignations,
@@ -54,13 +51,10 @@ export struct RandomAssigner: Assigner
    */
   @hidden
   pub fn generateAssignationOrder() -> order: list
-    # (1) generate random jobs
-    const jobs = shuffle(self.jobs)
-
-    # (2) generate order
-    for each job in jobs do
-      for i = 0; i < job.weight; i += 1 do
-        order.push(job)
+    # (1) generate order
+    for each assign in shuffle(self.assignations) do
+      for i = 0; i < assign.weight; i += 1 do
+        order.push(assign)
 
     # (3) perform final shuffle
     order = shuffle(order)

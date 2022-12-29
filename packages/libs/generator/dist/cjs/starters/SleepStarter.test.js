@@ -5,7 +5,7 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const BlankSheetStream = _core.dogma.use(require("../BlankSheetStream"));
+const BlankSheetStream = _core.dogma.use(require("./BlankSheetStream"));
 const SleepStarter = _core.dogma.use(require("./SleepStarter"));
 const StarterState = _core.dogma.use(require("./StarterState"));
 suite(__filename, () => {
@@ -15,7 +15,7 @@ suite(__filename, () => {
         test("when called, nothing must be added to the stream", async () => {
           {
             const output = monitor(BlankSheetStream(), {
-              'method': "appendBlankSheet"
+              'method': "append"
             });
             const opts = {
               ["interval"]: 50,
@@ -29,10 +29,10 @@ suite(__filename, () => {
               'iterations': 5
             });
             expected(output.writable).equalTo(false);
-            const log = monitor.log(output, {
+            const append = monitor.log(output, {
               'clear': true
             });
-            expected(log.calls).equalTo(0);
+            expected(append.calls).equalTo(0);
           }
         });
       }

@@ -1,8 +1,6 @@
 use (
   {setInterval, clearInterval} = dep://timers
-
-  ../BlankSheetStream
-  StarterState
+  BlankSheetStream, StarterState
 )
 
 /**
@@ -80,10 +78,3 @@ export struct Starter
    */
   @abstract
   pub proc generateBlankSheets()
-  
-  /**
-   * Appends a blank sheet to the output stream.
-   */
-  @hidden
-  pub proc appendBlankSheet()
-    self.output.appendBlankSheet()

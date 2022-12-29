@@ -2,7 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const Distributor = _core.dogma.use(require("../../Distributor"));
-const RunReq = _core.dogma.use(require("../../../RunReq"));
+const RunReq = _core.dogma.use(require("../../../assigners/RunReq"));
 const Destination = _core.dogma.use(require("./Destination"));
 const $RedisStreamsDistributor = class RedisStreamsDistributor extends Distributor {
   constructor(_) {

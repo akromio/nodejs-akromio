@@ -21,7 +21,7 @@ suite(__filename, proc()
     end)
 
     test("when end reached, restart must be performed", proc()
-# (1) act
+      # (1) act
       const (
         points = ["zero", "one"]
         ring = Ring(points=)

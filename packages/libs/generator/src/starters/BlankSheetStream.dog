@@ -1,5 +1,6 @@
 use (
   {PassThrough} = dep://stream
+  BlankSheet
 )
 
 /**
@@ -9,5 +10,5 @@ export struct BlankSheetStream: PassThrough
   /**
    * Adds a new blank sheet.
    */
-  pub fn appendBlankSheet() -> self
-    self.write("bs")
+  pub fn append(blankSheet: BlankSheet) -> self
+    self.write(json.encode(blankSheet))

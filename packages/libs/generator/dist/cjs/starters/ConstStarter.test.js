@@ -5,7 +5,7 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const BlankSheetStream = _core.dogma.use(require("../BlankSheetStream"));
+const BlankSheetStream = _core.dogma.use(require("./BlankSheetStream"));
 const ConstStarter = _core.dogma.use(require("./ConstStarter"));
 const StarterState = _core.dogma.use(require("./StarterState"));
 suite(__filename, () => {
@@ -13,7 +13,7 @@ suite(__filename, () => {
     test("generateBlankSheets()", async () => {
       {
         const output = monitor(BlankSheetStream(), {
-          'method': "appendBlankSheet"
+          'method': "append"
         });
         const opts = {
           ["interval"]: 50,
@@ -28,10 +28,13 @@ suite(__filename, () => {
           'iterations': 5
         });
         expected(output.writable).equalTo(false);
-        const log = monitor.log(output, {
+        const append = monitor.log(output, {
           'clear': true
         });
-        expected(log.calls).equalTo(opts.times * opts.blankSheets);
+        expected(append.calls).equalTo(opts.times * opts.blankSheets);
+        for (let i = 0; i < append.calls; i += 1) {
+          expected(append.getCall(i).args).toHaveLen(1).it(0).toHave("ts");
+        }
       }
     });
   }

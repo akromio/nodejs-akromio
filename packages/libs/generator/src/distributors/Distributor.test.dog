@@ -23,11 +23,13 @@ suite(__filename, proc()
       # (1) act
       const (
         ring = Ring(points = ["one", "two", "three"])
+        ts = timestamp().valueOf()
+        assignTs = ts
         reqs = [
-          json.encode({registry, catalog, job = "#1"})
-          json.encode({registry, catalog, job = "#2"})
-          json.encode({registry, catalog, job = "#1"})
-          json.encode({registry, catalog, job = "#3"})
+          json.encode({ts, assignTs, registry, catalog, job = "#1"})
+          json.encode({ts, assignTs, registry, catalog, job = "#2"})
+          json.encode({ts, assignTs, registry, catalog, job = "#1"})
+          json.encode({ts, assignTs, registry, catalog, job = "#3"})
         ]
         input = sim.stream.readable(data = reqs)
         distributor = monitor(Distributor(input=, ring), method = "deliver")

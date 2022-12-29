@@ -16,10 +16,12 @@ suite(__filename, proc()
     test("when called, message must be sent to stream", async proc()
       # (1) act
       const (
+        ts = timestamp().valueOf()
+        assignTs = ts
         reqs = [
-          json.encode({registry, catalog, job = "job1"})
-          json.encode({registry, catalog, job = "job2"})
-          json.encode({registry, catalog, job = "job3"})
+          json.encode({ts, assignTs, registry, catalog, job = "job1"})
+          json.encode({ts, assignTs, registry, catalog, job = "job2"})
+          json.encode({ts, assignTs, registry, catalog, job = "job3"})
         ]
         input = sim.stream.readable(data = reqs)
 
