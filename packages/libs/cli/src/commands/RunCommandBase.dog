@@ -1,7 +1,5 @@
 use (
   CatalogCommandBase
-  {PluginLoader} = alias://core
-  {ConsoleReporter, Reporters} = alias://reporter
 )
 
 /**
@@ -10,115 +8,18 @@ use (
 const {baseOptions} = CatalogCommandBase
 
 /**
- * Base command to run jobs such as, for example,
- * run or trigger.
+ * Base command to run things such as, for example, run or trigger.
  */
+@abstract
 export struct RunCommandBase: CatalogCommandBase
   /**
    * Common options for the catalog commands.
    */
   @hidden
-  pub static const baseOptions = baseOptions{
-    *
-
-    onError = {
-      choices = ["carryOn", "finish"]
-      desc = "What to do on error."
-      default = "carryOn"
-    }
-
-    reporter = {
-      type = "array"
-      alias = ["p", "reporters"]
-      choices = ["none", "console"]
-      desc = "A reporter to notify the run events."
-      default = ["console"]
-    }
-
-    summaryReporter = {
-      type = "array"
-      alias = ["R", "summaryReporters"]
-      choices = ["none", "console"]
-      desc = "A reporter to notify the run summary."
-      default = ["none"]
-    }
-
-    answer = {
-      type = "array"
-      alias = ["A", "answers"]
-      desc = "An answer (if name=value) or an answers file path. Available using $(answers.name)."
-    }
-
-    logAnswers = {
-      choices = ["options", "file"]
-      desc = "Print the answers for their reuse as CLI options or option file."
-    }
-  }
+  pub static const baseOptions = baseOptions
 
   /**
    * Creates and returns the catalog parser to use.
    */
   @abstract @hidden
   pub fn createCatalogParser(opts: map): CatalogParser
-
-  /**
-   * Creates a catalog instance.
-   */
-  @hidden
-  pub async fn createCatalog(decl: map, pluginParser, globalDataset, ops) -> catalog
-    const (
-      pluginLoader = PluginLoader(paths = $KRM_NODE_PATH.split(":"))
-      catalogParser = self.createCatalogParser(pluginParser=, pluginLoader)
-    )
-
-    catalog = await(catalogParser.parse(
-      decl
-      parentDataset = globalDataset
-      ops
-    ))
-  
-  /**
-   * Creates and returns the reporters.
-   *
-   * When a reporter name is unknown, nothing to do with this.
-   */
-  @hidden
-  pub fn createReporters(reporterNames: list, log) -> reporters: Reporters
-    reporters = Reporters()
-    
-    for each reporterName in reporterNames do
-      #!cov ignore else
-      with reporterName do
-        if "console" then reporters.append(ConsoleReporter(log=))
-  
-  /**
-   * Creates and returns the engine to use.
-   */
-  @abstract @hidden
-  pub fn _createEngine(opts: map): Engine
-  
-  /**
-   * Creates and returns the engine to use.
-   *
-   * @remarks
-   * The built-in plugins are loaded and
-   * any additional built-in plugin too,
-   * such as, for example, cr.
-   *
-   * [registry] needed to create the rc plugin.
-   */
-  @hidden @noParamCheck
-  pub async fn createEngine(opts: map, registry: Registry) -> engine: Engine
-    #(1) create engine
-    engine = self._createEngine(opts)
-
-    #(2) load the built-in plugins
-    await(engine.loadBuiltInPlugins())
-
-    #(3) create additional plugins
-    const (
-      piCrDecl = use("@akromio/pi-registry"){*, plugin = "cr"}
-      piCr = await(engine.pluginParser.parsePlugin(piCrDecl, registry))
-    )
-
-    engine.ops.appendPlugin(piCr)

@@ -3,19 +3,20 @@ use (
   {Runner, Ops, PluginLoader, PluginParser} = alias://core
   {Trigger} = alias://trigger
   alias://intervalTriggerImpl
-  ../RunCommandBase
+
+  ../JobRunCommandBase
 )
 
 /**
  * The options defined in the super types.
  */
-const {baseOptions} = RunCommandBase
+const {baseOptions} = JobRunCommandBase
 
 /**
  * The trigger command.
  */
 @abstract
-export struct TriggerCommand: RunCommandBase
+export struct TriggerCommand: JobRunCommandBase
   @override
   pub const name := ["trigger [jobName]", "t"]
 

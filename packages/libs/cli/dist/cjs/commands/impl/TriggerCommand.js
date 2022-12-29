@@ -14,11 +14,11 @@ const {
   Trigger
 } = _core.dogma.use(require("@akromio/trigger"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
-const RunCommandBase = _core.dogma.use(require("../RunCommandBase"));
+const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
   baseOptions
-} = RunCommandBase;
-const $TriggerCommand = class TriggerCommand extends RunCommandBase {
+} = JobRunCommandBase;
+const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
