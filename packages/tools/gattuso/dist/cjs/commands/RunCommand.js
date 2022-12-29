@@ -2,10 +2,10 @@
 
 var _core = require("@dogmalang/core");
 const {
-  RunCommand: RunCommandBase
+  JobRunCommand
 } = _core.dogma.use(require("@akromio/cli"));
 const _JobCommand = _core.dogma.use(require("./_JobCommand"));
-const $RunCommand = class RunCommand extends RunCommandBase {
+const $RunCommand = class RunCommand extends JobRunCommand {
   constructor(_) {
     super(_);
     /* c8 ignore start */

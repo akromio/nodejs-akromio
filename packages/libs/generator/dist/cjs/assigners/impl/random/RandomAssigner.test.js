@@ -86,8 +86,7 @@ suite(__filename, () => {
               ["ring"]: ring
             };
             const assigner = RandomAssigner(opts);
-            assigner.start();
-            0, await (0, _core.sleep)("1500ms");
+            0, await assigner.start();
             expected(input.readable).equalTo(false);
             expected(output.writable).equalTo(false);
             const log = monitor.log(output, {

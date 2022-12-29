@@ -2,4 +2,6 @@ pub use (
   catalog/merger/StageCatalogMerger
   catalog/parser/StageCatalogParser
   stages/StageParser
+  stages/ConstStage
+  stages/SleepStage
 )

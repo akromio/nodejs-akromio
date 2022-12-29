@@ -5,7 +5,7 @@ use (
   env
   {DescCommand, SysCommand, createCommands, handleErrors} = alias://cli
   commands/{CatalogCommand, RegistryCommand}
-  commands/{RunCommand, ShowCommand, TriggerCommand}
+  commands/{RunCommand, ShowCommand}
   commands/{EnvCommand, DatasetCommand}
 )
 
@@ -34,7 +34,6 @@ const commands = [
   RunCommand()
   ShowCommand()
   SysCommand()
-  TriggerCommand()
 ]
 
 createCommands(yargs, commands)

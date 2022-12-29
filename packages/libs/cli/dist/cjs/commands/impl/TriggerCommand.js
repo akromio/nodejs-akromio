@@ -14,11 +14,11 @@ const {
   Trigger
 } = _core.dogma.use(require("@akromio/trigger"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
-const RunCommandBase = _core.dogma.use(require("../RunCommandBase"));
+const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
   baseOptions
-} = RunCommandBase;
-const $TriggerCommand = class TriggerCommand extends RunCommandBase {
+} = JobRunCommandBase;
+const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
@@ -115,10 +115,7 @@ TriggerCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Job catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      const {
-        createGlobalDataset
-      } = _core.dogma.use(require("../util/dataset"));
-      const globalDataset = (0, await createGlobalDataset({
+      const globalDataset = (0, await this.createGlobalDataset({
         'catalog': decl,
         'args': args,
         'answers': answers

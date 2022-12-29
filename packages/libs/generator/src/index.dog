@@ -2,8 +2,8 @@ pub use (
   starters/BlankSheetStream
   starters/StarterState
   starters/Starter
-  starters/SleepStarter
-  starters/ConstStarter
+  starters/impl/sleep/SleepStarter
+  starters/impl/const/ConstStarter
 
   ring/Ring
 

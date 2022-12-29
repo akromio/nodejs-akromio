@@ -90,13 +90,7 @@ QuestionsCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      const {
-        createGlobalDataset
-      } = _core.dogma.use(require("../util/dataset"));
-      const globalDataset = (0, await createGlobalDataset({
-        'catalog': decl,
-        'args': args
-      }));
+      const globalDataset = (0, await this.createGlobalDataset(decl, args));
       const localDataset = DatasetParser().parse((_decl$dataset = decl.dataset) !== null && _decl$dataset !== void 0 ? _decl$dataset : [], {
         'name': "catalog",
         'parent': globalDataset

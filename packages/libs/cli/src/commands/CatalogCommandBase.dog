@@ -1,6 +1,8 @@
 use (
   dep://path
   {Registries} = alias://registry
+
+  {createGlobalDataset} = util/dataset
   RegistryCommandBase
 )
 
@@ -72,3 +74,9 @@ export struct CatalogCommandBase: RegistryCommandBase
   pub fn buildCatalogPath(catalogPath: text) -> catalogPath
     if not catalogPath.startsWith("/") then
       catalogPath = path.join("/", $KRM_CATALOGS_PATH, catalogPath)
+
+  /**
+   * Creates the global dataset.
+   */
+  @hidden @async
+  pub fn createGlobalDataset(decl, args, answers?) = createGlobalDataset(catalog = decl, args, answers)

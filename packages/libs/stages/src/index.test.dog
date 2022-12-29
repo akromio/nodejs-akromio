@@ -9,6 +9,8 @@ suite(__filename, proc()
       "StageCatalogParser"
       "StageCatalogMerger"
       "StageParser"
+      "ConstStage"
+      "SleepStage"
     ])
   end)
 end)

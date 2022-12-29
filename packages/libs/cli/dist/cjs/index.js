@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.tableOpts = exports.table = exports.handleErrors = exports.createCommands = exports.TriggerCommand = exports.SysCommand = exports.ShowCommand = exports.RunCommand = exports.RegistryCommandBase = exports.RegistryCommand = exports.QuestionsCommand = exports.EnvCommand = exports.DescCommand = exports.DatasetCommand = exports.Command = exports.CatalogCommand = void 0;
+exports.tableOpts = exports.table = exports.handleErrors = exports.createCommands = exports.TriggerCommand = exports.SysCommand = exports.ShowCommand = exports.RunCommand = exports.RegistryCommandBase = exports.RegistryCommand = exports.QuestionsCommand = exports.JobRunCommand = exports.EnvCommand = exports.DescCommand = exports.DatasetCommand = exports.Command = exports.CatalogCommand = void 0;
 var _core = require("@dogmalang/core");
 const {
   table,
@@ -23,6 +23,8 @@ const DescCommand = _core.dogma.use(require("./commands/impl/DescCommand"));
 exports.DescCommand = DescCommand;
 const EnvCommand = _core.dogma.use(require("./commands/impl/EnvCommand"));
 exports.EnvCommand = EnvCommand;
+const JobRunCommand = _core.dogma.use(require("./commands/impl/JobRunCommand"));
+exports.JobRunCommand = JobRunCommand;
 const QuestionsCommand = _core.dogma.use(require("./commands/impl/QuestionsCommand"));
 exports.QuestionsCommand = QuestionsCommand;
 const RegistryCommand = _core.dogma.use(require("./commands/impl/RegistryCommand"));

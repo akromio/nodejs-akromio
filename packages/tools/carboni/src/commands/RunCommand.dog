@@ -1,9 +1,187 @@
 use (
   {RunCommand as RunCommandBase} = alias://cli
+  {Stage, ConstStage, SleepStage} = alias://stages
+  {ConstStarter, SleepStarter, BlankSheetStream} = alias://generator
+  {RandomAssigner, Ring, RunReqStream} = alias://generator
+  {ConsoleDistributor, RedisDistributor} = alias://generator
+
   _StageCommand
 )
+
+/**
+ * Options defined in the super types.
+ */
+const {baseOptions} = RunCommandBase
 
 /**
  * The run command.
  */
 export struct RunCommand: RunCommandBase:: _StageCommand
+  @override
+  pub const name := ["run [stages..]", "r"]
+
+  @override
+  pub const desc := "Run a stage from a catalog."
+
+  @override
+  pub const positionals := {
+    stages =
+      type = "string"
+      desc = "stage or stage:botnet to run. If unset, defaultStageName:botnet used."
+  }
+
+  @override
+  pub const options := {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+  }
+
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, stages, args})
+    # (1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    var code  # ps exit code
+
+    do
+      # (2) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+
+      # (3) get the catalog decl
+      const decl = await(self.readCatalogDecl(
+        (catalogName = self.buildCatalogPath(catalogName))
+        registries
+      ))
+
+      if not decl then
+        print($"Stage catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+      
+      # (4) create global dataset
+      const dataset = await(self.createGlobalDataset(decl, args))
+
+      # (5) create catalog instance
+      const catalog = await(self.createCatalog(decl, dataset))
+
+      # (6) get stage and botnet
+      const stagenets#[: list<{stageName, botnetName}>] = []
+
+      # use default stage?
+      if len(stages) == 0 then
+        if not catalog.defaultStageName then
+          console.error("Catalog doesn't contain default stage name.")
+          code = 2
+        else
+          stages = [catalog.defaultStageName + ":botnet"]
+      
+      # extract stage and botnet names for each given stage
+      if code != 2 then
+        const args = dataset.getDatumValue("args")
+
+        for each stage in stages do
+          var [stageName, botnetName] = stage.split(":")
+          botnetName ?= "botnet"
+
+          if stage ::= catalog.stages[stageName] then
+            if botnet ::= args[botnetName]; not botnet then
+              console.log($"Botnet not found: ${botnetName}.")
+              code = 2
+              break
+            else
+              stagenets.push({stage, botnet})
+          else
+            console.error($"Stage not found: ${stageName}.")
+            code = 2
+            break
+
+      # (7) run stages
+      for each stagenet in stagenets do
+        const {stage, botnet} = stagenet
+
+        print($"Stage: ${stage.name} (duration: ${stage.duration}ms)")
+        await(self.runStage(stage, botnet))
+    finally
+      pawait(registries.disconnect())
+    
+    ps.exit(code)
+
+  /**
+   * Creates a stage catalog instance.
+   */
+  @hidden
+  pub async fn createCatalog(decl: map, globalDataset) -> catalog
+    const catalogParser = self.createCatalogParser()
+
+    catalog = await(catalogParser.parse(
+      decl
+      parentDataset = globalDataset
+    ))
+  
+  /**
+   * Run a [stage].
+   */
+  @hidden @async
+  pub fn runStage(stage: Stage, botnet?: {impl: text, bots: map[]}) -> promise
+    with type(stage) do
+      if ConstStage then promise = self.runConstStage(stage, botnet)
+      if SleepStage then promise = self.runSleepStage(stage)
+      else throw(Error($"Unknown stage: ${fmt(stage)}."))
+
+  /**
+   * Run a [stage].
+   */
+  @hidden @async
+  pub fn runConstStage(stage: ConstStage, botnet: {impl: text, bots: map[]})
+    # (1) create starter
+    const (
+      starterOutput = BlankSheetStream()
+      times = stage.duration / stage.interval
+      blankSheets = stage.requests
+      starterProps = stage{*, output = starterOutput, times, blankSheets}
+      starter = ConstStarter(starterProps)
+    )
+    
+    # (2) create assigner
+    const (
+      assignerOutput = RunReqStream()
+      assignations = stage.jobs
+      ring = Ring(points = botnet.bots.map(fn(bot) = bot.bot end))
+      assignerProps = {input = starterOutput, output = assignerOutput, ring, assignations}
+      assigner = RandomAssigner(assignerProps)
+    )
+
+    # (3) create distributor
+    var (
+      distributor: Distributor
+      distributorInput ::= assignerOutput
+      distributorProps ::= botnet{*, input = distributorInput}
+    )
+
+    with i ::= botnet.impl do
+      if "console" then distributor = ConsoleDistributor(distributorProps)
+      if "redis" then distributor = RedisDistributor(distributorProps)
+      else throw(TypeError($"Unknown botnet impl: ${i}."))
+
+    # (4) starts
+    return Promise.all([
+      starter.start()
+      assigner.start()
+      distributor.start()
+    ])
+
+  /**
+   * Runs a sleep stage.
+   */
+  @hidden @async
+  pub proc runSleepStage(stage: SleepStage)
+    const (
+      starterOutput = BlankSheetStream()
+      times = stage.duration / 1000
+      starterProps = stage{*, output = starterOutput, times}
+      starter = SleepStarter(starterProps)
+    )
+      
+    return starter.start()

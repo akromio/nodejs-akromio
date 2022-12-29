@@ -67,7 +67,7 @@ _StageCommand.prototype.createCatalogReader = function () {
 };
 _StageCommand.prototype.createCatalogParser = function (opts) {
   const self = this; /* c8 ignore next */
-  _core.dogma.expect("opts", opts, _core.map);
+  if (opts != null) _core.dogma.expect("opts", opts, _core.map);
   {
     return CatalogParser(opts);
   }

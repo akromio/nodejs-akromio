@@ -5,6 +5,9 @@ const path = _core.dogma.use(require("path"));
 const {
   Registries
 } = _core.dogma.use(require("@akromio/registry"));
+const {
+  createGlobalDataset
+} = _core.dogma.use(require("./util/dataset"));
 const RegistryCommandBase = _core.dogma.use(require("./RegistryCommandBase"));
 const {
   baseOptions
@@ -79,4 +82,16 @@ CatalogCommandBase.prototype.buildCatalogPath = function (catalogPath) {
     }
   }
   return catalogPath;
+};
+CatalogCommandBase.prototype.createGlobalDataset = function (decl, args, answers) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl); /* c8 ignore next */
+  _core.dogma.expect("args", args);
+  {
+    return createGlobalDataset({
+      'catalog': decl,
+      'args': args,
+      'answers': answers
+    });
+  }
 };

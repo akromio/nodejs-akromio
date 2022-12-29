@@ -9,6 +9,7 @@ pub use (
   commands/impl/DatasetCommand
   commands/impl/DescCommand
   commands/impl/EnvCommand
+  commands/impl/JobRunCommand
   commands/impl/QuestionsCommand
   commands/impl/RegistryCommand
   commands/impl/RunCommand

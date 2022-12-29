@@ -50,8 +50,7 @@ suite(__filename, () => {
               'console': console,
               'input': input
             });
-            distributor.start();
-            0, await (0, _core.sleep)("1s");
+            0, await distributor.start();
             const clog = monitor.log(console, {
               'clear': true
             });

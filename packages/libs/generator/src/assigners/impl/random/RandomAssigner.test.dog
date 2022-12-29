@@ -47,8 +47,7 @@ suite(__filename, proc()
         assigner = RandomAssigner(opts)
       )
 
-      assigner.start()
-      await(sleep("1500ms"))
+      await(assigner.start())
 
       # (2) assessment
       expected(input.readable).equalTo(false)

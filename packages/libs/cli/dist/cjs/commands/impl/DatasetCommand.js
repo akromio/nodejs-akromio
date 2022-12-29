@@ -126,13 +126,7 @@ DatasetCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      const {
-        createGlobalDataset
-      } = _core.dogma.use(require("../util/dataset"));
-      const globalDataset = (0, await createGlobalDataset({
-        'catalog': decl,
-        'args': args
-      }));
+      const globalDataset = (0, await this.createGlobalDataset(decl, args));
       const datum = globalDataset.getDatum("args");
       const originalArgs = datum.getValue();
       datum.setValueWithoutUpdatableCheck((0, _core.proxy)(originalArgs, {

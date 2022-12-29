@@ -33,8 +33,7 @@ suite(__filename, proc()
         distributor = monitor(Distributor(input=), method = "deliver")
       )
 
-      distributor.start()
-      await(sleep("100ms"))
+      await(distributor.start())
 
       # (2) assessment
       const deliver = monitor.log(distributor, clear = true)

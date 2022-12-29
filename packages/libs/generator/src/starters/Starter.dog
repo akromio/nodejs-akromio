@@ -12,7 +12,7 @@ export struct Starter
   /**
    * Interval, in ms, for generating the blank sheets in the stream.
    */
-  pub const interval: num
+  pub const interval := 1000
 
   /**
    * Number of times to generate blank sheets.
@@ -22,8 +22,8 @@ export struct Starter
   /**
    * Number of iterations performed currently.
    */
-  @hidden
-  pub var iterations := 0
+  @hidden @strict
+  pub var iterations = 0
 
   /**
    * Timer to use.
@@ -46,17 +46,20 @@ export struct Starter
   /**
    * Starts to work.
    */
-  pub fn start() -> self
+  @async
+  pub fn start() = promise(proc(resolve, reject)
     # (1) set state to idle
     self.state =~ idle
 
     # (2) configure
     self.timer = setInterval(proc()
       self.handle()
+      if not self.output.writable then resolve()
     end, self.interval)
+  end)
     
   /**
-   * Handles an interval event.
+   * Handles an interval event, returning if the output has been ended.
    */
   @hidden
   pub proc handle()
