@@ -56,5 +56,5 @@ export struct RandomAssigner: Assigner
       for i = 0; i < assign.weight; i += 1 do
         order.push(assign)
 
-    # (3) perform final shuffle
+    # (2) perform final shuffle
     order = shuffle(order)
