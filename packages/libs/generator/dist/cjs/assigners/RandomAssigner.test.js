@@ -6,8 +6,8 @@ const {
   sim,
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const BlankSheetStream = _core.dogma.use(require("../BlankSheetStream"));
-const RunReqStream = _core.dogma.use(require("../RunReqStream"));
+const BlankSheetStream = _core.dogma.use(require("../starters/BlankSheetStream"));
+const RunReqStream = _core.dogma.use(require("./RunReqStream"));
 const RandomAssigner = _core.dogma.use(require("./RandomAssigner"));
 suite(__filename, () => {
   {
@@ -18,7 +18,7 @@ suite(__filename, () => {
       {
         test("when total weight is not 100, error must be raised", () => {
           {
-            const jobs = [{
+            const assignations = [{
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: job,
@@ -34,12 +34,12 @@ suite(__filename, () => {
             const opts = {
               ["input"]: input,
               ["output"]: output,
-              ["jobs"]: jobs
+              ["assignations"]: assignations
             };
             const out = _core.dogma.peval(() => {
               return RandomAssigner(opts);
             });
-            expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Sum of job weights must be 100. Got: 110."));
+            expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Sum of assignation weights must be 100. Got: 110."));
           }
         });
       }
@@ -48,8 +48,15 @@ suite(__filename, () => {
       {
         test("when started, run requests must be generated", async () => {
           {
-            const blankSheets = _core.dogma.getSlice("b ".repeat(100).split(" "), 0, -2);
-            const jobs = [{
+            const blankSheets = _core.dogma.getSlice((0, _core.text)((0, _core.timestamp)().valueOf() + " ").repeat(100).split(" "), 0, -2).map(ts => {
+              /* c8 ignore next */_core.dogma.expect("ts", ts);
+              {
+                return {
+                  ["ts"]: (0, _core.num)(ts)
+                };
+              }
+            });
+            const assignations = [{
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "#1",
@@ -61,6 +68,7 @@ suite(__filename, () => {
               ["weight"]: 75
             }];
             const input = sim.stream.readable({
+              'objectMode': true,
               'data': blankSheets
             });
             const output = monitor(RunReqStream(), {
@@ -69,7 +77,7 @@ suite(__filename, () => {
             const opts = {
               ["input"]: input,
               ["output"]: output,
-              ["jobs"]: jobs
+              ["assignations"]: assignations
             };
             const assigner = RandomAssigner(opts);
             assigner.start();

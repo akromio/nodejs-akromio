@@ -1,0 +1,13 @@
+use (
+  ../JobInfo
+)
+
+/**
+ * An assignation of job with its weight in the total
+ * of assignations performed.
+ */
+export intf Assignation: JobInfo
+  /**
+   * Weight of this job, between 0 and 100.
+   */
+  weight: num

@@ -16,12 +16,14 @@ suite(__filename, proc()
     test("when called, message must be sent to stream", async proc()
       # (1) act
       const (
+        ts = timestamp().valueOf()
+        assignTs = ts
         reqs = [
-          json.encode({registry, catalog, job = "job1"})
-          json.encode({registry, catalog, job = "job2"})
-          json.encode({registry, catalog, job = "job3"})
+          {ts, assignTs, registry, catalog, job = "job1"}
+          {ts, assignTs, registry, catalog, job = "job2"}
+          {ts, assignTs, registry, catalog, job = "job3"}
         ]
-        input = sim.stream.readable(data = reqs)
+        input = sim.stream.readable(objectMode = true, data = reqs)
 
         points = [{id = "cavani1"}, {id = "cavani2"}]
         ring = Ring(points=)
@@ -37,7 +39,7 @@ suite(__filename, proc()
       const clog = monitor.log(console, clear = true)
       expected(clog.calls).equalTo(3)
       for i = 0; i < clog.calls; i += 1 do
-        expected(clog.getCall(i).args[0]).like("\\[.+\\] cavani. registry:.+ catalog:.+ job:job.")
+        expected(clog.getCall(i).args[0]).like("\\[.+\\] cavani. ts:.+ assignTs:.+ registry:.+ catalog:.+ job:job.")
     end)
   end)
 end)

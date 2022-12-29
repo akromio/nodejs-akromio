@@ -2,8 +2,7 @@ use (
   alias://expected
   {monitor} = alias://doubles
 
-  ../BlankSheetStream
-  SleepStarter, StarterState
+  BlankSheetStream, SleepStarter, StarterState
 )
 
 suite(__filename, proc()
@@ -11,7 +10,7 @@ suite(__filename, proc()
     test("when called, nothing must be added to the stream", async proc()
       # (1) act
       const (
-        output = monitor(BlankSheetStream(), method = "appendBlankSheet")
+        output = monitor(BlankSheetStream(), method = "append")
         opts = {interval = 50, times = 5, output}
         starter = SleepStarter(opts).start()
       )
@@ -22,8 +21,8 @@ suite(__filename, proc()
       expected(starter).toHave(state = StarterState.stopped, iterations = 5)
       expected(output.writable).equalTo(false)
       
-      const log = monitor.log(output, clear = true)
-      expected(log.calls).equalTo(0)
+      const append = monitor.log(output, clear = true)
+      expected(append.calls).equalTo(0)
     end)
   end)
 end)

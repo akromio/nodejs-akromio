@@ -1,0 +1,17 @@
+use (
+  ../JobInfo
+)
+
+/**
+ * A request for querying the execution of a job.
+ */
+export intf RunReq: JobInfo
+  /**
+   * Timestamp when blank sheet was created.
+   */
+  ts: num
+
+  /**
+   * Timestamp when this request was created.
+   */
+  assignTs: num

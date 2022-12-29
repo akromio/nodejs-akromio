@@ -43,10 +43,7 @@ Distributor.prototype.start = async function () {
     input
   } = self;
   {
-    for await (let req of input) {
-      if (_core.dogma.is(req, Buffer)) {
-        req = _core.json.decode(req);
-      }
+    for await (const req of input) {
       this.deliver(req, ring.next());
     }
   }

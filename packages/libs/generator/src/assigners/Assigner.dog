@@ -1,8 +1,6 @@
 use (
   {Readable} = dep://stream
-  
-  ../{RunReqStream}
-  JobInfo
+  Assignation, RunReqStream
 )
 
 /**
@@ -24,7 +22,7 @@ export struct Assigner
   /**
    * Job infos to use.
    */
-  pub const jobs: JobInfo[]
+  pub const assignations: Assignation[]
 
   /**
    * Starts the assigner, reading from the input stream, assigning
@@ -37,7 +35,7 @@ export struct Assigner
     const {input, output} = self
 
     await for each blankSheet in input do
-      output.append(self.assign())
+      output.append(self.assign(blankSheet))
     
     # (2) set end for the output stream
     output.end()
@@ -46,4 +44,4 @@ export struct Assigner
    * Performs a new assignation.
    */
   @abstract @hidden
-  pub fn assign(): RunReq
+  pub fn assign(blankSheet: BlankSheet): RunReq

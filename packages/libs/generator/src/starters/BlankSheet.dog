@@ -1,0 +1,8 @@
+/**
+ * A blank sheet added to the stream by the starter.
+ */
+export intf BlankSheet
+  /**
+   * Timestamp when the blank sheet was added to the streaming.
+   */
+  ts: num

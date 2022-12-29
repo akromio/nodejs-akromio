@@ -18,20 +18,29 @@ suite(__filename, () => {
       {
         test("when called, message must be sent to stream", async () => {
           {
-            const reqs = [_core.json.encode({
+            const ts = (0, _core.timestamp)().valueOf();
+            const assignTs = ts;
+            const reqs = [{
+              ["ts"]: ts,
+              ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "job1"
-            }), _core.json.encode({
+            }, {
+              ["ts"]: ts,
+              ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "job2"
-            }), _core.json.encode({
+            }, {
+              ["ts"]: ts,
+              ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "job3"
-            })];
+            }];
             const input = sim.stream.readable({
+              'objectMode': true,
               'data': reqs
             });
             const points = [{
@@ -55,7 +64,7 @@ suite(__filename, () => {
             });
             expected(clog.calls).equalTo(3);
             for (let i = 0; i < clog.calls; i += 1) {
-              expected(_core.dogma.getItem(clog.getCall(i).args, 0)).like("\\[.+\\] cavani. registry:.+ catalog:.+ job:job.");
+              expected(_core.dogma.getItem(clog.getCall(i).args, 0)).like("\\[.+\\] cavani. ts:.+ assignTs:.+ registry:.+ catalog:.+ job:job.");
             }
           }
         });

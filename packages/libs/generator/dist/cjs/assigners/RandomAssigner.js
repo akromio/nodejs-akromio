@@ -33,32 +33,34 @@ RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66_post = function (
   const self = this;
   {
     let total = 0;
-    for (const job of this.jobs) {
-      total += job.weight;
+    for (const assign of this.assignations) {
+      total += assign.weight;
     }
     if (total != 100) {
-      _core.dogma.raise(TypeError(`Sum of job weights must be 100. Got: ${total}.`));
+      _core.dogma.raise(TypeError(`Sum of assignation weights must be 100. Got: ${total}.`));
     }
   }
 };
 RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66___post__ = RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66_post;
-RandomAssigner.prototype.assign = function () {
+RandomAssigner.prototype.assign = function (blankSheet) {
   const self = this;
   {
     if ((0, _core.len)(this.assignationOrder) == 0) {
       this.assignationOrder = this.generateAssignationOrder();
     }
-    return Math.round(Math.random()) == 0 ? this.assignationOrder.shift() : this.assignationOrder.pop();
+    const assignation = this.assignationOrder.pop();
+    return _core.dogma.clone(assignation, {
+      "assignTs": (0, _core.timestamp)().valueOf()
+    }, {}, ["weight"], [blankSheet]);
   }
 };
 RandomAssigner.prototype.generateAssignationOrder = function () {
   const self = this;
   let order = [];
   {
-    const jobs = shuffle(this.jobs);
-    for (const job of jobs) {
-      for (let i = 0; i < job.weight; i += 1) {
-        order.push(job);
+    for (const assign of shuffle(this.assignations)) {
+      for (let i = 0; i < assign.weight; i += 1) {
+        order.push(assign);
       }
     }
     order = shuffle(order);

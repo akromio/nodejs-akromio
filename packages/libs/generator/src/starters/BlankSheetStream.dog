@@ -1,13 +1,18 @@
 use (
   {PassThrough} = dep://stream
+  BlankSheet
 )
 
 /**
  * A stream for exchanging blank sheets.
  */
+@factory
 export struct BlankSheetStream: PassThrough
+  @factory
+  pvt fn create() = new({objectMode = true})
+
   /**
    * Adds a new blank sheet.
    */
-  pub fn appendBlankSheet() -> self
-    self.write("bs")
+  pub fn append(blankSheet: BlankSheet) -> self
+    self.write(blankSheet)

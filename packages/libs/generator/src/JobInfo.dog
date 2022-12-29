@@ -1,7 +1,7 @@
 /**
- * A request for querying the execution of a job.
+ * Info on a job to set by the assigners.
  */
-export intf RunReq
+export intf JobInfo
   /**
    * Registry where the job catalog is.
    */
