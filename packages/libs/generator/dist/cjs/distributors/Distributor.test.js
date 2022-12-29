@@ -81,8 +81,7 @@ suite(__filename, () => {
             }), {
               'method': "deliver"
             });
-            distributor.start();
-            0, await (0, _core.sleep)("100ms");
+            0, await distributor.start();
             const deliver = monitor.log(distributor, {
               'clear': true
             });

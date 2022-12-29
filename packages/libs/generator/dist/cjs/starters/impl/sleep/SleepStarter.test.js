@@ -5,9 +5,9 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const BlankSheetStream = _core.dogma.use(require("./BlankSheetStream"));
+const BlankSheetStream = _core.dogma.use(require("../../BlankSheetStream"));
+const StarterState = _core.dogma.use(require("../../StarterState"));
 const SleepStarter = _core.dogma.use(require("./SleepStarter"));
-const StarterState = _core.dogma.use(require("./StarterState"));
 suite(__filename, () => {
   {
     suite("generateBlankSheets()", () => {
@@ -22,8 +22,8 @@ suite(__filename, () => {
               ["times"]: 5,
               ["output"]: output
             };
-            const starter = SleepStarter(opts).start();
-            0, await (0, _core.sleep)("400ms");
+            const starter = SleepStarter(opts);
+            0, await starter.start();
             expected(starter).toHave({
               'state': StarterState.stopped,
               'iterations': 5

@@ -27,8 +27,7 @@ suite(__filename, proc()
         distributor = ConsoleDistributor(console=, input)
       )
 
-      distributor.start()
-      await(sleep("1s"))
+      await(distributor.start())
 
       # (2) assessment
       const clog = monitor.log(console, clear = true)

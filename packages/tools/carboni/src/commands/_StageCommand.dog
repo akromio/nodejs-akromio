@@ -38,4 +38,4 @@ export struct _StageCommand
   )
   
   @override
-  pub fn createCatalogParser(opts: map) = CatalogParser(opts)
+  pub fn createCatalogParser(opts?: map) = CatalogParser(opts)

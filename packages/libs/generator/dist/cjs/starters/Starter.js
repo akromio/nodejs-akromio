@@ -23,10 +23,8 @@ const $Starter = class Starter {
       writable: false,
       enumerable: true
     });
-    /* c8 ignore start */
-    if (_['iterations'] != null) (0, _core.expect)('iterations', _['iterations'], _core.num); /* c8 ignore stop */
     Object.defineProperty(this, 'iterations', {
-      value: (0, _core.coalesce)(_['iterations'], 0),
+      value: 0,
       writable: true,
       enumerable: false
     });
@@ -64,14 +62,22 @@ module.exports = exports = Starter;
 Starter.prototype.start = function () {
   const self = this;
   {
-    this.state = _core.dogma.enumGet(this.state, "idle");
-    this.timer = setInterval(() => {
+    return (0, _core.promise)((resolve, reject) => {
+      /* c8 ignore next */_core.dogma.expect("resolve", resolve); /* c8 ignore next */
+      _core.dogma.expect("reject", reject);
       {
-        this.handle();
+        this.state = _core.dogma.enumGet(this.state, "idle");
+        this.timer = setInterval(() => {
+          {
+            this.handle();
+            if (!this.output.writable) {
+              resolve();
+            }
+          }
+        }, this.interval);
       }
-    }, this.interval);
+    });
   }
-  return this;
 };
 Starter.prototype.handle = function () {
   const self = this;

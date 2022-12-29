@@ -23,20 +23,12 @@ uses:
   expected:
     js: "@akromio/expected"
   
-  fsx:
-    js: "fs-extra"
-  
-  preset:
-    js: "@akromio/preset-gattuso"
+  generator:
+    js: "@akromio/generator"
   
   registry:
     js: "@akromio/registry"
   
-  reporter:
-    js: "@akromio/reporter"
-  
   stages:
     js: "@akromio/stages"
   
-  trigger:
-    js: "@akromio/trigger"

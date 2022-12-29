@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, api must be exported", () => {
       {
-        expected(index).toHave(["StageCatalogParser", "StageCatalogMerger", "StageParser"]);
+        expected(index).toHave(["StageCatalogParser", "StageCatalogMerger", "StageParser", "ConstStage", "SleepStage"]);
       }
     });
   }

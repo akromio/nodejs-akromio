@@ -1,7 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const Starter = _core.dogma.use(require("./Starter"));
+const Starter = _core.dogma.use(require("../../Starter"));
 const $ConstLoadStarter = class ConstLoadStarter extends Starter {
   constructor(_) {
     super(_);
@@ -15,11 +15,11 @@ const $ConstLoadStarter = class ConstLoadStarter extends Starter {
       enumerable: true
     });
     /* c8 ignore start */
-    if (this._pvt_8eeadc57686bfa10a215b7740477e5de___init__ instanceof Function) this._pvt_8eeadc57686bfa10a215b7740477e5de___init__(_); /* c8 ignore stop */
+    if (this._pvt_76957bb720c0a049ef4279e0f43eef47___init__ instanceof Function) this._pvt_76957bb720c0a049ef4279e0f43eef47___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_8eeadc57686bfa10a215b7740477e5de___post__ instanceof Function) this._pvt_8eeadc57686bfa10a215b7740477e5de___post__(); /* c8 ignore stop */
+    if (this._pvt_76957bb720c0a049ef4279e0f43eef47___post__ instanceof Function) this._pvt_76957bb720c0a049ef4279e0f43eef47___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_8eeadc57686bfa10a215b7740477e5de___validate__ instanceof Function) this._pvt_8eeadc57686bfa10a215b7740477e5de___validate__(); /* c8 ignore stop */
+    if (this._pvt_76957bb720c0a049ef4279e0f43eef47___validate__ instanceof Function) this._pvt_76957bb720c0a049ef4279e0f43eef47___validate__(); /* c8 ignore stop */
   }
 };
 

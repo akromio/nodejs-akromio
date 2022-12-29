@@ -9,4 +9,9 @@ export struct StageCatalog: Catalog
   /**
    * Stages defined into this catalog.
    */
-  pub const stages := {}
+  pub const stages = {}
+
+  /**
+   * Default stage to run when not indicated explicitly.
+   */
+  pub const defaultStageName?: text

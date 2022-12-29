@@ -41,6 +41,7 @@
     "@akromio/cli-defaults": "^0.11.0",
     "@akromio/core": "^0.11.0",
     "@akromio/dataset": "^0.11.0",
+    "@akromio/generator": "^0.11.0",
     "@akromio/registry": "^0.11.0",
     "@akromio/stages": "^0.11.0",
     "@dogmalang/core": "^1.0.0-rc18.0",

@@ -8,13 +8,6 @@ const $RunCommand = class RunCommand extends RunCommandBase {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
-    Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["run [name]", "r"]),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
     if (this._pvt_429919f6c4cad4ed48fd7ebb8e965ca4___init__ instanceof Function) this._pvt_429919f6c4cad4ed48fd7ebb8e965ca4___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_429919f6c4cad4ed48fd7ebb8e965ca4___post__ instanceof Function) this._pvt_429919f6c4cad4ed48fd7ebb8e965ca4___post__(); /* c8 ignore stop */

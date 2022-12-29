@@ -2,7 +2,8 @@ use (
   alias://expected
   {monitor} = alias://doubles
 
-  BlankSheetStream, SleepStarter, StarterState
+  ../../{BlankSheetStream, StarterState}
+  SleepStarter
 )
 
 suite(__filename, proc()
@@ -12,10 +13,10 @@ suite(__filename, proc()
       const (
         output = monitor(BlankSheetStream(), method = "append")
         opts = {interval = 50, times = 5, output}
-        starter = SleepStarter(opts).start()
+        starter = SleepStarter(opts)
       )
 
-      await(sleep("400ms"))
+      await(starter.start())
 
       # (2) assessment
       expected(starter).toHave(state = StarterState.stopped, iterations = 5)
