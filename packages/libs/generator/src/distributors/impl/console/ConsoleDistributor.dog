@@ -1,7 +1,6 @@
 use (
   ../../Distributor
   ../../../assigners/RunReq
-  Destination
 )
 
 /**
@@ -14,6 +13,6 @@ export struct ConsoleDistributor: Distributor
   pub const console = print
 
   @override @hidden
-  pub async proc deliver(req: RunReq, dst: Destination)
+  pub async proc deliver(req: RunReq)
     const now = timestamp().toISOString()
-    self.console($"[${now}] ${dst.id} ts:${req.ts} assignTs:${req.assignTs} registry:${req.registry} catalog:${req.catalog} job:${req.job}")
+    self.console($"[${now}] ${req.assignee} ts:${req.ts} assignTs:${req.assignTs} registry:${req.registry} catalog:${req.catalog} job:${req.job}")

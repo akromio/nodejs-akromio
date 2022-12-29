@@ -7,7 +7,6 @@ const {
   monitor,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const Ring = _core.dogma.use(require("../../ring/Ring"));
 const RedisStreamsDistributor = _core.dogma.use(require("./RedisStreamsDistributor"));
 suite(__filename, () => {
   {
@@ -24,31 +23,26 @@ suite(__filename, () => {
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "job1"
+              ["job"]: "job1",
+              ["assignee"]: "cavani1"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "job2"
+              ["job"]: "job2",
+              ["assignee"]: "cavani2"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "job3"
+              ["job"]: "job3",
+              ["assignee"]: "cavani1"
             }];
             const input = sim.stream.readable({
               'objectMode': true,
               'data': reqs
-            });
-            const points = [{
-              ["stream"]: "runner1"
-            }, {
-              ["stream"]: "runner2"
-            }];
-            const ring = Ring({
-              'points': points
             });
             const redis = monitor(sim({
               'xadd': method.resolves()
@@ -57,7 +51,6 @@ suite(__filename, () => {
             });
             const distributor = RedisStreamsDistributor({
               'input': input,
-              'ring': ring,
               'redis': redis
             });
             distributor.start();
@@ -66,9 +59,9 @@ suite(__filename, () => {
               'clear': true
             });
             expected(xadd.calls).equalTo(3);
-            expected(xadd.getCall(0).args).equalTo([_core.dogma.getItem(points, 0).stream, "*", "req", _core.dogma.getItem(reqs, 0)]);
-            expected(xadd.getCall(1).args).equalTo([_core.dogma.getItem(points, 1).stream, "*", "req", _core.dogma.getItem(reqs, 1)]);
-            expected(xadd.getCall(2).args).equalTo([_core.dogma.getItem(points, 0).stream, "*", "req", _core.dogma.getItem(reqs, 2)]);
+            expected(xadd.getCall(0).args).equalTo(["cavani1", "*", "req", _core.dogma.getItem(reqs, 0)]);
+            expected(xadd.getCall(1).args).equalTo(["cavani2", "*", "req", _core.dogma.getItem(reqs, 1)]);
+            expected(xadd.getCall(2).args).equalTo(["cavani1", "*", "req", _core.dogma.getItem(reqs, 2)]);
           }
         });
       }

@@ -1,6 +1,5 @@
 use (
   {Readable} = dep://stream
-  ring/Ring
 )
 
 /**
@@ -12,12 +11,6 @@ use (
 @abstract
 export struct Distributor
   /**
-   * Ring with the destinations to use.
-   */
-  @inject
-  pub const ring: Ring
-
-  /**
    * Input stream with the run requests to deliver.
    */
   @inject
@@ -28,10 +21,10 @@ export struct Distributor
    */
   pub async proc start()
     await for each req in input do
-      self.deliver(req, ring.next())
+      self.deliver(req)
   
   /**
-   * Deliver a given run [req]uest to a given destination.
+   * Deliver a given run [req]uest.
    */
   @abstract @hidden
-  pub proc deliver(req: RunReq, destination: Destination)
+  pub proc deliver(req: RunReq)

@@ -5,13 +5,14 @@ pub use (
   starters/SleepStarter
   starters/ConstStarter
 
+  ring/Ring
+
   assigners/Assigner
   assigners/RunReq
   assigners/RunReqStream
-  assigners/RandomAssigner
+  assigners/impl/random/RandomAssigner
 
   distributors/Distributor
-  distributors/ring/Ring
   distributors/impl/console/ConsoleDistributor
   distributors/impl/redis/RedisStreamsDistributor
 )

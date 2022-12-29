@@ -1,7 +1,6 @@
 use (
   ../../Distributor
   ../../../assigners/RunReq
-  Destination
 )
 
 /**
@@ -15,5 +14,5 @@ export struct RedisStreamsDistributor: Distributor
   pub const redis
 
   @override @hidden
-  pub async proc deliver(req: RunReq, dst: Destination)
-    redis.xadd(dst.stream, "*", "req", req)
+  pub async proc deliver(req: RunReq)
+    redis.xadd(req.assignee, "*", "req", req)

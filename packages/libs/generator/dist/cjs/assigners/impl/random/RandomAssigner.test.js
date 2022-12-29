@@ -6,14 +6,18 @@ const {
   sim,
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const BlankSheetStream = _core.dogma.use(require("../starters/BlankSheetStream"));
-const RunReqStream = _core.dogma.use(require("./RunReqStream"));
+const BlankSheetStream = _core.dogma.use(require("../../../starters/BlankSheetStream"));
+const Ring = _core.dogma.use(require("../../../ring/Ring"));
+const RunReqStream = _core.dogma.use(require("../../RunReqStream"));
 const RandomAssigner = _core.dogma.use(require("./RandomAssigner"));
 suite(__filename, () => {
   {
     const registry = "fs:///my/registry";
     const catalog = "catalog-name";
     const job = "job-name";
+    const ring = Ring({
+      'points': ["one", "two", "three"]
+    });
     suite("constructor", () => {
       {
         test("when total weight is not 100, error must be raised", () => {
@@ -34,7 +38,8 @@ suite(__filename, () => {
             const opts = {
               ["input"]: input,
               ["output"]: output,
-              ["assignations"]: assignations
+              ["assignations"]: assignations,
+              ["ring"]: ring
             };
             const out = _core.dogma.peval(() => {
               return RandomAssigner(opts);
@@ -77,7 +82,8 @@ suite(__filename, () => {
             const opts = {
               ["input"]: input,
               ["output"]: output,
-              ["assignations"]: assignations
+              ["assignations"]: assignations,
+              ["ring"]: ring
             };
             const assigner = RandomAssigner(opts);
             assigner.start();
@@ -89,17 +95,58 @@ suite(__filename, () => {
             });
             let job1 = 0;
             let job2 = 0;
+            let assignee1 = 0;
+            let assignee2 = 0;
+            let assignee3 = 0;
             expected(log.calls).equalTo(100);
             for (let i = 0; i < log.calls; i += 1) {
-              const job = _core.dogma.getItem(log.getCall(i).args, 0);
-              if (job.job == "#1") {
-                job1 += 1;
-              } else {
-                job2 += 1;
+              const req = _core.dogma.getItem(log.getCall(i).args, 0);
+              {
+                const _ = req.job;
+                switch (_) {
+                  case "#1":
+                    {
+                      job1 += 1;
+                    } /* c8 ignore start */
+                    break;
+                  /* c8 ignore stop */
+                  case "#2":
+                    {
+                      job2 += 1;
+                    } /* c8 ignore start */
+                    break;
+                  /* c8 ignore stop */
+                }
+              }
+              {
+                const _ = req.assignee;
+                switch (_) {
+                  case "one":
+                    {
+                      assignee1 += 1;
+                    } /* c8 ignore start */
+                    break;
+                  /* c8 ignore stop */
+                  case "two":
+                    {
+                      assignee2 += 1;
+                    } /* c8 ignore start */
+                    break;
+                  /* c8 ignore stop */
+                  case "three":
+                    {
+                      assignee3 += 1;
+                    } /* c8 ignore start */
+                    break;
+                  /* c8 ignore stop */
+                }
               }
             }
             expected(job1).equalTo(25);
             expected(job2).equalTo(75);
+            expected(assignee1).greaterThanOrEqualTo(33);
+            expected(assignee2).greaterThanOrEqualTo(33);
+            expected(assignee3).greaterThanOrEqualTo(33);
           }
         });
       }

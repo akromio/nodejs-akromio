@@ -2,8 +2,10 @@ use (
   alias://expected
   {sim, monitor} = alias://doubles
 
-  ../starters/BlankSheetStream
-  RunReqStream, RandomAssigner
+  ../../../starters/BlankSheetStream
+  ../../../ring/Ring
+  ../../RunReqStream
+  RandomAssigner
 )
 
 suite(__filename, proc()
@@ -11,6 +13,7 @@ suite(__filename, proc()
     registry = "fs:///my/registry"
     catalog = "catalog-name"
     job = "job-name"
+    ring = Ring(points = ["one", "two", "three"])
   )
 
   suite("constructor", proc()
@@ -20,7 +23,7 @@ suite(__filename, proc()
         assignations = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
         input = BlankSheetStream()
         output = RunReqStream()
-        opts = {input, output, assignations}
+        opts = {input, output, assignations, ring}
         out = peval(RandomAssigner(opts))
       )
 
@@ -40,7 +43,7 @@ suite(__filename, proc()
         ]
         input = sim.stream.readable(objectMode = true, data = blankSheets)
         output = monitor(RunReqStream(), method = "append")
-        opts = {input, output, assignations}
+        opts = {input, output, assignations, ring}
         assigner = RandomAssigner(opts)
       )
 
@@ -55,18 +58,30 @@ suite(__filename, proc()
         log ::= monitor.log(output, clear = true)
         job1 = 0
         job2 = 0
+        assignee1 = 0
+        assignee2 = 0
+        assignee3 = 0
       )
 
       expected(log.calls).equalTo(100)
       
       for i = 0; i < log.calls; i += 1 do
-        const job = log.getCall(i).args[0]
+        const req = log.getCall(i).args[0]
         
-        if job.job == "#1" then job1 += 1
-        else job2 += 1
+        with req.job do
+          if "#1" then job1 += 1
+          if "#2" then job2 += 1
+
+        with req.assignee do
+          if "one" then assignee1 += 1
+          if "two" then assignee2 += 1
+          if "three" then assignee3 += 1
       
       expected(job1).equalTo(25)
       expected(job2).equalTo(75)
+      expected(assignee1).greaterThanOrEqualTo(33)
+      expected(assignee2).greaterThanOrEqualTo(33)
+      expected(assignee3).greaterThanOrEqualTo(33)
     end)
   end)
 end)

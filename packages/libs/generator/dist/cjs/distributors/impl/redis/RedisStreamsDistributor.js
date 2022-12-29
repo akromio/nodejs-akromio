@@ -3,7 +3,6 @@
 var _core = require("@dogmalang/core");
 const Distributor = _core.dogma.use(require("../../Distributor"));
 const RunReq = _core.dogma.use(require("../../../assigners/RunReq"));
-const Destination = _core.dogma.use(require("./Destination"));
 const $RedisStreamsDistributor = class RedisStreamsDistributor extends Distributor {
   constructor(_) {
     super(_);
@@ -31,14 +30,13 @@ const RedisStreamsDistributor = new Proxy($RedisStreamsDistributor, {
   }
 });
 module.exports = exports = RedisStreamsDistributor;
-RedisStreamsDistributor.prototype.deliver = async function (req, dst) {
+RedisStreamsDistributor.prototype.deliver = async function (req) {
   const self = this;
   const {
     redis
   } = self; /* c8 ignore next */
-  _core.dogma.expect("req", req, RunReq); /* c8 ignore next */
-  _core.dogma.expect("dst", dst, Destination);
+  _core.dogma.expect("req", req, RunReq);
   {
-    redis.xadd(dst.stream, "*", "req", req);
+    redis.xadd(req.assignee, "*", "req", req);
   }
 };

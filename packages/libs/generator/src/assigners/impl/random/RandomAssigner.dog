@@ -1,12 +1,19 @@
 use (
   dep://array-shuffle
-  Assigner
+
+  ../../../ring/Ring
+  ../../Assigner
 )
 
 /**
  * An assigner to assign the jobs randomly.
  */
 export struct RandomAssigner: Assigner
+  /**
+   * Ring with the possible assignees.
+   */
+  pub const ring: Ring
+
   /**
    * Current assignation order.
    */
@@ -42,8 +49,12 @@ export struct RandomAssigner: Assigner
       self.assignationOrder = self.generateAssignationOrder()
     
     # (2) determine assignation
-    const assignation = self.assignationOrder.pop()
-    return assignation{*, -weight, ...blankSheet, assignTs = timestamp().valueOf()}
+    const (
+      assignation = self.assignationOrder.pop()
+      assignee = self.ring.next()
+    )
+
+    return assignation{*, -weight, ...blankSheet, assignTs = timestamp().valueOf(), assignee}
 
   /**
    * Generates an assignation order for 100 assignations,

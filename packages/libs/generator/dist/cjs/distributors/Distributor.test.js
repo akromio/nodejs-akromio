@@ -6,7 +6,6 @@ const {
   sim,
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const Ring = _core.dogma.use(require("./ring/Ring"));
 const DistributorBase = _core.dogma.use(require("./Distributor"));
 const $Distributor = class Distributor extends DistributorBase {
   constructor(_) {
@@ -42,9 +41,6 @@ suite(__filename, () => {
       {
         test("when called, input stream read and _delivery() run for each request", async () => {
           {
-            const ring = Ring({
-              'points': ["one", "two", "three"]
-            });
             const ts = (0, _core.timestamp)().valueOf();
             const assignTs = ts;
             const reqs = [{
@@ -52,33 +48,36 @@ suite(__filename, () => {
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "#1"
+              ["job"]: "#1",
+              ["assignee"]: "one"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "#2"
+              ["job"]: "#2",
+              ["assignee"]: "two"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "#1"
+              ["job"]: "#1",
+              ["assignee"]: "three"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "#3"
+              ["job"]: "#3",
+              ["assignee"]: "one"
             }];
             const input = sim.stream.readable({
               'objectMode': true,
               'data': reqs
             });
             const distributor = monitor(Distributor({
-              'input': input,
-              'ring': ring
+              'input': input
             }), {
               'method': "deliver"
             });
