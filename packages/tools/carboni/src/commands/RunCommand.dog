@@ -13,7 +13,7 @@ const {baseOptions} = RunCommandBase
 /**
  * The run command.
  */
-export struct RunCommand: RunCommandBase:: _JobCommand
+export struct RunCommand: RunCommandBase:: _StageCommand
   @override
   pub const desc := "Run a stage from a catalog."
 

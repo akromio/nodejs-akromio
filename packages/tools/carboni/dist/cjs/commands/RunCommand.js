@@ -17,7 +17,7 @@ const $RunCommand = class RunCommand extends RunCommandBase {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore next */
-    if (_JobCommand.prototype._constructor instanceof Function) _JobCommand.prototype._constructor.bind(this)(_);
+    if (_StageCommand.prototype._constructor instanceof Function) _StageCommand.prototype._constructor.bind(this)(_);
     /* c8 ignore start */
     if (_['desc'] != null) (0, _core.expect)('desc', _['desc'], _core.text); /* c8 ignore stop */
     Object.defineProperty(this, 'desc', {
@@ -59,7 +59,7 @@ const $RunCommand = class RunCommand extends RunCommandBase {
   }
 };
 
-_core.dogma.mixin($RunCommand, _JobCommand);
+_core.dogma.mixin($RunCommand, _StageCommand);
 const RunCommand = new Proxy($RunCommand, {
   apply(receiver, self, args) {
     return new $RunCommand(...args);
