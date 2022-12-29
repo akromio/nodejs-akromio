@@ -3,7 +3,7 @@
  *
  * @dev
  * Every ring point represents something.
- * When next() ncalled, the ring returns the next point.
+ * When next() called, the ring returns the next point.
  * When a cycle reached, the cycle starts at the first point.
  */
 export struct Ring

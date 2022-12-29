@@ -4,17 +4,10 @@ var _core = require("@dogmalang/core");
 const {
   Readable
 } = _core.dogma.use(require("stream"));
-const Ring = _core.dogma.use(require("./ring/Ring"));
 const $Distributor = class Distributor {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */
-    (0, _core.expect)('ring', _['ring'], Ring);
-    Object.defineProperty(this, 'ring', {
-      value: (0, _core.coalesce)(_['ring'], null),
-      writable: false,
-      enumerable: true
-    });
     (0, _core.expect)('input', _['input'], Readable);
     Object.defineProperty(this, 'input', {
       value: (0, _core.coalesce)(_['input'], null),
@@ -39,12 +32,11 @@ module.exports = exports = Distributor;
 Distributor.prototype.start = async function () {
   const self = this;
   const {
-    ring,
     input
   } = self;
   {
     for await (const req of input) {
-      this.deliver(req, ring.next());
+      this.deliver(req);
     }
   }
 };

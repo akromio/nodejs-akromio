@@ -15,3 +15,8 @@ export intf RunReq: JobInfo
    * Timestamp when this request was created.
    */
   assignTs: num
+
+  /**
+   * Assignee id.
+   */
+  assignee: text

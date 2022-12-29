@@ -2,24 +2,31 @@
 
 var _core = require("@dogmalang/core");
 const shuffle = _core.dogma.use(require("array-shuffle"));
-const Assigner = _core.dogma.use(require("./Assigner"));
+const Ring = _core.dogma.use(require("../../../ring/Ring"));
+const Assigner = _core.dogma.use(require("../../Assigner"));
 const $RandomAssigner = class RandomAssigner extends Assigner {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */
+    (0, _core.expect)('ring', _['ring'], Ring);
+    Object.defineProperty(this, 'ring', {
+      value: (0, _core.coalesce)(_['ring'], null),
+      writable: false,
+      enumerable: true
+    });
     Object.defineProperty(this, 'assignationOrder', {
       value: [],
       writable: true,
       enumerable: false
     });
     /* c8 ignore start */
-    if (this._pvt_05145d21b486203b0f2eaa683209bc66___init__ instanceof Function) this._pvt_05145d21b486203b0f2eaa683209bc66___init__(_); /* c8 ignore stop */
+    if (this._pvt_fba4ce954ae6f3485b6af57f4e179ab0___init__ instanceof Function) this._pvt_fba4ce954ae6f3485b6af57f4e179ab0___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_05145d21b486203b0f2eaa683209bc66___post__ instanceof Function) this._pvt_05145d21b486203b0f2eaa683209bc66___post__(); /* c8 ignore stop */
+    if (this._pvt_fba4ce954ae6f3485b6af57f4e179ab0___post__ instanceof Function) this._pvt_fba4ce954ae6f3485b6af57f4e179ab0___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_05145d21b486203b0f2eaa683209bc66___validate__ instanceof Function) this._pvt_05145d21b486203b0f2eaa683209bc66___validate__(); /* c8 ignore stop */
+    if (this._pvt_fba4ce954ae6f3485b6af57f4e179ab0___validate__ instanceof Function) this._pvt_fba4ce954ae6f3485b6af57f4e179ab0___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -29,7 +36,7 @@ const RandomAssigner = new Proxy($RandomAssigner, {
   }
 });
 module.exports = exports = RandomAssigner;
-RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66_post = function () {
+RandomAssigner.prototype._pvt_fba4ce954ae6f3485b6af57f4e179ab0_post = function () {
   const self = this;
   {
     let total = 0;
@@ -41,7 +48,7 @@ RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66_post = function (
     }
   }
 };
-RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66___post__ = RandomAssigner.prototype._pvt_05145d21b486203b0f2eaa683209bc66_post;
+RandomAssigner.prototype._pvt_fba4ce954ae6f3485b6af57f4e179ab0___post__ = RandomAssigner.prototype._pvt_fba4ce954ae6f3485b6af57f4e179ab0_post;
 RandomAssigner.prototype.assign = function (blankSheet) {
   const self = this;
   {
@@ -49,8 +56,10 @@ RandomAssigner.prototype.assign = function (blankSheet) {
       this.assignationOrder = this.generateAssignationOrder();
     }
     const assignation = this.assignationOrder.pop();
+    const assignee = this.ring.next();
     return _core.dogma.clone(assignation, {
-      "assignTs": (0, _core.timestamp)().valueOf()
+      "assignTs": (0, _core.timestamp)().valueOf(),
+      "assignee": assignee
     }, {}, ["weight"], [blankSheet]);
   }
 };

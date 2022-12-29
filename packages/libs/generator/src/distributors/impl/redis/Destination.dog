@@ -1,8 +1,0 @@
-/**
- * A destination for a Redis stream.
- */
-export intf RedisStreamsDestination
-  /**
-   * Stream name as destination.
-   */
-  stream: text

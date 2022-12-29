@@ -13,9 +13,9 @@ suite(__filename, proc()
       
       "Assigner"
       "RandomAssigner"
+      "Ring"
 
       "Distributor"
-      "Ring"
       "ConsoleDistributor"
       "RedisStreamsDistributor"
     ])

@@ -2,7 +2,6 @@ use (
   alias://expected
   {sim, monitor, method} = alias://doubles
 
-  ../../ring/Ring
   RedisStreamsDistributor
 )
 
@@ -19,17 +18,13 @@ suite(__filename, proc()
         ts = timestamp().valueOf()
         assignTs = ts
         reqs = [
-          {ts, assignTs, registry, catalog, job = "job1"}
-          {ts, assignTs, registry, catalog, job = "job2"}
-          {ts, assignTs, registry, catalog, job = "job3"}
+          {ts, assignTs, registry, catalog, job = "job1", assignee = "cavani1"}
+          {ts, assignTs, registry, catalog, job = "job2", assignee = "cavani2"}
+          {ts, assignTs, registry, catalog, job = "job3", assignee = "cavani1"}
         ]
         input = sim.stream.readable(objectMode = true, data = reqs)
-
-        points = [{stream = "runner1"}, {stream = "runner2"}]
-        ring = Ring(points=)
-        
         redis = monitor(sim(xadd = method.resolves()), method = "xadd")
-        distributor = RedisStreamsDistributor(input=, ring, redis)
+        distributor = RedisStreamsDistributor(input=, redis)
       )
 
       distributor.start()
@@ -38,9 +33,9 @@ suite(__filename, proc()
       # (2) assessment
       const xadd = monitor.log(redis, clear = true)
       expected(xadd.calls).equalTo(3)
-      expected(xadd.getCall(0).args).equalTo([points[0].stream, "*", "req", reqs[0]])
-      expected(xadd.getCall(1).args).equalTo([points[1].stream, "*", "req", reqs[1]])
-      expected(xadd.getCall(2).args).equalTo([points[0].stream, "*", "req", reqs[2]])
+      expected(xadd.getCall(0).args).equalTo(["cavani1", "*", "req", reqs[0]])
+      expected(xadd.getCall(1).args).equalTo(["cavani2", "*", "req", reqs[1]])
+      expected(xadd.getCall(2).args).equalTo(["cavani1", "*", "req", reqs[2]])
     end)
   end)
 end)

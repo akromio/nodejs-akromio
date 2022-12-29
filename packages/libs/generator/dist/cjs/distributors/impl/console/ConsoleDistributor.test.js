@@ -8,7 +8,6 @@ const {
   fun,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const Ring = _core.dogma.use(require("../../ring/Ring"));
 const ConsoleDistributor = _core.dogma.use(require("./ConsoleDistributor"));
 suite(__filename, () => {
   {
@@ -25,37 +24,31 @@ suite(__filename, () => {
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "job1"
+              ["job"]: "job1",
+              ["assignee"]: "cavani1"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "job2"
+              ["job"]: "job2",
+              ["assignee"]: "cavani2"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
-              ["job"]: "job3"
+              ["job"]: "job3",
+              ["assignee"]: "cavani3"
             }];
             const input = sim.stream.readable({
               'objectMode': true,
               'data': reqs
             });
-            const points = [{
-              ["id"]: "cavani1"
-            }, {
-              ["id"]: "cavani2"
-            }];
-            const ring = Ring({
-              'points': points
-            });
             const console = monitor(fun());
             const distributor = ConsoleDistributor({
               'console': console,
-              'input': input,
-              'ring': ring
+              'input': input
             });
             distributor.start();
             0, await (0, _core.sleep)("1s");

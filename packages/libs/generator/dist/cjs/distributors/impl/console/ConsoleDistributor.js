@@ -3,7 +3,6 @@
 var _core = require("@dogmalang/core");
 const Distributor = _core.dogma.use(require("../../Distributor"));
 const RunReq = _core.dogma.use(require("../../../assigners/RunReq"));
-const Destination = _core.dogma.use(require("./Destination"));
 const $ConsoleDistributor = class ConsoleDistributor extends Distributor {
   constructor(_) {
     super(_);
@@ -30,12 +29,11 @@ const ConsoleDistributor = new Proxy($ConsoleDistributor, {
   }
 });
 module.exports = exports = ConsoleDistributor;
-ConsoleDistributor.prototype.deliver = async function (req, dst) {
+ConsoleDistributor.prototype.deliver = async function (req) {
   const self = this; /* c8 ignore next */
-  _core.dogma.expect("req", req, RunReq); /* c8 ignore next */
-  _core.dogma.expect("dst", dst, Destination);
+  _core.dogma.expect("req", req, RunReq);
   {
     const now = (0, _core.timestamp)().toISOString();
-    this.console(`[${now}] ${dst.id} ts:${req.ts} assignTs:${req.assignTs} registry:${req.registry} catalog:${req.catalog} job:${req.job}`);
+    this.console(`[${now}] ${req.assignee} ts:${req.ts} assignTs:${req.assignTs} registry:${req.registry} catalog:${req.catalog} job:${req.job}`);
   }
 };

@@ -10,6 +10,10 @@ const RunReq = _core.dogma.intf('RunReq', {
   assignTs: {
     optional: false,
     type: _core.num
+  },
+  assignee: {
+    optional: false,
+    type: _core.text
   }
 }, JobInfo);
 module.exports = exports = RunReq;
