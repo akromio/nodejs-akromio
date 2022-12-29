@@ -26,12 +26,12 @@ suite(__filename, proc()
         ts = timestamp().valueOf()
         assignTs = ts
         reqs = [
-          json.encode({ts, assignTs, registry, catalog, job = "#1"})
-          json.encode({ts, assignTs, registry, catalog, job = "#2"})
-          json.encode({ts, assignTs, registry, catalog, job = "#1"})
-          json.encode({ts, assignTs, registry, catalog, job = "#3"})
+          {ts, assignTs, registry, catalog, job = "#1"}
+          {ts, assignTs, registry, catalog, job = "#2"}
+          {ts, assignTs, registry, catalog, job = "#1"}
+          {ts, assignTs, registry, catalog, job = "#3"}
         ]
-        input = sim.stream.readable(data = reqs)
+        input = sim.stream.readable(objectMode = true, data = reqs)
         distributor = monitor(Distributor(input=, ring), method = "deliver")
       )
 

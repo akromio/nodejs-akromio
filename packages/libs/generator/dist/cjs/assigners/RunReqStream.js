@@ -21,15 +21,26 @@ const $RunReqStream = class RunReqStream extends PassThrough {
 
 const RunReqStream = new Proxy($RunReqStream, {
   apply(receiver, self, args) {
-    return new $RunReqStream(...args);
+    return RunReqStream._pvt_bd3c204241eb47b56c518b76ff461a19___factory__(...args);
   }
 });
 module.exports = exports = RunReqStream;
-RunReqStream.prototype.append = function (req) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("req", req, RunReq);
-  {
-    this.write(_core.json.encode(req));
-  }
-  return this;
-};
+{
+  const $$Class$$ = RunReqStream;
+  RunReqStream._pvt_bd3c204241eb47b56c518b76ff461a19___factory__ = RunReqStream._pvt_bd3c204241eb47b56c518b76ff461a19_create = function () {
+    {
+      return new $$Class$$({
+        ["readableObjectMode"]: true,
+        ["writableObjectMode"]: true
+      });
+    }
+  };
+  RunReqStream.prototype.append = function (req) {
+    const self = this; /* c8 ignore next */
+    _core.dogma.expect("req", req, RunReq);
+    {
+      this.write(req);
+    }
+    return this;
+  };
+}

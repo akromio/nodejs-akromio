@@ -16,4 +16,4 @@ export struct RedisStreamsDistributor: Distributor
 
   @override @hidden
   pub async proc deliver(req: RunReq, dst: Destination)
-    redis.xadd(dst.stream, "*", "req", json.encode(req))
+    redis.xadd(dst.stream, "*", "req", req)

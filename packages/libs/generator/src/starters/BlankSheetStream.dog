@@ -6,9 +6,13 @@ use (
 /**
  * A stream for exchanging blank sheets.
  */
+@factory
 export struct BlankSheetStream: PassThrough
+  @factory
+  pvt fn create() = new({objectMode = true})
+
   /**
    * Adds a new blank sheet.
    */
   pub fn append(blankSheet: BlankSheet) -> self
-    self.write(json.encode(blankSheet))
+    self.write(blankSheet)

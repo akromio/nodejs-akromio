@@ -56,7 +56,7 @@ Assigner.prototype.start = async function () {
       output
     } = this;
     for await (const blankSheet of input) {
-      output.append(this.assign(_core.json.decode(blankSheet)));
+      output.append(this.assign(blankSheet));
     }
     output.end();
   }

@@ -35,7 +35,7 @@ export struct Assigner
     const {input, output} = self
 
     await for each blankSheet in input do
-      output.append(self.assign(json.decode(blankSheet)))
+      output.append(self.assign(blankSheet))
     
     # (2) set end for the output stream
     output.end()

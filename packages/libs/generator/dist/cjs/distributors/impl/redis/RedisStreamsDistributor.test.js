@@ -19,26 +19,27 @@ suite(__filename, () => {
           {
             const ts = (0, _core.timestamp)().valueOf();
             const assignTs = ts;
-            const reqs = [_core.json.encode({
+            const reqs = [{
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "job1"
-            }), _core.json.encode({
+            }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "job2"
-            }), _core.json.encode({
+            }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
               ["registry"]: registry,
               ["catalog"]: catalog,
               ["job"]: "job3"
-            })];
+            }];
             const input = sim.stream.readable({
+              'objectMode': true,
               'data': reqs
             });
             const points = [{

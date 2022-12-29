@@ -33,12 +33,12 @@ suite(__filename, proc()
     test("when started, run requests must be generated", async proc()
       # (1) act
       const (
-        blankSheets = text(timestamp().valueOf() + " ").repeat(100).split(" ")[0, -2].map(fn(ts) = json.encode(ts = num(ts)) end)
+        blankSheets = text(timestamp().valueOf() + " ").repeat(100).split(" ")[0, -2].map(fn(ts) = {ts = num(ts)} end)
         assignations = [
           {registry, catalog, job = "#1", weight = 25},
           {registry, catalog, job = "#2", weight = 75}
         ]
-        input = sim.stream.readable(data = blankSheets)
+        input = sim.stream.readable(objectMode = true, data = blankSheets)
         output = monitor(RunReqStream(), method = "append")
         opts = {input, output, assignations}
         assigner = RandomAssigner(opts)

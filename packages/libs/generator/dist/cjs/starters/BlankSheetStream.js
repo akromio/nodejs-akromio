@@ -21,15 +21,25 @@ const $BlankSheetStream = class BlankSheetStream extends PassThrough {
 
 const BlankSheetStream = new Proxy($BlankSheetStream, {
   apply(receiver, self, args) {
-    return new $BlankSheetStream(...args);
+    return BlankSheetStream._pvt_6854bf13ee7c2549dc0ed2293505cf65___factory__(...args);
   }
 });
 module.exports = exports = BlankSheetStream;
-BlankSheetStream.prototype.append = function (blankSheet) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("blankSheet", blankSheet, BlankSheet);
-  {
-    this.write(_core.json.encode(blankSheet));
-  }
-  return this;
-};
+{
+  const $$Class$$ = BlankSheetStream;
+  BlankSheetStream._pvt_6854bf13ee7c2549dc0ed2293505cf65___factory__ = BlankSheetStream._pvt_6854bf13ee7c2549dc0ed2293505cf65_create = function () {
+    {
+      return new $$Class$$({
+        ["objectMode"]: true
+      });
+    }
+  };
+  BlankSheetStream.prototype.append = function (blankSheet) {
+    const self = this; /* c8 ignore next */
+    _core.dogma.expect("blankSheet", blankSheet, BlankSheet);
+    {
+      this.write(blankSheet);
+    }
+    return this;
+  };
+}

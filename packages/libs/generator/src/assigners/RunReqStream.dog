@@ -7,9 +7,12 @@ use (
  * A stream where the assigners let the run requests and
  * are read, for example, by the distributors.
  */
+@factory
 export struct RunReqStream: PassThrough
+  @factory
+  pvt fn create() = new({readableObjectMode = true, writableObjectMode = true})
   /**
    * Adds a new request
    */
   pub fn append(req: RunReq) -> self
-    self.write(json.encode(req))
+    self.write(req)

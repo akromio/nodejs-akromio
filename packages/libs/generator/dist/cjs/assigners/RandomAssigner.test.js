@@ -51,9 +51,9 @@ suite(__filename, () => {
             const blankSheets = _core.dogma.getSlice((0, _core.text)((0, _core.timestamp)().valueOf() + " ").repeat(100).split(" "), 0, -2).map(ts => {
               /* c8 ignore next */_core.dogma.expect("ts", ts);
               {
-                return _core.json.encode({
-                  'ts': (0, _core.num)(ts)
-                });
+                return {
+                  ["ts"]: (0, _core.num)(ts)
+                };
               }
             });
             const assignations = [{
@@ -68,6 +68,7 @@ suite(__filename, () => {
               ["weight"]: 75
             }];
             const input = sim.stream.readable({
+              'objectMode': true,
               'data': blankSheets
             });
             const output = monitor(RunReqStream(), {

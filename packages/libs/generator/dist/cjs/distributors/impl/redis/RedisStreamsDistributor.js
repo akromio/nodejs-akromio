@@ -39,6 +39,6 @@ RedisStreamsDistributor.prototype.deliver = async function (req, dst) {
   _core.dogma.expect("req", req, RunReq); /* c8 ignore next */
   _core.dogma.expect("dst", dst, Destination);
   {
-    redis.xadd(dst.stream, "*", "req", _core.json.encode(req));
+    redis.xadd(dst.stream, "*", "req", req);
   }
 };

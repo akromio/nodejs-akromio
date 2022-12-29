@@ -19,11 +19,11 @@ suite(__filename, proc()
         ts = timestamp().valueOf()
         assignTs = ts
         reqs = [
-          json.encode({ts, assignTs, registry, catalog, job = "job1"})
-          json.encode({ts, assignTs, registry, catalog, job = "job2"})
-          json.encode({ts, assignTs, registry, catalog, job = "job3"})
+          {ts, assignTs, registry, catalog, job = "job1"}
+          {ts, assignTs, registry, catalog, job = "job2"}
+          {ts, assignTs, registry, catalog, job = "job3"}
         ]
-        input = sim.stream.readable(data = reqs)
+        input = sim.stream.readable(objectMode = true, data = reqs)
 
         points = [{stream = "runner1"}, {stream = "runner2"}]
         ring = Ring(points=)
