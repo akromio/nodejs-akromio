@@ -3,7 +3,7 @@
   "sourceMap": true,
   "reporter": ["lcov", "text"],
   "statements": 86,
-  "branches": 95,
+  "branches": 94,
   "functions": 86,
   "lines": 86
 }

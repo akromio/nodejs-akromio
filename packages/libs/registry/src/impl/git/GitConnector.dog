@@ -40,6 +40,13 @@ export struct GitConnector: InternalConnector
    */
   pub const prefix: text
 
+  /**
+   * @workaround
+   * When axios gets a package.json from a Handlebars template,
+   * its value is transformed to a map. We need the text, not the map.
+   * For this reason, we check the content type and if handlebars and returned value is map,
+   * this is transformed to text.
+   */
   @override
   pub async fn _getItem(itemPath: text) -> item
     const (
@@ -48,8 +55,10 @@ export struct GitConnector: InternalConnector
     )
 
     if [ok, resp] ::= pawait(axios.get(url)); ok and resp.status == 200 then
-      item = {
-        name = itemPath
+      var (
+        cty ::= mime.lookup(itemPath) or resp.headers["content-type"]
         value = resp.data
-        cty = mime.lookup(itemPath) or resp.headers["content-type"]
-      }
+      )
+
+      if cty == "text/x-handlebars-template" and value is not text then value = fmt(value)
+      item = {name = itemPath, value, cty}
