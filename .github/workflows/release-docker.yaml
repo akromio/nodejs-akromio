@@ -9,7 +9,7 @@ on:
 
 jobs:
   docker-hub:
-    name: Publish image on Docker Hub
+    name: Publish images on Docker Hub
     runs-on: ubuntu-latest
 
     strategy:
@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       
-      - name: Determine version to publish
+      - name: Determine versions to publish
         run: |
           # (1) latest version
           version=$(npm pkg --workspace @akromio/gattuso get version | grep gattuso | grep -o -E "[[:digit:]]+.[[:digit:]]+.[[:digit:]]")
@@ -41,10 +41,18 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
       
-      - name: Build and push image
+      - name: Build and push Gattuso image
         uses: docker/build-push-action@v3
         with:
           context: ./docker/gattuso/alpine
           build-args: version=${{ env.version }}
           push: true
           tags: akromio/gattuso:latest,akromio/gattuso:${{ env.mmVersion}},akromio/gattuso:${{ env.version }}
+
+      - name: Build and push Carboni image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./docker/carboni/alpine
+          build-args: version=${{ env.version }}
+          push: true
+          tags: akromio/carboni:latest,akromio/carboni:${{ env.mmVersion}},akromio/carboni:${{ env.version }}
