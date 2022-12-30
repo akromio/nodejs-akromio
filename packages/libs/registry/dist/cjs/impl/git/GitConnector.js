@@ -68,14 +68,19 @@ GitConnector.prototype._getItem = async function (itemPath) {
   {
     const axios = this.client;
     const url = `https://${self.host}/${self.user}/${self.repo}/${self.branch}/${self.prefix}${itemPath}`;
+    const opts = {
+      ["transformResponse"]: resp => {
+        /* c8 ignore next */_core.dogma.expect("resp", resp);
+        {
+          return resp;
+        }
+      }
+    };
     {
-      const [ok, resp] = await _core.dogma.pawait(() => axios.get(url));
+      const [ok, resp] = await _core.dogma.pawait(() => axios.get(url, opts));
       if (ok && resp.status == 200) {
         const cty = mime.lookup(itemPath) || _core.dogma.getItem(resp.headers, "content-type");
-        let value = resp.data;
-        if (cty == "text/x-handlebars-template" && _core.dogma.isNot(value, _core.text)) {
-          value = (0, _core.fmt)(value);
-        }
+        const value = resp.data;
         item = {
           ["name"]: itemPath,
           ["value"]: value,

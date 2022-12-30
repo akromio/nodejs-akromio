@@ -42,23 +42,23 @@ export struct GitConnector: InternalConnector
 
   /**
    * @workaround
-   * When axios gets a package.json from a Handlebars template,
-   * its value is transformed to a map. We need the text, not the map.
-   * For this reason, we check the content type and if handlebars and returned value is map,
-   * this is transformed to text.
+   * When axios gets a content in JSON format, its value is transformed to a map.
+   * We need the text, not the map. For this reason, we disable the auto-transformation.
    */
   @override
   pub async fn _getItem(itemPath: text) -> item
     const (
       axios = self.client
       url = $"https://${self.host}/${self.user}/${self.repo}/${self.branch}/${self.prefix}${itemPath}"
+      opts = {
+        transformResponse = fn(resp) = resp end
+      }
     )
 
-    if [ok, resp] ::= pawait(axios.get(url)); ok and resp.status == 200 then
-      var (
-        cty ::= mime.lookup(itemPath) or resp.headers["content-type"]
+    if [ok, resp] ::= pawait(axios.get(url, opts)); ok and resp.status == 200 then
+      const (
+        cty = mime.lookup(itemPath) or resp.headers["content-type"]
         value = resp.data
       )
 
-      if cty == "text/x-handlebars-template" and value is not text then value = fmt(value)
       item = {name = itemPath, value, cty}
