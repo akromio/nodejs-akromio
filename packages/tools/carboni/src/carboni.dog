@@ -33,7 +33,7 @@ const commands = [
   RegistryCommand()
   RunCommand()
   ShowCommand()
-  SysCommand()
+  SysCommand(app = {name = appName, version = pkg.version})
 ]
 
 createCommands(yargs, commands)

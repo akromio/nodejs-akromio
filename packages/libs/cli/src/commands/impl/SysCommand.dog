@@ -8,6 +8,11 @@ use (
  * The system command.
  */
 export struct SysCommand: Command
+  /**
+   * App data such as its name and version.
+   */
+  pub const app: {name: text, version: text}
+
   @override
   pub const name := ["sys", "s"]
 
@@ -22,6 +27,7 @@ export struct SysCommand: Command
 
   @override @hidden
   pub proc handle(argv=> {pattern})
+    print($"${self.app.name}: v${self.app.version}")
     printf("OS: %s (%s) %s", process.platform, os.release(), os.version())
     print("Arch:", process.arch)
     print("Node.js:", process.version)
