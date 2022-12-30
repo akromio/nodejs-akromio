@@ -23,6 +23,7 @@ const {
   ConsoleDistributor,
   RedisDistributor
 } = _core.dogma.use(require("@akromio/generator"));
+const ms = _core.dogma.use(require("ms"));
 const _StageCommand = _core.dogma.use(require("./_StageCommand"));
 const {
   baseOptions
@@ -155,7 +156,7 @@ RunCommand.prototype.handle = async function (argv) {
           stage,
           botnet
         } = stagenet;
-        (0, _core.print)(`Stage: ${stage.name} (duration: ${stage.duration}ms)`);
+        (0, _core.print)(`Stage: ${stage.name} (duration: ${ms(stage.duration)})`);
         0, await this.runStage(stage, botnet);
       }
     } finally {
