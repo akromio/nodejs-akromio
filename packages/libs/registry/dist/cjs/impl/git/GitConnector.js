@@ -71,10 +71,15 @@ GitConnector.prototype._getItem = async function (itemPath) {
     {
       const [ok, resp] = await _core.dogma.pawait(() => axios.get(url));
       if (ok && resp.status == 200) {
+        const cty = mime.lookup(itemPath) || _core.dogma.getItem(resp.headers, "content-type");
+        let value = resp.data;
+        if (cty == "text/x-handlebars-template" && _core.dogma.isNot(value, _core.text)) {
+          value = (0, _core.fmt)(value);
+        }
         item = {
           ["name"]: itemPath,
-          ["value"]: resp.data,
-          ["cty"]: mime.lookup(itemPath) || _core.dogma.getItem(resp.headers, "content-type")
+          ["value"]: value,
+          ["cty"]: cty
         };
       }
     }
