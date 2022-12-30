@@ -49,15 +49,13 @@ StageCatalogParser.prototype.parseSpecialization = function (decl, opts) {
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, StageCatalogParseOpts);
   {
-    const stages = this.parseStages(decl.stages, opts);
-    _core.dogma.update(decl, {
+    return _core.dogma.update(decl, {
       name: "stages",
       visib: ".",
       assign: "=",
-      value: stages
+      value: this.parseStages(decl.dataset.eval(decl.stages), opts)
     });
   }
-  return decl;
 };
 StageCatalogParser.prototype.parseStages = function (decl, opts) {
   const self = this;
