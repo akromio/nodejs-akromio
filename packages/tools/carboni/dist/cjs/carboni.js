@@ -28,6 +28,11 @@ yargs.help("help");
 yargs.epilogue(`Copyright © ${years} ${author}. All rights reserved.
 Product of Spain, EU, made in Valencia.`);
 yargs.fail(handleErrors);
-const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand()];
+const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand({
+  'app': {
+    ["name"]: appName,
+    ["version"]: pkg.version
+  }
+})];
 createCommands(yargs, commands);
 yargs.argv;

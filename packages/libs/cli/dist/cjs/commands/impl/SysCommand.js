@@ -9,7 +9,23 @@ const $SysCommand = class SysCommand extends Command {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
+    /* c8 ignore stop */
+    (0, _core.expect)('app', _['app'], _core.dogma.intf("inline", {
+      name: {
+        optional: false,
+        type: _core.text
+      },
+      version: {
+        optional: false,
+        type: _core.text
+      }
+    }));
+    Object.defineProperty(this, 'app', {
+      value: (0, _core.coalesce)(_['app'], null),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
       value: (0, _core.coalesce)(_['name'], ["sys", "s"]),
@@ -59,6 +75,7 @@ SysCommand.prototype.handle = function (argv) {
     pattern
   } = argv;
   {
+    (0, _core.print)(`${self.app.name}: v${self.app.version}`);
     (0, _core.printf)("OS: %s (%s) %s", process.platform, os.release(), os.version());
     (0, _core.print)("Arch:", process.arch);
     (0, _core.print)("Node.js:", process.version);
