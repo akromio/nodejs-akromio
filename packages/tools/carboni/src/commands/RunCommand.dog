@@ -4,6 +4,7 @@ use (
   {ConstStarter, SleepStarter, BlankSheetStream} = alias://generator
   {RandomAssigner, Ring, RunReqStream} = alias://generator
   {ConsoleDistributor, RedisDistributor} = alias://generator
+  dep://ms
 
   _StageCommand
 )
@@ -101,7 +102,7 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       for each stagenet in stagenets do
         const {stage, botnet} = stagenet
 
-        print($"Stage: ${stage.name} (duration: ${stage.duration}ms)")
+        print($"Stage: ${stage.name} (duration: ${ms(stage.duration)})")
         await(self.runStage(stage, botnet))
     finally
       pawait(registries.disconnect())
