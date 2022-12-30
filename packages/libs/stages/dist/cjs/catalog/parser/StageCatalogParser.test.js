@@ -67,7 +67,7 @@ suite(__filename, () => {
                 ["duration"]: "1m"
               }, {
                 ["const"]: "load",
-                ["duration"]: "10m",
+                ["duration"]: "$(duration)",
                 ["requests"]: 2000,
                 ["jobs"]: []
               }]

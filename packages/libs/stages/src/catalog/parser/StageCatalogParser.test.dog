@@ -47,7 +47,7 @@ suite(__filename, proc()
           stages = [
             {'const' = "warmup", duration = "2m", requests = 1000, jobs = []}
             {sleep = "pause", duration = "1m"}
-            {'const' = "load", duration = "10m", requests = 2000, jobs = []}
+            {'const' = "load", duration = "$(duration)", requests = 2000, jobs = []}
           ]
         }
 
