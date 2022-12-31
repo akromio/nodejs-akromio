@@ -16,6 +16,8 @@ suite(__filename, proc()
       "Ring"
 
       "Distributor"
+      "DistributorBase"
+      "Distributors"
       "ConsoleDistributor"
       "RedisStreamsDistributor"
     ])

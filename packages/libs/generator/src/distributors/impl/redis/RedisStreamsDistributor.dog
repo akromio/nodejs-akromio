@@ -1,18 +1,27 @@
 use (
-  ../../Distributor
+  ../DistributorBase
   ../../../assigners/RunReq
 )
 
 /**
  * A distributor to deliver run requests to Redis streams.
  */
-export struct RedisStreamsDistributor: Distributor
+export struct RedisStreamsDistributor: DistributorBase
   /**
    * Redis client to use.
    */
-  @inject
   pub const redis
 
-  @override @hidden
-  pub async proc deliver(req: RunReq)
-    redis.xadd(req.assignee, "*", "req", req)
+  @hidden @async
+  pub fn connect() = self.redis.connect()
+  
+  @hidden @async
+  pub fn disconnect() = self.redis.disconnect()
+
+  @override @hidden @async
+  pub fn deliver(req: RunReq) = self.redis.sendCommand([
+    "XADD"
+    req.assignee
+    "*"
+    "req", json.encode(req)
+  ])

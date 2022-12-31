@@ -3,7 +3,8 @@ use (
   {Stage, ConstStage, SleepStage} = alias://stages
   {ConstStarter, SleepStarter, BlankSheetStream} = alias://generator
   {RandomAssigner, Ring, RunReqStream} = alias://generator
-  {ConsoleDistributor, RedisDistributor} = alias://generator
+  {Distributors, ConsoleDistributor, RedisStreamsDistributor} = alias://generator
+  dep://redis
   dep://ms
 
   _StageCommand
@@ -37,10 +38,22 @@ export struct RunCommand: RunCommandBase:: _StageCommand
     {catalogName} = baseOptions
     {registryAndCatalogName} = baseOptions
     {arg} = baseOptions
+
+    log =
+      alias = ["l"]
+      desc = "Show the log of the run requests generated."
+      type = "boolean"
+      default = false
+
+    onlyLog =
+      alias = ["L"]
+      desc = "Only show the log of the run requests generated."
+      type = "boolean"
+      default = false
   }
 
   @override @hidden
-  pub async proc handle(argv=> {catalogName, registryAndCatalogName, stages, args})
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, stages, args, log, onlyLog})
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
 
@@ -103,7 +116,7 @@ export struct RunCommand: RunCommandBase:: _StageCommand
         const {stage, botnet} = stagenet
 
         print($"Stage: ${stage.name} (duration: ${ms(stage.duration)})")
-        await(self.runStage(stage, botnet))
+        await(self.runStage(stage, botnet, log=, onlyLog))
     finally
       pawait(registries.disconnect())
     
@@ -125,17 +138,17 @@ export struct RunCommand: RunCommandBase:: _StageCommand
    * Run a [stage].
    */
   @hidden @async
-  pub fn runStage(stage: Stage, botnet?: {impl: text, bots: map[]}) -> promise
+  pub fn runStage(stage: Stage, botnet?: {impl: text, bots: map[]}, opts: map) -> promise
     with type(stage) do
-      if ConstStage then promise = self.runConstStage(stage, botnet)
+      if ConstStage then promise = self.runConstStage(stage, botnet, opts)
       if SleepStage then promise = self.runSleepStage(stage)
       else throw(Error($"Unknown stage: ${fmt(stage)}."))
 
   /**
-   * Run a [stage].
+   * Run a constant [stage].
    */
-  @hidden @async
-  pub fn runConstStage(stage: ConstStage, botnet: {impl: text, bots: map[]})
+  @hidden
+  pub async fn runConstStage(stage: ConstStage, botnet: {impl: text, bots: map[]}, opts:> {onlyLog: bool, log: bool})
     # (1) create starter
     const (
       starterOutput = BlankSheetStream()
@@ -161,10 +174,31 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       distributorProps ::= botnet{*, input = distributorInput}
     )
 
-    with i ::= botnet.impl do
-      if "console" then distributor = ConsoleDistributor(distributorProps)
-      if "redis" then distributor = RedisDistributor(distributorProps)
-      else throw(TypeError($"Unknown botnet impl: ${i}."))
+    if onlyLog then
+      distributor = ConsoleDistributor(distributorProps)
+    else
+      with i ::= botnet.impl do
+        if "redis" then
+          const opts = {
+            name = "carboni"
+            socket =
+              host = botnet.host ?? "localhost"
+              port = botnet.port ?? 6379
+            if botnet.username then username = botnet.username
+            if botnet.password then password = botnet.password
+          }
+
+          distributor = RedisStreamsDistributor(distributorProps{*, redis = redis.createClient(opts)})
+        
+        else
+          throw(TypeError($"Unknown botnet impl: ${i}."))
+      
+      if log then
+        distributor = Distributors().append(distributor).append(
+          ConsoleDistributor(distributorProps)
+        )
+
+        printf(distributor)
 
     # (4) starts
     return Promise.all([

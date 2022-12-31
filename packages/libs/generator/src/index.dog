@@ -13,6 +13,8 @@ pub use (
   assigners/impl/random/RandomAssigner
 
   distributors/Distributor
+  distributors/Distributors
+  distributors/impl/DistributorBase
   distributors/impl/console/ConsoleDistributor
   distributors/impl/redis/RedisStreamsDistributor
 )

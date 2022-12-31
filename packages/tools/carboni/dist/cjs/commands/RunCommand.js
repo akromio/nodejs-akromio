@@ -20,9 +20,11 @@ const {
   RunReqStream
 } = _core.dogma.use(require("@akromio/generator"));
 const {
+  Distributors,
   ConsoleDistributor,
-  RedisDistributor
+  RedisStreamsDistributor
 } = _core.dogma.use(require("@akromio/generator"));
+const redis = _core.dogma.use(require("redis"));
 const ms = _core.dogma.use(require("ms"));
 const _StageCommand = _core.dogma.use(require("./_StageCommand"));
 const {
@@ -68,7 +70,19 @@ const $RunCommand = class RunCommand extends RunCommandBase {
         ["registries"]: baseOptions.registries,
         ["catalogName"]: baseOptions.catalogName,
         ["registryAndCatalogName"]: baseOptions.registryAndCatalogName,
-        ["arg"]: baseOptions.arg
+        ["arg"]: baseOptions.arg,
+        ["log"]: {
+          ["alias"]: ["l"],
+          ["desc"]: "Show the log of the run requests generated.",
+          ["type"]: "boolean",
+          ["default"]: false
+        },
+        ["onlyLog"]: {
+          ["alias"]: ["L"],
+          ["desc"]: "Only show the log of the run requests generated.",
+          ["type"]: "boolean",
+          ["default"]: false
+        }
       }),
       writable: false,
       enumerable: true
@@ -96,7 +110,9 @@ RunCommand.prototype.handle = async function (argv) {
     catalogName,
     registryAndCatalogName,
     stages,
-    args
+    args,
+    log,
+    onlyLog
   } = argv;
   {
     const registries = (0, await this.createRegistries(argv).connect());
@@ -157,7 +173,10 @@ RunCommand.prototype.handle = async function (argv) {
           botnet
         } = stagenet;
         (0, _core.print)(`Stage: ${stage.name} (duration: ${ms(stage.duration)})`);
-        0, await this.runStage(stage, botnet);
+        0, await this.runStage(stage, botnet, {
+          'log': log,
+          'onlyLog': onlyLog
+        });
       }
     } finally {
       await _core.dogma.pawait(() => registries.disconnect());
@@ -178,7 +197,7 @@ RunCommand.prototype.createCatalog = async function (decl, globalDataset) {
   }
   return catalog;
 };
-RunCommand.prototype.runStage = function (stage, botnet) {
+RunCommand.prototype.runStage = function (stage, botnet, opts) {
   const self = this;
   let promise; /* c8 ignore next */
   _core.dogma.expect("stage", stage, Stage); /* c8 ignore next */
@@ -196,13 +215,14 @@ RunCommand.prototype.runStage = function (stage, botnet) {
         max: null
       })
     }
-  }));
+  })); /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.map);
   {
     {
       const _ = stage;
       if (_core.dogma.is(_, ConstStage)) {
         {
-          promise = this.runConstStage(stage, botnet);
+          promise = this.runConstStage(stage, botnet, opts);
         }
       } else if (_core.dogma.is(_, SleepStage)) {
         {
@@ -217,7 +237,7 @@ RunCommand.prototype.runStage = function (stage, botnet) {
   }
   return promise;
 };
-RunCommand.prototype.runConstStage = function (stage, botnet) {
+RunCommand.prototype.runConstStage = async function (stage, botnet, opts) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("stage", stage, ConstStage); /* c8 ignore next */
   _core.dogma.expect("botnet", botnet, _core.dogma.intf("inline", {
@@ -234,7 +254,21 @@ RunCommand.prototype.runConstStage = function (stage, botnet) {
         max: null
       })
     }
+  })); /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.dogma.intf("inline", {
+    onlyLog: {
+      optional: false,
+      type: _core.bool
+    },
+    log: {
+      optional: false,
+      type: _core.bool
+    }
   }));
+  let {
+    onlyLog,
+    log
+  } = opts;
   {
     const starterOutput = BlankSheetStream();
     const times = stage.duration / stage.interval;
@@ -267,25 +301,41 @@ RunCommand.prototype.runConstStage = function (stage, botnet) {
     const distributorProps = _core.dogma.clone(botnet, {
       "input": distributorInput
     }, {}, [], []);
-    {
-      const i = botnet.impl;
-      switch (i) {
-        case "console":
-          {
-            distributor = ConsoleDistributor(distributorProps);
-          } /* c8 ignore start */
-          break;
-        /* c8 ignore stop */
-        case "redis":
-          {
-            distributor = RedisDistributor(distributorProps);
-          } /* c8 ignore start */
-          break;
-        /* c8 ignore stop */
-        default:
-          {
-            _core.dogma.raise(TypeError(`Unknown botnet impl: ${i}.`));
-          }
+    if (onlyLog) {
+      distributor = ConsoleDistributor(distributorProps);
+    } else {
+      {
+        const i = botnet.impl;
+        switch (i) {
+          case "redis":
+            {
+              var _botnet$host, _botnet$port;
+              const opts = Object.assign({}, {
+                ["name"]: "carboni",
+                ["socket"]: {
+                  ["host"]: (_botnet$host = botnet.host) !== null && _botnet$host !== void 0 ? _botnet$host : "localhost",
+                  ["port"]: (_botnet$port = botnet.port) !== null && _botnet$port !== void 0 ? _botnet$port : 6379
+                }
+              }, botnet.username ? {
+                ["username"]: botnet.username
+              } : {}, botnet.password ? {
+                ["password"]: botnet.password
+              } : {});
+              distributor = RedisStreamsDistributor(_core.dogma.clone(distributorProps, {
+                "redis": redis.createClient(opts)
+              }, {}, [], []));
+            } /* c8 ignore start */
+            break;
+          /* c8 ignore stop */
+          default:
+            {
+              _core.dogma.raise(TypeError(`Unknown botnet impl: ${i}.`));
+            }
+        }
+      }
+      if (log) {
+        distributor = Distributors().append(distributor).append(ConsoleDistributor(distributorProps));
+        (0, _core.printf)(distributor);
       }
     }
     return Promise.all([starter.start(), assigner.start(), distributor.start()]);
