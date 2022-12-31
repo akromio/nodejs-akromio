@@ -1,12 +1,12 @@
 use (
-  ../../Distributor
+  ../DistributorBase
   ../../../assigners/RunReq
 )
 
 /**
  * A distributor to show run requests in console.
  */
-export struct ConsoleDistributor: Distributor
+export struct ConsoleDistributor: DistributorBase
   /**
    * Console output to use.
    */

@@ -23,18 +23,26 @@ suite(__filename, proc()
           {ts, assignTs, registry, catalog, job = "job3", assignee = "cavani1"}
         ]
         input = sim.stream.readable(objectMode = true, data = reqs)
-        redis = monitor(sim(xadd = method.resolves()), method = "xadd")
+        redis = monitor(
+          sim(
+            sendCommand = method.resolves()
+            connect = method.resolves()
+            disconnect = method.resolves()
+          )
+        )
         distributor = RedisStreamsDistributor(input=, redis)
       )
 
       await(distributor.start())
 
       # (2) assessment
-      const xadd = monitor.log(redis, clear = true)
-      expected(xadd.calls).equalTo(3)
-      expected(xadd.getCall(0).args).equalTo(["cavani1", "*", "req", reqs[0]])
-      expected(xadd.getCall(1).args).equalTo(["cavani2", "*", "req", reqs[1]])
-      expected(xadd.getCall(2).args).equalTo(["cavani1", "*", "req", reqs[2]])
+      const mlog = monitor.log(redis, clear = true)
+      expected(mlog.calls).equalTo(5)
+      expected(mlog.getCall(0).args).equalTo([])  # connect()
+      expected(mlog.getCall(1).args).equalTo([["XADD", "cavani1", "*", "req", json.encode(reqs[0])]])
+      expected(mlog.getCall(2).args).equalTo([["XADD", "cavani2", "*", "req", json.encode(reqs[1])]])
+      expected(mlog.getCall(3).args).equalTo([["XADD", "cavani1", "*", "req", json.encode(reqs[2])]])
+      expected(mlog.getCall(4).args).equalTo([])  # disconnect()
     end)
   end)
 end)

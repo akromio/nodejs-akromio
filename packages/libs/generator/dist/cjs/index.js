@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RandomAssigner = exports.Distributor = exports.ConstStarter = exports.ConsoleDistributor = exports.BlankSheetStream = exports.Assigner = void 0;
+exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RandomAssigner = exports.Distributors = exports.DistributorBase = exports.Distributor = exports.ConstStarter = exports.ConsoleDistributor = exports.BlankSheetStream = exports.Assigner = void 0;
 var _core = require("@dogmalang/core");
 const BlankSheetStream = _core.dogma.use(require("./starters/BlankSheetStream"));
 exports.BlankSheetStream = BlankSheetStream;
@@ -27,6 +27,10 @@ const RandomAssigner = _core.dogma.use(require("./assigners/impl/random/RandomAs
 exports.RandomAssigner = RandomAssigner;
 const Distributor = _core.dogma.use(require("./distributors/Distributor"));
 exports.Distributor = Distributor;
+const Distributors = _core.dogma.use(require("./distributors/Distributors"));
+exports.Distributors = Distributors;
+const DistributorBase = _core.dogma.use(require("./distributors/impl/DistributorBase"));
+exports.DistributorBase = DistributorBase;
 const ConsoleDistributor = _core.dogma.use(require("./distributors/impl/console/ConsoleDistributor"));
 exports.ConsoleDistributor = ConsoleDistributor;
 const RedisStreamsDistributor = _core.dogma.use(require("./distributors/impl/redis/RedisStreamsDistributor"));

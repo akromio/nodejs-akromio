@@ -1,9 +1,9 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const Distributor = _core.dogma.use(require("../../Distributor"));
+const DistributorBase = _core.dogma.use(require("../DistributorBase"));
 const RunReq = _core.dogma.use(require("../../../assigners/RunReq"));
-const $ConsoleDistributor = class ConsoleDistributor extends Distributor {
+const $ConsoleDistributor = class ConsoleDistributor extends DistributorBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */

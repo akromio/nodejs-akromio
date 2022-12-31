@@ -1,9 +1,9 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const Distributor = _core.dogma.use(require("../../Distributor"));
+const DistributorBase = _core.dogma.use(require("../DistributorBase"));
 const RunReq = _core.dogma.use(require("../../../assigners/RunReq"));
-const $RedisStreamsDistributor = class RedisStreamsDistributor extends Distributor {
+const $RedisStreamsDistributor = class RedisStreamsDistributor extends DistributorBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
@@ -30,13 +30,22 @@ const RedisStreamsDistributor = new Proxy($RedisStreamsDistributor, {
   }
 });
 module.exports = exports = RedisStreamsDistributor;
-RedisStreamsDistributor.prototype.deliver = async function (req) {
+RedisStreamsDistributor.prototype.connect = function () {
   const self = this;
-  const {
-    redis
-  } = self; /* c8 ignore next */
+  {
+    return this.redis.connect();
+  }
+};
+RedisStreamsDistributor.prototype.disconnect = function () {
+  const self = this;
+  {
+    return this.redis.disconnect();
+  }
+};
+RedisStreamsDistributor.prototype.deliver = function (req) {
+  const self = this; /* c8 ignore next */
   _core.dogma.expect("req", req, RunReq);
   {
-    redis.xadd(req.assignee, "*", "req", req);
+    return this.redis.sendCommand(["XADD", req.assignee, "*", "req", _core.json.encode(req)]);
   }
 };

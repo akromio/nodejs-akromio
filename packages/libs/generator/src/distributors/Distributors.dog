@@ -1,0 +1,30 @@
+use (
+  Distributor
+)
+
+/**
+ * A collection of distributors complying the Distributor interface.
+ */
+export struct Distributors
+  /**
+   * Distributors of this collection.
+   */
+  @hidden @strict
+  pub const distributors: Distributor[] = []
+
+  /**
+   * Returns the size of the collection.
+   */
+  pub fn len = len(self.distributors)
+
+  /**
+   * Appends a new [distributor] to the collection.
+   */
+  pub fn append(distributor: Distributor) -> self
+    self.distributors.push(distributor)
+  
+  /**
+   * Starts all the distributors of this collection.
+   */
+  @override @async
+  pub fn start() = Promise.all([for each d in self.distributors do d.start()])

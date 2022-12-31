@@ -45,22 +45,24 @@ suite(__filename, () => {
               'data': reqs
             });
             const redis = monitor(sim({
-              'xadd': method.resolves()
-            }), {
-              'method': "xadd"
-            });
+              'sendCommand': method.resolves(),
+              'connect': method.resolves(),
+              'disconnect': method.resolves()
+            }));
             const distributor = RedisStreamsDistributor({
               'input': input,
               'redis': redis
             });
             0, await distributor.start();
-            const xadd = monitor.log(redis, {
+            const mlog = monitor.log(redis, {
               'clear': true
             });
-            expected(xadd.calls).equalTo(3);
-            expected(xadd.getCall(0).args).equalTo(["cavani1", "*", "req", _core.dogma.getItem(reqs, 0)]);
-            expected(xadd.getCall(1).args).equalTo(["cavani2", "*", "req", _core.dogma.getItem(reqs, 1)]);
-            expected(xadd.getCall(2).args).equalTo(["cavani1", "*", "req", _core.dogma.getItem(reqs, 2)]);
+            expected(mlog.calls).equalTo(5);
+            expected(mlog.getCall(0).args).equalTo([]);
+            expected(mlog.getCall(1).args).equalTo([["XADD", "cavani1", "*", "req", _core.json.encode(_core.dogma.getItem(reqs, 0))]]);
+            expected(mlog.getCall(2).args).equalTo([["XADD", "cavani2", "*", "req", _core.json.encode(_core.dogma.getItem(reqs, 1))]]);
+            expected(mlog.getCall(3).args).equalTo([["XADD", "cavani1", "*", "req", _core.json.encode(_core.dogma.getItem(reqs, 2))]]);
+            expected(mlog.getCall(4).args).equalTo([]);
           }
         });
       }

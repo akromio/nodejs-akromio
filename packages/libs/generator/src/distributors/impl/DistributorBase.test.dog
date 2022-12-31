@@ -2,7 +2,7 @@ use (
   alias://expected
   {sim, monitor} = alias://doubles
 
-  DistributorBase = Distributor
+  DistributorBase
 )
 
 # Distributor for the tests.

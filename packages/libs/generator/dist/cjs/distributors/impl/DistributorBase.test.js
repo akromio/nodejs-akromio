@@ -6,18 +6,18 @@ const {
   sim,
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const DistributorBase = _core.dogma.use(require("./Distributor"));
+const DistributorBase = _core.dogma.use(require("./DistributorBase"));
 const $Distributor = class Distributor extends DistributorBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_575e39b1ead75622983b012b4543ea5d___init__ instanceof Function) this._pvt_575e39b1ead75622983b012b4543ea5d___init__(_); /* c8 ignore stop */
+    if (this._pvt_782bf0103a8ac21a6d4979ed0ae96608___init__ instanceof Function) this._pvt_782bf0103a8ac21a6d4979ed0ae96608___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_575e39b1ead75622983b012b4543ea5d___post__ instanceof Function) this._pvt_575e39b1ead75622983b012b4543ea5d___post__(); /* c8 ignore stop */
+    if (this._pvt_782bf0103a8ac21a6d4979ed0ae96608___post__ instanceof Function) this._pvt_782bf0103a8ac21a6d4979ed0ae96608___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_575e39b1ead75622983b012b4543ea5d___validate__ instanceof Function) this._pvt_575e39b1ead75622983b012b4543ea5d___validate__(); /* c8 ignore stop */
+    if (this._pvt_782bf0103a8ac21a6d4979ed0ae96608___validate__ instanceof Function) this._pvt_782bf0103a8ac21a6d4979ed0ae96608___validate__(); /* c8 ignore stop */
   }
 };
 

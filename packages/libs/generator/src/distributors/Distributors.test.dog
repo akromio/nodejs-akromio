@@ -1,0 +1,39 @@
+use (
+  alias://expected
+  {sim, monitor} = alias://doubles
+
+  Distributors
+  impl/console/ConsoleDistributor
+)
+
+suite(__filename, proc()
+  suite("append()", proc()
+    test("when distributor passed, this must be added to the list", proc()
+      # (1) act
+      const (
+        distributor = ConsoleDistributor(input = sim.stream.readable())
+        distributors = Distributors()
+        out = distributors.append(distributor)
+      )
+
+      # (2) assessment
+      expected(distributors).toHaveLen(1)
+    end)
+  end)
+
+  suite("start()", proc()
+    test("when called, the start() must be called for each item", async proc()
+      # (1) act
+      const (
+        distributor = monitor(ConsoleDistributor(input = sim.stream.readable()), method = "start")
+        distributors = Distributors().append(distributor)
+      )
+
+      await(distributors.start())
+
+      # (2) assessment
+      const start = monitor.log(distributor, clear = true)
+      expected(start.calls).equalTo(1)
+    end)
+  end)
+end)
