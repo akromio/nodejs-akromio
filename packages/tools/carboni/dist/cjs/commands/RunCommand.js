@@ -335,7 +335,6 @@ RunCommand.prototype.runConstStage = async function (stage, botnet, opts) {
       }
       if (log) {
         distributor = Distributors().append(distributor).append(ConsoleDistributor(distributorProps));
-        (0, _core.printf)(distributor);
       }
     }
     return Promise.all([starter.start(), assigner.start(), distributor.start()]);
