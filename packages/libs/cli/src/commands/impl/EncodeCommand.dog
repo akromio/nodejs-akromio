@@ -34,21 +34,54 @@ export struct EncodeCommand: Command
       alias = ["p", "prop"]
       desc = "Property to encode."
       type = "string"
+    
+    envVarArg =
+      alias = ["a"]
+      desc = "If -p, show content as KRM_ARG_property."
+      type = "boolean"
+      default = false
+    
+    envVarArgs =
+      alias = ["A"]
+      desc = "Show each property of the content as KRM_ARG_*."
+      type = "boolean"
+      default = false
   }
 
   @override @hidden
-  pub async proc handle(argv=> {filePath, format, prop})
+  pub async proc handle(argv=> {filePath, format, prop, envVarArg, envVarArgs})
     # (1) read content to encode
     var content = await(readFile(filePath, "utf-8"))
 
     if filePath.endsWith("yaml") then content = yaml.parse(content)
     else content = json.decode(content)
 
-    if prop then content = content[prop]
+    # (2) encode and print content
+    if envVarArg and prop then printContentAsEnvVarArg(content[prop], prop, format)
+    else if envVarArgs then printContentAsEnvVarArgs(content, format)
+    else printContent("", content, format)
 
-    # (2) encode content
-    content = json.encode(content)
-    if format == "json+base64" then content = Buffer.from(content).toString("base64")
+/**
+ * Prints the [content] using the specified [format].
+ * If a [prefix] given, this is added to content.
+ */
+proc printContent(prefix: text, content: any, format: text)
+  # (1) encode
+  content = json.encode(content)
+  if format == "json+base64" then content = Buffer.from(content).toString("base64")
 
-    # (3) show transformation
-    print(content)
+  # (2) print
+  print($"${prefix}${format}://${content}")
+
+/**
+ * Prints the [content] as KRM_ARG_[arg] in the given [format].
+ */
+proc printContentAsEnvVarArg(content: any, arg: text, format: text)
+  printContent($"KRM_ARG_${arg}=", content, format)
+
+/**
+ * Prints each property of the given [content] as a KRM_ARG_prop, using the specified [format].
+ */
+proc printContentAsEnvVarArgs(content: map, format: text)
+  for each prop, value in content do
+    printContentAsEnvVarArg(content[prop], prop, format)

@@ -51,6 +51,18 @@ const $EncodeCommand = class EncodeCommand extends Command {
           ["alias"]: ["p", "prop"],
           ["desc"]: "Property to encode.",
           ["type"]: "string"
+        },
+        ["envVarArg"]: {
+          ["alias"]: ["a"],
+          ["desc"]: "If -p, show content as KRM_ARG_property.",
+          ["type"]: "boolean",
+          ["default"]: false
+        },
+        ["envVarArgs"]: {
+          ["alias"]: ["A"],
+          ["desc"]: "Show each property of the content as KRM_ARG_*.",
+          ["type"]: "boolean",
+          ["default"]: false
         }
       }),
       writable: false,
@@ -77,7 +89,9 @@ EncodeCommand.prototype.handle = async function (argv) {
   let {
     filePath,
     format,
-    prop
+    prop,
+    envVarArg,
+    envVarArgs
   } = argv;
   {
     let content = (0, await readFile(filePath, "utf-8"));
@@ -86,13 +100,43 @@ EncodeCommand.prototype.handle = async function (argv) {
     } else {
       content = _core.json.decode(content);
     }
-    if (prop) {
-      content = _core.dogma.getItem(content, prop);
+    if (envVarArg && prop) {
+      printContentAsEnvVarArg(_core.dogma.getItem(content, prop), prop, format);
+    } else if (envVarArgs) {
+      printContentAsEnvVarArgs(content, format);
+    } else {
+      printContent("", content, format);
     }
+  }
+};
+function printContent(prefix, content, format) {
+  /* c8 ignore next */_core.dogma.expect("prefix", prefix, _core.text); /* c8 ignore next */
+  _core.dogma.expect("content", content, _core.any); /* c8 ignore next */
+  _core.dogma.expect("format", format, _core.text);
+  {
     content = _core.json.encode(content);
     if (format == "json+base64") {
       content = Buffer.from(content).toString("base64");
     }
-    (0, _core.print)(content);
+    (0, _core.print)(`${prefix}${format}://${content}`);
   }
-};
+}
+function printContentAsEnvVarArg(content, arg, format) {
+  /* c8 ignore next */_core.dogma.expect("content", content, _core.any); /* c8 ignore next */
+  _core.dogma.expect("arg", arg, _core.text); /* c8 ignore next */
+  _core.dogma.expect("format", format, _core.text);
+  {
+    printContent(`KRM_ARG_${arg}=`, content, format);
+  }
+}
+function printContentAsEnvVarArgs(content, format) {
+  /* c8 ignore next */_core.dogma.expect("content", content, _core.map); /* c8 ignore next */
+  _core.dogma.expect("format", format, _core.text);
+  {
+    for (const [prop, value] of Object.entries(content)) {
+      {
+        printContentAsEnvVarArg(_core.dogma.getItem(content, prop), prop, format);
+      }
+    }
+  }
+}
