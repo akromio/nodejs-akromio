@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-env",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Plugin for setting environment variables on Akromio.",
   "author": {
     "name": "Sia Codelabs",
