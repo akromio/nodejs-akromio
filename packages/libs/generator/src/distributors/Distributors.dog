@@ -9,8 +9,13 @@ export struct Distributors
   /**
    * Distributors of this collection.
    */
-  @hidden
+  @hidden @strict
   pub const distributors: Distributor[] = []
+
+  /**
+   * Returns the size of the collection.
+   */
+  pub fn len = len(self.distributors)
 
   /**
    * Appends a new [distributor] to the collection.

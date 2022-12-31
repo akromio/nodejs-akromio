@@ -5,15 +5,14 @@ const Distributor = _core.dogma.use(require("./Distributor"));
 const $Distributors = class Distributors {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
-    if (_['distributors'] != null) (0, _core.expect)('distributors', _['distributors'], _core.dogma.TypeDef({
-      name: 'inline',
-      types: [Distributor],
-      min: 0,
-      max: null
-    })); /* c8 ignore stop */
+    /* c8 ignore stop */
     Object.defineProperty(this, 'distributors', {
-      value: (0, _core.coalesce)(_['distributors'], []),
+      value: _core.dogma.expect('distributors', [], _core.dogma.TypeDef({
+        name: 'inline',
+        types: [Distributor],
+        min: 0,
+        max: null
+      })),
       writable: false,
       enumerable: false
     });
@@ -32,6 +31,15 @@ const Distributors = new Proxy($Distributors, {
   }
 });
 module.exports = exports = Distributors;
+Object.defineProperty(Distributors.prototype, "len", {
+  enum: true,
+  get: function () {
+    const self = this;
+    {
+      return (0, _core.len)(this.distributors);
+    }
+  }
+});
 Distributors.prototype.append = function (distributor) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("distributor", distributor, Distributor);
