@@ -6,6 +6,7 @@ const pkg = _core.dogma.use(require("../../package"));
 const env = _core.dogma.use(require("./env"));
 const {
   DescCommand,
+  EncodeCommand,
   SysCommand,
   createCommands,
   handleErrors
@@ -28,7 +29,7 @@ yargs.help("help");
 yargs.epilogue(`Copyright © ${years} ${author}. All rights reserved.
 Product of Spain, EU, made in Valencia.`);
 yargs.fail(handleErrors);
-const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand({
+const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EncodeCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand({
   'app': {
     ["name"]: appName,
     ["version"]: pkg.version

@@ -8,6 +8,7 @@ pub use (
   commands/impl/CatalogCommand
   commands/impl/DatasetCommand
   commands/impl/DescCommand
+  commands/impl/EncodeCommand
   commands/impl/EnvCommand
   commands/impl/JobRunCommand
   commands/impl/QuestionsCommand

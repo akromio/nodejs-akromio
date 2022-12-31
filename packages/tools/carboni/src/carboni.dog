@@ -3,7 +3,7 @@
 use (
   pkg = ../../package
   env
-  {DescCommand, SysCommand, createCommands, handleErrors} = alias://cli
+  {DescCommand, EncodeCommand, SysCommand, createCommands, handleErrors} = alias://cli
   commands/{CatalogCommand, RegistryCommand}
   commands/{RunCommand, ShowCommand}
   commands/{EnvCommand, DatasetCommand}
@@ -29,6 +29,7 @@ const commands = [
   CatalogCommand()
   DatasetCommand()
   DescCommand()
+  EncodeCommand()
   EnvCommand()
   RegistryCommand()
   RunCommand()

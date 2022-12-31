@@ -1,0 +1,54 @@
+use (
+  {readFile} = dep://fs/promises
+  dep://yaml
+
+  ../Command
+)
+
+/**
+ * The encode command.
+ */
+export struct EncodeCommand: Command
+  @override
+  pub const name := ["encode <filePath>"]
+
+  @override
+  pub const desc := "Encodes data to json or json+base64."
+
+  @override
+  pub const positionals := {
+    filePath =
+      type = "string"
+      desc = "File path to encode."
+  }
+
+  @override
+  pub const options := {
+    format =
+      alias = ["f", "fmt"]
+      desc = "Format to encode."
+      choices = ["json", "json+base64"]
+      default = "json+base64"
+    
+    property =
+      alias = ["p", "prop"]
+      desc = "Property to encode."
+      type = "string"
+  }
+
+  @override @hidden
+  pub async proc handle(argv=> {filePath, format, prop})
+    # (1) read content to encode
+    var content = await(readFile(filePath, "utf-8"))
+
+    if filePath.endsWith("yaml") then content = yaml.parse(content)
+    else content = json.decode(content)
+
+    if prop then content = content[prop]
+
+    # (2) encode content
+    content = json.encode(content)
+    if format == "json+base64" then content = Buffer.from(content).toString("base64")
+
+    # (3) show transformation
+    print(content)
