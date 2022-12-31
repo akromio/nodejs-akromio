@@ -11,6 +11,7 @@ suite(__filename, proc()
       "CatalogCommand"
       "DatasetCommand"
       "DescCommand"
+      "EncodeCommand"
       "EnvCommand"
       "RegistryCommandBase"
       "RunCommand"
