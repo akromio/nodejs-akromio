@@ -46,19 +46,30 @@ export struct EncodeCommand: Command
       desc = "Show each property of the content as KRM_ARG_*."
       type = "boolean"
       default = false
+    
+    export =
+      alias = ["x", "xport"]
+      desc = "If KRM_ARG_*, add export to the output. It sets -a or -A."
+      type = "boolean"
+      default = false
   }
 
   @override @hidden
-  pub async proc handle(argv=> {filePath, format, prop, envVarArg, envVarArgs})
+  pub async proc handle(argv=> {filePath, format, prop, envVarArg, envVarArgs, xport})
     # (1) read content to encode
     var content = await(readFile(filePath, "utf-8"))
 
     if filePath.endsWith("yaml") then content = yaml.parse(content)
     else content = json.decode(content)
 
-    # (2) encode and print content
-    if envVarArg and prop then printContentAsEnvVarArg(content[prop], prop, format)
-    else if envVarArgs then printContentAsEnvVarArgs(content, format)
+    # (2) handle export
+    if xport then
+      if prop then envVarArg = true
+      else envVarArgs = true
+
+    # (3) encode and print content
+    if envVarArg and prop then printContentAsEnvVarArg(content[prop], prop, format, xport)
+    else if envVarArgs then printContentAsEnvVarArgs(content, format, xport)
     else printContent("", content, format)
 
 /**
@@ -75,13 +86,16 @@ proc printContent(prefix: text, content: any, format: text)
 
 /**
  * Prints the [content] as KRM_ARG_[arg] in the given [format].
+ * If [xport] set, export prefix added.
  */
-proc printContentAsEnvVarArg(content: any, arg: text, format: text)
-  printContent($"KRM_ARG_${arg}=", content, format)
+proc printContentAsEnvVarArg(content: any, arg: text, format: text, xport: bool)
+  const prefix = if xport then "export " else "" end
+  printContent($"${prefix}KRM_ARG_${arg}=", content, format)
 
 /**
  * Prints each property of the given [content] as a KRM_ARG_prop, using the specified [format].
+ * If [xport] set, export prefix added.
  */
-proc printContentAsEnvVarArgs(content: map, format: text)
+proc printContentAsEnvVarArgs(content: map, format: text, xport: bool)
   for each prop, value in content do
-    printContentAsEnvVarArg(content[prop], prop, format)
+    printContentAsEnvVarArg(content[prop], prop, format, xport)
