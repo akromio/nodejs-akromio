@@ -34,21 +34,68 @@ export struct EncodeCommand: Command
       alias = ["p", "prop"]
       desc = "Property to encode."
       type = "string"
+    
+    envVarArg =
+      alias = ["a"]
+      desc = "If -p, show content as KRM_ARG_property."
+      type = "boolean"
+      default = false
+    
+    envVarArgs =
+      alias = ["A"]
+      desc = "Show each property of the content as KRM_ARG_*."
+      type = "boolean"
+      default = false
+    
+    export =
+      alias = ["x", "xport"]
+      desc = "If KRM_ARG_*, add export to the output. It sets -a or -A."
+      type = "boolean"
+      default = false
   }
 
   @override @hidden
-  pub async proc handle(argv=> {filePath, format, prop})
+  pub async proc handle(argv=> {filePath, format, prop, envVarArg, envVarArgs, xport})
     # (1) read content to encode
     var content = await(readFile(filePath, "utf-8"))
 
     if filePath.endsWith("yaml") then content = yaml.parse(content)
     else content = json.decode(content)
 
-    if prop then content = content[prop]
+    # (2) handle export
+    if xport then
+      if prop then envVarArg = true
+      else envVarArgs = true
 
-    # (2) encode content
-    content = json.encode(content)
-    if format == "json+base64" then content = Buffer.from(content).toString("base64")
+    # (3) encode and print content
+    if envVarArg and prop then printContentAsEnvVarArg(content[prop], prop, format, xport)
+    else if envVarArgs then printContentAsEnvVarArgs(content, format, xport)
+    else printContent("", content, format)
 
-    # (3) show transformation
-    print(content)
+/**
+ * Prints the [content] using the specified [format].
+ * If a [prefix] given, this is added to content.
+ */
+proc printContent(prefix: text, content: any, format: text)
+  # (1) encode
+  content = json.encode(content)
+  if format == "json+base64" then content = Buffer.from(content).toString("base64")
+
+  # (2) print
+  print($"${prefix}${format}://${content}")
+
+/**
+ * Prints the [content] as KRM_ARG_[arg] in the given [format].
+ * If [xport] set, export prefix added.
+ */
+proc printContentAsEnvVarArg(content: any, arg: text, format: text, xport: bool)
+  const prefix = if xport then "export " else "" end
+  printContent($"${prefix}KRM_ARG_${arg}=", content, format)
+
+/**
+ * Prints each property of the given [content] as a KRM_ARG_prop, using the specified [format].
+ * If [xport] set, export prefix added.
+ */
+proc printContentAsEnvVarArgs(content: map, format: text, xport: bool)
+  for each prop, value in content do
+    printContentAsEnvVarArg(content[prop], prop, format, xport)
