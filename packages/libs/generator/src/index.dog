@@ -4,6 +4,7 @@ pub use (
   starters/Starter
   starters/impl/sleep/SleepStarter
   starters/impl/const/ConstStarter
+  starters/impl/inc/IncStarter
 
   ring/Ring
 

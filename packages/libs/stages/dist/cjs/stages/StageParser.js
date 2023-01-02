@@ -9,6 +9,7 @@ const {
   CatalogItemParseOpts
 } = _core.dogma.use(require("@akromio/catalog"));
 const ConstStage = _core.dogma.use(require("./ConstStage"));
+const IncStage = _core.dogma.use(require("./IncStage"));
 const SleepStage = _core.dogma.use(require("./SleepStage"));
 const ParseOpts = CatalogItemParseOpts;
 const $StageParser = class StageParser extends CatalogItemParser {
@@ -53,6 +54,8 @@ StageParser.prototype.parseStage = function (decl, opts) {
   {
     if (_core.dogma.includes(decl, "const")) {
       stage = this.parseConstStage(decl, opts);
+    } else if (_core.dogma.includes(decl, "inc")) {
+      stage = this.parseIncStage(decl, opts);
     } else if (_core.dogma.includes(decl, "sleep")) {
       stage = this.parseSleepStage(decl, opts);
     } else {
@@ -77,7 +80,23 @@ StageParser.prototype.parseConstStage = function (decl, _) {
     return ConstStage(_core.dogma.clone(decl, {
       "name": decl.const,
       "duration": ms(decl.duration),
-      "interval": ms(decl.interval || "1s")
+      "interval": _core.dogma.clone(decl.interval, {
+        "duration": ms(decl.interval.duration || "1s")
+      }, {}, [], [])
+    }, {}, [], []));
+  }
+};
+StageParser.prototype.parseIncStage = function (decl, _) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
+  _core.dogma.expect("_", _, ParseOpts);
+  {
+    return IncStage(_core.dogma.clone(decl, {
+      "name": decl.inc,
+      "duration": ms(decl.duration),
+      "interval": _core.dogma.clone(decl.interval, {
+        "duration": ms(decl.interval.duration || "1s")
+      }, {}, [], [])
     }, {}, [], []));
   }
 };

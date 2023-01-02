@@ -17,12 +17,17 @@ intf Interval
    */
   requests: num
 
-/**
- * Schema for the const stages.
- */
-export struct ConstStage: Stage
   /**
-   * Interval data.
+   * Number of request to increment per interval.
+   */
+  inc: num
+
+/**
+ * Schema for the incremental stages.
+ */
+export struct IncStage: Stage
+  /**
+   * Interval.
    */
   pub const interval: Interval
 

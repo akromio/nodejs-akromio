@@ -31,7 +31,9 @@ suite(__filename, () => {
               ["stages"]: [{
                 ["xconstx"]: "warmup",
                 ["duration"]: "2m",
-                ["requests"]: 1000,
+                ["interval"]: {
+                  ["requests"]: 1000
+                },
                 ["jobs"]: []
               }, {
                 ["sleep"]: "pause",
@@ -39,12 +41,14 @@ suite(__filename, () => {
               }, {
                 ["const"]: "load",
                 ["duration"]: "$(duration)",
-                ["requests"]: 2000,
+                ["interval"]: {
+                  ["requests"]: 2000
+                },
                 ["jobs"]: []
               }]
             };
             const out = await _core.dogma.pawait(() => parser.parse(decl, parseOpts));
-            expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Invalid stage declaration:.+xconstx");
+            expected(out).it(0).equalTo(false).it(1).toBe(TypeError).like("Invalid stage declaration").like("xconstx");
           }
         });
         test("when declaration is ok, stage catalog must be raised", async () => {
@@ -60,15 +64,20 @@ suite(__filename, () => {
               ["stages"]: [{
                 ["const"]: "warmup",
                 ["duration"]: "2m",
-                ["requests"]: 1000,
+                ["interval"]: {
+                  ["requests"]: 1000
+                },
                 ["jobs"]: []
               }, {
                 ["sleep"]: "pause",
                 ["duration"]: "1m"
               }, {
-                ["const"]: "load",
+                ["inc"]: "load",
                 ["duration"]: "$(duration)",
-                ["requests"]: 2000,
+                ["interval"]: {
+                  ["requests"]: 2000,
+                  ["inc"]: 1
+                },
                 ["jobs"]: []
               }]
             };
@@ -83,8 +92,10 @@ suite(__filename, () => {
                   ["desc"]: null,
                   ["tags"]: [],
                   ["duration"]: 120000,
-                  ["interval"]: 1000,
-                  ["requests"]: 1000,
+                  ["interval"]: {
+                    ["duration"]: 1000,
+                    ["requests"]: 1000
+                  },
                   ["jobs"]: []
                 },
                 ["pause"]: {
@@ -98,8 +109,11 @@ suite(__filename, () => {
                   ["desc"]: null,
                   ["tags"]: [],
                   ["duration"]: 600000,
-                  ["interval"]: 1000,
-                  ["requests"]: 2000,
+                  ["interval"]: {
+                    ["duration"]: 1000,
+                    ["requests"]: 2000,
+                    ["inc"]: 1
+                  },
                   ["jobs"]: []
                 }
               }

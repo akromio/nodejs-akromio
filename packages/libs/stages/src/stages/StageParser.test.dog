@@ -1,6 +1,6 @@
 use (
   alias://expected
-  StageParser
+  StageParser, ConstStage, IncStage, SleepStage
 )
 
 suite(__filename, proc()
@@ -18,8 +18,9 @@ suite(__filename, proc()
           decl = {
             'const' = "warmup"
             duration = "2m"
-            interval = "2s"
-            requests = 100
+            interval =
+              duration = "2s"
+              requests = 100
             jobs
           }
 
@@ -27,12 +28,46 @@ suite(__filename, proc()
         )
 
         # (2) assessment
-        expected(out.warmup).toBe("ConstStage").toHave(
+        expected(out.warmup).toBe(ConstStage).toHave(
           name = "warmup"
           duration = 120000
-          interval = 2000
-          requests = 100
           jobs
+          interval = {
+            duration = 2000
+            requests = 100
+          }
+        )
+      end)
+    end)
+
+    suite("inc", proc()
+      test("when valid declaration, a IncStage must be returned", proc()
+        # (1) act
+        const (
+          jobs = []
+          decl = {
+            inc = "load"
+            duration = "2m"
+            jobs
+            interval =
+              duration = "2s"
+              requests = 100
+              inc = 0.5
+          }
+
+          out = parser.parse(decl, parseOpts)
+        )
+
+        # (2) assessment
+        expected(out.load).toBe(IncStage).toHave(
+          name = "load"
+          duration = 120000
+          jobs
+          interval = {
+            duration = 2000
+            requests = 100
+            inc = 0.5
+          }
         )
       end)
     end)
@@ -47,7 +82,7 @@ suite(__filename, proc()
         )
 
         # (2) assessment
-        expected(out.pause).toBe("SleepStage").toHave(
+        expected(out.pause).toBe(SleepStage).toHave(
           name = "pause"
           duration = 120000
         )

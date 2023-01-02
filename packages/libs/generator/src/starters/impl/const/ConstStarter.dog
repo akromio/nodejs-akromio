@@ -6,7 +6,7 @@ use (
  * A starter for generating the same number of blank sheets
  * in every event.
  */
-export struct ConstLoadStarter: Starter
+export struct ConstStarter: Starter
   /**
    * Number of blank sheets to generate per event.
    */

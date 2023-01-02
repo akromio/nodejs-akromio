@@ -1,0 +1,29 @@
+use (
+  ../../Starter
+)
+
+/**
+ * A starter for generating an incremental number of blank sheets
+ * in every event.
+ */
+export struct IncStarter: Starter
+  /**
+   * Number of blank sheets to generate per event.
+   */
+  @hidden
+  pub var blankSheets: num
+
+  /**
+   * Number of requests to add per interval.
+   */
+  @hidden
+  pub var inc: num
+
+  @override
+  pub proc generateBlankSheets()
+    # (1) increment bvlank sheets to generate
+    if self.iterations > 1 then self.blankSheets += self.inc
+
+    # (2) generate blank sheets
+    for i = 0; i < Math.floor(self.blankSheets); i += 1 do
+      self.output.append(ts = timestamp().valueOf())

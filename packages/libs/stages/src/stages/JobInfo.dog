@@ -1,0 +1,28 @@
+/**
+ * Info on a job to run.
+ */
+export intf JobInfo
+  /**
+   * Registry where the catalog is.
+   */
+  registry: text
+
+  /**
+   * Catalog name where the job is.
+   */
+  catalog: text
+
+  /**
+   * Job name to run.
+   */
+  job: text
+
+  /**
+   * Arguments to pass.
+   */
+  args?: any
+
+  /**
+   * Weight of this job into the stage.
+   */
+  weight: num

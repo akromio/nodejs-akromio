@@ -11,9 +11,13 @@ const Interval = _core.dogma.intf('Interval', {
   requests: {
     optional: false,
     type: _core.num
+  },
+  inc: {
+    optional: false,
+    type: _core.num
   }
 });
-const $ConstStage = class ConstStage extends Stage {
+const $IncStage = class IncStage extends Stage {
   constructor(_) {
     super(_);
     /* c8 ignore start */
@@ -37,17 +41,17 @@ const $ConstStage = class ConstStage extends Stage {
       enumerable: true
     });
     /* c8 ignore start */
-    if (this._pvt_e02a8a86ca8c21a75d68e27f2bcef633___init__ instanceof Function) this._pvt_e02a8a86ca8c21a75d68e27f2bcef633___init__(_); /* c8 ignore stop */
+    if (this._pvt_f76517ab6e70462397ea39a4795c1d96___init__ instanceof Function) this._pvt_f76517ab6e70462397ea39a4795c1d96___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_e02a8a86ca8c21a75d68e27f2bcef633___post__ instanceof Function) this._pvt_e02a8a86ca8c21a75d68e27f2bcef633___post__(); /* c8 ignore stop */
+    if (this._pvt_f76517ab6e70462397ea39a4795c1d96___post__ instanceof Function) this._pvt_f76517ab6e70462397ea39a4795c1d96___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_e02a8a86ca8c21a75d68e27f2bcef633___validate__ instanceof Function) this._pvt_e02a8a86ca8c21a75d68e27f2bcef633___validate__(); /* c8 ignore stop */
+    if (this._pvt_f76517ab6e70462397ea39a4795c1d96___validate__ instanceof Function) this._pvt_f76517ab6e70462397ea39a4795c1d96___validate__(); /* c8 ignore stop */
   }
 };
 
-const ConstStage = new Proxy($ConstStage, {
+const IncStage = new Proxy($IncStage, {
   apply(receiver, self, args) {
-    return new $ConstStage(...args);
+    return new $IncStage(...args);
   }
 });
-module.exports = exports = ConstStage;
+module.exports = exports = IncStage;

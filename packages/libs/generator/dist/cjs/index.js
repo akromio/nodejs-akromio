@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RandomAssigner = exports.Distributors = exports.DistributorBase = exports.Distributor = exports.ConstStarter = exports.ConsoleDistributor = exports.BlankSheetStream = exports.Assigner = void 0;
+exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RandomAssigner = exports.IncStarter = exports.Distributors = exports.DistributorBase = exports.Distributor = exports.ConstStarter = exports.ConsoleDistributor = exports.BlankSheetStream = exports.Assigner = void 0;
 var _core = require("@dogmalang/core");
 const BlankSheetStream = _core.dogma.use(require("./starters/BlankSheetStream"));
 exports.BlankSheetStream = BlankSheetStream;
@@ -15,6 +15,8 @@ const SleepStarter = _core.dogma.use(require("./starters/impl/sleep/SleepStarter
 exports.SleepStarter = SleepStarter;
 const ConstStarter = _core.dogma.use(require("./starters/impl/const/ConstStarter"));
 exports.ConstStarter = ConstStarter;
+const IncStarter = _core.dogma.use(require("./starters/impl/inc/IncStarter"));
+exports.IncStarter = IncStarter;
 const Ring = _core.dogma.use(require("./ring/Ring"));
 exports.Ring = Ring;
 const Assigner = _core.dogma.use(require("./assigners/Assigner"));
