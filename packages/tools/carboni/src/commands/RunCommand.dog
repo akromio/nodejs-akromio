@@ -1,7 +1,7 @@
 use (
   {RunCommand as RunCommandBase} = alias://cli
-  {Stage, ConstStage, SleepStage} = alias://stages
-  {ConstStarter, SleepStarter, BlankSheetStream} = alias://generator
+  {Stage, ConstStage, IncStage, SleepStage} = alias://stages
+  {ConstStarter, IncStarter, SleepStarter, BlankSheetStream} = alias://generator
   {RandomAssigner, Ring, RunReqStream} = alias://generator
   {Distributors, ConsoleDistributor, RedisStreamsDistributor} = alias://generator
   dep://redis
@@ -141,6 +141,7 @@ export struct RunCommand: RunCommandBase:: _StageCommand
   pub fn runStage(stage: Stage, botnet?: {impl: text, bots: map[]}, opts: map) -> promise
     with type(stage) do
       if ConstStage then promise = self.runConstStage(stage, botnet, opts)
+      if IncStage then promise = self.runIncStage(stage, botnet, opts)
       if SleepStage then promise = self.runSleepStage(stage)
       else throw(Error($"Unknown stage: ${fmt(stage)}."))
 
@@ -152,9 +153,9 @@ export struct RunCommand: RunCommandBase:: _StageCommand
     # (1) create starter
     const (
       starterOutput = BlankSheetStream()
-      times = stage.duration / stage.interval
-      blankSheets = stage.requests
-      starterProps = stage{*, output = starterOutput, times, blankSheets}
+      times = stage.duration / stage.interval.duration
+      blankSheets = stage.interval.requests
+      starterProps = stage{*, output = starterOutput, interval = stage.interval.duration, times, blankSheets}
       starter = ConstStarter(starterProps)
     )
     
@@ -178,25 +179,53 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       distributor = ConsoleDistributor(distributorProps)
     else
       with i ::= botnet.impl do
-        if "redis" then
-          const opts = {
-            name = "carboni"
-            socket =
-              host = botnet.host ?? "localhost"
-              port = botnet.port ?? 6379
-            if botnet.username then username = botnet.username
-            if botnet.password then password = botnet.password
-          }
-
-          distributor = RedisStreamsDistributor(distributorProps{*, redis = redis.createClient(opts)})
-        
-        else
-          throw(TypeError($"Unknown botnet impl: ${i}."))
+        if "redis" then distributor = createRedisStreamsDistributor(distributorProps, botnet)
+        else throw(TypeError($"Unknown botnet impl: ${i}."))
       
       if log then
         distributor = Distributors().append(distributor).append(
           ConsoleDistributor(distributorProps)
         )
+
+    # (4) starts
+    return Promise.all([
+      starter.start()
+      assigner.start()
+      distributor.start()
+    ])
+  
+  /**
+   * Run an incremental [stage].
+   */
+  @hidden
+  pub async fn runIncStage(stage: IncStage, botnet: {impl: text, bots: map[]}, opts:> {onlyLog: bool, log: bool})
+    # (1) create starter
+    const (
+      starterOutput = BlankSheetStream()
+      times = stage.duration / stage.interval.duration
+      blankSheets = stage.interval.requests
+      starterProps = stage{
+        *
+        output = starterOutput
+        interval = stage.interval.duration
+        inc = stage.interval.inc
+        times
+        blankSheets
+      }
+      starter = IncStarter(starterProps)
+    )
+    
+    # (2) create assigner
+    const (
+      assignerOutput = RunReqStream()
+      assignations = stage.jobs
+      ring = Ring(points = botnet.bots.map(fn(bot) = bot.bot end))
+      assignerProps = {input = starterOutput, output = assignerOutput, ring, assignations}
+      assigner = RandomAssigner(assignerProps)
+    )
+
+    # (3) create distributor
+    const distributor = createDistributor(assignerOutput, botnet, {onlyLog, log})
 
     # (4) starts
     return Promise.all([
@@ -218,3 +247,36 @@ export struct RunCommand: RunCommandBase:: _StageCommand
     )
       
     return starter.start()
+
+/**
+ * Creates a distributor.
+ */
+fn createDistributor(assignerOutput, botnet, opts:> {onlyLog: bool, log: bool}) -> distributor: Distributor
+  const props = botnet{*, input = assignerOutput}
+
+  if onlyLog then
+    distributor = ConsoleDistributor(props)
+  else
+    with i ::= botnet.impl do
+      if "redis" then distributor = createRedisStreamsDistributor(props, botnet)
+      else throw(TypeError($"Unknown botnet impl: ${i}."))
+    
+    if log then
+      distributor = Distributors().append(distributor).append(
+        ConsoleDistributor(distributorProps)
+      )
+
+/**
+ * Creates a Redis Streams distributor.
+ */
+fn createRedisStreamsDistributor(props, botnet) -> distributor: RedisStreamsDistributor
+  const opts = {
+    name = "carboni"
+    socket =
+      host = botnet.host ?? "localhost"
+      port = botnet.port ?? 6379
+    if botnet.username then username = botnet.username
+    if botnet.password then password = botnet.password
+  }
+
+  distributor = RedisStreamsDistributor(props{*, redis = redis.createClient(opts)})

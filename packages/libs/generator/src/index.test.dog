@@ -9,6 +9,7 @@ suite(__filename, proc()
       "StarterState"
       "Starter"
       "ConstStarter"
+      "IncStarter"
       "SleepStarter"
       
       "Assigner"

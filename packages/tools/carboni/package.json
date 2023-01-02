@@ -2,7 +2,7 @@
   "name": "@akromio/carboni",
   "version": "0.14.0",
   "description": "Tool for generating run requests on Akromio.",
-  "years": "2022",
+  "year": "2023",
   "author": {
     "name": "Sia Codelabs",
     "email": "hello@siacodelabs.com",

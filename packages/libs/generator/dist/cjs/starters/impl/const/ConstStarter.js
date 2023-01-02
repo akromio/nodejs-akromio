@@ -2,7 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const Starter = _core.dogma.use(require("../../Starter"));
-const $ConstLoadStarter = class ConstLoadStarter extends Starter {
+const $ConstStarter = class ConstStarter extends Starter {
   constructor(_) {
     super(_);
     /* c8 ignore start */
@@ -23,13 +23,13 @@ const $ConstLoadStarter = class ConstLoadStarter extends Starter {
   }
 };
 
-const ConstLoadStarter = new Proxy($ConstLoadStarter, {
+const ConstStarter = new Proxy($ConstStarter, {
   apply(receiver, self, args) {
-    return new $ConstLoadStarter(...args);
+    return new $ConstStarter(...args);
   }
 });
-module.exports = exports = ConstLoadStarter;
-ConstLoadStarter.prototype.generateBlankSheets = function () {
+module.exports = exports = ConstStarter;
+ConstStarter.prototype.generateBlankSheets = function () {
   const self = this;
   {
     for (let i = 0; i < this.blankSheets; i += 1) {

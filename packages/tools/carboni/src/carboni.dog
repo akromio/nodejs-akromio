@@ -12,7 +12,7 @@ use (
 const (
   yargs = require("yargs")
   appName = pkg.name.split("/")[-1]
-  {years} = pkg
+  {year} = pkg
   author = pkg.author.name
 )
 
@@ -20,7 +20,7 @@ yargs.scriptName(appName)
 yargs.version("v", pkg.version)
 yargs.help("help")
 yargs.epilogue(
-  $"Copyright © ${years} ${author}. All rights reserved.\nProduct of Spain, EU, made in Valencia."
+  $"Copyright © ${year} ${author}. All rights reserved.\nProduct of Spain, EU, made in Valencia."
 )
 yargs.fail(handleErrors)
 
