@@ -1,0 +1,11 @@
+use (
+  {JobEngine} = alias://jobs
+  alias://preset
+)
+
+/**
+ * A jobs engine for the akro tool.
+ */
+export struct Engine: JobEngine
+  @override @hidden
+  pub fn getBuiltInPresets() = [preset]

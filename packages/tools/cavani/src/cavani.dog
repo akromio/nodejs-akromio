@@ -1,0 +1,44 @@
+#!env
+
+use (
+  pkg = ../../package
+  env
+  {DescCommand, EncodeCommand, SysCommand, createCommands, handleErrors} = alias://cli
+  commands/{CatalogCommand, RegistryCommand}
+  commands/{RunCommand, ShowCommand}
+  commands/{EnvCommand, DatasetCommand, QuestionsCommand}
+)
+
+const (
+  yargs = require("yargs")
+  appName = pkg.name.split("/")[-1]
+  {year} = pkg
+  author = pkg.author.name
+)
+
+yargs.scriptName(appName)
+yargs.version("v", pkg.version)
+yargs.help("help")
+yargs.epilogue(
+  $"Copyright © ${year} ${author}. All rights reserved.\nProduct of Spain, EU, made in Valencia."
+)
+yargs.fail(handleErrors)
+
+# commands
+const commands = [
+  CatalogCommand()
+  DatasetCommand()
+  DescCommand()
+  EncodeCommand()
+  EnvCommand()
+  QuestionsCommand()
+  RegistryCommand()
+  RunCommand()
+  ShowCommand()
+  SysCommand(app = {name = appName, version = pkg.version})
+]
+
+createCommands(yargs, commands)
+
+# get args
+yargs.argv

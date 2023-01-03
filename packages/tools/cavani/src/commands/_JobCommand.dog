@@ -1,0 +1,45 @@
+use (
+  {JobCatalogParser as CatalogParser} = alias://jobs
+  ../catalog/CatalogReader
+  ../engine/Engine
+)
+
+/**
+ * The common components for every job command with catalog.
+ */
+@mixable @abstract
+export struct _JobCommand
+  @override
+  pub const defaults = {
+    git =
+      host = $KRM_REGISTRY_GIT_HOST
+      user = $KRM_REGISTRY_GIT_USER
+      repo = $KRM_REGISTRY_GIT_REPO
+      branch = $KRM_REGISTRY_GIT_BRANCH
+      prefix = $KRM_REGISTRY_GIT_PREFIX
+
+    http =
+      host = $KRM_REGISTRY_HTTP_HOST
+      base = $KRM_REGISTRY_HTTP_BASE
+      
+    skynet =
+      portal = $KRM_REGISTRY_SKYNET_PORTAL
+      skylink = $KRM_REGISTRY_SKYNET_SKYLINK
+    
+    sns =
+      portal = $KRM_REGISTRY_SNS_PORTAL
+      name = $KRM_REGISTRY_SNS_NAME
+      publicKey = $KRM_REGISTRY_SNS_PUBLIC_KEY
+  }
+
+  @override
+  pub fn createCatalogReader() = CatalogReader(
+    akromioDirName = $KRM_DIR_NAME
+    akromioCatalogsPath = $KRM_JOB_CATALOGS_PATH
+  )
+  
+  @override
+  pub fn createCatalogParser(opts: map) = CatalogParser(opts)
+
+  @override @hidden
+  pub fn _createEngine(opts: map) = Engine(opts)

@@ -1,7 +1,7 @@
 {
-  "name": "@akromio/preset-gattuso",
+  "name": "@akromio/preset-cavani",
   "version": "0.15.1",
-  "description": "Preset for the gattuso tool",
+  "description": "Preset for the cavani tool",
   "author": {
     "name": "Sia Codelabs",
     "email": "hello@siacodelabs.com",
@@ -42,7 +42,6 @@
     "@akromio/pi-hbs": "^0.15.1",
     "@akromio/pi-http": "^0.15.1",
     "@akromio/pi-inc": "^0.15.1",
-    "@akromio/pi-inquire": "^0.15.1",
     "@akromio/pi-json": "^0.15.1",
     "@akromio/pi-list": "^0.15.1",
     "@akromio/pi-log": "^0.15.1",

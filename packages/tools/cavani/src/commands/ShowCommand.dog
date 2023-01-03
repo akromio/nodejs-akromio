@@ -1,0 +1,12 @@
+use (
+  {ShowCommand as ShowCommandBase} = alias://cli
+  {JobParser} = alias://jobs
+  _JobCommand
+)
+
+/**
+ * The show command.
+ */
+export struct ShowCommand: ShowCommandBase:: _JobCommand
+  @override
+  pub fn createItemParser() = JobParser()
