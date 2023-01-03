@@ -6,7 +6,7 @@ use (
   {DescCommand, EncodeCommand, SysCommand, createCommands, handleErrors} = alias://cli
   commands/{CatalogCommand, RegistryCommand}
   commands/{RunCommand, ShowCommand}
-  commands/{EnvCommand, DatasetCommand, QuestionsCommand}
+  commands/{EnvCommand, DatasetCommand}
 )
 
 const (
@@ -31,7 +31,6 @@ const commands = [
   DescCommand()
   EncodeCommand()
   EnvCommand()
-  QuestionsCommand()
   RegistryCommand()
   RunCommand()
   ShowCommand()

@@ -17,7 +17,6 @@ const RunCommand = _core.dogma.use(require("./commands/RunCommand"));
 const ShowCommand = _core.dogma.use(require("./commands/ShowCommand"));
 const EnvCommand = _core.dogma.use(require("./commands/EnvCommand"));
 const DatasetCommand = _core.dogma.use(require("./commands/DatasetCommand"));
-const QuestionsCommand = _core.dogma.use(require("./commands/QuestionsCommand"));
 const yargs = require("yargs");
 const appName = _core.dogma.getItem(pkg.name.split("/"), -1);
 const {
@@ -30,7 +29,7 @@ yargs.help("help");
 yargs.epilogue(`Copyright © ${year} ${author}. All rights reserved.
 Product of Spain, EU, made in Valencia.`);
 yargs.fail(handleErrors);
-const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EncodeCommand(), EnvCommand(), QuestionsCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand({
+const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EncodeCommand(), EnvCommand(), RegistryCommand(), RunCommand(), ShowCommand(), SysCommand({
   'app': {
     ["name"]: appName,
     ["version"]: pkg.version
