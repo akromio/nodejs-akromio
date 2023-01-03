@@ -42,6 +42,9 @@ EnvCommand.prototype.buildSpecializationVars = function () {
       },
       ["JOB_NAME"]: {
         ["desc"]: "Default job name to run when unset."
+      },
+      ["STAGE_CATALOGS_PATH"]: {
+        ["desc"]: "Dir path to prefix when root stage catalog name is relative."
       }
     };
   }

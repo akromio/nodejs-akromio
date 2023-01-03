@@ -142,6 +142,11 @@ async function createGlobalDataset(data) {
           ["catalogs"]: {
             ["path"]: _core.ps.env.KRM_CATALOGS_PATH
           }
+        },
+        ["stages"]: {
+          ["catalogs"]: {
+            ["path"]: _core.ps.env.KRM_STAGE_CATALOGS_PATH
+          }
         }
       }
     }));
