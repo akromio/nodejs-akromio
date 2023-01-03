@@ -272,24 +272,4 @@ suite(__filename, proc()
         .it(1).equalTo(TypeError("Unknown plugin declaration: { name: 'woi', impl: 'pi-without-ini' }."))
     end)
   end)
-
-  suite("parseTriggers()", proc()
-    test("when triggers, triggers must be parsed", async proc()
-      # (1) act
-      const (
-        parser = JobCatalogParser(pluginLoader=, pluginParser)
-        trg1 = {trigger = "trg1"}
-        trg2 = {trigger = "trg2"}
-        triggers = [trg1, trg2]
-        out = await(parser.parse(
-          catalogDecl{*, on = triggers}
-          parentDataset=,
-          ops
-        )).triggers
-      )
-
-      # (2) assessment
-      expected(out).equalTo(trg1=, trg2)
-    end)
-  end)
 end)

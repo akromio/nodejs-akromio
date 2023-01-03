@@ -6,8 +6,7 @@ const {
 } = _core.dogma.use(require("@akromio/dataset"));
 const {
   Ops,
-  CatalogParser,
-  CatalogParseOpts
+  CatalogParser
 } = _core.dogma.use(require("@akromio/catalog"));
 const {
   Plugin,
@@ -17,17 +16,8 @@ const {
 } = _core.dogma.use(require("@akromio/core"));
 const JobCatalog = _core.dogma.use(require("../JobCatalog"));
 const JobParser = _core.dogma.use(require("./JobParser"));
+const JobCatalogParseOpts = _core.dogma.use(require("./JobCatalogParseOpts"));
 const jobParser = JobParser();
-const JobCatalogParseOpts = _core.dogma.intf('JobCatalogParseOpts', {
-  parentDataset: {
-    optional: false,
-    type: Dataset
-  },
-  ops: {
-    optional: false,
-    type: Ops
-  }
-}, CatalogParseOpts);
 const $JobCatalogParser = class JobCatalogParser extends CatalogParser {
   constructor(_) {
     super(_);
@@ -73,11 +63,10 @@ JobCatalogParser.prototype.parseSpecialization = async function (decl, opts) {
   _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
   _core.dogma.expect("opts", opts, JobCatalogParseOpts);
   {
-    var _decl$on, _decl$plugins;
+    var _decl$plugins;
     const {
       dataset
     } = decl;
-    const triggers = this.parseTriggers((_decl$on = decl.on) !== null && _decl$on !== void 0 ? _decl$on : [], dataset);
     const {
       ops
     } = opts;
@@ -98,11 +87,6 @@ JobCatalogParser.prototype.parseSpecialization = async function (decl, opts) {
       visib: ".",
       assign: "=",
       value: jobs
-    }, {
-      name: "triggers",
-      visib: ".",
-      assign: "=",
-      value: triggers
     });
   }
   return decl;
@@ -140,23 +124,6 @@ JobCatalogParser.prototype.parsePlugins = async function (decl) {
     }
   }
   return plugins;
-};
-JobCatalogParser.prototype.parseTriggers = function (decl, ds) {
-  const self = this;
-  let triggers = {}; /* c8 ignore next */
-  _core.dogma.expect("decl", decl, _core.dogma.TypeDef({
-    name: 'inline',
-    types: [_core.map],
-    min: 0,
-    max: null
-  })); /* c8 ignore next */
-  _core.dogma.expect("ds", ds, Dataset);
-  {
-    for (const trgDecl of ds.eval(decl)) {
-      _core.dogma.setItem("=", triggers, trgDecl.trigger, trgDecl);
-    }
-  }
-  return triggers;
 };
 JobCatalogParser.prototype.parseJobs = function (decl, opts) {
   const self = this;

@@ -1,0 +1,34 @@
+use (
+  {Dataset} = alias://dataset
+
+  ../TriggeredJobCatalog
+  JobCatalogParser, JobCatalogParseOpts
+)
+
+/**
+ * A parser to parse triggered jobs catalog declarations.
+ */
+export struct TriggeredJobCatalogParser: JobCatalogParser
+  @override @hidden
+  pub fn createCatalog(decl: map) = TriggeredJobCatalog(decl)
+
+  @override @hidden
+  pub async fn parseSpecialization(decl: map, opts: JobCatalogParseOpts) -> decl
+    # (1) parse triggers
+    const (
+      {dataset} = decl
+      triggers = self.parseTriggers(decl.on, dataset)
+    )
+  
+    # (2) parse base
+    decl = super.parseSpecialization(decl.{triggers}, opts)
+
+  /**
+   * Parses the trigger declarations,
+   * returning a map with these declarations
+   * with the data already evaluated.
+   */
+  @hidden
+  pub fn parseTriggers(decl: map[], ds: Dataset) -> triggers: map
+    for each trgDecl in ds.eval(decl) do
+      triggers[trgDecl.trigger] = trgDecl

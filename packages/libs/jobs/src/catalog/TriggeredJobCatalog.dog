@@ -1,0 +1,12 @@
+use (
+  JobCatalog
+)
+
+/**
+ * A catalog of jobs whose run is triggered by events.
+ */
+export struct TriggeredJobCatalog: JobCatalog
+  /**
+   * The triggers defined into the catalog.
+   */
+  pub const triggers := {}

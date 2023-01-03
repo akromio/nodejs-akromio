@@ -334,34 +334,5 @@ suite(__filename, () => {
         });
       }
     });
-    suite("parseTriggers()", () => {
-      {
-        test("when triggers, triggers must be parsed", async () => {
-          {
-            const parser = JobCatalogParser({
-              'pluginLoader': pluginLoader,
-              'pluginParser': pluginParser
-            });
-            const trg1 = {
-              ["trigger"]: "trg1"
-            };
-            const trg2 = {
-              ["trigger"]: "trg2"
-            };
-            const triggers = [trg1, trg2];
-            const out = (0, await parser.parse(_core.dogma.clone(catalogDecl, {
-              "on": triggers
-            }, {}, [], []), {
-              'parentDataset': parentDataset,
-              'ops': ops
-            })).triggers;
-            expected(out).equalTo({
-              'trg1': trg1,
-              'trg2': trg2
-            });
-          }
-        });
-      }
-    });
   }
 });

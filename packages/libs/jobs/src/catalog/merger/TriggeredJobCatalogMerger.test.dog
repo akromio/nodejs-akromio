@@ -1,0 +1,12 @@
+use (
+  alias://expected
+  TriggeredJobCatalogMerger
+)
+
+suite(__filename, proc()
+  const (
+    merger = TriggeredJobCatalogMerger()
+  )
+
+  # nothing to test
+end)
