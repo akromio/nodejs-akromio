@@ -40,6 +40,3 @@ uses:
   
   reporter:
     js: "@akromio/reporter"
-  
-  trigger:
-    js: "@akromio/trigger"

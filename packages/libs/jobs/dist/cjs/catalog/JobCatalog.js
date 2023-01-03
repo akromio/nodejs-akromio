@@ -41,13 +41,6 @@ const $JobCatalog = class JobCatalog extends Catalog {
       enumerable: true
     });
     /* c8 ignore start */
-    if (_['triggers'] != null) (0, _core.expect)('triggers', _['triggers'], _core.map); /* c8 ignore stop */
-    Object.defineProperty(this, 'triggers', {
-      value: (0, _core.coalesce)(_['triggers'], {}),
-      writable: false,
-      enumerable: true
-    });
-    /* c8 ignore start */
     if (this._pvt_14e4ef70508331cc6a23c8e83c5270a1___init__ instanceof Function) this._pvt_14e4ef70508331cc6a23c8e83c5270a1___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_14e4ef70508331cc6a23c8e83c5270a1___post__ instanceof Function) this._pvt_14e4ef70508331cc6a23c8e83c5270a1___post__(); /* c8 ignore stop */

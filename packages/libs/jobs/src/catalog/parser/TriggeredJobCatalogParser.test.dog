@@ -1,0 +1,52 @@
+use (
+  alias://expected
+  {sim, method} = alias://doubles
+  {Dataset, GlobalDataset, LocalDataset} = alias://dataset
+  {Ops, PluginParser, PluginLoader, Plugins, Plugin} = alias://core
+
+  ../JobCatalog
+  TriggeredJobCatalogParser
+)
+
+suite(__filename, proc()
+  const (
+    globalDataset = GlobalDataset(name = "global")
+    parentDataset = globalDataset
+    ops = Ops()
+    catalogOpt = {
+      name = "test"
+      loc = "file:///my/file.yaml"
+      cty = "text/yaml"
+    }
+    catalogDecl = {
+      spec = "v1.0"
+      name = "test-catalog"
+      loc = "test:///jobs/catalogs/test-catalog"
+      cty = "text/yaml"
+      desc = "A test catalog."
+      jobs = []
+    }
+    pluginParser = PluginParser()
+    pluginLoader = sim(PluginLoader, {})
+    parser = TriggeredJobCatalogParser(pluginParser=, pluginLoader)
+  )
+
+  suite("parseTriggers()", proc()
+    test("when triggers, triggers must be parsed", async proc()
+      # (1) act
+      const (
+        trg1 = {trigger = "trg1"}
+        trg2 = {trigger = "trg2"}
+        triggers = [trg1, trg2]
+        out = await(parser.parse(
+          catalogDecl{*, on = triggers}
+          parentDataset=,
+          ops
+        )).triggers
+      )
+
+      # (2) assessment
+      expected(out).equalTo(trg1=, trg2)
+    end)
+  end)
+end)

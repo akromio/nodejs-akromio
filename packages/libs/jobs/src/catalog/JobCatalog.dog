@@ -28,11 +28,6 @@ export struct JobCatalog: Catalog
   pub const defaultTriggerName?: text
 
   /**
-   * The triggers defined into the catalog.
-   */
-  pub const triggers := {}
-
-  /**
    * Performs the final actions associated to this catalog
    * such as, for example, the plugin finalizers.
    */

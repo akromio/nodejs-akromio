@@ -5,7 +5,7 @@ use (
   env
   {DescCommand, EncodeCommand, SysCommand, createCommands, handleErrors} = alias://cli
   commands/{CatalogCommand, RegistryCommand}
-  commands/{RunCommand, ShowCommand, TriggerCommand}
+  commands/{RunCommand, ShowCommand}
   commands/{EnvCommand, DatasetCommand, QuestionsCommand}
 )
 
@@ -36,7 +36,6 @@ const commands = [
   RunCommand()
   ShowCommand()
   SysCommand(app = {name = appName, version = pkg.version})
-  TriggerCommand()
 ]
 
 createCommands(yargs, commands)

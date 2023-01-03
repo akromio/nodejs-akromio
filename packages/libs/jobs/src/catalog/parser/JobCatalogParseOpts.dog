@@ -1,0 +1,19 @@
+use (
+  {Ops, CatalogParseOpts} = alias://catalog
+  {Dataset} = alias://dataset
+)
+
+/**
+ * Parse options.
+ */
+export intf JobCatalogParseOpts: CatalogParseOpts
+  /**
+   * Dataset parent to use.
+   */
+  parentDataset: Dataset
+
+  /**
+   * The ops registry to use with the cataloged ops such as, for example,
+   * the macros.
+   */
+  ops: Ops

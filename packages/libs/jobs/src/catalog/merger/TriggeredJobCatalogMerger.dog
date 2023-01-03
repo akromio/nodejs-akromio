@@ -1,0 +1,8 @@
+use (
+  JobCatalogMerger
+)
+
+/**
+ * A mixer of triggered job catalog declarations.
+ */
+export struct TriggeredJobCatalogMerger: JobCatalogMerger
