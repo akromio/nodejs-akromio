@@ -46,7 +46,6 @@
     "@akromio/preset-gattuso": "^0.15.1",
     "@akromio/registry": "^0.15.1",
     "@akromio/reporter": "^0.15.1",
-    "@akromio/trigger": "^0.15.1",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "dotenv": "^16.0.3",
     "yargs": "^17.6.2"

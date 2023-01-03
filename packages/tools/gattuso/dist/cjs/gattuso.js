@@ -15,7 +15,6 @@ const CatalogCommand = _core.dogma.use(require("./commands/CatalogCommand"));
 const RegistryCommand = _core.dogma.use(require("./commands/RegistryCommand"));
 const RunCommand = _core.dogma.use(require("./commands/RunCommand"));
 const ShowCommand = _core.dogma.use(require("./commands/ShowCommand"));
-const TriggerCommand = _core.dogma.use(require("./commands/TriggerCommand"));
 const EnvCommand = _core.dogma.use(require("./commands/EnvCommand"));
 const DatasetCommand = _core.dogma.use(require("./commands/DatasetCommand"));
 const QuestionsCommand = _core.dogma.use(require("./commands/QuestionsCommand"));
@@ -36,6 +35,6 @@ const commands = [CatalogCommand(), DatasetCommand(), DescCommand(), EncodeComma
     ["name"]: appName,
     ["version"]: pkg.version
   }
-}), TriggerCommand()];
+})];
 createCommands(yargs, commands);
 yargs.argv;
