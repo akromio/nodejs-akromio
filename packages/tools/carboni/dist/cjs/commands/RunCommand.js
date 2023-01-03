@@ -26,6 +26,9 @@ const {
   ConsoleDistributor,
   RedisStreamsDistributor
 } = _core.dogma.use(require("@akromio/generator"));
+const {
+  ConstDatum
+} = _core.dogma.use(require("@akromio/dataset"));
 const redis = _core.dogma.use(require("redis"));
 const ms = _core.dogma.use(require("ms"));
 const _StageCommand = _core.dogma.use(require("./_StageCommand"));
@@ -84,6 +87,12 @@ const $RunCommand = class RunCommand extends RunCommandBase {
           ["desc"]: "Only show the log of the run requests generated.",
           ["type"]: "boolean",
           ["default"]: false
+        },
+        ["name"]: {
+          ["alias"]: ["n"],
+          ["desc"]: "Identifier of this instance of Carboni.",
+          ["type"]: "string",
+          ["default"]: "carboni"
         }
       }),
       writable: false,
@@ -114,7 +123,8 @@ RunCommand.prototype.handle = async function (argv) {
     stages,
     args,
     log,
-    onlyLog
+    onlyLog,
+    name
   } = argv;
   {
     const registries = (0, await this.createRegistries(argv).connect());
@@ -128,7 +138,11 @@ RunCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Stage catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      const dataset = (0, await this.createGlobalDataset(decl, args));
+      const dataset = (0, await this.createGlobalDataset(decl, args)).setDatum(ConstDatum({
+        'name': "instance",
+        'desc': "Carboni instance name.",
+        'value': name
+      }));
       const catalog = (0, await this.createCatalog(decl, dataset));
       const stagenets = [];
       if ((0, _core.len)(stages) == 0) {
@@ -177,7 +191,8 @@ RunCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Stage: ${stage.name} (duration: ${ms(stage.duration)})`);
         0, await this.runStage(stage, botnet, {
           'log': log,
-          'onlyLog': onlyLog
+          'onlyLog': onlyLog,
+          'name': name
         });
       }
     } finally {
@@ -269,11 +284,16 @@ RunCommand.prototype.runConstStage = async function (stage, botnet, opts) {
     log: {
       optional: false,
       type: _core.bool
+    },
+    name: {
+      optional: false,
+      type: _core.text
     }
   }));
   let {
     onlyLog,
-    log
+    log,
+    name
   } = opts;
   {
     const starterOutput = BlankSheetStream();
@@ -287,49 +307,20 @@ RunCommand.prototype.runConstStage = async function (stage, botnet, opts) {
     }, {}, [], []);
     const starter = ConstStarter(starterProps);
     const assignerOutput = RunReqStream();
-    const assignations = stage.jobs;
-    const ring = Ring({
-      'points': botnet.bots.map(bot => {
-        /* c8 ignore next */_core.dogma.expect("bot", bot);
-        {
-          return bot.bot;
-        }
-      })
+    const assigner = createAssigner({
+      'input': starterOutput,
+      'output': assignerOutput,
+      'ring': Ring({
+        'points': botnet.bots.map(bot => {
+          /* c8 ignore next */_core.dogma.expect("bot", bot);
+          {
+            return bot.bot;
+          }
+        })
+      }),
+      'assignations': stage.jobs
     });
-    const assignerProps = {
-      ["input"]: starterOutput,
-      ["output"]: assignerOutput,
-      ["ring"]: ring,
-      ["assignations"]: assignations
-    };
-    const assigner = RandomAssigner(assignerProps);
-    let distributor;
-    const distributorInput = assignerOutput;
-    const distributorProps = _core.dogma.clone(botnet, {
-      "input": distributorInput
-    }, {}, [], []);
-    if (onlyLog) {
-      distributor = ConsoleDistributor(distributorProps);
-    } else {
-      {
-        const i = botnet.impl;
-        switch (i) {
-          case "redis":
-            {
-              distributor = createRedisStreamsDistributor(distributorProps, botnet);
-            } /* c8 ignore start */
-            break;
-          /* c8 ignore stop */
-          default:
-            {
-              _core.dogma.raise(TypeError(`Unknown botnet impl: ${i}.`));
-            }
-        }
-      }
-      if (log) {
-        distributor = Distributors().append(distributor).append(ConsoleDistributor(distributorProps));
-      }
-    }
+    const distributor = createDistributor(assignerOutput, botnet, opts);
     return Promise.all([starter.start(), assigner.start(), distributor.start()]);
   }
 };
@@ -351,20 +342,7 @@ RunCommand.prototype.runIncStage = async function (stage, botnet, opts) {
       })
     }
   })); /* c8 ignore next */
-  _core.dogma.expect("opts", opts, _core.dogma.intf("inline", {
-    onlyLog: {
-      optional: false,
-      type: _core.bool
-    },
-    log: {
-      optional: false,
-      type: _core.bool
-    }
-  }));
-  let {
-    onlyLog,
-    log
-  } = opts;
+  _core.dogma.expect("opts", opts, _core.map);
   {
     const starterOutput = BlankSheetStream();
     const times = stage.duration / stage.interval.duration;
@@ -378,26 +356,20 @@ RunCommand.prototype.runIncStage = async function (stage, botnet, opts) {
     }, {}, [], []);
     const starter = IncStarter(starterProps);
     const assignerOutput = RunReqStream();
-    const assignations = stage.jobs;
-    const ring = Ring({
-      'points': botnet.bots.map(bot => {
-        /* c8 ignore next */_core.dogma.expect("bot", bot);
-        {
-          return bot.bot;
-        }
-      })
+    const assigner = createAssigner({
+      'input': starterOutput,
+      'output': assignerOutput,
+      'ring': Ring({
+        'points': botnet.bots.map(bot => {
+          /* c8 ignore next */_core.dogma.expect("bot", bot);
+          {
+            return bot.bot;
+          }
+        })
+      }),
+      'assignations': stage.jobs
     });
-    const assignerProps = {
-      ["input"]: starterOutput,
-      ["output"]: assignerOutput,
-      ["ring"]: ring,
-      ["assignations"]: assignations
-    };
-    const assigner = RandomAssigner(assignerProps);
-    const distributor = createDistributor(assignerOutput, botnet, {
-      ["onlyLog"]: onlyLog,
-      ["log"]: log
-    });
+    const distributor = createDistributor(assignerOutput, botnet, opts);
     return Promise.all([starter.start(), assigner.start(), distributor.start()]);
   }
 };
@@ -415,6 +387,12 @@ RunCommand.prototype.runSleepStage = function (stage) {
     return starter.start();
   }
 };
+function createAssigner(props) {
+  /* c8 ignore next */_core.dogma.expect("props", props, _core.map);
+  {
+    return RandomAssigner(props);
+  }
+}
 function createDistributor(assignerOutput, botnet, opts) {
   let distributor; /* c8 ignore next */
   _core.dogma.expect("assignerOutput", assignerOutput); /* c8 ignore next */
@@ -427,15 +405,21 @@ function createDistributor(assignerOutput, botnet, opts) {
     log: {
       optional: false,
       type: _core.bool
+    },
+    name: {
+      optional: false,
+      type: _core.text
     }
   }));
   let {
     onlyLog,
-    log
+    log,
+    name
   } = opts;
   {
     const props = _core.dogma.clone(botnet, {
-      "input": assignerOutput
+      "input": assignerOutput,
+      "name": name
     }, {}, [], []);
     if (onlyLog) {
       distributor = ConsoleDistributor(props);
@@ -445,7 +429,7 @@ function createDistributor(assignerOutput, botnet, opts) {
         switch (i) {
           case "redis":
             {
-              distributor = createRedisStreamsDistributor(props, botnet);
+              distributor = createRedisStreamsDistributor(props, botnet, opts);
             } /* c8 ignore start */
             break;
           /* c8 ignore stop */
@@ -456,20 +440,29 @@ function createDistributor(assignerOutput, botnet, opts) {
         }
       }
       if (log) {
-        distributor = Distributors().append(distributor).append(ConsoleDistributor(distributorProps));
+        distributor = Distributors().append(distributor).append(ConsoleDistributor(props));
       }
     }
   }
   return distributor;
 }
-function createRedisStreamsDistributor(props, botnet) {
+function createRedisStreamsDistributor(props, botnet, opts) {
   let distributor; /* c8 ignore next */
   _core.dogma.expect("props", props); /* c8 ignore next */
-  _core.dogma.expect("botnet", botnet);
+  _core.dogma.expect("botnet", botnet); /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.dogma.intf("inline", {
+    name: {
+      optional: false,
+      type: _core.text
+    }
+  }));
+  let {
+    name
+  } = opts;
   {
     var _botnet$host, _botnet$port;
     const opts = Object.assign({}, {
-      ["name"]: "carboni",
+      ["name"]: name,
       ["socket"]: {
         ["host"]: (_botnet$host = botnet.host) !== null && _botnet$host !== void 0 ? _botnet$host : "localhost",
         ["port"]: (_botnet$port = botnet.port) !== null && _botnet$port !== void 0 ? _botnet$port : 6379

@@ -22,7 +22,7 @@ export struct DistributorBase
     await(self.connect())
     await for each req in self.input do self.deliver(req)
   finally
-    self.disconnect()
+    await(self.disconnect())
   
   /**
    * Connects to the destination. 

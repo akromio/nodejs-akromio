@@ -37,7 +37,7 @@ DistributorBase.prototype.start = async function () {
       this.deliver(req);
     }
   } finally {
-    this.disconnect();
+    0, await this.disconnect();
   }
 };
 DistributorBase.prototype.connect = function () {

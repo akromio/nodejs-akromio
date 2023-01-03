@@ -15,8 +15,14 @@ export struct RedisStreamsDistributor: DistributorBase
   @hidden @async
   pub fn connect() = self.redis.connect()
   
-  @hidden @async
-  pub fn disconnect() = self.redis.disconnect()
+  /**
+   * @dev
+   * We perform a sleep for the Redis internal queue to be flushed.
+   */
+  @hidden
+  pub async proc disconnect()
+    await(sleep("100ms"))
+    pawait(self.redis.disconnect())
 
   @override @hidden @async
   pub fn deliver(req: RunReq) = self.redis.sendCommand([

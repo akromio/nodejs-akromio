@@ -36,10 +36,11 @@ RedisStreamsDistributor.prototype.connect = function () {
     return this.redis.connect();
   }
 };
-RedisStreamsDistributor.prototype.disconnect = function () {
+RedisStreamsDistributor.prototype.disconnect = async function () {
   const self = this;
   {
-    return this.redis.disconnect();
+    0, await (0, _core.sleep)("100ms");
+    await _core.dogma.pawait(() => this.redis.disconnect());
   }
 };
 RedisStreamsDistributor.prototype.deliver = function (req) {
