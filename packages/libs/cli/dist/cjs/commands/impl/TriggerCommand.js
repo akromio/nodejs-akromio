@@ -13,6 +13,9 @@ const {
 const {
   Trigger
 } = _core.dogma.use(require("@akromio/trigger"));
+const {
+  TriggeredJobCatalogParser
+} = _core.dogma.use(require("@akromio/jobs"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
 const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
@@ -26,7 +29,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     /* c8 ignore stop */ /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["trigger [jobName]", "t"]),
+      value: (0, _core.coalesce)(_['name'], ["run [jobName]", "r"]),
       writable: false,
       enumerable: true
     });
@@ -60,7 +63,6 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
         ["onError"]: baseOptions.onError,
         ["reporter"]: baseOptions.reporter,
         ["summaryReporter"]: baseOptions.summaryReporter,
-        ["answer"]: baseOptions.answer,
         ["triggerName"]: {
           ["type"]: "string",
           ["alias"]: ["trigger", "t"],
@@ -85,10 +87,13 @@ const TriggerCommand = new Proxy($TriggerCommand, {
   } /* c8 ignore stop */
 });
 module.exports = exports = TriggerCommand;
-/* c8 ignore start */
-TriggerCommand.prototype.createCatalogParser = function () {
-  (0, _core.abstract)();
-}; /* c8 ignore stop */
+TriggerCommand.prototype.createCatalogParser = function (opts) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.map);
+  {
+    return TriggeredJobCatalogParser(opts);
+  }
+};
 TriggerCommand.prototype.handle = async function (argv) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("argv", argv, _core.map);
@@ -99,7 +104,6 @@ TriggerCommand.prototype.handle = async function (argv) {
     jobName,
     onError,
     args,
-    answers,
     reporters,
     summaryReporters
   } = argv;
@@ -115,11 +119,7 @@ TriggerCommand.prototype.handle = async function (argv) {
         (0, _core.print)(`Job catalog '${catalogName}' not found in '${registries.registryNames}'.`);
         _core.ps.exit(1);
       }
-      const globalDataset = (0, await this.createGlobalDataset({
-        'catalog': decl,
-        'args': args,
-        'answers': answers
-      }));
+      const globalDataset = (0, await this.createGlobalDataset(decl, args));
       const pluginParser = PluginParser();
       const catalog = (0, await this.createCatalog(decl, pluginParser, globalDataset, ops));
       const log = new Duplex({
@@ -167,7 +167,11 @@ TriggerCommand.prototype.handle = async function (argv) {
 function createTrigger(name, cat, engine, jobName, jobArgs) {
   let trigger;
   {
-    const decl = _core.dogma.getItem(cat.triggers, name !== null && name !== void 0 ? name : cat.defaultTriggerName);
+    var _name;
+    if (!(name = (_name = name) !== null && _name !== void 0 ? _name : cat.defaultTriggerName)) {
+      _core.dogma.raise(TypeError(`trigger name expected.`));
+    }
+    const decl = _core.dogma.getItem(cat.triggers, name);
     let TriggerImpl;
     {
       var _decl$impl;

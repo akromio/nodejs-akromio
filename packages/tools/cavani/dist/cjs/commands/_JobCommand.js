@@ -1,9 +1,6 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const {
-  JobCatalogParser: CatalogParser
-} = _core.dogma.use(require("@akromio/jobs"));
 const CatalogReader = _core.dogma.use(require("../catalog/CatalogReader"));
 const Engine = _core.dogma.use(require("../engine/Engine"));
 const $_JobCommand = class _JobCommand {
@@ -64,13 +61,6 @@ _JobCommand.prototype.createCatalogReader = function () {
       'akromioDirName': _core.ps.env.KRM_DIR_NAME,
       'akromioCatalogsPath': _core.ps.env.KRM_JOB_CATALOGS_PATH
     });
-  }
-};
-_JobCommand.prototype.createCatalogParser = function (opts) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("opts", opts, _core.map);
-  {
-    return CatalogParser(opts);
   }
 };
 _JobCommand.prototype._createEngine = function (opts) {

@@ -1,7 +1,9 @@
 use (
-  RunCommandBase
   {PluginLoader} = alias://core
   {ConsoleReporter, Reporters} = alias://reporter
+  {JobCatalogParser} = alias://jobs
+
+  RunCommandBase
 )
 
 /**
@@ -54,8 +56,14 @@ export struct JobRunCommandBase: RunCommandBase
     }
   }
 
+  @override
+  pub fn createCatalogParser(opts: map) = JobCatalogParser(opts)
+
   /**
    * Creates a catalog instance.
+   *
+   * @dev
+   * This method uses the createCatalogParser() for creating the catalog instance.
    */
   @hidden
   pub async fn createCatalog(decl: map, pluginParser, globalDataset, ops) -> catalog

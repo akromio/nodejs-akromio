@@ -2,6 +2,7 @@ use (
   {Duplex} = dep://stream
   {Runner, Ops, PluginLoader, PluginParser} = alias://core
   {Trigger} = alias://trigger
+  {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
 
   ../JobRunCommandBase
@@ -18,7 +19,7 @@ const {baseOptions} = JobRunCommandBase
 @abstract
 export struct TriggerCommand: JobRunCommandBase
   @override
-  pub const name := ["trigger [jobName]", "t"]
+  pub const name := ["run [jobName]", "r"]
 
   @override
   pub const desc := "Use a trigger to run a job of a catalog."
@@ -39,7 +40,6 @@ export struct TriggerCommand: JobRunCommandBase
     {onError} = baseOptions
     {reporter} = baseOptions
     {summaryReporter} = baseOptions
-    {answer} = baseOptions
 
     triggerName =
       type = "string"
@@ -50,11 +50,13 @@ export struct TriggerCommand: JobRunCommandBase
   /**
    * Creates and returns the catalog parser to use.
    */
-  @abstract @hidden
-  pub fn createCatalogParser(opts: map): CatalogParser
+  @hidden
+  pub fn createCatalogParser(opts: map) = TriggeredJobCatalogParser(opts)
 
   @override @hidden
-  pub async proc handle(argv=> {triggerName, catalogName, registryAndCatalogName, jobName, onError, args, answers, reporters, summaryReporters})
+  pub async proc handle(
+    argv=> {triggerName, catalogName, registryAndCatalogName, jobName, onError, args, reporters, summaryReporters}
+  )
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
 
@@ -77,7 +79,7 @@ export struct TriggerCommand: JobRunCommandBase
         ps.exit(1)
 
       # (5) create global dataset
-      const globalDataset = await(self.createGlobalDataset(catalog = decl, args, answers))
+      const globalDataset = await(self.createGlobalDataset(decl, args))
 
       # (6) create catalog instance
       const (
@@ -130,11 +132,15 @@ export struct TriggerCommand: JobRunCommandBase
  */
 @noParamCheck
 fn createTrigger(name, cat, engine, jobName?, jobArgs?) -> trigger
-  # (1) get trigger declaration
-  const decl = cat.triggers[name ?? cat.defaultTriggerName]
+  # (1) pre: set name if unset
+  if not (name ?= cat.defaultTriggerName) then
+    throw(TypeError($"trigger name expected."))
 
   # (2) get the trigger implementation
-  var TriggerImpl
+  var (
+    decl ::= cat.triggers[name]
+    TriggerImpl
+  )
 
   with i ::= decl.impl ?? name do
     if "interval" then TriggerImpl = intervalTriggerImpl.impl

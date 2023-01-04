@@ -1,5 +1,4 @@
 use (
-  {JobCatalogParser as CatalogParser} = alias://jobs
   ../catalog/CatalogReader
   ../engine/Engine
 )
@@ -38,8 +37,5 @@ export struct _JobCommand
     akromioCatalogsPath = $KRM_JOB_CATALOGS_PATH
   )
   
-  @override
-  pub fn createCatalogParser(opts: map) = CatalogParser(opts)
-
   @override @hidden
   pub fn _createEngine(opts: map) = Engine(opts)
