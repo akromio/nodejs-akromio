@@ -143,6 +143,7 @@ JobRunCommand.prototype.handle = async function (argv) {
         return reporters.disconnect();
       });
     }
+    0, await (0, _core.sleep)("1ms");
     _core.ps.exit(code);
   }
 };
