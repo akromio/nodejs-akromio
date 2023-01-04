@@ -1,7 +1,6 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const RunCommandBase = _core.dogma.use(require("./RunCommandBase"));
 const {
   PluginLoader
 } = _core.dogma.use(require("@akromio/core"));
@@ -9,6 +8,10 @@ const {
   ConsoleReporter,
   Reporters
 } = _core.dogma.use(require("@akromio/reporter"));
+const {
+  JobCatalogParser
+} = _core.dogma.use(require("@akromio/jobs"));
+const RunCommandBase = _core.dogma.use(require("./RunCommandBase"));
 const {
   baseOptions
 } = RunCommandBase;
@@ -66,6 +69,13 @@ Object.defineProperty(JobRunCommandBase, 'baseOptions', {
   writable: false,
   enumerable: true
 });
+JobRunCommandBase.prototype.createCatalogParser = function (opts) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.map);
+  {
+    return JobCatalogParser(opts);
+  }
+};
 JobRunCommandBase.prototype.createCatalog = async function (decl, pluginParser, globalDataset, ops) {
   const self = this;
   let catalog; /* c8 ignore next */

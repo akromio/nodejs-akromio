@@ -6,7 +6,7 @@ const plugins = [
   "env", "exec"
   "file", "fs"
   "hbs", "http"
-  "inc", "inquire"
+  "inc"
   "json"
   "list", "log"
   "merge"
@@ -20,8 +20,8 @@ const plugins = [
 ]
 
 export {
-  name = "gattuso"
-  desc = "Preset for the gattuso tool."
+  name = "cavani"
+  desc = "Preset for the cavani tool."
   tags = ["built-in"]
   
   plugins = plugins.map(

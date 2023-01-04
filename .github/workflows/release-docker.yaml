@@ -56,3 +56,11 @@ jobs:
           build-args: version=${{ env.version }}
           push: true
           tags: akromio/carboni:latest,akromio/carboni:${{ env.mmVersion}},akromio/carboni:${{ env.version }}
+
+      - name: Build and push Cavani image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./docker/cavani/alpine
+          build-args: version=${{ env.version }}
+          push: true
+          tags: akromio/cavani:latest,akromio/cavani:${{ env.mmVersion}},akromio/cavani:${{ env.version }}

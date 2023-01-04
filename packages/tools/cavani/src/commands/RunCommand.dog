@@ -1,0 +1,9 @@
+use (
+  {TriggerCommand as TriggerCommandBase} = alias://cli
+  _JobCommand
+)
+
+/**
+ * The run command.
+ */
+export struct RunCommand: TriggerCommandBase:: _JobCommand

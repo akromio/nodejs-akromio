@@ -1,0 +1,9 @@
+use (
+  {DatasetCommand as DatasetCommandBase} = alias://cli
+  _JobCommand
+)
+
+/**
+ * The dataset command.
+ */
+export struct DatasetCommand: DatasetCommandBase:: _JobCommand
