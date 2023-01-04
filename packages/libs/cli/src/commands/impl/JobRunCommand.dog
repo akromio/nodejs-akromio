@@ -113,4 +113,5 @@ export struct JobRunCommand: JobRunCommandBase
       pawait(registries.disconnect())
       peval(reporters.disconnect())
     
+    await(sleep("1ms")) # for log stream to be processed
     ps.exit(code)
