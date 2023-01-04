@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-base64",
-  "version": "0.15.1",
+  "version": "0.16.0",
   "description": "Plugin for working with base64 on Akromio.",
   "author": {
     "name": "Sia Codelabs",
