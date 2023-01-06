@@ -21,13 +21,17 @@ const {baseOptions} = JobRunCommandBase
 @abstract
 export struct TriggerCommand: JobRunCommandBase
   @override
-  pub const name := ["run", "r"]
+  pub const name := ["run [triggerName]", "r"]
 
   @override
   pub const desc := "Use a trigger to run a job of a catalog."
 
   @override
-  pub const positionals := {}
+  pub const positionals := {
+    triggerName =
+      type = "string"
+      desc = "Trigger name to use. If unset, defaultTriggerName used."
+  }
 
   @override
   pub const options := {
@@ -38,11 +42,6 @@ export struct TriggerCommand: JobRunCommandBase
     {onError} = baseOptions
     {reporter} = baseOptions
     {summaryReporter} = baseOptions
-
-    triggerName =
-      type = "string"
-      alias = ["trigger", "t"]
-      desc = "Trigger name to use. If unset, defaultTriggerName used."
   }
 
   /**
@@ -132,7 +131,7 @@ fn createTrigger(name, cat, engine, jobArgs?) -> trigger
 
   # (2) get the trigger implementation
   var (
-    decl ::= cat.triggers[name]
+    decl ::= cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
     TriggerImpl
   )
 

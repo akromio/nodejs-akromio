@@ -31,7 +31,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     /* c8 ignore stop */ /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["run", "r"]),
+      value: (0, _core.coalesce)(_['name'], ["run [triggerName]", "r"]),
       writable: false,
       enumerable: true
     });
@@ -45,7 +45,12 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     /* c8 ignore start */
     if (_['positionals'] != null) (0, _core.expect)('positionals', _['positionals'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'positionals', {
-      value: (0, _core.coalesce)(_['positionals'], {}),
+      value: (0, _core.coalesce)(_['positionals'], {
+        ["triggerName"]: {
+          ["type"]: "string",
+          ["desc"]: "Trigger name to use. If unset, defaultTriggerName used."
+        }
+      }),
       writable: false,
       enumerable: true
     });
@@ -59,12 +64,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
         ["arg"]: baseOptions.arg,
         ["onError"]: baseOptions.onError,
         ["reporter"]: baseOptions.reporter,
-        ["summaryReporter"]: baseOptions.summaryReporter,
-        ["triggerName"]: {
-          ["type"]: "string",
-          ["alias"]: ["trigger", "t"],
-          ["desc"]: "Trigger name to use. If unset, defaultTriggerName used."
-        }
+        ["summaryReporter"]: baseOptions.summaryReporter
       }),
       writable: false,
       enumerable: true
@@ -159,11 +159,11 @@ TriggerCommand.prototype.handle = async function (argv) {
 function createTrigger(name, cat, engine, jobArgs) {
   let trigger;
   {
-    var _name;
+    var _name, _dogma$getItem;
     if (!(name = (_name = name) !== null && _name !== void 0 ? _name : cat.defaultTriggerName)) {
       _core.dogma.raise(TypeError(`trigger name expected.`));
     }
-    const decl = _core.dogma.getItem(cat.triggers, name);
+    const decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
     let TriggerImpl;
     {
       var _decl$impl;
