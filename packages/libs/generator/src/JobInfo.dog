@@ -3,16 +3,6 @@
  */
 export intf JobInfo
   /**
-   * Registry where the job catalog is.
-   */
-  registry: text
-
-  /**
-   * Catalog name where the job to run is.
-   */
-  catalog: text
-
-  /**
    * Job name to run.
    */
   job: text

@@ -12,8 +12,6 @@ const RunReqStream = _core.dogma.use(require("../../RunReqStream"));
 const RandomAssigner = _core.dogma.use(require("./RandomAssigner"));
 suite(__filename, () => {
   {
-    const registry = "fs:///my/registry";
-    const catalog = "catalog-name";
     const job = "job-name";
     const ring = Ring({
       'points': ["one", "two", "three"]
@@ -23,13 +21,9 @@ suite(__filename, () => {
         test("when total weight is not 100, error must be raised", () => {
           {
             const assignations = [{
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: job,
               ["weight"]: 90
             }, {
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: job,
               ["weight"]: 20
             }];
@@ -62,13 +56,9 @@ suite(__filename, () => {
               }
             });
             const assignations = [{
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#1",
               ["weight"]: 25
             }, {
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#2",
               ["weight"]: 75
             }];

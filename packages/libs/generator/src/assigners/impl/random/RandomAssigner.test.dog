@@ -10,8 +10,6 @@ use (
 
 suite(__filename, proc()
   const (
-    registry = "fs:///my/registry"
-    catalog = "catalog-name"
     job = "job-name"
     ring = Ring(points = ["one", "two", "three"])
   )
@@ -20,7 +18,7 @@ suite(__filename, proc()
     test("when total weight is not 100, error must be raised", proc()
       # (1) act
       const (
-        assignations = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
+        assignations = [{job, weight = 90}, {job, weight = 20}]
         input = BlankSheetStream()
         output = RunReqStream()
         opts = {input, output, assignations, ring}
@@ -37,10 +35,7 @@ suite(__filename, proc()
       # (1) act
       const (
         blankSheets = text(timestamp().valueOf() + " ").repeat(100).split(" ")[0, -2].map(fn(ts) = {ts = num(ts)} end)
-        assignations = [
-          {registry, catalog, job = "#1", weight = 25},
-          {registry, catalog, job = "#2", weight = 75}
-        ]
+        assignations = [{job = "#1", weight = 25}, {job = "#2", weight = 75}]
         input = sim.stream.readable(objectMode = true, data = blankSheets)
         output = monitor(RunReqStream(), method = "append")
         opts = {input, output, assignations, ring}
