@@ -163,7 +163,7 @@ function createTrigger(name, cat, engine, jobArgs) {
     if (!(name = (_name = name) !== null && _name !== void 0 ? _name : cat.defaultTriggerName)) {
       _core.dogma.raise(TypeError(`trigger name expected.`));
     }
-    const decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
+    let decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
     let TriggerImpl;
     {
       var _decl$impl;
@@ -177,17 +177,17 @@ function createTrigger(name, cat, engine, jobArgs) {
         /* c8 ignore stop */
         case "redisstreams":
           {
-            var _botnet$host, _botnet$port;
+            var _decl$host, _decl$port;
             const opts = Object.assign({}, {
               ["name"]: decl.group.consumer,
               ["socket"]: {
-                ["host"]: (_botnet$host = botnet.host) !== null && _botnet$host !== void 0 ? _botnet$host : "localhost",
-                ["port"]: (_botnet$port = botnet.port) !== null && _botnet$port !== void 0 ? _botnet$port : 6379
+                ["host"]: (_decl$host = decl.host) !== null && _decl$host !== void 0 ? _decl$host : "localhost",
+                ["port"]: (_decl$port = decl.port) !== null && _decl$port !== void 0 ? _decl$port : 6379
               }
-            }, botnet.username ? {
-              ["username"]: botnet.username
-            } : {}, botnet.password ? {
-              ["password"]: botnet.password
+            }, decl.username ? {
+              ["username"]: decl.username
+            } : {}, decl.password ? {
+              ["password"]: decl.password
             } : {});
             TriggerImpl = redisStreamsTriggerImpl.impl;
             decl = _core.dogma.clone(decl, {

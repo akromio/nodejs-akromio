@@ -1,7 +1,6 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const StreamEvent = _core.dogma.use(require("./StreamEvent"));
 const $RedisStreamsTriggerImpl = class RedisStreamsTriggerImpl {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -73,6 +72,7 @@ RedisStreamsTriggerImpl.prototype.start = function (handler) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("handler", handler, _core.func);
   {
+    this.redis.connect();
     const callback = () => {
       {
         if (!(_core.dogma.is(this.times, _core.num) && this.fired > this.times)) {
@@ -102,6 +102,7 @@ RedisStreamsTriggerImpl.prototype.stop = function () {
     this.handler = null;
     clearInterval(this.timer);
     this.timer = null;
+    this.redis.disconnect();
   }
   return this;
 };
@@ -114,13 +115,18 @@ RedisStreamsTriggerImpl.prototype.fire = async function () {
       group,
       consumer
     } = this;
-    const payload = (0, await redis.sendCommand(["XREADGROUP", "GROUP", group, consumer, "COUNT", 1, "BLOCK", 150, "NOACK", "STREAMS", stream, ">"]));
-    if (payload) {
+    const resp = (0, await redis.sendCommand(["XREADGROUP", "GROUP", group, consumer, "COUNT", "1", "BLOCK", "150", "NOACK", "STREAMS", stream, ">"]));
+    if (resp) {
       this.fired += 1;
-      0, await this.handler(StreamEvent({
+      const msg = _core.json.decode(_core.dogma.getItem(_core.dogma.getItem(_core.dogma.getItem(_core.dogma.getItem(_core.dogma.getItem(resp, 0), 1), 0), 1), 1));
+      const call = {
+        ["jobName"]: msg.job,
+        ["args"]: msg.args
+      };
+      0, await this.handler({
         'last': _core.dogma.is(this.times, _core.num) && this.fired >= this.times,
-        'payload': payload
-      }));
+        'call': call
+      });
     }
   }
 };

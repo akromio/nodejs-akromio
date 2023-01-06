@@ -131,7 +131,7 @@ fn createTrigger(name, cat, engine, jobArgs?) -> trigger
 
   # (2) get the trigger implementation
   var (
-    decl ::= cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
+    decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
     TriggerImpl
   )
 
@@ -143,10 +143,10 @@ fn createTrigger(name, cat, engine, jobArgs?) -> trigger
       const opts = {
         name = decl.group.consumer
         socket =
-          host = botnet.host ?? "localhost"
-          port = botnet.port ?? 6379
-        if botnet.username then username = botnet.username
-        if botnet.password then password = botnet.password
+          host = decl.host ?? "localhost"
+          port = decl.port ?? 6379
+        if decl.username then username = decl.username
+        if decl.password then password = decl.password
       }
 
       TriggerImpl = redisStreamsTriggerImpl.impl
