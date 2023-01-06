@@ -1,7 +1,8 @@
 use (
   alias://expected
   {monitor} = alias://doubles
-  {Trigger, TriggerState} = ~
+
+  Trigger, TriggerState
 )
 
 struct Engine
@@ -109,8 +110,8 @@ suite(__filename, proc()
       const (
         engine = monitor(Engine(), members = ["run"], onlyCalls = true)
         triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = await(Trigger(name=, engine, call, triggerImpl).start())
-        e = {ts = timestamp()}
+        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        e = {ts = timestamp(), call, last = false}
       )
 
       await(triggerImpl.fireEvent(e))
@@ -131,8 +132,8 @@ suite(__filename, proc()
       const (
         engine = monitor(Engine(), members = ["run"], onlyCalls = true)
         triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = await(Trigger(name=, engine, call, triggerImpl).start())
-        e = {ts = timestamp(), last = true}
+        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        e = {ts = timestamp(), call, last = true}
       )
 
       await(triggerImpl.fireEvent(e))
@@ -152,8 +153,8 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = TriggerImpl()
-        trigger = await(Trigger(name=, engine, call, triggerImpl).start())
-        e = {ts = timestamp()}
+        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        e = {ts = timestamp(), call}
       )
 
       triggerImpl.fireEvent(e)

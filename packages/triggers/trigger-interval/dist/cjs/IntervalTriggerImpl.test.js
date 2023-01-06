@@ -9,6 +9,7 @@ const TriggerImpl = _core.dogma.use(require("./IntervalTriggerImpl"));
 suite(__filename, () => {
   {
     const interval = "10s";
+    const job = "job-name";
     setup(() => {
       {
         monitor.clearAll();
@@ -20,7 +21,8 @@ suite(__filename, () => {
           {
             const handler = monitor(_core.dogma.nop());
             const trigger = TriggerImpl({
-              'interval': interval
+              'interval': interval,
+              'job': job
             }).start(handler);
             try {
               expected(trigger).toHave({
@@ -41,7 +43,8 @@ suite(__filename, () => {
         test("when called, timer must be cleared", () => {
           {
             const trigger = TriggerImpl({
-              'interval': interval
+              'interval': interval,
+              'job': job
             }).start(_core.dogma.nop()).stop();
             expected(trigger).members("handler", "timer").toBeNil();
           }
@@ -52,7 +55,8 @@ suite(__filename, () => {
       {
         const handler = monitor(_core.dogma.nop());
         const trigger = TriggerImpl({
-          'interval': "225ms"
+          'interval': "225ms",
+          'job': job
         }).start(handler);
         0, await (0, _core.sleep)(800);
         try {
@@ -60,7 +64,7 @@ suite(__filename, () => {
           const fired = 4;
           expected(log.calls).equalTo(fired);
           for (let i = 0; i < fired; i += 1) {
-            expected(log.getCall(i).args).it(0).toBe("IntervalEvent");
+            expected(log.getCall(i).args).it(0).toHave(["last", "ts", "call"]);
           }
         } finally {
           trigger.stop();
@@ -72,7 +76,8 @@ suite(__filename, () => {
         const handler = monitor(_core.dogma.nop());
         const trigger = TriggerImpl({
           'immediate': false,
-          'interval': "225ms"
+          'interval': "225ms",
+          'job': job
         }).start(handler);
         0, await (0, _core.sleep)(800);
         try {
@@ -80,7 +85,7 @@ suite(__filename, () => {
           const fired = 3;
           expected(log.calls).equalTo(fired);
           for (let i = 0; i < fired; i += 1) {
-            expected(log.getCall(i).args).it(0).toBe("IntervalEvent");
+            expected(log.getCall(i).args).it(0).toHave(["last", "ts", "call"]);
           }
         } finally {
           trigger.stop();
@@ -93,14 +98,15 @@ suite(__filename, () => {
         const handler = monitor(_core.dogma.nop());
         const trigger = TriggerImpl({
           'interval': "225ms",
-          'times': times
+          'times': times,
+          'job': job
         }).start(handler);
         0, await (0, _core.sleep)(800);
         try {
           const log = monitor.log(handler);
           expected(log.calls).equalTo(times);
           for (let i = 0; i < times; i += 1) {
-            expected(log.getCall(i).args).it(0).toBe("IntervalEvent");
+            expected(log.getCall(i).args).it(0).toHave(["last", "ts", "call"]);
           }
         } finally {
           trigger.stop();

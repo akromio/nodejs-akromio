@@ -23,11 +23,6 @@ export struct Trigger
   pub const engine
 
   /**
-   * The job call to perform.
-   */
-  pub const call: JobCall
-
-  /**
    * The function to call when finished.
    */
   pub var callback?: func
@@ -82,7 +77,7 @@ export struct Trigger
    * Right now, only one event can be handled at the same time.
    */
   @hidden
-  pub async proc handle(e: map)
+  pub async proc handle(e: {call: JobCall, last?: bool})
     # (1) pre
     if self._state ==~ running then
       throw(TypeError("Trigger still processing an event."))
@@ -90,7 +85,7 @@ export struct Trigger
     # (2) process event
     self._state =~ running
 
-    await(self.engine.run(self.call.jobName, self.call.args))
+    await(self.engine.run(e.call.jobName, e.call.args))
 
     if e.last === true then
       await(self.stop())

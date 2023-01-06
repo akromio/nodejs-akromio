@@ -17,6 +17,8 @@ const {
   TriggeredJobCatalogParser
 } = _core.dogma.use(require("@akromio/jobs"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
+const redis = _core.dogma.use(require("redis"));
+const redisStreamsTriggerImpl = _core.dogma.use(require("@akromio/trigger-redisstreams"));
 const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
   baseOptions
@@ -139,10 +141,6 @@ TriggerCommand.prototype.handle = async function (argv) {
       reporters = this.createReporters(reporters, log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
       const trigger = createTrigger(triggerName, catalog, engine, jobName, args);
-      if (!trigger.call.jobName) {
-        console.error("Catalog doesn't contain default job name.");
-        _core.ps.exit(2);
-      }
       let code = 0;
       trigger.start(async result => {
         {
@@ -183,6 +181,27 @@ function createTrigger(name, cat, engine, jobName, jobArgs) {
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
+        case "redisstreams":
+          {
+            var _botnet$host, _botnet$port;
+            const opts = Object.assign({}, {
+              ["name"]: decl.group.consumer,
+              ["socket"]: {
+                ["host"]: (_botnet$host = botnet.host) !== null && _botnet$host !== void 0 ? _botnet$host : "localhost",
+                ["port"]: (_botnet$port = botnet.port) !== null && _botnet$port !== void 0 ? _botnet$port : 6379
+              }
+            }, botnet.username ? {
+              ["username"]: botnet.username
+            } : {}, botnet.password ? {
+              ["password"]: botnet.password
+            } : {});
+            TriggerImpl = redisStreamsTriggerImpl.impl;
+            decl = _core.dogma.clone(decl, {
+              "redis": redis.createClient(opts)
+            }, {}, [], []);
+          } /* c8 ignore start */
+          break;
+        /* c8 ignore stop */
         default:
           {
             _core.dogma.raise(TypeError(`Invalid trigger implementation: ${i}.`));
@@ -192,10 +211,6 @@ function createTrigger(name, cat, engine, jobName, jobArgs) {
     trigger = Trigger({
       'name': name,
       'engine': engine,
-      'call': {
-        ["jobName"]: jobName !== null && jobName !== void 0 ? jobName : cat.defaultJobName,
-        ["args"]: jobArgs
-      },
       'triggerImpl': TriggerImpl(decl)
     });
   }

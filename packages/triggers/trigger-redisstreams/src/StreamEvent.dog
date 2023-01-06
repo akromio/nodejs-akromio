@@ -1,0 +1,13 @@
+/**
+ * A event read from a stream.
+ */
+export struct StreamEvent
+  /**
+   * Message read form the Redis Stream stream.
+   */
+  pub const payload: any
+
+  /**
+   * When true, this is the last event to be fired.
+   */
+  pub const last: bool

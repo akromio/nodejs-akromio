@@ -1,6 +1,5 @@
 use (
   dep://ms
-  IntervalEvent
 )
 
 /**
@@ -9,6 +8,16 @@ use (
  * The first event is raised immediately, except if immediate is false.
  */
 export struct IntervalTriggerImpl
+  /**
+   * Job name to run when event fired.
+   */
+  pub const job: text
+
+  /**
+   * Arguments to pass to the job to run.
+   */
+  pub const args?: any
+
   /**
    * The timer object.
    */
@@ -78,10 +87,13 @@ export struct IntervalTriggerImpl
   @hidden
   pub async proc fire(ts: timestamp)
     # (1) create event
-    const e = IntervalEvent(
-      ts=,
+    const e = {
       last = self.times is num and self.fired >= self.times
-    )
+      ts
+      call = 
+        jobName = self.job
+        args = self.args
+    }
 
     # (2) call the handler
     await(self.handler(e))

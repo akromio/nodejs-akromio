@@ -270,7 +270,7 @@ fn createDistributor(
     distributor = ConsoleDistributor(props)
   else
     with i ::= botnet.impl do
-      if "redis" then distributor = createRedisStreamsDistributor(props, botnet, opts)
+      if "redisstreams" then distributor = createRedisStreamsDistributor(props, botnet, opts)
       else throw(TypeError($"Unknown botnet impl: ${i}."))
     
     if log then

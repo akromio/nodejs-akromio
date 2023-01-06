@@ -2,11 +2,23 @@
 
 var _core = require("@dogmalang/core");
 const ms = _core.dogma.use(require("ms"));
-const IntervalEvent = _core.dogma.use(require("./IntervalEvent"));
 const $IntervalTriggerImpl = class IntervalTriggerImpl {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */
+    (0, _core.expect)('job', _['job'], _core.text);
+    Object.defineProperty(this, 'job', {
+      value: (0, _core.coalesce)(_['job'], null),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
+    if (_['args'] != null) (0, _core.expect)('args', _['args'], _core.any); /* c8 ignore stop */
+    Object.defineProperty(this, 'args', {
+      value: (0, _core.coalesce)(_['args'], null),
+      writable: false,
+      enumerable: true
+    });
     Object.defineProperty(this, 'timer', {
       value: null,
       writable: true,
@@ -102,10 +114,14 @@ IntervalTriggerImpl.prototype.fire = async function (ts) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("ts", ts, _core.timestamp);
   {
-    const e = IntervalEvent({
-      'ts': ts,
-      'last': _core.dogma.is(this.times, _core.num) && this.fired >= this.times
-    });
+    const e = {
+      ["last"]: _core.dogma.is(this.times, _core.num) && this.fired >= this.times,
+      ["ts"]: ts,
+      ["call"]: {
+        ["jobName"]: this.job,
+        ["args"]: this.args
+      }
+    };
     0, await this.handler(e);
   }
 };

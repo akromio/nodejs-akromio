@@ -4,6 +4,8 @@ use (
   {Trigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
+  dep://redis
+  alias://redisStreamsTriggerImpl
 
   ../JobRunCommandBase
 )
@@ -106,16 +108,12 @@ export struct TriggerCommand: JobRunCommandBase
       reporters = self.createReporters(reporters, log).connect()
       ops.appendOps(...values(catalog.jobs))
 
-      # (8) create trigger
-      const trigger = createTrigger(triggerName, catalog, engine, jobName, args)
-
-      if not trigger.call.jobName then
-        console.error("Catalog doesn't contain default job name.")
-        ps.exit(2)
-
-      # (9) run trigger
-      var code = 0
-
+      # (8) create and run trigger
+      var (
+        trigger ::= createTrigger(triggerName, catalog, engine, jobName, args)
+        code = 0
+      )
+      
       trigger.start(async proc(result?)
         do
           if result then code = 1
@@ -143,16 +141,27 @@ fn createTrigger(name, cat, engine, jobName?, jobArgs?) -> trigger
   )
 
   with i ::= decl.impl ?? name do
-    if "interval" then TriggerImpl = intervalTriggerImpl.impl
+    if "interval" then
+      TriggerImpl = intervalTriggerImpl.impl
+
+    if "redisstreams" then
+      const opts = {
+        name = decl.group.consumer
+        socket =
+          host = botnet.host ?? "localhost"
+          port = botnet.port ?? 6379
+        if botnet.username then username = botnet.username
+        if botnet.password then password = botnet.password
+      }
+
+      TriggerImpl = redisStreamsTriggerImpl.impl
+      decl = decl{*, redis = redis.createClient(opts)}
+    
     else throw(TypeError($"Invalid trigger implementation: ${i}."))
 
   # (3) create trigger
   trigger = Trigger(
     name=,
     engine
-    call = {
-      jobName = jobName ?? cat.defaultJobName
-      args = jobArgs
-    }
     triggerImpl = TriggerImpl(decl)
   )

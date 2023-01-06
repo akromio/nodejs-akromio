@@ -1,0 +1,109 @@
+use (
+  StreamEvent
+)
+
+/**
+ * A trigger implementation to fire an event read from a Redis Stream stream.
+ */
+export struct RedisStreamsTriggerImpl
+  /**
+   * Redis client to use for querying the stream.
+   */
+  @hidden
+  pub const redis
+
+  /**
+   * Redis Streams stream name.
+   */
+  pub const stream: text
+
+  /**
+   * Redis Streams consumer group name associted to this consumer.
+   */
+  pub const group: text
+
+  /**
+   * Consumer name into the group.
+   */
+  pub const consumer: text
+
+  /**
+   * Timer object.
+   */
+  @hidden @strict
+  pub var timer = nil
+
+  /**
+   * Number of times the trigger must be fired.
+   *
+   * If unset, infinite.
+   */
+  pub const times?: num
+
+  /**
+   * Number of times fired up to now.
+   */
+  @hidden @strict
+  pub var fired = 0
+
+  /**
+   * Handler to call when event fired.
+   *
+   * Prototype: proc(e: {ts: timestamp, payload: map}).
+   */
+  @hidden
+  pub var handler?: func
+
+  /**
+   * Starts the trigger.
+   *
+   * @dev
+   * Right now, the stream is queried every 333ms.
+   * If no message waiting, wait for the next interval.
+   */
+  pub fn start(handler: func) -> self
+    const callback = proc()
+      if not (self.times is num and self.fired > self.times) then
+        self.fire()
+    end
+
+    # (2) set timers
+    self.{handler, fired = 0}
+
+    setImmediate(callback)
+    self.timer = setInterval(callback, 333)
+  
+  /**
+   * Stops de trigger.
+   */
+  pub fn stop() -> self
+    self.handler = nil
+    clearInterval(self.timer)
+    self.timer = nil
+  
+  /**
+   * Handles a timer event.
+   */
+  @hidden
+  pub async proc fire()
+    # (1) read message
+    const (
+      {redis, stream, group, consumer} = self
+      payload = await(redis.sendCommand([
+        "XREADGROUP"
+        "GROUP", group, consumer
+        "COUNT", 1
+        "BLOCK", 150
+        "NOACK"
+        "STREAMS", stream, ">"
+      ]))
+    )
+
+    # (2) handle stream event
+    if payload then
+      self.fired += 1
+
+      await(self.handler(StreamEvent(
+        last = self.times is num and self.fired >= self.times
+        payload
+      )))

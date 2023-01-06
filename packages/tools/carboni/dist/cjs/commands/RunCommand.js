@@ -427,7 +427,7 @@ function createDistributor(assignerOutput, botnet, opts) {
       {
         const i = botnet.impl;
         switch (i) {
-          case "redis":
+          case "redisstreams":
             {
               distributor = createRedisStreamsDistributor(props, botnet, opts);
             } /* c8 ignore start */
