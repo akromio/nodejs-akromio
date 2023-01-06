@@ -31,7 +31,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     /* c8 ignore stop */ /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["run [jobName]", "r"]),
+      value: (0, _core.coalesce)(_['name'], ["run", "r"]),
       writable: false,
       enumerable: true
     });
@@ -45,12 +45,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     /* c8 ignore start */
     if (_['positionals'] != null) (0, _core.expect)('positionals', _['positionals'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'positionals', {
-      value: (0, _core.coalesce)(_['positionals'], {
-        ["jobName"]: {
-          ["type"]: "string",
-          ["desc"]: "Job name to run. If unset, defaultJobName used."
-        }
-      }),
+      value: (0, _core.coalesce)(_['positionals'], {}),
       writable: false,
       enumerable: true
     });
@@ -103,7 +98,6 @@ TriggerCommand.prototype.handle = async function (argv) {
     triggerName,
     catalogName,
     registryAndCatalogName,
-    jobName,
     onError,
     args,
     reporters,
@@ -140,7 +134,7 @@ TriggerCommand.prototype.handle = async function (argv) {
       }, registries.getRegistry(decl.registryName)));
       reporters = this.createReporters(reporters, log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
-      const trigger = createTrigger(triggerName, catalog, engine, jobName, args);
+      const trigger = createTrigger(triggerName, catalog, engine, args);
       let code = 0;
       trigger.start(async result => {
         {
@@ -162,7 +156,7 @@ TriggerCommand.prototype.handle = async function (argv) {
     }
   }
 };
-function createTrigger(name, cat, engine, jobName, jobArgs) {
+function createTrigger(name, cat, engine, jobArgs) {
   let trigger;
   {
     var _name;

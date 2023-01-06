@@ -21,17 +21,13 @@ const {baseOptions} = JobRunCommandBase
 @abstract
 export struct TriggerCommand: JobRunCommandBase
   @override
-  pub const name := ["run [jobName]", "r"]
+  pub const name := ["run", "r"]
 
   @override
   pub const desc := "Use a trigger to run a job of a catalog."
 
   @override
-  pub const positionals := {
-    jobName =
-      type = "string"
-      desc = "Job name to run. If unset, defaultJobName used."
-  }
+  pub const positionals := {}
 
   @override
   pub const options := {
@@ -57,7 +53,7 @@ export struct TriggerCommand: JobRunCommandBase
 
   @override @hidden
   pub async proc handle(
-    argv=> {triggerName, catalogName, registryAndCatalogName, jobName, onError, args, reporters, summaryReporters}
+    argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters, summaryReporters}
   )
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
@@ -110,7 +106,7 @@ export struct TriggerCommand: JobRunCommandBase
 
       # (8) create and run trigger
       var (
-        trigger ::= createTrigger(triggerName, catalog, engine, jobName, args)
+        trigger ::= createTrigger(triggerName, catalog, engine, args)
         code = 0
       )
       
@@ -129,7 +125,7 @@ export struct TriggerCommand: JobRunCommandBase
  * Creates a trigger with the given data.
  */
 @noParamCheck
-fn createTrigger(name, cat, engine, jobName?, jobArgs?) -> trigger
+fn createTrigger(name, cat, engine, jobArgs?) -> trigger
   # (1) pre: set name if unset
   if not (name ?= cat.defaultTriggerName) then
     throw(TypeError($"trigger name expected."))
