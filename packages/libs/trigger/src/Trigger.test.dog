@@ -149,6 +149,28 @@ suite(__filename, proc()
       expected(stop.calls).equalTo(1)
     end)
 
+    test("when job is __exit__, last event must be generated", async proc()
+      # (1) act
+      const (
+        engine = monitor(Engine(), members = ["run"], onlyCalls = true)
+        triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
+        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        call = {jobName = "__exit__"}
+        e = {ts = timestamp(), call, last = false}
+      )
+
+      await(triggerImpl.fireEvent(e))
+
+      # (2) assessment
+      expected(trigger.state).equalTo(TriggerState.stopped)
+
+      const run = monitor.log(engine)
+      expected(run.calls).equalTo(0)
+
+      const stop = monitor.log(triggerImpl)
+      expected(stop.calls).equalTo(1)
+    end)
+
     test("when running and called, error must be raised", async proc()
       # (1) act
       const (

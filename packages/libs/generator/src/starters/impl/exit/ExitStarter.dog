@@ -1,0 +1,15 @@
+use (
+  ../../Starter
+)
+
+/**
+ * A starter to send an exit job. It represents the agent exit.
+ */
+@factory
+export struct ExitStarter: Starter
+  @factory
+  pvt fn create(props) = new(props{*, times = 1})
+
+  @override
+  pub proc generateBlankSheets()
+    self.output.append(ts = timestamp().valueOf(), job = "__exit__")

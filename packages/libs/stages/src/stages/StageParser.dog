@@ -2,7 +2,7 @@ use (
   {ms} = util
   {CatalogItemParser, CatalogItemParseOpts} = alias://catalog
 
-  ConstStage, IncStage, SleepStage
+  ConstStage, ExitStage, IncStage, SleepStage
 )
 
 /**
@@ -27,6 +27,7 @@ export struct StageParser: CatalogItemParser
     if "const" in decl then stage = self.parseConstStage(decl, opts)
     else if "inc" in decl then stage = self.parseIncStage(decl, opts)
     else if "sleep" in decl then stage = self.parseSleepStage(decl, opts)
+    else if "exit" in decl then stage = self.parseExitStage(decl, opts)
     else stage = self.parseAddOnStage(decl, opts)
   
   /**
@@ -70,6 +71,18 @@ export struct StageParser: CatalogItemParser
     decl{
       *
       name = decl.sleep
+      duration = ms(decl.duration)
+    }
+  )
+
+  /**
+   * Parses an exit stage [decl]aration.
+   */
+  @hidden
+  pub fn parseExitStage(decl: map, _: ParseOpts) = ExitStage(
+    decl{
+      *
+      name = decl.exit
       duration = ms(decl.duration)
     }
   )

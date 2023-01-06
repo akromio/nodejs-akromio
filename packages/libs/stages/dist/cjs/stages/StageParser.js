@@ -9,6 +9,7 @@ const {
   CatalogItemParseOpts
 } = _core.dogma.use(require("@akromio/catalog"));
 const ConstStage = _core.dogma.use(require("./ConstStage"));
+const ExitStage = _core.dogma.use(require("./ExitStage"));
 const IncStage = _core.dogma.use(require("./IncStage"));
 const SleepStage = _core.dogma.use(require("./SleepStage"));
 const ParseOpts = CatalogItemParseOpts;
@@ -58,6 +59,8 @@ StageParser.prototype.parseStage = function (decl, opts) {
       stage = this.parseIncStage(decl, opts);
     } else if (_core.dogma.includes(decl, "sleep")) {
       stage = this.parseSleepStage(decl, opts);
+    } else if (_core.dogma.includes(decl, "exit")) {
+      stage = this.parseExitStage(decl, opts);
     } else {
       stage = this.parseAddOnStage(decl, opts);
     }
@@ -107,6 +110,17 @@ StageParser.prototype.parseSleepStage = function (decl, _) {
   {
     return SleepStage(_core.dogma.clone(decl, {
       "name": decl.sleep,
+      "duration": ms(decl.duration)
+    }, {}, [], []));
+  }
+};
+StageParser.prototype.parseExitStage = function (decl, _) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("decl", decl, _core.map); /* c8 ignore next */
+  _core.dogma.expect("_", _, ParseOpts);
+  {
+    return ExitStage(_core.dogma.clone(decl, {
+      "name": decl.exit,
       "duration": ms(decl.duration)
     }, {}, [], []));
   }

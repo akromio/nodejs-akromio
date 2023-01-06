@@ -4,6 +4,7 @@ pub use (
 
   stages/StageParser
   stages/ConstStage
+  stages/ExitStage
   stages/IncStage
   stages/SleepStage
 )

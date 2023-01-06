@@ -56,7 +56,16 @@ Assigner.prototype.start = async function () {
       output
     } = this;
     for await (const blankSheet of input) {
-      output.append(this.assign(blankSheet));
+      {
+        const req = this.assign(blankSheet);
+        if (_core.dogma.is(req, _core.list)) {
+          for (const r of req) {
+            output.append(r);
+          }
+        } else {
+          output.append(req);
+        }
+      }
     }
     output.end();
   }

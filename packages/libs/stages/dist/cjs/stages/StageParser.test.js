@@ -4,6 +4,7 @@ var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
 const StageParser = _core.dogma.use(require("./StageParser"));
 const ConstStage = _core.dogma.use(require("./ConstStage"));
+const ExitStage = _core.dogma.use(require("./ExitStage"));
 const IncStage = _core.dogma.use(require("./IncStage"));
 const SleepStage = _core.dogma.use(require("./SleepStage"));
 suite(__filename, () => {
@@ -42,7 +43,7 @@ suite(__filename, () => {
         });
         suite("inc", () => {
           {
-            test("when valid declaration, a IncStage must be returned", () => {
+            test("when valid declaration, an IncStage must be returned", () => {
               {
                 const jobs = [];
                 const decl = {
@@ -83,6 +84,24 @@ suite(__filename, () => {
                 expected(out.pause).toBe(SleepStage).toHave({
                   'name': "pause",
                   'duration': 120000
+                });
+              }
+            });
+          }
+        });
+        suite("exit", () => {
+          {
+            test("when valid declaration, an ExitStage must be returned", () => {
+              {
+                const jobs = [];
+                const decl = {
+                  ["exit"]: "fin",
+                  ["duration"]: "1s"
+                };
+                const out = parser.parse(decl, parseOpts);
+                expected(out.fin).toBe(ExitStage).toHave({
+                  'name': "fin",
+                  'duration': 1000
                 });
               }
             });

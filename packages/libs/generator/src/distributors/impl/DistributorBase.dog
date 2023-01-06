@@ -20,7 +20,8 @@ export struct DistributorBase
    */
   pub async proc start()
     await(self.connect())
-    await for each req in self.input do self.deliver(req)
+    await for each req in self.input do
+      self.deliver(req)
   finally
     await(self.disconnect())
   

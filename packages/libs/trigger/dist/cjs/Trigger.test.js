@@ -236,6 +236,37 @@ suite(__filename, () => {
             expected(stop.calls).equalTo(1);
           }
         });
+        test("when job is __exit__, last event must be generated", async () => {
+          {
+            const engine = monitor(Engine(), {
+              'members': ["run"],
+              'onlyCalls': true
+            });
+            const triggerImpl = monitor(TriggerImpl(), {
+              'members': ["stop"],
+              'onlyCalls': true
+            });
+            const trigger = (0, await Trigger({
+              'name': name,
+              'engine': engine,
+              'triggerImpl': triggerImpl
+            }).start());
+            const call = {
+              ["jobName"]: "__exit__"
+            };
+            const e = {
+              ["ts"]: (0, _core.timestamp)(),
+              ["call"]: call,
+              ["last"]: false
+            };
+            0, await triggerImpl.fireEvent(e);
+            expected(trigger.state).equalTo(TriggerState.stopped);
+            const run = monitor.log(engine);
+            expected(run.calls).equalTo(0);
+            const stop = monitor.log(triggerImpl);
+            expected(stop.calls).equalTo(1);
+          }
+        });
         test("when running and called, error must be raised", async () => {
           {
             const triggerImpl = TriggerImpl();

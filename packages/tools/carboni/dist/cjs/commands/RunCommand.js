@@ -7,11 +7,13 @@ const {
 const {
   Stage,
   ConstStage,
+  ExitStage,
   IncStage,
   SleepStage
 } = _core.dogma.use(require("@akromio/stages"));
 const {
   ConstStarter,
+  ExitStarter,
   IncStarter,
   SleepStarter,
   BlankSheetStream
@@ -249,6 +251,10 @@ RunCommand.prototype.runStage = function (stage, botnet, opts) {
         {
           promise = this.runSleepStage(stage);
         }
+      } else if (_core.dogma.is(_, ExitStage)) {
+        {
+          promise = this.runExitStage(stage, botnet, opts);
+        }
       } else {
         {
           _core.dogma.raise(Error(`Unknown stage: ${(0, _core.fmt)(stage)}.`));
@@ -385,6 +391,52 @@ RunCommand.prototype.runSleepStage = function (stage) {
     }, {}, [], []);
     const starter = SleepStarter(starterProps);
     return starter.start();
+  }
+};
+RunCommand.prototype.runExitStage = async function (stage, botnet, opts) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("stage", stage, ExitStage); /* c8 ignore next */
+  _core.dogma.expect("botnet", botnet, _core.dogma.intf("inline", {
+    impl: {
+      optional: false,
+      type: _core.text
+    },
+    bots: {
+      optional: false,
+      type: _core.dogma.TypeDef({
+        name: 'inline',
+        types: [_core.map],
+        min: 0,
+        max: null
+      })
+    }
+  })); /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.map);
+  {
+    const starterOutput = BlankSheetStream();
+    const starterProps = _core.dogma.clone(stage, {
+      "output": starterOutput
+    }, {}, [], []);
+    const starter = ExitStarter(starterProps);
+    const assignerOutput = RunReqStream();
+    const assigner = createAssigner({
+      'input': starterOutput,
+      'output': assignerOutput,
+      'ring': Ring({
+        'points': botnet.bots.map(bot => {
+          /* c8 ignore next */_core.dogma.expect("bot", bot);
+          {
+            return bot.bot;
+          }
+        })
+      }),
+      'assignations': [{
+        ["job"]: "__exit__",
+        ["weight"]: 100
+      }]
+    });
+    const distributor = createDistributor(assignerOutput, botnet, opts);
+    return Promise.all([starter.start(), assigner.start(), distributor.start()]);
   }
 };
 function createAssigner(props) {

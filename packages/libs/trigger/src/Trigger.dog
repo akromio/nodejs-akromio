@@ -85,7 +85,10 @@ export struct Trigger
     # (2) process event
     self._state =~ running
 
-    await(self.engine.run(e.call.jobName, e.call.args))
+    if e.call.jobName == "__exit__" then
+      e = {last = true}
+    else
+      await(self.engine.run(e.call.jobName, e.call.args))
 
     if e.last === true then
       await(self.stop())

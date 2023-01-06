@@ -113,7 +113,13 @@ Trigger.prototype.handle = async function (e) {
       _core.dogma.raise(TypeError("Trigger still processing an event."));
     }
     this._state = _core.dogma.enumGet(this._state, "running");
-    0, await this.engine.run(e.call.jobName, e.call.args);
+    if (e.call.jobName == "__exit__") {
+      e = {
+        ["last"]: true
+      };
+    } else {
+      0, await this.engine.run(e.call.jobName, e.call.args);
+    }
     if (e.last === true) {
       0, await this.stop();
     } else {

@@ -1,6 +1,6 @@
 use (
   alias://expected
-  StageParser, ConstStage, IncStage, SleepStage
+  StageParser, ConstStage, ExitStage, IncStage, SleepStage
 )
 
 suite(__filename, proc()
@@ -41,7 +41,7 @@ suite(__filename, proc()
     end)
 
     suite("inc", proc()
-      test("when valid declaration, a IncStage must be returned", proc()
+      test("when valid declaration, an IncStage must be returned", proc()
         # (1) act
         const (
           jobs = []
@@ -85,6 +85,23 @@ suite(__filename, proc()
         expected(out.pause).toBe(SleepStage).toHave(
           name = "pause"
           duration = 120000
+        )
+      end)
+    end)
+
+    suite("exit", proc()
+      test("when valid declaration, an ExitStage must be returned", proc()
+        # (1) act
+        const (
+          jobs = []
+          decl = {exit = "fin", duration = "1s"}
+          out = parser.parse(decl, parseOpts)
+        )
+
+        # (2) assessment
+        expected(out.fin).toBe(ExitStage).toHave(
+          name = "fin"
+          duration = 1000
         )
       end)
     end)

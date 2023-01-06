@@ -1,0 +1,10 @@
+use (
+  Stage
+)
+
+/**
+ * A stage for requesting the process exit.
+ *
+ * Its duration is the delay for allowing to end the current operations.
+ */
+export struct ExitStage: Stage
