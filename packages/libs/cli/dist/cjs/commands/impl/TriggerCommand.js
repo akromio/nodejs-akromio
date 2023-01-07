@@ -17,6 +17,8 @@ const {
   TriggeredJobCatalogParser
 } = _core.dogma.use(require("@akromio/jobs"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
+const redis = _core.dogma.use(require("redis"));
+const redisStreamsTriggerImpl = _core.dogma.use(require("@akromio/trigger-redisstreams"));
 const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
   baseOptions
@@ -29,7 +31,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     /* c8 ignore stop */ /* c8 ignore start */
     if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'name', {
-      value: (0, _core.coalesce)(_['name'], ["run [jobName]", "r"]),
+      value: (0, _core.coalesce)(_['name'], ["run [triggerName]", "r"]),
       writable: false,
       enumerable: true
     });
@@ -44,9 +46,9 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
     if (_['positionals'] != null) (0, _core.expect)('positionals', _['positionals'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'positionals', {
       value: (0, _core.coalesce)(_['positionals'], {
-        ["jobName"]: {
+        ["triggerName"]: {
           ["type"]: "string",
-          ["desc"]: "Job name to run. If unset, defaultJobName used."
+          ["desc"]: "Trigger name to use. If unset, defaultTriggerName used."
         }
       }),
       writable: false,
@@ -62,12 +64,7 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
         ["arg"]: baseOptions.arg,
         ["onError"]: baseOptions.onError,
         ["reporter"]: baseOptions.reporter,
-        ["summaryReporter"]: baseOptions.summaryReporter,
-        ["triggerName"]: {
-          ["type"]: "string",
-          ["alias"]: ["trigger", "t"],
-          ["desc"]: "Trigger name to use. If unset, defaultTriggerName used."
-        }
+        ["summaryReporter"]: baseOptions.summaryReporter
       }),
       writable: false,
       enumerable: true
@@ -101,7 +98,6 @@ TriggerCommand.prototype.handle = async function (argv) {
     triggerName,
     catalogName,
     registryAndCatalogName,
-    jobName,
     onError,
     args,
     reporters,
@@ -138,11 +134,7 @@ TriggerCommand.prototype.handle = async function (argv) {
       }, registries.getRegistry(decl.registryName)));
       reporters = this.createReporters(reporters, log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
-      const trigger = createTrigger(triggerName, catalog, engine, jobName, args);
-      if (!trigger.call.jobName) {
-        console.error("Catalog doesn't contain default job name.");
-        _core.ps.exit(2);
-      }
+      const trigger = createTrigger(triggerName, catalog, engine, args);
       let code = 0;
       trigger.start(async result => {
         {
@@ -164,14 +156,14 @@ TriggerCommand.prototype.handle = async function (argv) {
     }
   }
 };
-function createTrigger(name, cat, engine, jobName, jobArgs) {
+function createTrigger(name, cat, engine, jobArgs) {
   let trigger;
   {
-    var _name;
+    var _name, _dogma$getItem;
     if (!(name = (_name = name) !== null && _name !== void 0 ? _name : cat.defaultTriggerName)) {
       _core.dogma.raise(TypeError(`trigger name expected.`));
     }
-    const decl = _core.dogma.getItem(cat.triggers, name);
+    let decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
     let TriggerImpl;
     {
       var _decl$impl;
@@ -180,6 +172,27 @@ function createTrigger(name, cat, engine, jobName, jobArgs) {
         case "interval":
           {
             TriggerImpl = intervalTriggerImpl.impl;
+          } /* c8 ignore start */
+          break;
+        /* c8 ignore stop */
+        case "redisstreams":
+          {
+            var _decl$host, _decl$port;
+            const opts = Object.assign({}, {
+              ["name"]: decl.group.consumer,
+              ["socket"]: {
+                ["host"]: (_decl$host = decl.host) !== null && _decl$host !== void 0 ? _decl$host : "localhost",
+                ["port"]: (_decl$port = decl.port) !== null && _decl$port !== void 0 ? _decl$port : 6379
+              }
+            }, decl.username ? {
+              ["username"]: decl.username
+            } : {}, decl.password ? {
+              ["password"]: decl.password
+            } : {});
+            TriggerImpl = redisStreamsTriggerImpl.impl;
+            decl = _core.dogma.clone(decl, {
+              "redis": redis.createClient(opts)
+            }, {}, [], []);
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -192,10 +205,6 @@ function createTrigger(name, cat, engine, jobName, jobArgs) {
     trigger = Trigger({
       'name': name,
       'engine': engine,
-      'call': {
-        ["jobName"]: jobName !== null && jobName !== void 0 ? jobName : cat.defaultJobName,
-        ["args"]: jobArgs
-      },
       'triggerImpl': TriggerImpl(decl)
     });
   }

@@ -35,8 +35,6 @@ Distributor.prototype.deliver = function (req) {
 };
 suite(__filename, () => {
   {
-    const registry = "registry";
-    const catalog = "catalog-name";
     suite("deliver()", () => {
       {
         test("when called, input stream read and _delivery() run for each request", async () => {
@@ -46,29 +44,21 @@ suite(__filename, () => {
             const reqs = [{
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#1",
               ["assignee"]: "one"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#2",
               ["assignee"]: "two"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#1",
               ["assignee"]: "three"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#3",
               ["assignee"]: "one"
             }];

@@ -10,8 +10,6 @@ use (
 
 suite(__filename, proc()
   const (
-    registry = "fs:///my/registry"
-    catalog = "catalog-name"
     job = "job-name"
     ring = Ring(points = ["one", "two", "three"])
   )
@@ -20,7 +18,7 @@ suite(__filename, proc()
     test("when total weight is not 100, error must be raised", proc()
       # (1) act
       const (
-        assignations = [{registry, catalog, job, weight = 90}, {registry, catalog, job, weight = 20}]
+        assignations = [{job, weight = 90}, {job, weight = 20}]
         input = BlankSheetStream()
         output = RunReqStream()
         opts = {input, output, assignations, ring}
@@ -32,15 +30,12 @@ suite(__filename, proc()
     end)
   end)
 
-  suite("start()", proc()
-    test("when started, run requests must be generated", async proc()
+  suite("assignToOne()", proc()
+    test("when called, only one request must be generated for every call", async proc()
       # (1) act
       const (
         blankSheets = text(timestamp().valueOf() + " ").repeat(100).split(" ")[0, -2].map(fn(ts) = {ts = num(ts)} end)
-        assignations = [
-          {registry, catalog, job = "#1", weight = 25},
-          {registry, catalog, job = "#2", weight = 75}
-        ]
+        assignations = [{job = "#1", weight = 25}, {job = "#2", weight = 75}]
         input = sim.stream.readable(objectMode = true, data = blankSheets)
         output = monitor(RunReqStream(), method = "append")
         opts = {input, output, assignations, ring}
@@ -54,7 +49,7 @@ suite(__filename, proc()
       expected(output.writable).equalTo(false)
 
       var (
-        log ::= monitor.log(output, clear = true)
+        append ::= monitor.log(output, clear = true)
         job1 = 0
         job2 = 0
         assignee1 = 0
@@ -62,10 +57,10 @@ suite(__filename, proc()
         assignee3 = 0
       )
 
-      expected(log.calls).equalTo(100)
+      expected(append.calls).equalTo(100)
       
-      for i = 0; i < log.calls; i += 1 do
-        const req = log.getCall(i).args[0]
+      for i = 0; i < append.calls; i += 1 do
+        const req = append.getCall(i).args[0]
         
         with req.job do
           if "#1" then job1 += 1
@@ -81,6 +76,35 @@ suite(__filename, proc()
       expected(assignee1).greaterThanOrEqualTo(33)
       expected(assignee2).greaterThanOrEqualTo(33)
       expected(assignee3).greaterThanOrEqualTo(33)
+    end)
+  end)
+
+  suite("assignInternalJob()", proc()
+    test("when job is __exit__, one request for every ring point must be generated", async proc()
+      # (1) act
+      const (
+        blankSheets = [{ts = timestamp().valueOf(), job = "__exit__"}]
+        assignations = [{job = "__exit__", weight = 100}]
+        input = sim.stream.readable(objectMode = true, data = blankSheets)
+        output = monitor(RunReqStream(), method = "append")
+        opts = {input, output, assignations, ring}
+        assigner = RandomAssigner(opts)
+      )
+
+      await(assigner.start())      
+
+      # (2) assessment
+      expected(input.readable).equalTo(false)
+      expected(output.writable).equalTo(false)
+
+      const append = monitor.log(output, clear = true)
+      expected(append.calls).equalTo(3)
+
+      const assignees = []
+      for i = 0; i < append.calls; i += 1 do
+        const args = append.getCall(i).args[0]
+        expected(args.job).equalTo("__exit__")
+        expected(args.assignee).equalTo(ring.points[i])
     end)
   end)
 end)

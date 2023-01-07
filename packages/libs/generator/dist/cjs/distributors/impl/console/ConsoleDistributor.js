@@ -34,6 +34,6 @@ ConsoleDistributor.prototype.deliver = async function (req) {
   _core.dogma.expect("req", req, RunReq);
   {
     const now = (0, _core.timestamp)().toISOString();
-    this.console(`[${now}] ${req.assignee} ts:${req.ts} assignTs:${req.assignTs} registry:${req.registry} catalog:${req.catalog} job:${req.job}`);
+    this.console(`[${now}] ${req.assignee} ts:${req.ts} assignTs:${req.assignTs} job:${req.job}`);
   }
 };

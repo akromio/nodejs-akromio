@@ -6,11 +6,6 @@ use (
 )
 
 suite(__filename, proc()
-  const (
-    registry = "registry"
-    catalog = "catalog-name"
-  )
-
   suite("deliver()", proc()
     test("when called, message must be sent to stream", async proc()
       # (1) act
@@ -18,9 +13,9 @@ suite(__filename, proc()
         ts = timestamp().valueOf()
         assignTs = ts
         reqs = [
-          {ts, assignTs, registry, catalog, job = "job1", assignee = "cavani1"}
-          {ts, assignTs, registry, catalog, job = "job2", assignee = "cavani2"}
-          {ts, assignTs, registry, catalog, job = "job3", assignee = "cavani1"}
+          {ts, assignTs, job = "job1", assignee = "cavani1"}
+          {ts, assignTs, job = "job2", assignee = "cavani2"}
+          {ts, assignTs, job = "job3", assignee = "cavani1"}
         ]
         input = sim.stream.readable(objectMode = true, data = reqs)
         redis = monitor(

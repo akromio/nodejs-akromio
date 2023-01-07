@@ -11,8 +11,6 @@ const {
 const ConsoleDistributor = _core.dogma.use(require("./ConsoleDistributor"));
 suite(__filename, () => {
   {
-    const registry = "registry";
-    const catalog = "catalog-name";
     suite("deliver()", () => {
       {
         test("when called, message must be sent to stream", async () => {
@@ -22,22 +20,16 @@ suite(__filename, () => {
             const reqs = [{
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "job1",
               ["assignee"]: "cavani1"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "job2",
               ["assignee"]: "cavani2"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "job3",
               ["assignee"]: "cavani3"
             }];
@@ -56,7 +48,7 @@ suite(__filename, () => {
             });
             expected(clog.calls).equalTo(3);
             for (let i = 0; i < clog.calls; i += 1) {
-              expected(_core.dogma.getItem(clog.getCall(i).args, 0)).like("\\[.+\\] cavani. ts:.+ assignTs:.+ registry:.+ catalog:.+ job:job.");
+              expected(_core.dogma.getItem(clog.getCall(i).args, 0)).like("\\[.+\\] cavani. ts:.+ assignTs:.+ job:job.");
             }
           }
         });

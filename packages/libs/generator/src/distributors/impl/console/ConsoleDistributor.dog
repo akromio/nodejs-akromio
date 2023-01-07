@@ -15,4 +15,4 @@ export struct ConsoleDistributor: DistributorBase
   @override @hidden
   pub async proc deliver(req: RunReq)
     const now = timestamp().toISOString()
-    self.console($"[${now}] ${req.assignee} ts:${req.ts} assignTs:${req.assignTs} registry:${req.registry} catalog:${req.catalog} job:${req.job}")
+    self.console($"[${now}] ${req.assignee} ts:${req.ts} assignTs:${req.assignTs} job:${req.job}")

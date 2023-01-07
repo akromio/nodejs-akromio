@@ -19,3 +19,5 @@ uses:
     js: "@akromio/trigger"
   intervalTriggerImpl:
     js: "@akromio/trigger-interval"
+  redisStreamsTriggerImpl:
+    js: "@akromio/trigger-redisstreams"

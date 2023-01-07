@@ -52,6 +52,28 @@ RandomAssigner.prototype._pvt_fba4ce954ae6f3485b6af57f4e179ab0___post__ = Random
 RandomAssigner.prototype.assign = function (blankSheet) {
   const self = this;
   {
+    return blankSheet.job ? this.assignInternalJob(blankSheet) : this.assignToOne(blankSheet);
+  }
+};
+RandomAssigner.prototype.assignInternalJob = function (blankSheet) {
+  const self = this;
+  let reqs = [];
+  {
+    if (blankSheet.job == "__exit__") {
+      const assignTs = (0, _core.timestamp)().valueOf();
+      for (const assignee of this.ring.points) {
+        reqs.push(_core.dogma.clone(blankSheet, {
+          "assignTs": assignTs,
+          "assignee": assignee
+        }, {}, [], []));
+      }
+    }
+  }
+  return reqs;
+};
+RandomAssigner.prototype.assignToOne = function (blankSheet) {
+  const self = this;
+  {
     if ((0, _core.len)(this.assignationOrder) == 0) {
       this.assignationOrder = this.generateAssignationOrder();
     }

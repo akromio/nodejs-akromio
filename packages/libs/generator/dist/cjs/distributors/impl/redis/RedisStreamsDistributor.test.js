@@ -10,8 +10,6 @@ const {
 const RedisStreamsDistributor = _core.dogma.use(require("./RedisStreamsDistributor"));
 suite(__filename, () => {
   {
-    const registry = "registry";
-    const catalog = "catalog-name";
     suite("deliver()", () => {
       {
         test("when called, message must be sent to stream", async () => {
@@ -21,22 +19,16 @@ suite(__filename, () => {
             const reqs = [{
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "job1",
               ["assignee"]: "cavani1"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "job2",
               ["assignee"]: "cavani2"
             }, {
               ["ts"]: ts,
               ["assignTs"]: assignTs,
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "job3",
               ["assignee"]: "cavani1"
             }];

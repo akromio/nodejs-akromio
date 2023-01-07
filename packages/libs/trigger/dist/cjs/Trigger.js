@@ -20,12 +20,6 @@ const $Trigger = class Trigger {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('call', _['call'], JobCall);
-    Object.defineProperty(this, 'call', {
-      value: (0, _core.coalesce)(_['call'], null),
-      writable: false,
-      enumerable: true
-    });
     /* c8 ignore start */
     if (_['callback'] != null) (0, _core.expect)('callback', _['callback'], _core.func); /* c8 ignore stop */
     Object.defineProperty(this, 'callback', {
@@ -104,13 +98,28 @@ Trigger.prototype.stop = async function () {
 };
 Trigger.prototype.handle = async function (e) {
   const self = this; /* c8 ignore next */
-  _core.dogma.expect("e", e, _core.map);
+  _core.dogma.expect("e", e, _core.dogma.intf("inline", {
+    call: {
+      optional: false,
+      type: JobCall
+    },
+    last: {
+      optional: true,
+      type: _core.bool
+    }
+  }));
   {
     if (_core.dogma.enumEq(this._state, "running")) {
       _core.dogma.raise(TypeError("Trigger still processing an event."));
     }
     this._state = _core.dogma.enumGet(this._state, "running");
-    0, await this.engine.run(this.call.jobName, this.call.args);
+    if (e.call.jobName == "__exit__") {
+      e = {
+        ["last"]: true
+      };
+    } else {
+      0, await this.engine.run(e.call.jobName, e.call.args);
+    }
     if (e.last === true) {
       0, await this.stop();
     } else {

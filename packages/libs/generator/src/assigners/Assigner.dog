@@ -35,13 +35,21 @@ export struct Assigner
     const {input, output} = self
 
     await for each blankSheet in input do
-      output.append(self.assign(blankSheet))
+      if req ::= self.assign(blankSheet); req is list then
+        for each r in req do
+          output.append(r)
+      else
+        output.append(req)
     
     # (2) set end for the output stream
     output.end()
   
   /**
    * Performs a new assignation.
+   *
+   * @dev
+   * This method can return RunReq[] if a special operation must be
+   * sent to several destinations such as, for example, the exit operation.
    */
   @abstract @hidden
-  pub fn assign(blankSheet: BlankSheet): RunReq
+  pub fn assign(blankSheet: BlankSheet): RunReq | RunReq[]

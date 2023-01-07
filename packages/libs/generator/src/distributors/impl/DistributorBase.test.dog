@@ -12,11 +12,6 @@ struct Distributor: DistributorBase
     nop
 
 suite(__filename, proc()
-  const (
-    registry = "registry"
-    catalog = "catalog-name"
-  )
-
   suite("deliver()", proc()
     test("when called, input stream read and _delivery() run for each request", async proc()
       # (1) act
@@ -24,10 +19,10 @@ suite(__filename, proc()
         ts = timestamp().valueOf()
         assignTs = ts
         reqs = [
-          {ts, assignTs, registry, catalog, job = "#1", assignee = "one"}
-          {ts, assignTs, registry, catalog, job = "#2", assignee = "two"}
-          {ts, assignTs, registry, catalog, job = "#1", assignee = "three"}
-          {ts, assignTs, registry, catalog, job = "#3", assignee = "one"}
+          {ts, assignTs, job = "#1", assignee = "one"}
+          {ts, assignTs, job = "#2", assignee = "two"}
+          {ts, assignTs, job = "#1", assignee = "three"}
+          {ts, assignTs, job = "#3", assignee = "one"}
         ]
         input = sim.stream.readable(objectMode = true, data = reqs)
         distributor = monitor(Distributor(input=), method = "deliver")

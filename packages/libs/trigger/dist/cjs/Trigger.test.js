@@ -5,19 +5,17 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  Trigger,
-  TriggerState
-} = _core.dogma.use(require("../.."));
+const Trigger = _core.dogma.use(require("./Trigger"));
+const TriggerState = _core.dogma.use(require("./TriggerState"));
 const $Engine = class Engine {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___init__ instanceof Function) this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___init__(_); /* c8 ignore stop */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___init__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___post__ instanceof Function) this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___post__(); /* c8 ignore stop */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___post__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___validate__ instanceof Function) this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___validate__(); /* c8 ignore stop */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___validate__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -41,11 +39,11 @@ const $TriggerImpl = class TriggerImpl {
       enumerable: true
     });
     /* c8 ignore start */
-    if (this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___init__ instanceof Function) this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___init__(_); /* c8 ignore stop */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___init__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___post__ instanceof Function) this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___post__(); /* c8 ignore stop */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___post__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___validate__ instanceof Function) this._pvt_b8c0a6acd40c5390b69cb4337c1e7d16___validate__(); /* c8 ignore stop */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___validate__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -193,11 +191,12 @@ suite(__filename, () => {
             const trigger = (0, await Trigger({
               'name': name,
               'engine': engine,
-              'call': call,
               'triggerImpl': triggerImpl
             }).start());
             const e = {
-              ["ts"]: (0, _core.timestamp)()
+              ["ts"]: (0, _core.timestamp)(),
+              ["call"]: call,
+              ["last"]: false
             };
             0, await triggerImpl.fireEvent(e);
             expected(trigger.state).equalTo(TriggerState.started);
@@ -221,11 +220,11 @@ suite(__filename, () => {
             const trigger = (0, await Trigger({
               'name': name,
               'engine': engine,
-              'call': call,
               'triggerImpl': triggerImpl
             }).start());
             const e = {
               ["ts"]: (0, _core.timestamp)(),
+              ["call"]: call,
               ["last"]: true
             };
             0, await triggerImpl.fireEvent(e);
@@ -237,17 +236,48 @@ suite(__filename, () => {
             expected(stop.calls).equalTo(1);
           }
         });
+        test("when job is __exit__, last event must be generated", async () => {
+          {
+            const engine = monitor(Engine(), {
+              'members': ["run"],
+              'onlyCalls': true
+            });
+            const triggerImpl = monitor(TriggerImpl(), {
+              'members': ["stop"],
+              'onlyCalls': true
+            });
+            const trigger = (0, await Trigger({
+              'name': name,
+              'engine': engine,
+              'triggerImpl': triggerImpl
+            }).start());
+            const call = {
+              ["jobName"]: "__exit__"
+            };
+            const e = {
+              ["ts"]: (0, _core.timestamp)(),
+              ["call"]: call,
+              ["last"]: false
+            };
+            0, await triggerImpl.fireEvent(e);
+            expected(trigger.state).equalTo(TriggerState.stopped);
+            const run = monitor.log(engine);
+            expected(run.calls).equalTo(0);
+            const stop = monitor.log(triggerImpl);
+            expected(stop.calls).equalTo(1);
+          }
+        });
         test("when running and called, error must be raised", async () => {
           {
             const triggerImpl = TriggerImpl();
             const trigger = (0, await Trigger({
               'name': name,
               'engine': engine,
-              'call': call,
               'triggerImpl': triggerImpl
             }).start());
             const e = {
-              ["ts"]: (0, _core.timestamp)()
+              ["ts"]: (0, _core.timestamp)(),
+              ["call"]: call
             };
             triggerImpl.fireEvent(e);
             const out = await _core.dogma.pawait(() => triggerImpl.fireEvent(e));

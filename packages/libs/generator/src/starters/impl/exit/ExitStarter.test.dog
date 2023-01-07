@@ -1,0 +1,30 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+
+  ../../{BlankSheetStream, StarterState}
+  ExitStarter
+)
+
+suite(__filename, proc()
+  suite("generateBlankSheets()", proc()
+    test("when called, nothing must be added to the stream", async proc()
+      # (1) act
+      const (
+        output = monitor(BlankSheetStream(), method = "append")
+        opts = {interval = 50, output}
+        starter = ExitStarter(opts)
+      )
+
+      await(starter.start())
+
+      # (2) assessment
+      expected(starter).toHave(state = StarterState.stopped, iterations = 1)
+      expected(output.writable).equalTo(false)
+      
+      const append = monitor.log(output, clear = true)
+      expected(append.calls).equalTo(1)
+      expected(append.getCall(0).args).it(0).toHave(job = "__exit__")
+    end)
+  end)
+end)

@@ -5,7 +5,10 @@ use (
 )
 
 suite(__filename, proc()
-  const interval = "10s"
+  const (
+    interval = "10s"
+    job = "job-name"
+  )
 
   setup(proc()
     monitor.clearAll()
@@ -16,7 +19,7 @@ suite(__filename, proc()
       # (1) act
       const (
         handler = monitor(nop)
-        trigger = TriggerImpl(interval=).start(handler)
+        trigger = TriggerImpl(interval=, job).start(handler)
       )
 
       # (2) assessment
@@ -37,7 +40,7 @@ suite(__filename, proc()
     test("when called, timer must be cleared", proc()
       # (1) act
       const (
-        trigger = TriggerImpl(interval=).start(nop).stop()
+        trigger = TriggerImpl(interval=, job).start(nop).stop()
       )
 
       # (2) assessment
@@ -49,7 +52,7 @@ suite(__filename, proc()
     # (1) act
     const (
       handler = monitor(nop)
-      trigger = TriggerImpl(interval = "225ms").start(handler)
+      trigger = TriggerImpl(interval = "225ms", job).start(handler)
     )
 
     await(sleep(800))
@@ -64,7 +67,7 @@ suite(__filename, proc()
       expected(log.calls).equalTo(fired)
 
       for i = 0; i < fired; i += 1 do
-        expected(log.getCall(i).args).it(0).toBe("IntervalEvent")
+        expected(log.getCall(i).args).it(0).toHave(["last", "ts", "call"])
     finally
       trigger.stop()
   end)
@@ -73,7 +76,7 @@ suite(__filename, proc()
     # (1) act
     const (
       handler = monitor(nop)
-      trigger = TriggerImpl(immediate = false, interval = "225ms").start(handler)
+      trigger = TriggerImpl(immediate = false, interval = "225ms", job).start(handler)
     )
 
     await(sleep(800))
@@ -88,7 +91,7 @@ suite(__filename, proc()
       expected(log.calls).equalTo(fired)
 
       for i = 0; i < fired; i += 1 do
-        expected(log.getCall(i).args).it(0).toBe("IntervalEvent")
+        expected(log.getCall(i).args).it(0).toHave(["last", "ts", "call"])
     finally
       trigger.stop()
   end)
@@ -98,7 +101,7 @@ suite(__filename, proc()
     const (
       times = 2
       handler = monitor(nop)
-      trigger = TriggerImpl(interval = "225ms", times).start(handler)
+      trigger = TriggerImpl(interval = "225ms", times, job).start(handler)
     )
 
     await(sleep(800))
@@ -109,7 +112,7 @@ suite(__filename, proc()
       expected(log.calls).equalTo(times)
 
       for i = 0; i < times; i += 1 do
-        expected(log.getCall(i).args).it(0).toBe("IntervalEvent")
+        expected(log.getCall(i).args).it(0).toHave(["last", "ts", "call"])
     finally
       trigger.stop()
   end)

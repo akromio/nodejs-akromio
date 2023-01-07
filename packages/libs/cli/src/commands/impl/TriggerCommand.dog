@@ -4,6 +4,8 @@ use (
   {Trigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
+  dep://redis
+  alias://redisStreamsTriggerImpl
 
   ../JobRunCommandBase
 )
@@ -19,16 +21,16 @@ const {baseOptions} = JobRunCommandBase
 @abstract
 export struct TriggerCommand: JobRunCommandBase
   @override
-  pub const name := ["run [jobName]", "r"]
+  pub const name := ["run [triggerName]", "r"]
 
   @override
   pub const desc := "Use a trigger to run a job of a catalog."
 
   @override
   pub const positionals := {
-    jobName =
+    triggerName =
       type = "string"
-      desc = "Job name to run. If unset, defaultJobName used."
+      desc = "Trigger name to use. If unset, defaultTriggerName used."
   }
 
   @override
@@ -40,11 +42,6 @@ export struct TriggerCommand: JobRunCommandBase
     {onError} = baseOptions
     {reporter} = baseOptions
     {summaryReporter} = baseOptions
-
-    triggerName =
-      type = "string"
-      alias = ["trigger", "t"]
-      desc = "Trigger name to use. If unset, defaultTriggerName used."
   }
 
   /**
@@ -55,7 +52,7 @@ export struct TriggerCommand: JobRunCommandBase
 
   @override @hidden
   pub async proc handle(
-    argv=> {triggerName, catalogName, registryAndCatalogName, jobName, onError, args, reporters, summaryReporters}
+    argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters, summaryReporters}
   )
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
@@ -106,16 +103,12 @@ export struct TriggerCommand: JobRunCommandBase
       reporters = self.createReporters(reporters, log).connect()
       ops.appendOps(...values(catalog.jobs))
 
-      # (8) create trigger
-      const trigger = createTrigger(triggerName, catalog, engine, jobName, args)
-
-      if not trigger.call.jobName then
-        console.error("Catalog doesn't contain default job name.")
-        ps.exit(2)
-
-      # (9) run trigger
-      var code = 0
-
+      # (8) create and run trigger
+      var (
+        trigger ::= createTrigger(triggerName, catalog, engine, args)
+        code = 0
+      )
+      
       trigger.start(async proc(result?)
         do
           if result then code = 1
@@ -131,28 +124,39 @@ export struct TriggerCommand: JobRunCommandBase
  * Creates a trigger with the given data.
  */
 @noParamCheck
-fn createTrigger(name, cat, engine, jobName?, jobArgs?) -> trigger
+fn createTrigger(name, cat, engine, jobArgs?) -> trigger
   # (1) pre: set name if unset
   if not (name ?= cat.defaultTriggerName) then
     throw(TypeError($"trigger name expected."))
 
   # (2) get the trigger implementation
   var (
-    decl ::= cat.triggers[name]
+    decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
     TriggerImpl
   )
 
   with i ::= decl.impl ?? name do
-    if "interval" then TriggerImpl = intervalTriggerImpl.impl
+    if "interval" then
+      TriggerImpl = intervalTriggerImpl.impl
+
+    if "redisstreams" then
+      const opts = {
+        name = decl.group.consumer
+        socket =
+          host = decl.host ?? "localhost"
+          port = decl.port ?? 6379
+        if decl.username then username = decl.username
+        if decl.password then password = decl.password
+      }
+
+      TriggerImpl = redisStreamsTriggerImpl.impl
+      decl = decl{*, redis = redis.createClient(opts)}
+    
     else throw(TypeError($"Invalid trigger implementation: ${i}."))
 
   # (3) create trigger
   trigger = Trigger(
     name=,
     engine
-    call = {
-      jobName = jobName ?? cat.defaultJobName
-      args = jobArgs
-    }
     triggerImpl = TriggerImpl(decl)
   )

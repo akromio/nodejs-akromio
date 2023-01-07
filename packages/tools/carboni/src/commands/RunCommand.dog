@@ -1,12 +1,13 @@
 use (
+  dep://redis
+  dep://ms
+  {PassThrough} = dep://stream
   {RunCommand as RunCommandBase} = alias://cli
-  {Stage, ConstStage, IncStage, SleepStage} = alias://stages
-  {ConstStarter, IncStarter, SleepStarter, BlankSheetStream} = alias://generator
+  {Stage, ConstStage, ExitStage, IncStage, SleepStage} = alias://stages
+  {ConstStarter, ExitStarter, IncStarter, SleepStarter, BlankSheetStream} = alias://generator
   {RandomAssigner, Ring, RunReqStream} = alias://generator
   {Distributors, ConsoleDistributor, RedisStreamsDistributor} = alias://generator
   {ConstDatum} = alias://dataset
-  dep://redis
-  dep://ms
 
   _StageCommand
 )
@@ -154,6 +155,7 @@ export struct RunCommand: RunCommandBase:: _StageCommand
       if ConstStage then promise = self.runConstStage(stage, botnet, opts)
       if IncStage then promise = self.runIncStage(stage, botnet, opts)
       if SleepStage then promise = self.runSleepStage(stage)
+      if ExitStage then promise = self.runExitStage(stage, botnet, opts)
       else throw(Error($"Unknown stage: ${fmt(stage)}."))
 
   /**
@@ -250,6 +252,39 @@ export struct RunCommand: RunCommandBase:: _StageCommand
     )
       
     return starter.start()
+  
+  /**
+   * Run an incremental [stage].
+   */
+  @hidden
+  pub async fn runExitStage(stage: ExitStage, botnet: {impl: text, bots: map[]}, opts: map)
+    # (1) create starter
+    const (
+      starterOutput = BlankSheetStream()
+      starterProps = stage{*, output = starterOutput}
+      starter = ExitStarter(starterProps)
+    )
+    
+    # (2) create rest of components
+    const (
+      assignerOutput = RunReqStream()
+
+      assigner = createAssigner(
+        input = starterOutput
+        output = assignerOutput
+        ring = Ring(points = botnet.bots.map(fn(bot) = bot.bot end))
+        assignations = [{job = "__exit__", weight = 100}]
+      )
+
+      distributor = createDistributor(assignerOutput, botnet, opts)
+    )
+
+    # (3) start components
+    return Promise.all([
+      starter.start()
+      assigner.start()
+      distributor.start()
+    ])
 
 /**
  * Creates the assigner.
@@ -270,12 +305,14 @@ fn createDistributor(
     distributor = ConsoleDistributor(props)
   else
     with i ::= botnet.impl do
-      if "redis" then distributor = createRedisStreamsDistributor(props, botnet, opts)
+      if "redisstreams" then distributor = createRedisStreamsDistributor(props, botnet, opts)
       else throw(TypeError($"Unknown botnet impl: ${i}."))
     
     if log then
       distributor = Distributors().append(distributor).append(
-        ConsoleDistributor(props)
+        ConsoleDistributor(props{*, input = assignerOutput.pipe(
+          native("new PassThrough({readableObjectMode: true, writableObjectMode: true})")
+        )})
       )
 
 /**

@@ -1,0 +1,9 @@
+use (
+  RedisStreamsTriggerImpl
+)
+
+export {
+  name = "redisstreams"
+  desc = "Trigger for firing an event reading from a Redis Streams stream."
+  impl = RedisStreamsTriggerImpl
+}

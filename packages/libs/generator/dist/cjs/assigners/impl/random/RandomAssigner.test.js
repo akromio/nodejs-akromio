@@ -12,8 +12,6 @@ const RunReqStream = _core.dogma.use(require("../../RunReqStream"));
 const RandomAssigner = _core.dogma.use(require("./RandomAssigner"));
 suite(__filename, () => {
   {
-    const registry = "fs:///my/registry";
-    const catalog = "catalog-name";
     const job = "job-name";
     const ring = Ring({
       'points': ["one", "two", "three"]
@@ -23,13 +21,9 @@ suite(__filename, () => {
         test("when total weight is not 100, error must be raised", () => {
           {
             const assignations = [{
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: job,
               ["weight"]: 90
             }, {
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: job,
               ["weight"]: 20
             }];
@@ -49,9 +43,9 @@ suite(__filename, () => {
         });
       }
     });
-    suite("start()", () => {
+    suite("assignToOne()", () => {
       {
-        test("when started, run requests must be generated", async () => {
+        test("when called, only one request must be generated for every call", async () => {
           {
             const blankSheets = _core.dogma.getSlice((0, _core.text)((0, _core.timestamp)().valueOf() + " ").repeat(100).split(" "), 0, -2).map(ts => {
               /* c8 ignore next */_core.dogma.expect("ts", ts);
@@ -62,13 +56,9 @@ suite(__filename, () => {
               }
             });
             const assignations = [{
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#1",
               ["weight"]: 25
             }, {
-              ["registry"]: registry,
-              ["catalog"]: catalog,
               ["job"]: "#2",
               ["weight"]: 75
             }];
@@ -89,7 +79,7 @@ suite(__filename, () => {
             0, await assigner.start();
             expected(input.readable).equalTo(false);
             expected(output.writable).equalTo(false);
-            const log = monitor.log(output, {
+            const append = monitor.log(output, {
               'clear': true
             });
             let job1 = 0;
@@ -97,9 +87,9 @@ suite(__filename, () => {
             let assignee1 = 0;
             let assignee2 = 0;
             let assignee3 = 0;
-            expected(log.calls).equalTo(100);
-            for (let i = 0; i < log.calls; i += 1) {
-              const req = _core.dogma.getItem(log.getCall(i).args, 0);
+            expected(append.calls).equalTo(100);
+            for (let i = 0; i < append.calls; i += 1) {
+              const req = _core.dogma.getItem(append.getCall(i).args, 0);
               {
                 const _ = req.job;
                 switch (_) {
@@ -146,6 +136,49 @@ suite(__filename, () => {
             expected(assignee1).greaterThanOrEqualTo(33);
             expected(assignee2).greaterThanOrEqualTo(33);
             expected(assignee3).greaterThanOrEqualTo(33);
+          }
+        });
+      }
+    });
+    suite("assignInternalJob()", () => {
+      {
+        test("when job is __exit__, one request for every ring point must be generated", async () => {
+          {
+            const blankSheets = [{
+              ["ts"]: (0, _core.timestamp)().valueOf(),
+              ["job"]: "__exit__"
+            }];
+            const assignations = [{
+              ["job"]: "__exit__",
+              ["weight"]: 100
+            }];
+            const input = sim.stream.readable({
+              'objectMode': true,
+              'data': blankSheets
+            });
+            const output = monitor(RunReqStream(), {
+              'method': "append"
+            });
+            const opts = {
+              ["input"]: input,
+              ["output"]: output,
+              ["assignations"]: assignations,
+              ["ring"]: ring
+            };
+            const assigner = RandomAssigner(opts);
+            0, await assigner.start();
+            expected(input.readable).equalTo(false);
+            expected(output.writable).equalTo(false);
+            const append = monitor.log(output, {
+              'clear': true
+            });
+            expected(append.calls).equalTo(3);
+            const assignees = [];
+            for (let i = 0; i < append.calls; i += 1) {
+              const args = _core.dogma.getItem(append.getCall(i).args, 0);
+              expected(args.job).equalTo("__exit__");
+              expected(args.assignee).equalTo(_core.dogma.getItem(ring.points, i));
+            }
           }
         });
       }

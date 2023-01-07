@@ -2,9 +2,10 @@ pub use (
   starters/BlankSheetStream
   starters/StarterState
   starters/Starter
-  starters/impl/sleep/SleepStarter
   starters/impl/const/ConstStarter
+  starters/impl/exit/ExitStarter
   starters/impl/inc/IncStarter
+  starters/impl/sleep/SleepStarter
 
   ring/Ring
 
