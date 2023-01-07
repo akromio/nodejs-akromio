@@ -1,0 +1,35 @@
+use (
+  alias://expected
+  {monitor, sim, method} = alias://doubles
+
+  RedisStreamsTriggerImpl
+)
+
+suite(__filename, proc()
+  suite("fire()", proc()
+    test("when called, new message must be read from the stream", async proc()
+      # (1) act
+      const (
+        stream = "cavani"
+        job = {job = "backup", args = nil, assignTs = 1673076355206, assignee = "cavani", ts = 1673076355206}
+        resp = [
+          [
+            stream
+            [["1673076355208-1", ["req", json.encode(job)]]]
+          ]
+        ]
+        handler = monitor(method.resolves())
+        redis = sim(connect = method.returns(), sendCommand = method.resolves(resp))
+        trigger = RedisStreamsTriggerImpl(redis=, handler, stream, group = "botnet", consumer = "cavani1")
+        out = await(trigger.fire())
+      )
+
+      # (2) assessment
+      expected(out).toBeNil()
+
+      const hlog = monitor.log(handler, clear = true)
+      expected(hlog.calls).equalTo(1)
+      expected(hlog.getCall(0).args).it(0).equalTo(last = false, call = {jobName = job.job, args = job.args})
+    end)
+  end)
+end)
