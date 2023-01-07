@@ -1,6 +1,11 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const redis = _core.dogma.use(require("redis"));
+const ms = _core.dogma.use(require("ms"));
+const {
+  PassThrough
+} = _core.dogma.use(require("stream"));
 const {
   RunCommand: RunCommandBase
 } = _core.dogma.use(require("@akromio/cli"));
@@ -31,8 +36,6 @@ const {
 const {
   ConstDatum
 } = _core.dogma.use(require("@akromio/dataset"));
-const redis = _core.dogma.use(require("redis"));
-const ms = _core.dogma.use(require("ms"));
 const _StageCommand = _core.dogma.use(require("./_StageCommand"));
 const {
   baseOptions
@@ -476,6 +479,17 @@ function createDistributor(assignerOutput, botnet, opts) {
     if (onlyLog) {
       distributor = ConsoleDistributor(props);
     } else {
+      if (log) {
+        _core.dogma.update(props, {
+          name: "input",
+          visib: ".",
+          assign: "=",
+          value: assignerOutput.pipe(new PassThrough({
+            readableObjectMode: true,
+            writableObjectMode: true
+          }))
+        });
+      }
       {
         const i = botnet.impl;
         switch (i) {
@@ -492,7 +506,12 @@ function createDistributor(assignerOutput, botnet, opts) {
         }
       }
       if (log) {
-        distributor = Distributors().append(distributor).append(ConsoleDistributor(props));
+        distributor = Distributors().append(distributor).append(ConsoleDistributor(_core.dogma.clone(props, {
+          "input": props.input.pipe(new PassThrough({
+            readableObjectMode: true,
+            writableObjectMode: true
+          }))
+        }, {}, [], [])));
       }
     }
   }
