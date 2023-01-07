@@ -1,6 +1,6 @@
 {
   "name": "@akromio/carboni",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Tool for generating run requests on Akromio.",
   "year": "2023",
   "author": {
@@ -35,15 +35,15 @@
     "npm": ">= 6"
   },
   "dependencies": {
-    "@akromio/args": "^0.16.0",
-    "@akromio/catalog-reader": "^0.16.0",
-    "@akromio/cli": "^0.16.0",
-    "@akromio/cli-defaults": "^0.16.0",
-    "@akromio/core": "^0.16.0",
-    "@akromio/dataset": "^0.16.0",
-    "@akromio/generator": "^0.16.0",
-    "@akromio/registry": "^0.16.0",
-    "@akromio/stages": "^0.16.0",
+    "@akromio/args": "^0.17.0",
+    "@akromio/catalog-reader": "^0.17.0",
+    "@akromio/cli": "^0.17.0",
+    "@akromio/cli-defaults": "^0.17.0",
+    "@akromio/core": "^0.17.0",
+    "@akromio/dataset": "^0.17.0",
+    "@akromio/generator": "^0.17.0",
+    "@akromio/registry": "^0.17.0",
+    "@akromio/stages": "^0.17.0",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "dotenv": "^16.0.3",
     "ms": "^2.1.3",
