@@ -479,17 +479,6 @@ function createDistributor(assignerOutput, botnet, opts) {
     if (onlyLog) {
       distributor = ConsoleDistributor(props);
     } else {
-      if (log) {
-        _core.dogma.update(props, {
-          name: "input",
-          visib: ".",
-          assign: "=",
-          value: assignerOutput.pipe(new PassThrough({
-            readableObjectMode: true,
-            writableObjectMode: true
-          }))
-        });
-      }
       {
         const i = botnet.impl;
         switch (i) {
@@ -507,7 +496,7 @@ function createDistributor(assignerOutput, botnet, opts) {
       }
       if (log) {
         distributor = Distributors().append(distributor).append(ConsoleDistributor(_core.dogma.clone(props, {
-          "input": props.input.pipe(new PassThrough({
+          "input": assignerOutput.pipe(new PassThrough({
             readableObjectMode: true,
             writableObjectMode: true
           }))

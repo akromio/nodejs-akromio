@@ -304,20 +304,13 @@ fn createDistributor(
   if onlyLog then
     distributor = ConsoleDistributor(props)
   else
-    if log then
-      props.{
-        input = assignerOutput.pipe(
-          native("new PassThrough({readableObjectMode: true, writableObjectMode: true})")
-        )
-      }
-
     with i ::= botnet.impl do
       if "redisstreams" then distributor = createRedisStreamsDistributor(props, botnet, opts)
       else throw(TypeError($"Unknown botnet impl: ${i}."))
     
     if log then
       distributor = Distributors().append(distributor).append(
-        ConsoleDistributor(props{*, input = props.input.pipe(
+        ConsoleDistributor(props{*, input = assignerOutput.pipe(
           native("new PassThrough({readableObjectMode: true, writableObjectMode: true})")
         )})
       )
