@@ -67,12 +67,17 @@ suite(__filename, () => {
       {
         test("when decls are alright, a list with the steps must be returned", () => {
           {
-            const op1 = Action({
+            const cp = Action({
               'name': "cp",
               'fun': _core.dogma.nop(),
               'operator': ActionOperator()
             });
-            const ops = Ops().appendOp(op1);
+            const exec = Action({
+              'name': "exec",
+              'fun': _core.dogma.nop(),
+              'operator': ActionOperator()
+            });
+            const ops = Ops().appendOp(cp).appendOp(exec);
             const steps = ["cp", ["<cp", "$(src)", "$(dst)"], ["$result", "cp", "$(src2)", "$(dst2)"], {
               ["log"]: "cp"
             }, {
@@ -81,6 +86,10 @@ suite(__filename, () => {
               ["quiet"]: "cp"
             }, {
               ["step"]: "cp"
+            }, {
+              ["run"]: "redis-cli ping"
+            }, {
+              ["sudo"]: "docker ps"
             }];
             const macro = CatalogMacro({
               'name': "test",
@@ -97,7 +106,7 @@ suite(__filename, () => {
               'ctx': ctx
             });
             const out = macro.getSteps(call);
-            expected(out).toBeList().toHaveLen(7);
+            expected(out).toBeList().toHaveLen(9);
             expected(_core.dogma.getItem(out, 0)).toBeMap().member("op").toBe(Action);
             expected(_core.dogma.getItem(out, 1)).toBeMap().toHave({
               'onError': "finish",
@@ -135,6 +144,16 @@ suite(__filename, () => {
               'args': null
             }).member("op").toBe(Action);
             expected(_core.dogma.getItem(out, 6)).toBeMap().member("op").toBe(Action);
+            expected(_core.dogma.getItem(out, 7)).toBeMap().toHave({
+              'args': ["redis-cli", "ping"]
+            }).member("op").toBe(Action).toHave({
+              'name': "exec"
+            });
+            expected(_core.dogma.getItem(out, 8)).toBeMap().toHave({
+              'args': ["sudo", "docker", "ps"]
+            }).member("op").toBe(Action).toHave({
+              'name': "exec"
+            });
           }
         });
       }

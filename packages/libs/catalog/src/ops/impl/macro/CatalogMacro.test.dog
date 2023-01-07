@@ -50,8 +50,9 @@ suite(__filename, proc()
     test("when decls are alright, a list with the steps must be returned", proc()
       # (1) act
       const (
-        op1 = Action(name = "cp", fun = nop, operator = ActionOperator())
-        ops = Ops().appendOp(op1)
+        cp = Action(name = "cp", fun = nop, operator = ActionOperator())
+        exec = Action(name = "exec", fun = nop, operator = ActionOperator())
+        ops = Ops().appendOp(cp).appendOp(exec)
         steps = [
           "cp"
           ["<cp", "$(src)", "$(dst)"]
@@ -60,6 +61,8 @@ suite(__filename, proc()
           {log = ["cp", "$(src)", "$(dst)"]}
           {quiet = "cp"}
           {step = "cp"}
+          {run = "redis-cli ping"}
+          {sudo = "docker ps"}
         ]
         macro = CatalogMacro(name = "test", steps, ops, operator)
         call = Call(op = macro, dataset, onError, title, log, ctx)
@@ -67,7 +70,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toBeList().toHaveLen(7)
+      expected(out).toBeList().toHaveLen(9)
 
       expected(out[0]).toBeMap().member("op").toBe(Action)
 
@@ -112,6 +115,14 @@ suite(__filename, proc()
       ).member("op").toBe(Action)
 
       expected(out[6]).toBeMap().member("op").toBe(Action)
+
+      expected(out[7])\
+        .toBeMap().toHave(args = ["redis-cli", "ping"])\
+        .member("op").toBe(Action).toHave(name = "exec")
+
+      expected(out[8])\
+        .toBeMap().toHave(args = ["sudo", "docker", "ps"])\
+        .member("op").toBe(Action).toHave(name = "exec")
     end)
   end)
 
