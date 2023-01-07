@@ -1,6 +1,6 @@
 {
   "name": "@akromio/cavani",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "Event-driven tool for automating jobs.",
   "year": "2023",
   "author": {
@@ -35,17 +35,17 @@
     "npm": ">= 6"
   },
   "dependencies": {
-    "@akromio/args": "^0.17.1",
-    "@akromio/catalog-reader": "^0.17.1",
-    "@akromio/cli": "^0.17.1",
-    "@akromio/cli-defaults": "^0.17.1",
-    "@akromio/core": "^0.17.1",
-    "@akromio/dataset": "^0.17.1",
-    "@akromio/jobs": "^0.17.1",
-    "@akromio/preset-cavani": "^0.17.1",
-    "@akromio/registry": "^0.17.1",
-    "@akromio/reporter": "^0.17.1",
-    "@akromio/trigger": "^0.17.1",
+    "@akromio/args": "^0.17.2",
+    "@akromio/catalog-reader": "^0.17.2",
+    "@akromio/cli": "^0.17.2",
+    "@akromio/cli-defaults": "^0.17.2",
+    "@akromio/core": "^0.17.2",
+    "@akromio/dataset": "^0.17.2",
+    "@akromio/jobs": "^0.17.2",
+    "@akromio/preset-cavani": "^0.17.2",
+    "@akromio/registry": "^0.17.2",
+    "@akromio/reporter": "^0.17.2",
+    "@akromio/trigger": "^0.17.2",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "dotenv": "^16.0.3",
     "yargs": "^17.6.2"

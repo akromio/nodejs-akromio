@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-range",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "Plugin for returning a list with a sequence of numbers between given two.",
   "author": {
     "name": "Sia Codelabs",
