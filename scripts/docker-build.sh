@@ -9,5 +9,5 @@ mmVersion=$(npm pkg --workspace @akromio/gattuso get version | grep gattuso | gr
 
 # (2) build docker image
 for app in ${apps[@]}; do
-  sudo docker build -t akromio/$app:latest -t akromio/$app:$mmVersion -t akromio/$app:$version --build-arg version=$version docker/alpine/
+  sudo docker build -t akromio/$app:latest -t akromio/$app:$mmVersion -t akromio/$app:$version --build-arg version=$version docker/$app/alpine/
 done

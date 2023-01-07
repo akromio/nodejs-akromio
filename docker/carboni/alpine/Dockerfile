@@ -12,7 +12,7 @@ LABEL description="Carboni image."
 LABEL maintainer="Sia Codelabs"
 
 # build image
-RUN apk update && apk add bash
+RUN apk update && apk add bash redis
 RUN npm i -g @akromio/carboni@$version
 RUN echo "alias ll='ls -l'" >> ~/.bashrc
 
