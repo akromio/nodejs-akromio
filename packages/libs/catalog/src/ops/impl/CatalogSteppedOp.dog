@@ -47,7 +47,14 @@ export struct CatalogSteppedOp
       condition = decl.'if'
       decl = decl.quiet
       quiet = true
-    else if decl.step then
+    else if decl.run then
+      condition = decl.'if'
+      decl = "exec " + decl.run
+    else if decl.sudo then
+      condition = decl.'if'
+      decl = "exec sudo " + decl.sudo
+    
+    if decl.step then
       condition = decl.'if'
       decl = decl.step
 

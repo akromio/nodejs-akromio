@@ -77,7 +77,14 @@ CatalogSteppedOp.prototype.buildStep = function (decl, call, defaultResultVarNam
       condition = decl.if;
       decl = decl.quiet;
       quiet = true;
-    } else if (decl.step) {
+    } else if (decl.run) {
+      condition = decl.if;
+      decl = "exec " + decl.run;
+    } else if (decl.sudo) {
+      condition = decl.if;
+      decl = "exec sudo " + decl.sudo;
+    }
+    if (decl.step) {
       condition = decl.if;
       decl = decl.step;
     }
