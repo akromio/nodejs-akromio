@@ -2,7 +2,7 @@ use (
   alias://expected
   {monitor, interceptor} = alias://doubles
 
-  Trigger, TriggerState, JobCallStream
+  Trigger, TriggerState, CallReqStream
 )
 
 struct TriggerImpl
@@ -23,7 +23,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "start")
-        stream = JobCallStream()
+        stream = CallReqStream()
         trigger = Trigger(name=, stream, triggerImpl)
       )
 
@@ -41,7 +41,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = TriggerImpl()
-        stream = JobCallStream()
+        stream = CallReqStream()
         trigger = await(Trigger(name=, stream, triggerImpl).start())
         out = pawait(trigger.start())
       )
@@ -58,7 +58,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "stop")
-        stream = JobCallStream()
+        stream = CallReqStream()
         trigger = Trigger(name=, stream, triggerImpl)
       )
 
@@ -75,7 +75,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "stop")
-        stream = JobCallStream()
+        stream = CallReqStream()
         trigger = await(Trigger(name=, stream, triggerImpl).start())
       )
 
@@ -91,7 +91,7 @@ suite(__filename, proc()
       const (
         triggerImpl = TriggerImpl()
         callback = monitor(nop)
-        stream = JobCallStream()
+        stream = CallReqStream()
         trigger = await(Trigger(name=, stream, triggerImpl).start(callback))
       )
 
@@ -108,7 +108,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = TriggerImpl()
-        stream = JobCallStream()
+        stream = CallReqStream()
         trigger = await(await(Trigger(name=, stream, triggerImpl).start()).stop())
         e = {ts = timestamp(), call, last = false}
         out = pawait(triggerImpl.fireEvent(e))
@@ -122,7 +122,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "stop")
-        stream = monitor(JobCallStream(), method = "append")
+        stream = monitor(CallReqStream(), method = "append")
         trigger = await(Trigger(name=, stream, triggerImpl).start())
         e = {ts = timestamp(), call, last = false}
       )
@@ -144,7 +144,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "stop")
-        stream = monitor(JobCallStream(), method = "end")
+        stream = monitor(CallReqStream(), method = "end")
         trigger = await(Trigger(name=, stream, triggerImpl).start())
         e = {ts = timestamp(), call, last = true}
       )
@@ -165,7 +165,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "stop")
-        stream = monitor(JobCallStream(), method = "end")
+        stream = monitor(CallReqStream(), method = "end")
         trigger = await(Trigger(name=, stream, triggerImpl).start())
         call = {jobName = "__exit__"}
         e = {ts = timestamp(), call, last = false}

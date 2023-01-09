@@ -1,21 +1,21 @@
 use (
   {Readable as ReadableStream} = dep://stream
-  JobCall
+  CallReq
 )
 
 /**
- * A stream for exchanging the job events fired by the triggers.
+ * A stream for exchanging call requests.
  */
 @factory
-export struct JobCallStream: ReadableStream
+export struct CallReqStream: ReadableStream
   @factory
   pvt fn create(props := {}) = new(props{*, objectMode = true})
 
   /**
-   * Appends a new job [call] to the stream.
+   * Appends a new call [req]uest to the stream.
    */
-  pub fn append(call: JobCall) -> self
-    self.push(call)
+  pub fn append(req: CallReq) -> self
+    self.push(req)
 
   /**
    * Indicates the end of the stream.

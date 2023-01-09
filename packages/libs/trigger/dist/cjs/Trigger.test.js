@@ -8,7 +8,7 @@ const {
 } = _core.dogma.use(require("@akromio/doubles"));
 const Trigger = _core.dogma.use(require("./Trigger"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
-const JobCallStream = _core.dogma.use(require("./JobCallStream"));
+const CallReqStream = _core.dogma.use(require("./CallReqStream"));
 const $TriggerImpl = class TriggerImpl {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -69,7 +69,7 @@ suite(__filename, () => {
             const triggerImpl = monitor(TriggerImpl(), {
               'method': "start"
             });
-            const stream = JobCallStream();
+            const stream = CallReqStream();
             const trigger = Trigger({
               'name': name,
               'stream': stream,
@@ -89,7 +89,7 @@ suite(__filename, () => {
         test("when started, error must be raised", async () => {
           {
             const triggerImpl = TriggerImpl();
-            const stream = JobCallStream();
+            const stream = CallReqStream();
             const trigger = (0, await Trigger({
               'name': name,
               'stream': stream,
@@ -108,7 +108,7 @@ suite(__filename, () => {
             const triggerImpl = monitor(TriggerImpl(), {
               'method': "stop"
             });
-            const stream = JobCallStream();
+            const stream = CallReqStream();
             const trigger = Trigger({
               'name': name,
               'stream': stream,
@@ -129,7 +129,7 @@ suite(__filename, () => {
             const triggerImpl = monitor(TriggerImpl(), {
               'method': "stop"
             });
-            const stream = JobCallStream();
+            const stream = CallReqStream();
             const trigger = (0, await Trigger({
               'name': name,
               'stream': stream,
@@ -146,7 +146,7 @@ suite(__filename, () => {
           {
             const triggerImpl = TriggerImpl();
             const callback = monitor(_core.dogma.nop());
-            const stream = JobCallStream();
+            const stream = CallReqStream();
             const trigger = (0, await Trigger({
               'name': name,
               'stream': stream,
@@ -164,7 +164,7 @@ suite(__filename, () => {
         test("when trigger is stopped, error must be raised", async () => {
           {
             const triggerImpl = TriggerImpl();
-            const stream = JobCallStream();
+            const stream = CallReqStream();
             const trigger = (0, await (0, await Trigger({
               'name': name,
               'stream': stream,
@@ -184,7 +184,7 @@ suite(__filename, () => {
             const triggerImpl = monitor(TriggerImpl(), {
               'method': "stop"
             });
-            const stream = monitor(JobCallStream(), {
+            const stream = monitor(CallReqStream(), {
               'method': "append"
             });
             const trigger = (0, await Trigger({
@@ -215,7 +215,7 @@ suite(__filename, () => {
             const triggerImpl = monitor(TriggerImpl(), {
               'method': "stop"
             });
-            const stream = monitor(JobCallStream(), {
+            const stream = monitor(CallReqStream(), {
               'method': "end"
             });
             const trigger = (0, await Trigger({
@@ -245,7 +245,7 @@ suite(__filename, () => {
             const triggerImpl = monitor(TriggerImpl(), {
               'method': "stop"
             });
-            const stream = monitor(JobCallStream(), {
+            const stream = monitor(CallReqStream(), {
               'method': "end"
             });
             const trigger = (0, await Trigger({

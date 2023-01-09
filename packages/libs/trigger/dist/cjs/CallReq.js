@@ -1,7 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const JobCall = _core.dogma.intf('JobCall', {
+const CallReq = _core.dogma.intf('CallReq', {
   jobName: {
     optional: false,
     type: _core.text
@@ -11,4 +11,4 @@ const JobCall = _core.dogma.intf('JobCall', {
     type: _core.any
   }
 });
-module.exports = exports = JobCall;
+module.exports = exports = CallReq;

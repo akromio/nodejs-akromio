@@ -1,8 +1,8 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const JobCall = _core.dogma.use(require("./JobCall"));
-const JobCallStream = _core.dogma.use(require("./JobCallStream"));
+const CallReq = _core.dogma.use(require("./CallReq"));
+const CallReqStream = _core.dogma.use(require("./CallReqStream"));
 const TriggerImpl = _core.dogma.use(require("./TriggerImpl"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
 const $Trigger = class Trigger {
@@ -15,7 +15,7 @@ const $Trigger = class Trigger {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('stream', _['stream'], JobCallStream);
+    (0, _core.expect)('stream', _['stream'], CallReqStream);
     Object.defineProperty(this, 'stream', {
       value: (0, _core.coalesce)(_['stream'], null),
       writable: false,
@@ -102,7 +102,7 @@ Trigger.prototype.handle = async function (e) {
   _core.dogma.expect("e", e, _core.dogma.intf("inline", {
     call: {
       optional: false,
-      type: JobCall
+      type: CallReq
     },
     last: {
       optional: true,

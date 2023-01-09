@@ -1,6 +1,6 @@
 use (
-  JobCall
-  JobCallStream
+  CallReq
+  CallReqStream
   TriggerImpl
   TriggerState
 )
@@ -19,9 +19,9 @@ export struct Trigger
   pub const name: text
 
   /**
-   * Stream where this trigger must let the job calls.
+   * Stream where this trigger must let the job call requests.
    */
-  pub const stream: JobCallStream
+  pub const stream: CallReqStream
 
   /**
    * The function to call when finished.
@@ -76,7 +76,7 @@ export struct Trigger
    * is called and the stream is set as ended.
    */
   @hidden
-  pub async proc handle(e:> {call: JobCall, last?: bool})
+  pub async proc handle(e:> {call: CallReq, last?: bool})
     # (1) pre
     if self.state ==~ stopped then
       throw(TypeError("Trigger is stopped."))
