@@ -1,8 +1,10 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const CallReq = _core.dogma.use(require("./CallReq"));
-const CallReqStream = _core.dogma.use(require("./CallReqStream"));
+const {
+  CallReq,
+  CallReqStream
+} = _core.dogma.use(require("@akromio/core"));
 const TriggerImpl = _core.dogma.use(require("./TriggerImpl"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
 const $Trigger = class Trigger {

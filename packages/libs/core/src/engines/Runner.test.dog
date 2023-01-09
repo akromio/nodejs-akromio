@@ -2,7 +2,10 @@ use (
   alias://expected
   {monitor, simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
-  {Runner, StaticAction, ActionOperator, Result} = ~
+
+  Runner
+  ../ops/Result
+  ../ops/simple/action/{StaticAction, ActionOperator}
 )
 
 suite(__filename, proc()

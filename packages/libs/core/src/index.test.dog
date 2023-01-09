@@ -1,0 +1,36 @@
+use (
+  alias://expected
+  index
+)
+
+suite(__filename, proc()
+  test("when imported, its api must be exported", proc()
+    expected(index).toHave([
+      "Action"
+      "ActionOperator"
+      "Call"
+      "CallReq"
+      "CallReqStream"
+      "CompositeOp"
+      "CompositeOperator"
+      "Context"
+      "CoOperator"
+      "DynamicCo"
+      "DynamicMacro"
+      "MacroOperator"
+      "NotFoundError"
+      "Ops"
+      "Plugin"
+      "Plugins"
+      "PluginLoader"
+      "PluginParser"
+      "Result"
+      "Runner"
+      "Script"
+      "ScriptOperator"
+      "SimpleOp"
+      "SimpleOperator"
+      "StaticAction"
+    ])
+  end)
+end)

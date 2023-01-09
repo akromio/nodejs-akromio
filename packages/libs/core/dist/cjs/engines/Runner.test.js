@@ -9,12 +9,10 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  Runner,
-  StaticAction,
-  ActionOperator,
-  Result
-} = _core.dogma.use(require("../../.."));
+const Runner = _core.dogma.use(require("./Runner"));
+const Result = _core.dogma.use(require("../ops/Result"));
+const StaticAction = _core.dogma.use(require("../ops/simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../ops/simple/action/ActionOperator"));
 suite(__filename, () => {
   {
     const log = simulator.stream.duplex();

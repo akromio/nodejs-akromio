@@ -2,7 +2,12 @@ use (
   alias://expected
   {GlobalDataset} = alias://dataset
   {interceptor, method} = alias://doubles
-  {Engine as EngineBase, Runner, Ops, StaticAction, ActionOperator, Result, PluginParser} = ~
+
+  EngineBase = Engine
+  Runner
+  ../ops/{Ops, Result}
+  ../ops/simple/action/{StaticAction, ActionOperator}
+  ../plugins/PluginParser
 )
 
 #The engine type to test.

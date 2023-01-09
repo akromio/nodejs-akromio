@@ -1,0 +1,35 @@
+use (
+  alias://expected
+  {monitor} = alias://doubles
+
+  CallReqStream
+)
+
+suite(__filename, proc()
+  suite("append()", proc()
+    test("when request added, push() must be called", proc()
+      # (1) act
+      const (
+        call = {jobName = "job-name", args = []}
+        stream = monitor(CallReqStream(), method = "push").append(call)
+      )
+
+      # (2) assessment
+      const push = monitor.log(stream, clear = true)
+      expected(push.calls).equalTo(1)
+      expected(push.call.args).equalTo([call])
+    end)
+  end)
+
+  suite("end()", proc()
+    test("when called, nil must be pushed", proc()
+      # (1) act
+      const stream = monitor(CallReqStream(), method = "push").end()
+
+      # (2) assessment
+      const push = monitor.log(stream, clear = true)
+      expected(push.calls).equalTo(1)
+      expected(push.call.args).equalTo([nil])
+    end)
+  end)
+end)

@@ -2,7 +2,11 @@ use (
   alias://expected
   {GlobalDataset} = alias://dataset
   {monitor, simulator, field, method} = alias://doubles
-  {SingleRunnerEngine, Runner, Ops, StaticAction, ActionOperator, Result, PluginParser} = ~
+
+  SingleRunnerEngine, Runner
+  ../ops/{Ops, Result}
+  ../ops/simple/action/{StaticAction, ActionOperator}
+  ../plugins/PluginParser
 )
 
 #The engine type to test.

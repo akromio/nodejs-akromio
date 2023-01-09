@@ -11,26 +11,24 @@ const {
   field,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  SingleRunnerEngine,
-  Runner,
-  Ops,
-  StaticAction,
-  ActionOperator,
-  Result,
-  PluginParser
-} = _core.dogma.use(require("../../.."));
+const SingleRunnerEngine = _core.dogma.use(require("./SingleRunnerEngine"));
+const Runner = _core.dogma.use(require("./Runner"));
+const Ops = _core.dogma.use(require("../ops/Ops"));
+const Result = _core.dogma.use(require("../ops/Result"));
+const StaticAction = _core.dogma.use(require("../ops/simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../ops/simple/action/ActionOperator"));
+const PluginParser = _core.dogma.use(require("../plugins/PluginParser"));
 const $TestEngine = class TestEngine extends SingleRunnerEngine {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_4f79e2ab0f4411c18716754853e9399b___init__ instanceof Function) this._pvt_4f79e2ab0f4411c18716754853e9399b___init__(_); /* c8 ignore stop */
+    if (this._pvt_9bf06e0ef65048812156d76097fc123d___init__ instanceof Function) this._pvt_9bf06e0ef65048812156d76097fc123d___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_4f79e2ab0f4411c18716754853e9399b___post__ instanceof Function) this._pvt_4f79e2ab0f4411c18716754853e9399b___post__(); /* c8 ignore stop */
+    if (this._pvt_9bf06e0ef65048812156d76097fc123d___post__ instanceof Function) this._pvt_9bf06e0ef65048812156d76097fc123d___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_4f79e2ab0f4411c18716754853e9399b___validate__ instanceof Function) this._pvt_4f79e2ab0f4411c18716754853e9399b___validate__(); /* c8 ignore stop */
+    if (this._pvt_9bf06e0ef65048812156d76097fc123d___validate__ instanceof Function) this._pvt_9bf06e0ef65048812156d76097fc123d___validate__(); /* c8 ignore stop */
   }
 };
 

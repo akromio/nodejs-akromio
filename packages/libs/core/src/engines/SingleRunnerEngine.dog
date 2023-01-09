@@ -1,7 +1,7 @@
 use (
-  ../runners/Runner
   ../ops/Op
   Engine
+  Runner
 )
 
 /**

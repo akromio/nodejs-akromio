@@ -1,9 +1,9 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const Runner = _core.dogma.use(require("../runners/Runner"));
 const Op = _core.dogma.use(require("../ops/Op"));
 const Engine = _core.dogma.use(require("./Engine"));
+const Runner = _core.dogma.use(require("./Runner"));
 const $SingleRunnerEngine = class SingleRunnerEngine extends Engine {
   constructor(_) {
     super(_);

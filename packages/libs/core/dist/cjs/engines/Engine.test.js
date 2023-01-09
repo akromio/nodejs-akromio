@@ -9,26 +9,24 @@ const {
   interceptor,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  Engine: EngineBase,
-  Runner,
-  Ops,
-  StaticAction,
-  ActionOperator,
-  Result,
-  PluginParser
-} = _core.dogma.use(require("../../.."));
+const EngineBase = _core.dogma.use(require("./Engine"));
+const Runner = _core.dogma.use(require("./Runner"));
+const Ops = _core.dogma.use(require("../ops/Ops"));
+const Result = _core.dogma.use(require("../ops/Result"));
+const StaticAction = _core.dogma.use(require("../ops/simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../ops/simple/action/ActionOperator"));
+const PluginParser = _core.dogma.use(require("../plugins/PluginParser"));
 const $Engine = class Engine extends EngineBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_4479d13865211d355a223253ddec25c7___init__ instanceof Function) this._pvt_4479d13865211d355a223253ddec25c7___init__(_); /* c8 ignore stop */
+    if (this._pvt_325c1dea911c13e926831a34446a4fb6___init__ instanceof Function) this._pvt_325c1dea911c13e926831a34446a4fb6___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_4479d13865211d355a223253ddec25c7___post__ instanceof Function) this._pvt_4479d13865211d355a223253ddec25c7___post__(); /* c8 ignore stop */
+    if (this._pvt_325c1dea911c13e926831a34446a4fb6___post__ instanceof Function) this._pvt_325c1dea911c13e926831a34446a4fb6___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_4479d13865211d355a223253ddec25c7___validate__ instanceof Function) this._pvt_4479d13865211d355a223253ddec25c7___validate__(); /* c8 ignore stop */
+    if (this._pvt_325c1dea911c13e926831a34446a4fb6___validate__ instanceof Function) this._pvt_325c1dea911c13e926831a34446a4fb6___validate__(); /* c8 ignore stop */
   }
 };
 

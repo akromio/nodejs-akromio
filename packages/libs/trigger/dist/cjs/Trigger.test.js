@@ -6,9 +6,11 @@ const {
   monitor,
   interceptor
 } = _core.dogma.use(require("@akromio/doubles"));
+const {
+  CallReqStream
+} = _core.dogma.use(require("@akromio/core"));
 const Trigger = _core.dogma.use(require("./Trigger"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
-const CallReqStream = _core.dogma.use(require("./CallReqStream"));
 const $TriggerImpl = class TriggerImpl {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};

@@ -1,8 +1,6 @@
 use (
-  CallReq
-  CallReqStream
-  TriggerImpl
-  TriggerState
+  {CallReq, CallReqStream} = alias://core
+  TriggerImpl, TriggerState
 )
 
 /**

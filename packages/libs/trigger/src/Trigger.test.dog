@@ -1,8 +1,9 @@
 use (
   alias://expected
   {monitor, interceptor} = alias://doubles
+  {CallReqStream} = alias://core
 
-  Trigger, TriggerState, CallReqStream
+  Trigger, TriggerState
 )
 
 struct TriggerImpl
