@@ -10,17 +10,8 @@ use (
   ../plugins/PluginParser
 )
 
-#The engine type to test.
+# The engine type to test.
 struct Engine: EngineBase
-  @override @hidden
-  pub fn runOp(op, args?, opts) = Result(
-    callId = "123e4567-e89b-12d3-a456-426614174000"
-    title = "This is the title"
-    duration = 0
-    kind = "ok"
-    value = 1234
-    onError = "carryOn"
-  )
 
 suite(__filename, proc()
   const (
@@ -91,34 +82,6 @@ suite(__filename, proc()
 
       for each name in ["pi1.op11", "pi1.op12", "pi2.op21", "pi2.op22"] do
         expected(out.ops.getOp(name)).toBe(StaticAction)
-    end)
-  end)
-
-  suite("run()", proc()
-    test("when operation not found, error must be raised", async proc()
-      # (1) act
-      const (
-        engine = createEngine()
-        out = pawait(engine.run("myaction"))
-      )
-
-      # (2) assessment
-      expected(out)\
-        .it(0).equalTo(false)\
-        .it(1).equalTo(Error("Operation 'myaction' not found."))
-    end)
-
-    test("when operation not found, error must be raised", async proc()
-      # (1) act
-      const (
-        engine = createEngine(ops)
-        out = pawait(engine.run("myaction", ["arg1", "arg2"], {onError = "finish"}))
-      )
-
-      # (2) assessment
-      expected(out)\
-        .it(0).equalTo(true)\
-        .it(1).toBe(Result)
     end)
   end)
 end)

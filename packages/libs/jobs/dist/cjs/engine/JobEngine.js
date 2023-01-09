@@ -2,10 +2,10 @@
 
 var _core = require("@dogmalang/core");
 const {
-  SingleRunnerEngine,
+  SimpleEngine,
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
-const $JobEngine = class JobEngine extends SingleRunnerEngine {
+const $JobEngine = class JobEngine extends SimpleEngine {
   constructor(_) {
     super(_);
     /* c8 ignore start */

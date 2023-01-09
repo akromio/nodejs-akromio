@@ -9,28 +9,28 @@ const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
 const {
-  Runner,
+  SimpleRunner,
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
-const Engine = _core.dogma.use(require("./JobEngine"));
+const JobEngine = _core.dogma.use(require("./JobEngine"));
 suite(__filename, () => {
   {
     suite("constructor", () => {
       {
         test("when instantiated, built-in plugins must be loaded", () => {
           {
-            const out = Engine({
+            const out = JobEngine({
               'name': "jobs",
               'dataset': GlobalDataset({
                 'name': "global"
               }),
               'onError': "carryOn",
               'pluginParser': PluginParser(),
-              'runner': Runner({
+              'runner': SimpleRunner({
                 'log': simulator.stream.duplex()
               })
             });
-            expected(out).toBe(Engine).member("ops.ops").toHaveLen(0);
+            expected(out).toBe(JobEngine).member("ops.ops").toHaveLen(0);
           }
         });
       }

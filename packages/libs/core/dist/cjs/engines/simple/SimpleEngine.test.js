@@ -11,32 +11,13 @@ const {
   field,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const SingleRunnerEngine = _core.dogma.use(require("./SingleRunnerEngine"));
-const Runner = _core.dogma.use(require("./Runner"));
-const Ops = _core.dogma.use(require("../ops/Ops"));
-const Result = _core.dogma.use(require("../ops/Result"));
-const StaticAction = _core.dogma.use(require("../ops/simple/action/StaticAction"));
-const ActionOperator = _core.dogma.use(require("../ops/simple/action/ActionOperator"));
-const PluginParser = _core.dogma.use(require("../plugins/PluginParser"));
-const $TestEngine = class TestEngine extends SingleRunnerEngine {
-  constructor(_) {
-    super(_);
-    /* c8 ignore start */
-    if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_9bf06e0ef65048812156d76097fc123d___init__ instanceof Function) this._pvt_9bf06e0ef65048812156d76097fc123d___init__(_); /* c8 ignore stop */
-    /* c8 ignore start */
-    if (this._pvt_9bf06e0ef65048812156d76097fc123d___post__ instanceof Function) this._pvt_9bf06e0ef65048812156d76097fc123d___post__(); /* c8 ignore stop */
-    /* c8 ignore start */
-    if (this._pvt_9bf06e0ef65048812156d76097fc123d___validate__ instanceof Function) this._pvt_9bf06e0ef65048812156d76097fc123d___validate__(); /* c8 ignore stop */
-  }
-};
-
-const TestEngine = new Proxy($TestEngine, {
-  apply(receiver, self, args) {
-    return new $TestEngine(...args);
-  }
-});
+const SimpleEngine = _core.dogma.use(require("./SimpleEngine"));
+const SimpleRunner = _core.dogma.use(require("./SimpleRunner"));
+const Ops = _core.dogma.use(require("../../ops/Ops"));
+const Result = _core.dogma.use(require("../../ops/Result"));
+const StaticAction = _core.dogma.use(require("../../ops/simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../../ops/simple/action/ActionOperator"));
+const PluginParser = _core.dogma.use(require("../../plugins/PluginParser"));
 suite(__filename, () => {
   {
     const dataset = GlobalDataset({
@@ -61,18 +42,20 @@ suite(__filename, () => {
               'value': 1234,
               'onError': "carryOn"
             });
-            const runner = monitor(simulator(Runner, {
+            const runner = monitor(simulator(SimpleRunner, {
               'run': method.resolves(result),
               'log': field.stream.duplex()
             }));
-            const engine = TestEngine({
+            const engine = SimpleEngine({
               'runner': runner,
               'onError': "carryOn",
               'dataset': dataset,
               'ops': ops,
               'pluginParser': pluginParser
             });
-            const out = (0, await engine.run("myaction"));
+            const out = (0, await engine.run({
+              ["jobName"]: "myaction"
+            }));
             expected(out).sameAs(result);
           }
         });
@@ -92,18 +75,23 @@ suite(__filename, () => {
               'value': 1234,
               'onError': "carryOn"
             });
-            const runner = monitor(simulator(Runner, {
+            const runner = monitor(simulator(SimpleRunner, {
               'run': method.resolves(result),
               'log': field.stream.duplex()
             }));
-            const engine = TestEngine({
+            const engine = SimpleEngine({
               'runner': runner,
               'onError': "carryOn",
               'dataset': dataset,
               'ops': ops,
               'pluginParser': pluginParser
             });
-            const out = (0, await engine.run("myaction", ["arg1", "arg2"]));
+            const out = (0, await engine.run({
+              ["jobName"]: "myaction",
+              ["args"]: ["arg1", "arg2"]
+            }, {
+              ["onError"]: "finish"
+            }));
             expected(out).sameAs(result);
           }
         });

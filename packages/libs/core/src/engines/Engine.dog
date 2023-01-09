@@ -1,25 +1,21 @@
 use (
   {Dataset} = alias://dataset
-  
+
+  RunOpts 
+  ../{CallReq}
   ../ops/Ops
   ../errors/NotFoundError
   ../plugins/PluginParser
 )
 
 /**
- * An engine, that is, a component with its operations catalog
+ * An engine is a component with its operations catalog
  * working as the entry point for the things run.
- *
- * All the engines has one or more runners to perform the work.
- * Attending to the engine, we can need one or several runners.
- * For this reason, we have the following types:
- * SingleRunnerEngine and MultiRunnerEngine.
  */
 @abstract
 export struct Engine
   /**
-   * The dataset associated to this engine and inherited by
-   * its runners.
+   * Dataset associated to this engine and used by its runner(s).
    */
   pub const dataset: Dataset
 
@@ -29,15 +25,13 @@ export struct Engine
   pub const onError: ("carryOn" | "finish")
 
   /**
-   * The cataloged operations of this engine.
-   * When the user requests the run of an operation,
-   * the name of one of them must be passed.
+   * Cataloged operations of this engine.
+   * When the user requests the run of an operation, the name of one of them must be passed.
    */
   pub const ops: Ops = Ops()
 
   /**
-   * The plugin parser to use with the built-in
-   * plugins.
+   * Plugin parser to use with the built-in plugins.
    */
   pub const pluginParser: PluginParser
 
@@ -59,33 +53,4 @@ export struct Engine
     for each preset in self.getBuiltInPresets() do
       const plugins = await(parser.parsePreset(preset))
       ops.appendPlugins(...plugins)
-
-  /**
-   * Runs an operation of its catalog.
-   */
-  @async
-  pub fn run(opName: text, args?: any, opts?: RunOpts): Result
-    # (1) get the operation from the catalog
-    const op = self.ops.getOp(opName, raiseIfNotFound = true)
-    
-    # (2) set options to use
-    opts ?= {}
-    opts.onError ?= self.onError
-
-    # (3) run the operation
-    return self.runOp(op, args, opts{*, dataset = self.dataset})
   
-  /**
-   * Runs an operation using one of its runners.
-   */
-  @abstract @hidden
-  pub async fn runOp(op: Op, args?: any, opts: map): Result
-
-/**
- * The run options.
- */
-intf RunOpts
-  /**
-   * What to do on error.
-   */
-  onError: ("carryOn" | "finish")

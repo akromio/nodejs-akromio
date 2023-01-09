@@ -4,10 +4,6 @@ var _core = require("@dogmalang/core");
 const {
   Writable
 } = _core.dogma.use(require("stream"));
-const {
-  Dataset
-} = _core.dogma.use(require("@akromio/dataset"));
-const Op = _core.dogma.use(require("../ops/Op"));
 const $Runner = class Runner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -28,29 +24,8 @@ const $Runner = class Runner {
 };
 
 const Runner = new Proxy($Runner, {
-  apply(receiver, self, args) {
-    return new $Runner(...args);
-  }
+  /* c8 ignore start */apply(receiver, self, args) {
+    throw "'Runner' is abstract.";
+  } /* c8 ignore stop */
 });
 module.exports = exports = Runner;
-Runner.prototype.run = function (op, args, opts) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("op", op, Op); /* c8 ignore next */
-  if (args != null) _core.dogma.expect("args", args, _core.any); /* c8 ignore next */
-  _core.dogma.expect("opts", opts, RunOpts);
-  {
-    return op.runWith(args, _core.dogma.clone(opts, {
-      "log": this.log
-    }, {}, [], []));
-  }
-};
-const RunOpts = _core.dogma.intf('RunOpts', {
-  onError: {
-    optional: false,
-    type: ["carryOn", "finish"]
-  },
-  dataset: {
-    optional: false,
-    type: Dataset
-  }
-});

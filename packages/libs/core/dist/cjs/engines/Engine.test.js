@@ -35,21 +35,6 @@ const Engine = new Proxy($Engine, {
     return new $Engine(...args);
   }
 });
-Engine.prototype.runOp = function (op, args, opts) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("op", op); /* c8 ignore next */
-  _core.dogma.expect("opts", opts);
-  {
-    return Result({
-      'callId': "123e4567-e89b-12d3-a456-426614174000",
-      'title': "This is the title",
-      'duration': 0,
-      'kind': "ok",
-      'value': 1234,
-      'onError': "carryOn"
-    });
-  }
-};
 suite(__filename, () => {
   {
     const dataset = GlobalDataset({
@@ -129,26 +114,6 @@ suite(__filename, () => {
             for (const name of ["pi1.op11", "pi1.op12", "pi2.op21", "pi2.op22"]) {
               expected(out.ops.getOp(name)).toBe(StaticAction);
             }
-          }
-        });
-      }
-    });
-    suite("run()", () => {
-      {
-        test("when operation not found, error must be raised", async () => {
-          {
-            const engine = createEngine();
-            const out = await _core.dogma.pawait(() => engine.run("myaction"));
-            expected(out).it(0).equalTo(false).it(1).equalTo(Error("Operation 'myaction' not found."));
-          }
-        });
-        test("when operation not found, error must be raised", async () => {
-          {
-            const engine = createEngine(ops);
-            const out = await _core.dogma.pawait(() => engine.run("myaction", ["arg1", "arg2"], {
-              ["onError"]: "finish"
-            }));
-            expected(out).it(0).equalTo(true).it(1).toBe(Result);
           }
         });
       }

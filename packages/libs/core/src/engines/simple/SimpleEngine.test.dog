@@ -3,14 +3,11 @@ use (
   {GlobalDataset} = alias://dataset
   {monitor, simulator, field, method} = alias://doubles
 
-  SingleRunnerEngine, Runner
-  ../ops/{Ops, Result}
-  ../ops/simple/action/{StaticAction, ActionOperator}
-  ../plugins/PluginParser
+  SimpleEngine, SimpleRunner
+  ../../ops/{Ops, Result}
+  ../../ops/simple/action/{StaticAction, ActionOperator}
+  ../../plugins/PluginParser
 )
-
-#The engine type to test.
-struct TestEngine: SingleRunnerEngine
 
 suite(__filename, proc()
   const (
@@ -34,13 +31,13 @@ suite(__filename, proc()
         )
         runner = monitor(
           simulator(
-            Runner
+            SimpleRunner
             run = method.resolves(result)
             log = field.stream.duplex()
           )
         )
-        engine = TestEngine(runner=, onError = "carryOn", dataset, ops, pluginParser)
-        out = await(engine.run("myaction"))
+        engine = SimpleEngine(runner=, onError = "carryOn", dataset, ops, pluginParser)
+        out = await(engine.run({jobName = "myaction"}))
       )
 
       # (2) assessment
@@ -62,13 +59,13 @@ suite(__filename, proc()
         )
         runner = monitor(
           simulator(
-            Runner
+            SimpleRunner
             run = method.resolves(result)
             log = field.stream.duplex()
           )
         )
-        engine = TestEngine(runner=, onError = "carryOn", dataset, ops, pluginParser)
-        out = await(engine.run("myaction", ["arg1", "arg2"]))
+        engine = SimpleEngine(runner=, onError = "carryOn", dataset, ops, pluginParser)
+        out = await(engine.run({jobName = "myaction", args = ["arg1", "arg2"]}, {onError = "finish"}))
       )
 
       # (2) assessment

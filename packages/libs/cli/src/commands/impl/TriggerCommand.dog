@@ -1,6 +1,6 @@
 use (
   {Duplex} = dep://stream
-  {Runner, Ops, PluginLoader, PluginParser} = alias://core
+  {SimpleRunner, Ops, PluginLoader, PluginParser} = alias://core
   {Trigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
@@ -91,7 +91,7 @@ export struct TriggerCommand: JobRunCommandBase
           {
             dataset = catalog.dataset
             onError = catalog.onError or onError
-            runner = Runner(log=)
+            runner = SimpleRunner(log=)
             pluginParser
             ops
           }

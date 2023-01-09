@@ -1,37 +1,13 @@
 use (
   {Writable} = dep://stream
-  {Dataset} = alias://dataset
-
-  ../ops/Op
 )
 
 /**
  * A runner of operations.
  */
+@abstract
 export struct Runner
   /**
-   * The log stream to use to report the run events.
+   * Log stream to use to report the run events.
    */
   pub const log: Writable
-
-  /**
-   * Runs a given operation into this runner and its configuration.
-   */
-  pub fn run(op: Op, args?: any, opts: RunOpts): Result = op.runWith(
-    args,
-    opts{*, log = self.log}
-  )
-
-/**
- * The run options.
- */
-intf RunOpts
-  /**
-   * What to do on error.
-   */
-  onError: ("carryOn" | "finish")
-
-  /**
-   * The dataset to use.
-   */
-  dataset: Dataset

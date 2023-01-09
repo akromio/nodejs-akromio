@@ -5,7 +5,7 @@ const {
   Duplex
 } = _core.dogma.use(require("stream"));
 const {
-  Runner,
+  SimpleRunner,
   Ops,
   PluginLoader,
   PluginParser
@@ -126,7 +126,7 @@ TriggerCommand.prototype.handle = async function (argv) {
       const engine = (0, await this.createEngine({
         ["dataset"]: catalog.dataset,
         ["onError"]: catalog.onError || onError,
-        ["runner"]: Runner({
+        ["runner"]: SimpleRunner({
           'log': log
         }),
         ["pluginParser"]: pluginParser,
