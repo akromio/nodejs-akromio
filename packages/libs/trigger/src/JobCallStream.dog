@@ -1,0 +1,28 @@
+use (
+  {Readable as ReadableStream} = dep://stream
+  JobCall
+)
+
+/**
+ * A stream for exchanging the job events fired by the triggers.
+ */
+@factory
+export struct JobCallStream: ReadableStream
+  @factory
+  pvt fn create(props := {}) = new(props{*, objectMode = true})
+
+  /**
+   * Appends a new job [call] to the stream.
+   */
+  pub fn append(call: JobCall) -> self
+    self.push(call)
+
+  /**
+   * Indicates the end of the stream.
+   */
+  pub fn 'end'() -> self
+    self.push(nil)
+
+  @override
+  pub proc _read()
+    nop

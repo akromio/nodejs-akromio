@@ -1,12 +1,9 @@
 use (
   alias://expected
-  {monitor} = alias://doubles
+  {monitor, interceptor} = alias://doubles
 
-  Trigger, TriggerState
+  Trigger, TriggerState, JobCallStream
 )
-
-struct Engine
-  pub proc run()
 
 struct TriggerImpl
   pub var handler?: func
@@ -18,7 +15,6 @@ struct TriggerImpl
 suite(__filename, proc()
   const (
     name = "test" #the trigger name
-    engine = Engine()
     call = {jobName = "hello", args = [1, 2, 3]}
   )
 
@@ -26,32 +22,34 @@ suite(__filename, proc()
     test("when non started, impl.start() must be called", async proc()
       # (1) act
       const (
-        triggerImpl = monitor(TriggerImpl(), members = ["start"], onlyCalls = true)
-        trigger = Trigger(name=, engine, call, triggerImpl)
+        triggerImpl = monitor(TriggerImpl(), method = "start")
+        stream = JobCallStream()
+        trigger = Trigger(name=, stream, triggerImpl)
       )
 
       await(trigger.start())
 
       # (2) assessment
-      const log = monitor.log(triggerImpl)
-
       expected(trigger).toHave(state = TriggerState.started)
-      expected(log.calls).equalTo(1)
-      expected(log.getCall(0).args).toHaveLen(1).it(0).toBeFn()
+
+      const start = monitor.log(triggerImpl, clear = true)
+      expected(start.calls).equalTo(1)
+      expected(start.call.args).toHaveLen(1).first.toBeFn()
     end)
 
     test("when started, error must be raised", async proc()
       # (1) act
       const (
         triggerImpl = TriggerImpl()
-        trigger = await(Trigger(name=, engine, call, triggerImpl).start())
+        stream = JobCallStream()
+        trigger = await(Trigger(name=, stream, triggerImpl).start())
         out = pawait(trigger.start())
       )
 
       # (2) assessment
       expected(out)\
-        .it(0).equalTo(false)\
-        .it(1).equalTo(TypeError("The trigger has been already started."))
+        .first.equalTo(false)\
+        .second.equalTo(TypeError("The trigger has been already started."))
     end)
   end)
 
@@ -59,32 +57,33 @@ suite(__filename, proc()
     test("when non started, nothing to do", async proc()
       # (1) act
       const (
-        triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = Trigger(name=, engine, call, triggerImpl)
+        triggerImpl = monitor(TriggerImpl(), method = "stop")
+        stream = JobCallStream()
+        trigger = Trigger(name=, stream, triggerImpl)
       )
 
       await(trigger.stop())
 
       # (2) assessment
-      const log = monitor.log(triggerImpl)
+      const stop = monitor.log(triggerImpl, clear = true)
 
       expected(trigger).toHave(state = TriggerState.nonStarted)
-      expected(log.calls).equalTo(0)
+      expected(stop.calls).equalTo(0)
     end)
 
     test("when started, impl.stop() must be called", async proc()
       # (1) act
       const (
-        triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = await(Trigger(name=, engine, call, triggerImpl).start())
+        triggerImpl = monitor(TriggerImpl(), method = "stop")
+        stream = JobCallStream()
+        trigger = await(Trigger(name=, stream, triggerImpl).start())
       )
 
       await(trigger.stop())
 
       # (2) assessment
-      const log = monitor.log(triggerImpl)
-
-      expected(log.calls).equalTo(1)
+      const stop = monitor.log(triggerImpl, clear = true)
+      expected(stop.calls).equalTo(1)
     end)
 
     test("when callback set, this must be called", async proc()
@@ -92,25 +91,39 @@ suite(__filename, proc()
       const (
         triggerImpl = TriggerImpl()
         callback = monitor(nop)
-        trigger = await(Trigger(name=, engine, call, triggerImpl).start(callback))
+        stream = JobCallStream()
+        trigger = await(Trigger(name=, stream, triggerImpl).start(callback))
       )
 
       await(trigger.stop())
 
       # (2) assessment
       const log = monitor.log(callback)
-
       expected(log.calls).equalTo(1)
     end)
   end)
 
   suite("handle()", proc()
-    test("when started and called, engine must be called", async proc()
+    test("when trigger is stopped, error must be raised", async proc()
       # (1) act
       const (
-        engine = monitor(Engine(), members = ["run"], onlyCalls = true)
-        triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        triggerImpl = TriggerImpl()
+        stream = JobCallStream()
+        trigger = await(await(Trigger(name=, stream, triggerImpl).start()).stop())
+        e = {ts = timestamp(), call, last = false}
+        out = pawait(triggerImpl.fireEvent(e))
+      )
+
+      # (2) assessment
+      expected(out).first.equalTo(false).second.equalTo(TypeError("Trigger is stopped."))
+    end)
+
+    test("when started and called, call must be streamed", async proc()
+      # (1) act
+      const (
+        triggerImpl = monitor(TriggerImpl(), method = "stop")
+        stream = monitor(JobCallStream(), method = "append")
+        trigger = await(Trigger(name=, stream, triggerImpl).start())
         e = {ts = timestamp(), call, last = false}
       )
 
@@ -119,20 +132,20 @@ suite(__filename, proc()
       # (2) assessment
       expected(trigger.state).equalTo(TriggerState.started)
 
-      const run = monitor.log(engine)
-      expected(run.calls).equalTo(1)
-      expected(run.calledWith([call.jobName, call.args])).equalTo(1)
+      const append = monitor.log(stream, clear = true)
+      expected(append.calls).equalTo(1)
+      expected(append.calledWith([call])).equalTo(1)
 
-      const stop = monitor.log(triggerImpl)
+      const stop = monitor.log(triggerImpl, clear = true)
       expected(stop.calls).equalTo(0)
     end)
 
-    test("when started and called with last event, engine must be called and impl.stop() too", async proc()
+    test("when started and called with last event, impl.stop() and stream.end() must be called", async proc()
       # (1) act
       const (
-        engine = monitor(Engine(), members = ["run"], onlyCalls = true)
-        triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        triggerImpl = monitor(TriggerImpl(), method = "stop")
+        stream = monitor(JobCallStream(), method = "end")
+        trigger = await(Trigger(name=, stream, triggerImpl).start())
         e = {ts = timestamp(), call, last = true}
       )
 
@@ -141,20 +154,19 @@ suite(__filename, proc()
       # (2) assessment
       expected(trigger.state).equalTo(TriggerState.stopped)
 
-      const run = monitor.log(engine)
-      expected(run.calls).equalTo(1)
-      expected(run.calledWith([call.jobName, call.args])).equalTo(1)
+      const 'end' = monitor.log(stream, clear = true)
+      expected('end'.calls).equalTo(1)
 
-      const stop = monitor.log(triggerImpl)
+      const stop = monitor.log(triggerImpl, clear = true)
       expected(stop.calls).equalTo(1)
     end)
 
-    test("when job is __exit__, last event must be generated", async proc()
+    test("when job is __exit__, impl.stop() and stream.end() must be called", async proc()
       # (1) act
       const (
-        engine = monitor(Engine(), members = ["run"], onlyCalls = true)
-        triggerImpl = monitor(TriggerImpl(), members = ["stop"], onlyCalls = true)
-        trigger = await(Trigger(name=, engine, triggerImpl).start())
+        triggerImpl = monitor(TriggerImpl(), method = "stop")
+        stream = monitor(JobCallStream(), method = "end")
+        trigger = await(Trigger(name=, stream, triggerImpl).start())
         call = {jobName = "__exit__"}
         e = {ts = timestamp(), call, last = false}
       )
@@ -164,28 +176,11 @@ suite(__filename, proc()
       # (2) assessment
       expected(trigger.state).equalTo(TriggerState.stopped)
 
-      const run = monitor.log(engine)
-      expected(run.calls).equalTo(0)
+      const 'end' = monitor.log(stream, clear = true)
+      expected('end'.calls).equalTo(1)
 
-      const stop = monitor.log(triggerImpl)
+      const stop = monitor.log(triggerImpl, clear = true)
       expected(stop.calls).equalTo(1)
-    end)
-
-    test("when running and called, error must be raised", async proc()
-      # (1) act
-      const (
-        triggerImpl = TriggerImpl()
-        trigger = await(Trigger(name=, engine, triggerImpl).start())
-        e = {ts = timestamp(), call}
-      )
-
-      triggerImpl.fireEvent(e)
-      const out = pawait(triggerImpl.fireEvent(e))
-
-      # (2) assessment
-      expected(out)\
-        .it(0).equalTo(false)\
-        .it(1).equalTo(TypeError("Trigger still processing an event."))
     end)
   end)
 end)

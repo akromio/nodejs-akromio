@@ -2,6 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const JobCall = _core.dogma.use(require("./JobCall"));
+const JobCallStream = _core.dogma.use(require("./JobCallStream"));
 const TriggerImpl = _core.dogma.use(require("./TriggerImpl"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
 const $Trigger = class Trigger {
@@ -14,9 +15,9 @@ const $Trigger = class Trigger {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('engine', _['engine'], null);
-    Object.defineProperty(this, 'engine', {
-      value: (0, _core.coalesce)(_['engine'], null),
+    (0, _core.expect)('stream', _['stream'], JobCallStream);
+    Object.defineProperty(this, 'stream', {
+      value: (0, _core.coalesce)(_['stream'], null),
       writable: false,
       enumerable: true
     });
@@ -84,13 +85,13 @@ Trigger.prototype.stop = async function () {
   const self = this;
   {
     if (!_core.dogma.includes([TriggerState.nonStarted, TriggerState.stopped], this.state)) {
+      this._state = _core.dogma.enumGet(this._state, "stopped");
       try {
         0, await this.triggerImpl.stop();
       } finally {
         if (this.callback) {
           this.callback();
         }
-        this._state = _core.dogma.enumGet(this._state, "stopped");
       }
     }
   }
@@ -108,21 +109,20 @@ Trigger.prototype.handle = async function (e) {
       type: _core.bool
     }
   }));
+  let {
+    call,
+    last
+  } = e;
   {
-    if (_core.dogma.enumEq(this._state, "running")) {
-      _core.dogma.raise(TypeError("Trigger still processing an event."));
+    if (_core.dogma.enumEq(this.state, "stopped")) {
+      _core.dogma.raise(TypeError("Trigger is stopped."));
     }
     this._state = _core.dogma.enumGet(this._state, "running");
-    if (e.call.jobName == "__exit__") {
-      e = {
-        ["last"]: true
-      };
-    } else {
-      0, await this.engine.run(e.call.jobName, e.call.args);
-    }
-    if (e.last === true) {
+    if (call.jobName == "__exit__" || last) {
+      this.stream.end();
       0, await this.stop();
     } else {
+      this.stream.append(call);
       this._state = _core.dogma.enumGet(this._state, "started");
     }
   }

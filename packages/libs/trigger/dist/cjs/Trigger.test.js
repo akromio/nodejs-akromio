@@ -3,31 +3,12 @@
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
-  monitor
+  monitor,
+  interceptor
 } = _core.dogma.use(require("@akromio/doubles"));
 const Trigger = _core.dogma.use(require("./Trigger"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
-const $Engine = class Engine {
-  constructor(_) {
-    /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_13e200b5f20602815c1003cc0390c086___init__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___init__(_); /* c8 ignore stop */
-    /* c8 ignore start */
-    if (this._pvt_13e200b5f20602815c1003cc0390c086___post__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___post__(); /* c8 ignore stop */
-    /* c8 ignore start */
-    if (this._pvt_13e200b5f20602815c1003cc0390c086___validate__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___validate__(); /* c8 ignore stop */
-  }
-};
-
-const Engine = new Proxy($Engine, {
-  apply(receiver, self, args) {
-    return new $Engine(...args);
-  }
-});
-Engine.prototype.run = function () {
-  const self = this;
-  {}
-};
+const JobCallStream = _core.dogma.use(require("./JobCallStream"));
 const $TriggerImpl = class TriggerImpl {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -77,7 +58,6 @@ TriggerImpl.prototype.fireEvent = async function (e) {
 suite(__filename, () => {
   {
     const name = "test";
-    const engine = Engine();
     const call = {
       ["jobName"]: "hello",
       ["args"]: [1, 2, 3]
@@ -87,35 +67,36 @@ suite(__filename, () => {
         test("when non started, impl.start() must be called", async () => {
           {
             const triggerImpl = monitor(TriggerImpl(), {
-              'members': ["start"],
-              'onlyCalls': true
+              'method': "start"
             });
+            const stream = JobCallStream();
             const trigger = Trigger({
               'name': name,
-              'engine': engine,
-              'call': call,
+              'stream': stream,
               'triggerImpl': triggerImpl
             });
             0, await trigger.start();
-            const log = monitor.log(triggerImpl);
             expected(trigger).toHave({
               'state': TriggerState.started
             });
-            expected(log.calls).equalTo(1);
-            expected(log.getCall(0).args).toHaveLen(1).it(0).toBeFn();
+            const start = monitor.log(triggerImpl, {
+              'clear': true
+            });
+            expected(start.calls).equalTo(1);
+            expected(start.call.args).toHaveLen(1).first.toBeFn();
           }
         });
         test("when started, error must be raised", async () => {
           {
             const triggerImpl = TriggerImpl();
+            const stream = JobCallStream();
             const trigger = (0, await Trigger({
               'name': name,
-              'engine': engine,
-              'call': call,
+              'stream': stream,
               'triggerImpl': triggerImpl
             }).start());
             const out = await _core.dogma.pawait(() => trigger.start());
-            expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("The trigger has been already started."));
+            expected(out).first.equalTo(false).second.equalTo(TypeError("The trigger has been already started."));
           }
         });
       }
@@ -125,48 +106,50 @@ suite(__filename, () => {
         test("when non started, nothing to do", async () => {
           {
             const triggerImpl = monitor(TriggerImpl(), {
-              'members': ["stop"],
-              'onlyCalls': true
+              'method': "stop"
             });
+            const stream = JobCallStream();
             const trigger = Trigger({
               'name': name,
-              'engine': engine,
-              'call': call,
+              'stream': stream,
               'triggerImpl': triggerImpl
             });
             0, await trigger.stop();
-            const log = monitor.log(triggerImpl);
+            const stop = monitor.log(triggerImpl, {
+              'clear': true
+            });
             expected(trigger).toHave({
               'state': TriggerState.nonStarted
             });
-            expected(log.calls).equalTo(0);
+            expected(stop.calls).equalTo(0);
           }
         });
         test("when started, impl.stop() must be called", async () => {
           {
             const triggerImpl = monitor(TriggerImpl(), {
-              'members': ["stop"],
-              'onlyCalls': true
+              'method': "stop"
             });
+            const stream = JobCallStream();
             const trigger = (0, await Trigger({
               'name': name,
-              'engine': engine,
-              'call': call,
+              'stream': stream,
               'triggerImpl': triggerImpl
             }).start());
             0, await trigger.stop();
-            const log = monitor.log(triggerImpl);
-            expected(log.calls).equalTo(1);
+            const stop = monitor.log(triggerImpl, {
+              'clear': true
+            });
+            expected(stop.calls).equalTo(1);
           }
         });
         test("when callback set, this must be called", async () => {
           {
             const triggerImpl = TriggerImpl();
             const callback = monitor(_core.dogma.nop());
+            const stream = JobCallStream();
             const trigger = (0, await Trigger({
               'name': name,
-              'engine': engine,
-              'call': call,
+              'stream': stream,
               'triggerImpl': triggerImpl
             }).start(callback));
             0, await trigger.stop();
@@ -178,19 +161,35 @@ suite(__filename, () => {
     });
     suite("handle()", () => {
       {
-        test("when started and called, engine must be called", async () => {
+        test("when trigger is stopped, error must be raised", async () => {
           {
-            const engine = monitor(Engine(), {
-              'members': ["run"],
-              'onlyCalls': true
-            });
+            const triggerImpl = TriggerImpl();
+            const stream = JobCallStream();
+            const trigger = (0, await (0, await Trigger({
+              'name': name,
+              'stream': stream,
+              'triggerImpl': triggerImpl
+            }).start()).stop());
+            const e = {
+              ["ts"]: (0, _core.timestamp)(),
+              ["call"]: call,
+              ["last"]: false
+            };
+            const out = await _core.dogma.pawait(() => triggerImpl.fireEvent(e));
+            expected(out).first.equalTo(false).second.equalTo(TypeError("Trigger is stopped."));
+          }
+        });
+        test("when started and called, call must be streamed", async () => {
+          {
             const triggerImpl = monitor(TriggerImpl(), {
-              'members': ["stop"],
-              'onlyCalls': true
+              'method': "stop"
+            });
+            const stream = monitor(JobCallStream(), {
+              'method': "append"
             });
             const trigger = (0, await Trigger({
               'name': name,
-              'engine': engine,
+              'stream': stream,
               'triggerImpl': triggerImpl
             }).start());
             const e = {
@@ -200,26 +199,28 @@ suite(__filename, () => {
             };
             0, await triggerImpl.fireEvent(e);
             expected(trigger.state).equalTo(TriggerState.started);
-            const run = monitor.log(engine);
-            expected(run.calls).equalTo(1);
-            expected(run.calledWith([call.jobName, call.args])).equalTo(1);
-            const stop = monitor.log(triggerImpl);
+            const append = monitor.log(stream, {
+              'clear': true
+            });
+            expected(append.calls).equalTo(1);
+            expected(append.calledWith([call])).equalTo(1);
+            const stop = monitor.log(triggerImpl, {
+              'clear': true
+            });
             expected(stop.calls).equalTo(0);
           }
         });
-        test("when started and called with last event, engine must be called and impl.stop() too", async () => {
+        test("when started and called with last event, impl.stop() and stream.end() must be called", async () => {
           {
-            const engine = monitor(Engine(), {
-              'members': ["run"],
-              'onlyCalls': true
-            });
             const triggerImpl = monitor(TriggerImpl(), {
-              'members': ["stop"],
-              'onlyCalls': true
+              'method': "stop"
+            });
+            const stream = monitor(JobCallStream(), {
+              'method': "end"
             });
             const trigger = (0, await Trigger({
               'name': name,
-              'engine': engine,
+              'stream': stream,
               'triggerImpl': triggerImpl
             }).start());
             const e = {
@@ -229,26 +230,27 @@ suite(__filename, () => {
             };
             0, await triggerImpl.fireEvent(e);
             expected(trigger.state).equalTo(TriggerState.stopped);
-            const run = monitor.log(engine);
-            expected(run.calls).equalTo(1);
-            expected(run.calledWith([call.jobName, call.args])).equalTo(1);
-            const stop = monitor.log(triggerImpl);
+            const end = monitor.log(stream, {
+              'clear': true
+            });
+            expected(end.calls).equalTo(1);
+            const stop = monitor.log(triggerImpl, {
+              'clear': true
+            });
             expected(stop.calls).equalTo(1);
           }
         });
-        test("when job is __exit__, last event must be generated", async () => {
+        test("when job is __exit__, impl.stop() and stream.end() must be called", async () => {
           {
-            const engine = monitor(Engine(), {
-              'members': ["run"],
-              'onlyCalls': true
-            });
             const triggerImpl = monitor(TriggerImpl(), {
-              'members': ["stop"],
-              'onlyCalls': true
+              'method': "stop"
+            });
+            const stream = monitor(JobCallStream(), {
+              'method': "end"
             });
             const trigger = (0, await Trigger({
               'name': name,
-              'engine': engine,
+              'stream': stream,
               'triggerImpl': triggerImpl
             }).start());
             const call = {
@@ -261,27 +263,14 @@ suite(__filename, () => {
             };
             0, await triggerImpl.fireEvent(e);
             expected(trigger.state).equalTo(TriggerState.stopped);
-            const run = monitor.log(engine);
-            expected(run.calls).equalTo(0);
-            const stop = monitor.log(triggerImpl);
+            const end = monitor.log(stream, {
+              'clear': true
+            });
+            expected(end.calls).equalTo(1);
+            const stop = monitor.log(triggerImpl, {
+              'clear': true
+            });
             expected(stop.calls).equalTo(1);
-          }
-        });
-        test("when running and called, error must be raised", async () => {
-          {
-            const triggerImpl = TriggerImpl();
-            const trigger = (0, await Trigger({
-              'name': name,
-              'engine': engine,
-              'triggerImpl': triggerImpl
-            }).start());
-            const e = {
-              ["ts"]: (0, _core.timestamp)(),
-              ["call"]: call
-            };
-            triggerImpl.fireEvent(e);
-            const out = await _core.dogma.pawait(() => triggerImpl.fireEvent(e));
-            expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Trigger still processing an event."));
           }
         });
       }
