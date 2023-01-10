@@ -10,3 +10,8 @@ export struct TriggeredJobCatalog: JobCatalog
    * The triggers defined into the catalog.
    */
   pub const triggers := {}
+
+  /**
+   * Number of runners per engine.
+   */
+  pub const parallelism: num

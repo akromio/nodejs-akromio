@@ -1,4 +1,5 @@
 use (
+  dep://os
   alias://expected
   {sim, method} = alias://doubles
   {Dataset, GlobalDataset, LocalDataset} = alias://dataset
@@ -10,7 +11,7 @@ use (
 
 suite(__filename, proc()
   const (
-    globalDataset = GlobalDataset(name = "global")
+    globalDataset = GlobalDataset(name = "global").setDatumValue("halfCores", 5)
     parentDataset = globalDataset
     ops = Ops()
     catalogOpt = {
@@ -47,6 +48,32 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).equalTo(trg1=, trg2)
+    end)
+  end)
+
+  suite("parseParallelism()", proc()
+    test("when parallelism unset, default value must be set", async proc()
+      # (1) act
+      const out = await(parser.parse(
+        catalogDecl{*, on = []}
+        parentDataset=,
+        ops
+      )).parallelism
+
+      # (2) assessment
+      expected(out).equalTo(len(os.cpus()) * 2)
+    end)
+
+    test("when parallelism set, this must be used", async proc()
+      # (1) act
+      const out = await(parser.parse(
+        catalogDecl{*, on = [], parallelism = "$(halfCores)"}
+        parentDataset=,
+        ops
+      )).parallelism
+
+      # (2) assessment
+      expected(out).equalTo(parentDataset.getDatumValue("halfCores"))
     end)
   end)
 end)

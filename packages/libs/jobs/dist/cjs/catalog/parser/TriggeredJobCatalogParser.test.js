@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const os = _core.dogma.use(require("os"));
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   sim,
@@ -24,7 +25,7 @@ suite(__filename, () => {
   {
     const globalDataset = GlobalDataset({
       'name': "global"
-    });
+    }).setDatumValue("halfCores", 5);
     const parentDataset = globalDataset;
     const ops = Ops();
     const catalogOpt = {
@@ -67,6 +68,33 @@ suite(__filename, () => {
               'trg1': trg1,
               'trg2': trg2
             });
+          }
+        });
+      }
+    });
+    suite("parseParallelism()", () => {
+      {
+        test("when parallelism unset, default value must be set", async () => {
+          {
+            const out = (0, await parser.parse(_core.dogma.clone(catalogDecl, {
+              "on": []
+            }, {}, [], []), {
+              'parentDataset': parentDataset,
+              'ops': ops
+            })).parallelism;
+            expected(out).equalTo((0, _core.len)(os.cpus()) * 2);
+          }
+        });
+        test("when parallelism set, this must be used", async () => {
+          {
+            const out = (0, await parser.parse(_core.dogma.clone(catalogDecl, {
+              "on": [],
+              "parallelism": "$(halfCores)"
+            }, {}, [], []), {
+              'parentDataset': parentDataset,
+              'ops': ops
+            })).parallelism;
+            expected(out).equalTo(parentDataset.getDatumValue("halfCores"));
           }
         });
       }
