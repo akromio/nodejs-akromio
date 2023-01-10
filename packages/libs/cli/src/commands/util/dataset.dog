@@ -95,6 +95,22 @@ globalDataset.setDatum(
   )
 )
 
+globalDataset.setDatum(
+  ConstDatum(
+    name = "doubleCores"
+    desc = "cores * 2."
+    value = len(os.cpus()) * 2
+  )
+)
+
+globalDataset.setDatum(
+  ConstDatum(
+    name = "halfCores"
+    desc = "floor(cores / 2); at least 1 returned."
+    value = Math.floor(len(os.cpus()) / 2) or 1
+  )
+)
+
 const (
   platforms = ["aix", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"]
   userPlatform = os.platform()

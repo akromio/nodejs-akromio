@@ -91,6 +91,16 @@ globalDataset.setDatum(ConstDatum({
   'desc': "Number of logical CPU cores.",
   'value': (0, _core.len)(os.cpus())
 }));
+globalDataset.setDatum(ConstDatum({
+  'name': "doubleCores",
+  'desc': "cores * 2.",
+  'value': (0, _core.len)(os.cpus()) * 2
+}));
+globalDataset.setDatum(ConstDatum({
+  'name': "halfCores",
+  'desc': "floor(cores / 2); at least 1 returned.",
+  'value': Math.floor((0, _core.len)(os.cpus()) / 2) || 1
+}));
 const platforms = ["aix", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"];
 const userPlatform = os.platform();
 globalDataset.setDatum(ConstDatum({
