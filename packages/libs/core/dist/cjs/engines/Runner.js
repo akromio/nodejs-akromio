@@ -10,9 +10,9 @@ const $Runner = class Runner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (_['id'] != null) (0, _core.expect)('id', _['id'], _core.text); /* c8 ignore stop */
-    Object.defineProperty(this, 'id', {
-      value: (0, _core.coalesce)(_['id'], uuid.v4()),
+    if (_['name'] != null) (0, _core.expect)('name', _['name'], _core.text); /* c8 ignore stop */
+    Object.defineProperty(this, 'name', {
+      value: (0, _core.coalesce)(_['name'], uuid.v4()),
       writable: false,
       enumerable: true
     });

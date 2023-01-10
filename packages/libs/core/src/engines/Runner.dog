@@ -12,7 +12,7 @@ export struct Runner
   /**
    * Identifier of the runner.
    */
-  pub const id: text = uuid.v4()
+  pub const name: text = uuid.v4()
 
   /**
    * Log stream to use to report the run events.
