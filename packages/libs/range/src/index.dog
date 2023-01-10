@@ -1,0 +1,6 @@
+/**
+ * Creates and returns a list of numbers.
+ */
+export fn range(len: num) -> seq: list
+  for i = 0; i < len; i += 1 do
+    seq.push(i)
