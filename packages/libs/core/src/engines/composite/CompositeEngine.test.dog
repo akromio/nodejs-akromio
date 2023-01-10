@@ -2,15 +2,13 @@ use (
   alias://expected
   {monitor, interceptor, sim, method} = alias://doubles
   {GlobalDataset} = alias://dataset
+  alias://range
   
   CompositeEngine
   ../Runner
   ../../plugins/PluginParser
   ../../ops/Ops
 )
-
-fn range(len) -> seq: list
-  for i = 0; i < len; i += 1 do seq.push(i)
 
 suite(__filename, proc()
   suite("run()", proc()

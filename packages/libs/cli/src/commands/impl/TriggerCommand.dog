@@ -1,6 +1,6 @@
 use (
   {Duplex} = dep://stream
-  {Runner, Ops, PluginLoader, PluginParser} = alias://core
+  {CallReqStream, Runner, Ops, PluginLoader, PluginParser} = alias://core
   {Trigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
@@ -49,6 +49,10 @@ export struct TriggerCommand: JobRunCommandBase
    */
   @hidden
   pub fn createCatalogParser(opts: map) = TriggeredJobCatalogParser(opts)
+  
+  @override @hidden
+  pub fn createReporters(reporterNames: list, log) -> reporters: Reporters
+    return []
 
   @override @hidden
   pub async proc handle(
@@ -87,11 +91,13 @@ export struct TriggerCommand: JobRunCommandBase
       # (7) create engine
       const (
         log = native("new Duplex({emitClose: true, read() {}, write() {}})")
+        stream = CallReqStream()
         engine = await(self.createEngine(
           {
             dataset = catalog.dataset
             onError = catalog.onError or onError
-            runner = Runner(log=)
+            runners = [for i in range(catalog.parallelism) do Runner(name = $"runner#${i}", log)]
+            stream
             pluginParser
             ops
           }
@@ -105,7 +111,7 @@ export struct TriggerCommand: JobRunCommandBase
 
       # (8) create and run trigger
       var (
-        trigger ::= createTrigger(triggerName, catalog, engine, args)
+        trigger ::= createTrigger(triggerName, catalog, stream, args)
         code = 0
       )
       
@@ -124,7 +130,7 @@ export struct TriggerCommand: JobRunCommandBase
  * Creates a trigger with the given data.
  */
 @noParamCheck
-fn createTrigger(name, cat, engine, jobArgs?) -> trigger
+fn createTrigger(name, cat, stream, jobArgs?) -> trigger
   # (1) pre: set name if unset
   if not (name ?= cat.defaultTriggerName) then
     throw(TypeError($"trigger name expected."))
@@ -157,6 +163,6 @@ fn createTrigger(name, cat, engine, jobArgs?) -> trigger
   # (3) create trigger
   trigger = Trigger(
     name=,
-    engine
+    stream
     triggerImpl = TriggerImpl(decl)
   )

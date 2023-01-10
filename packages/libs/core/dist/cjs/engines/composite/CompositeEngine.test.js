@@ -11,20 +11,11 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
+const range = _core.dogma.use(require("@akromio/range"));
 const CompositeEngine = _core.dogma.use(require("./CompositeEngine"));
 const Runner = _core.dogma.use(require("../Runner"));
 const PluginParser = _core.dogma.use(require("../../plugins/PluginParser"));
 const Ops = _core.dogma.use(require("../../ops/Ops"));
-function range(len) {
-  let seq = []; /* c8 ignore next */
-  _core.dogma.expect("len", len);
-  {
-    for (let i = 0; i < len; i += 1) {
-      seq.push(i);
-    }
-  }
-  return seq;
-}
 suite(__filename, () => {
   {
     suite("run()", () => {

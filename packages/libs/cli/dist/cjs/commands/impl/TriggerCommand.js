@@ -5,6 +5,7 @@ const {
   Duplex
 } = _core.dogma.use(require("stream"));
 const {
+  CallReqStream,
   Runner,
   Ops,
   PluginLoader,
@@ -91,6 +92,16 @@ TriggerCommand.prototype.createCatalogParser = function (opts) {
     return TriggeredJobCatalogParser(opts);
   }
 };
+TriggerCommand.prototype.createReporters = function (reporterNames, log) {
+  const self = this;
+  let reporters; /* c8 ignore next */
+  _core.dogma.expect("reporterNames", reporterNames, _core.list); /* c8 ignore next */
+  _core.dogma.expect("log", log);
+  {
+    return [];
+  }
+  return reporters;
+};
 TriggerCommand.prototype.handle = async function (argv) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("argv", argv, _core.map);
@@ -123,18 +134,21 @@ TriggerCommand.prototype.handle = async function (argv) {
         read() {},
         write() {}
       });
+      const stream = CallReqStream();
       const engine = (0, await this.createEngine({
         ["dataset"]: catalog.dataset,
         ["onError"]: catalog.onError || onError,
-        ["runner"]: Runner({
+        ["runners"]: range(catalog.parallelism).map(i => Runner({
+          'name': `runner#${i}`,
           'log': log
-        }),
+        })),
+        ["stream"]: stream,
         ["pluginParser"]: pluginParser,
         ["ops"]: ops
       }, registries.getRegistry(decl.registryName)));
       reporters = this.createReporters(reporters, log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
-      const trigger = createTrigger(triggerName, catalog, engine, args);
+      const trigger = createTrigger(triggerName, catalog, stream, args);
       let code = 0;
       trigger.start(async result => {
         {
@@ -156,7 +170,7 @@ TriggerCommand.prototype.handle = async function (argv) {
     }
   }
 };
-function createTrigger(name, cat, engine, jobArgs) {
+function createTrigger(name, cat, stream, jobArgs) {
   let trigger;
   {
     var _name, _dogma$getItem;
@@ -204,7 +218,7 @@ function createTrigger(name, cat, engine, jobArgs) {
     }
     trigger = Trigger({
       'name': name,
-      'engine': engine,
+      'stream': stream,
       'triggerImpl': TriggerImpl(decl)
     });
   }
