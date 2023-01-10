@@ -1,13 +1,29 @@
 use (
   {Writable} = dep://stream
+  dep://uuid
+
+  ../ops/Op
 )
 
 /**
  * A runner of operations.
  */
-@abstract
 export struct Runner
+  /**
+   * Identifier of the runner.
+   */
+  pub const id: text = uuid.v4()
+
   /**
    * Log stream to use to report the run events.
    */
   pub const log: Writable
+
+  /**
+   * Runs a given operation into this runner and its configuration.
+   */
+  @async
+  pub fn run(op: Op, args?: any, opts #[: RunnerRunOpts]): Result = op.runWith(
+    args,
+    opts{*, log = self.log}
+  )

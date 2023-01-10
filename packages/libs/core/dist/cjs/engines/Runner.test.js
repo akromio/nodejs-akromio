@@ -9,10 +9,10 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const SimpleRunner = _core.dogma.use(require("./SimpleRunner"));
-const Result = _core.dogma.use(require("../../ops/Result"));
-const StaticAction = _core.dogma.use(require("../../ops/simple/action/StaticAction"));
-const ActionOperator = _core.dogma.use(require("../../ops/simple/action/ActionOperator"));
+const Runner = _core.dogma.use(require("./Runner"));
+const Result = _core.dogma.use(require("../ops/Result"));
+const StaticAction = _core.dogma.use(require("../ops/simple/action/StaticAction"));
+const ActionOperator = _core.dogma.use(require("../ops/simple/action/ActionOperator"));
 suite(__filename, () => {
   {
     const log = simulator.stream.duplex();
@@ -28,7 +28,7 @@ suite(__filename, () => {
             const dataset = GlobalDataset({
               'name': "global"
             });
-            const runner = SimpleRunner({
+            const runner = Runner({
               'log': log
             });
             const out = (0, await runner.run(action, null, {
@@ -50,7 +50,7 @@ suite(__filename, () => {
             const dataset = GlobalDataset({
               'name': "global"
             });
-            const runner = SimpleRunner({
+            const runner = Runner({
               'log': log
             });
             const args = ["one", "two", "three"];

@@ -1,6 +1,6 @@
 use (
   {Duplex} = dep://stream
-  {SimpleRunner, Ops, PluginParser} = alias://core
+  {Runner, Ops, PluginParser} = alias://core
 
   ../JobRunCommandBase
 )
@@ -86,7 +86,7 @@ export struct JobRunCommand: JobRunCommandBase
           {
             dataset = catalog.dataset
             onError = catalog.onError or onError
-            runner = SimpleRunner(log=)
+            runner = Runner(log=)
             pluginParser
             ops
           }

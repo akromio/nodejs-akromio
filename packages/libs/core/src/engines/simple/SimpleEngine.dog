@@ -1,6 +1,5 @@
 use (
-  ../{Engine, RunOpts}
-  SimpleRunner
+  ../{Engine, Runner, RunOpts}
   ../../CallReq
   ../../ops/Op
 )
@@ -13,17 +12,19 @@ export struct SimpleEngine: Engine
    * Runner for running its call requests.
    */
   @hidden
-  pub const runner: SimpleRunner
+  pub const runner: Runner
 
   /**
    * Runs the given call [req]uest.
+   *
+   * An error is raised if the request operation name unexists in the catalog.
    *
    * An error is raised if already running something.
    */
   @async
   pub fn run(req: CallReq, opts?: RunOpts): Result
     # (1) get the operation from its catalog
-    const op = self.ops.getOp(req.jobName, raiseIfNotFound = true)
+    const op = self.getOpOf(req)
     
     # (2) set options to use
     opts ?= {}

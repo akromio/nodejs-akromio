@@ -34,5 +34,4 @@ pub use (
   engines/Engine
   engines/Runner
   engines/simple/SimpleEngine
-  engines/simple/SimpleRunner
 )

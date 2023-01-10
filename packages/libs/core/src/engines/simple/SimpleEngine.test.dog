@@ -3,7 +3,8 @@ use (
   {GlobalDataset} = alias://dataset
   {monitor, simulator, field, method} = alias://doubles
 
-  SimpleEngine, SimpleRunner
+  SimpleEngine
+  ../Runner
   ../../ops/{Ops, Result}
   ../../ops/simple/action/{StaticAction, ActionOperator}
   ../../plugins/PluginParser
@@ -31,7 +32,7 @@ suite(__filename, proc()
         )
         runner = monitor(
           simulator(
-            SimpleRunner
+            Runner
             run = method.resolves(result)
             log = field.stream.duplex()
           )
@@ -59,7 +60,7 @@ suite(__filename, proc()
         )
         runner = monitor(
           simulator(
-            SimpleRunner
+            Runner
             run = method.resolves(result)
             log = field.stream.duplex()
           )

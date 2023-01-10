@@ -2,7 +2,7 @@ use (
   alias://expected
   {simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
-  {SimpleRunner, PluginParser} = alias://core
+  {Runner, PluginParser} = alias://core
   
   JobEngine
 )
@@ -17,7 +17,7 @@ suite(__filename, proc()
           dataset = GlobalDataset(name = "global")
           onError = "carryOn"
           pluginParser = PluginParser()
-          runner = SimpleRunner(log = simulator.stream.duplex())
+          runner = Runner(log = simulator.stream.duplex())
         )
       )
 

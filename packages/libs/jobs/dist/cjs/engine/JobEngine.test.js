@@ -9,7 +9,7 @@ const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
 const {
-  SimpleRunner,
+  Runner,
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
 const JobEngine = _core.dogma.use(require("./JobEngine"));
@@ -26,7 +26,7 @@ suite(__filename, () => {
               }),
               'onError': "carryOn",
               'pluginParser': PluginParser(),
-              'runner': SimpleRunner({
+              'runner': Runner({
                 'log': simulator.stream.duplex()
               })
             });

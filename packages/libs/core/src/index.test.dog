@@ -29,7 +29,6 @@ suite(__filename, proc()
       "Script"
       "ScriptOperator"
       "SimpleEngine"
-      "SimpleRunner"
       "SimpleOp"
       "SimpleOperator"
       "StaticAction"

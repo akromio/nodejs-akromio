@@ -12,7 +12,7 @@ const {
   method
 } = _core.dogma.use(require("@akromio/doubles"));
 const SimpleEngine = _core.dogma.use(require("./SimpleEngine"));
-const SimpleRunner = _core.dogma.use(require("./SimpleRunner"));
+const Runner = _core.dogma.use(require("../Runner"));
 const Ops = _core.dogma.use(require("../../ops/Ops"));
 const Result = _core.dogma.use(require("../../ops/Result"));
 const StaticAction = _core.dogma.use(require("../../ops/simple/action/StaticAction"));
@@ -42,7 +42,7 @@ suite(__filename, () => {
               'value': 1234,
               'onError': "carryOn"
             });
-            const runner = monitor(simulator(SimpleRunner, {
+            const runner = monitor(simulator(Runner, {
               'run': method.resolves(result),
               'log': field.stream.duplex()
             }));
@@ -75,7 +75,7 @@ suite(__filename, () => {
               'value': 1234,
               'onError': "carryOn"
             });
-            const runner = monitor(simulator(SimpleRunner, {
+            const runner = monitor(simulator(Runner, {
               'run': method.resolves(result),
               'log': field.stream.duplex()
             }));

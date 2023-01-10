@@ -5,7 +5,7 @@ const {
   Duplex
 } = _core.dogma.use(require("stream"));
 const {
-  SimpleRunner,
+  Runner,
   Ops,
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
@@ -110,7 +110,7 @@ JobRunCommand.prototype.handle = async function (argv) {
       const engine = (0, await this.createEngine({
         ["dataset"]: catalog.dataset,
         ["onError"]: catalog.onError || onError,
-        ["runner"]: SimpleRunner({
+        ["runner"]: Runner({
           'log': log
         }),
         ["pluginParser"]: pluginParser,

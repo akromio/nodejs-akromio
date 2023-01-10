@@ -4,10 +4,18 @@ var _core = require("@dogmalang/core");
 const {
   Writable
 } = _core.dogma.use(require("stream"));
+const uuid = _core.dogma.use(require("uuid"));
+const Op = _core.dogma.use(require("../ops/Op"));
 const $Runner = class Runner {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */
+    /* c8 ignore stop */ /* c8 ignore start */
+    if (_['id'] != null) (0, _core.expect)('id', _['id'], _core.text); /* c8 ignore stop */
+    Object.defineProperty(this, 'id', {
+      value: (0, _core.coalesce)(_['id'], uuid.v4()),
+      writable: false,
+      enumerable: true
+    });
     (0, _core.expect)('log', _['log'], Writable);
     Object.defineProperty(this, 'log', {
       value: (0, _core.coalesce)(_['log'], null),
@@ -24,8 +32,19 @@ const $Runner = class Runner {
 };
 
 const Runner = new Proxy($Runner, {
-  /* c8 ignore start */apply(receiver, self, args) {
-    throw "'Runner' is abstract.";
-  } /* c8 ignore stop */
+  apply(receiver, self, args) {
+    return new $Runner(...args);
+  }
 });
 module.exports = exports = Runner;
+Runner.prototype.run = function (op, args, opts) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("op", op, Op); /* c8 ignore next */
+  if (args != null) _core.dogma.expect("args", args, _core.any); /* c8 ignore next */
+  _core.dogma.expect("opts", opts);
+  {
+    return op.runWith(args, _core.dogma.clone(opts, {
+      "log": this.log
+    }, {}, [], []));
+  }
+};

@@ -2,7 +2,7 @@ use (
   {Dataset} = alias://dataset
 
   RunOpts 
-  ../{CallReq}
+  ../CallReq
   ../ops/Ops
   ../errors/NotFoundError
   ../plugins/PluginParser
@@ -29,6 +29,14 @@ export struct Engine
    * When the user requests the run of an operation, the name of one of them must be passed.
    */
   pub const ops: Ops = Ops()
+
+  /**
+   * Returns the operation associated a given call [req]uest.
+   *
+   * If it unexists, error is raised.
+   */
+  @hidden
+  pub fn getOpOf(req: CallReq) = self.ops.getOp(req.jobName, raiseIfNotFound = true)
 
   /**
    * Plugin parser to use with the built-in plugins.

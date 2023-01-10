@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StaticAction = exports.SimpleRunner = exports.SimpleOperator = exports.SimpleOp = exports.SimpleEngine = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CoOperator = exports.CallReqStream = exports.CallReq = exports.Call = exports.ActionOperator = exports.Action = void 0;
+exports.StaticAction = exports.SimpleOperator = exports.SimpleOp = exports.SimpleEngine = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CoOperator = exports.CallReqStream = exports.CallReq = exports.Call = exports.ActionOperator = exports.Action = void 0;
 var _core = require("@dogmalang/core");
 const CallReq = _core.dogma.use(require("./CallReq"));
 exports.CallReq = CallReq;
@@ -61,5 +61,3 @@ const Runner = _core.dogma.use(require("./engines/Runner"));
 exports.Runner = Runner;
 const SimpleEngine = _core.dogma.use(require("./engines/simple/SimpleEngine"));
 exports.SimpleEngine = SimpleEngine;
-const SimpleRunner = _core.dogma.use(require("./engines/simple/SimpleRunner"));
-exports.SimpleRunner = SimpleRunner;

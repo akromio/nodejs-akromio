@@ -53,6 +53,15 @@ const Engine = new Proxy($Engine, {
   } /* c8 ignore stop */
 });
 module.exports = exports = Engine;
+Engine.prototype.getOpOf = function (req) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("req", req, CallReq);
+  {
+    return this.ops.getOp(req.jobName, {
+      'raiseIfNotFound': true
+    });
+  }
+};
 Engine.prototype.getBuiltInPresets = function () {
   const self = this;
   {
