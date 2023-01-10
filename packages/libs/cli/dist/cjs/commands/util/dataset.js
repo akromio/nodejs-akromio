@@ -86,6 +86,11 @@ globalDataset.setDatum(DatumFn({
     }
   }
 }));
+globalDataset.setDatum(ConstDatum({
+  'name': "cores",
+  'desc': "Number of logical CPU cores.",
+  'value': (0, _core.len)(os.cpus())
+}));
 const platforms = ["aix", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"];
 const userPlatform = os.platform();
 globalDataset.setDatum(ConstDatum({
