@@ -11,6 +11,7 @@ suite(__filename, proc()
       "Call"
       "CallReq"
       "CallReqStream"
+      "CompositeEngine"
       "CompositeOp"
       "CompositeOperator"
       "Context"

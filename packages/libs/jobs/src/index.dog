@@ -2,6 +2,7 @@ pub use (
   JobDescriber
 
   engine/JobEngine
+  engine/JobsEngine
 
   catalog/JobCatalog
   catalog/parser/JobParser

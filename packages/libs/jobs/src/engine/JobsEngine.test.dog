@@ -4,7 +4,7 @@ use (
   {GlobalDataset} = alias://dataset
   {Runner, PluginParser} = alias://core
   
-  JobEngine
+  JobsEngine
 )
 
 suite(__filename, proc()
@@ -12,18 +12,19 @@ suite(__filename, proc()
     test("when instantiated, built-in plugins must be loaded", proc()
       # (1) act
       const (
-        out = JobEngine(
-          name = "job"
+        out = JobsEngine(
+          name = "jobs"
           dataset = GlobalDataset(name = "global")
           onError = "carryOn"
           pluginParser = PluginParser()
-          runner = Runner(log = sim.stream.duplex())
+          stream = sim.stream.readable()
+          runners = [Runner(log = sim.stream.duplex())]
         )
       )
 
       # (2) assessment
       expected(out)\
-        .toBe(JobEngine)\
+        .toBe(JobsEngine)\
         .member("ops.ops").toHaveLen(0)
     end)
   end)

@@ -1,11 +1,11 @@
 use (
-  {JobEngine} = alias://jobs
+  {JobsEngine} = alias://jobs
   alias://preset
 )
 
 /**
  * A jobs engine for the akro tool.
  */
-export struct Engine: JobEngine
+export struct Engine: JobsEngine
   @override @hidden
   pub fn getBuiltInPresets() = [preset]

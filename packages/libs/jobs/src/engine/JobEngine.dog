@@ -1,8 +1,9 @@
 use (
-  {SimpleEngine, PluginParser} = alias://core
+  {SimpleEngine} = alias://core
 )
 
 /**
- * An engine for running jobs.
+ * An engine for running only one job,
+ * although this can be called multiple times.
  */
 export struct JobEngine: SimpleEngine

@@ -2,8 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const {
-  SimpleEngine,
-  PluginParser
+  SimpleEngine
 } = _core.dogma.use(require("@akromio/core"));
 const $JobEngine = class JobEngine extends SimpleEngine {
   constructor(_) {
