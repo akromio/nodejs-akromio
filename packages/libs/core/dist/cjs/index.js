@@ -3,8 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StaticAction = exports.SingleRunnerEngine = exports.SimpleOperator = exports.SimpleOp = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CoOperator = exports.Call = exports.ActionOperator = exports.Action = void 0;
+exports.StaticAction = exports.SimpleOperator = exports.SimpleOp = exports.SimpleEngine = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CompositeEngine = exports.CoOperator = exports.CallReqStream = exports.CallReq = exports.Call = exports.ActionOperator = exports.Action = void 0;
 var _core = require("@dogmalang/core");
+const CallReq = _core.dogma.use(require("./CallReq"));
+exports.CallReq = CallReq;
+const CallReqStream = _core.dogma.use(require("./CallReqStream"));
+exports.CallReqStream = CallReqStream;
 const NotFoundError = _core.dogma.use(require("./errors/NotFoundError"));
 exports.NotFoundError = NotFoundError;
 const Ops = _core.dogma.use(require("./ops/Ops"));
@@ -51,9 +55,11 @@ const DynamicMacro = _core.dogma.use(require("./ops/composite/macro/DynamicMacro
 exports.DynamicMacro = DynamicMacro;
 const MacroOperator = _core.dogma.use(require("./ops/composite/macro/MacroOperator"));
 exports.MacroOperator = MacroOperator;
-const Runner = _core.dogma.use(require("./runners/Runner"));
-exports.Runner = Runner;
 const Engine = _core.dogma.use(require("./engines/Engine"));
 exports.Engine = Engine;
-const SingleRunnerEngine = _core.dogma.use(require("./engines/SingleRunnerEngine"));
-exports.SingleRunnerEngine = SingleRunnerEngine;
+const Runner = _core.dogma.use(require("./engines/Runner"));
+exports.Runner = Runner;
+const SimpleEngine = _core.dogma.use(require("./engines/simple/SimpleEngine"));
+exports.SimpleEngine = SimpleEngine;
+const CompositeEngine = _core.dogma.use(require("./engines/composite/CompositeEngine"));
+exports.CompositeEngine = CompositeEngine;

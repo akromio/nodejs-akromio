@@ -1,0 +1,68 @@
+use (
+  alias://expected
+  {monitor, fun} = alias://doubles
+
+  CallReqStream
+)
+
+suite(__filename, proc()
+  suite("appendDataRecollector()", proc()
+    test("when called, the recollector must be pushed to dataRecollectors", proc()
+      # (1) act
+      const (
+        stream = CallReqStream()
+        out = stream.appendDataRecollector(nop)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(stream)
+      expected(stream.dataRecollectors).toHaveLen(1).first.toBeFn()
+    end)
+  end)
+
+  suite("appendCallReq()", proc()
+    test("when request added, push() must be called", proc()
+      # (1) act
+      const (
+        call = {jobName = "job-name", args = []}
+        stream = monitor(CallReqStream(), method = "push").appendCallReq(call)
+      )
+
+      # (2) assessment
+      const push = monitor.log(stream, clear = true)
+      expected(push.calls).equalTo(1)
+      expected(push.call.args).equalTo([call])
+    end)
+  end)
+
+  suite("end()", proc()
+    test("when called, nil must be pushed", proc()
+      # (1) act
+      const stream = monitor(CallReqStream(), method = "push").end()
+
+      # (2) assessment
+      const push = monitor.log(stream, clear = true)
+      expected(push.calls).equalTo(1)
+      expected(push.call.args).equalTo([nil])
+    end)
+  end)
+
+  suite("_read()", proc()
+    test("when read() called w/ empty stream, _read() must be called", proc()
+      # (1) act
+      const (
+        gather = monitor(fun.returns())
+        stream = monitor(CallReqStream(dataRecollectors = [gather]), method = "_read")
+        out = stream.read()
+      )
+
+      # (2) assessment
+      const read = monitor.log(stream, clear = true)
+      expected(read.calls).equalTo(1)
+
+      const glog = monitor.log(gather, clear = true)
+      expected(glog.calls).equalTo(1)
+      expected(glog.call.args).toHaveLen(1).first.toBeNum().greaterThan(0)
+    end)
+  end)
+end)

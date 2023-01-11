@@ -6,6 +6,8 @@ use (
 suite(__filename, proc()
   test("when imported, api must be exported", proc()
     expected(index).toHave(
+      "PullTrigger"
+      "PushTrigger"
       "Trigger"
       "TriggerState"
     )

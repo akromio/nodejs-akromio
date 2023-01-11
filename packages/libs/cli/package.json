@@ -37,6 +37,7 @@
     "@akromio/inquirer": "^0.17.2",
     "@akromio/jobs": "^0.17.2",
     "@akromio/pi-registry": "^0.17.2",
+    "@akromio/range": "^0.17.2",
     "@akromio/registry": "^0.17.2",
     "@akromio/reporter": "^0.17.2",
     "@akromio/trigger": "^0.17.2",

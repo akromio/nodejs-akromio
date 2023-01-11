@@ -1,0 +1,31 @@
+use (
+  alias://expected
+  {sim} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  {Runner, PluginParser} = alias://core
+  
+  JobsEngine
+)
+
+suite(__filename, proc()
+  suite("constructor", proc()
+    test("when instantiated, built-in plugins must be loaded", proc()
+      # (1) act
+      const (
+        out = JobsEngine(
+          name = "jobs"
+          dataset = GlobalDataset(name = "global")
+          onError = "carryOn"
+          pluginParser = PluginParser()
+          stream = sim.stream.readable()
+          runners = [Runner(log = sim.stream.duplex())]
+        )
+      )
+
+      # (2) assessment
+      expected(out)\
+        .toBe(JobsEngine)\
+        .member("ops.ops").toHaveLen(0)
+    end)
+  end)
+end)

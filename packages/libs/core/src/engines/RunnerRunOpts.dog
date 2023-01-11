@@ -1,0 +1,12 @@
+use (
+  RunOpts
+)
+
+/**
+ * Options to use in a run.
+ */
+intf RunnerRunOpts: RunOpts
+  /**
+   * Dataset to use.
+   */
+  dataset #[: Dataset]

@@ -1,7 +1,10 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-const JobCall = _core.dogma.use(require("./JobCall"));
+const {
+  CallReq,
+  CallReqStream
+} = _core.dogma.use(require("@akromio/core"));
 const TriggerImpl = _core.dogma.use(require("./TriggerImpl"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
 const $Trigger = class Trigger {
@@ -14,9 +17,9 @@ const $Trigger = class Trigger {
       writable: false,
       enumerable: true
     });
-    (0, _core.expect)('engine', _['engine'], null);
-    Object.defineProperty(this, 'engine', {
-      value: (0, _core.coalesce)(_['engine'], null),
+    (0, _core.expect)('stream', _['stream'], CallReqStream);
+    Object.defineProperty(this, 'stream', {
+      value: (0, _core.coalesce)(_['stream'], null),
       writable: false,
       enumerable: true
     });
@@ -36,7 +39,7 @@ const $Trigger = class Trigger {
     Object.defineProperty(this, 'triggerImpl', {
       value: (0, _core.coalesce)(_['triggerImpl'], null),
       writable: false,
-      enumerable: true
+      enumerable: false
     });
     /* c8 ignore start */
     if (this._pvt_c3fa7541f85378fcfdd731681a632004___init__ instanceof Function) this._pvt_c3fa7541f85378fcfdd731681a632004___init__(_); /* c8 ignore stop */
@@ -48,9 +51,9 @@ const $Trigger = class Trigger {
 };
 
 const Trigger = new Proxy($Trigger, {
-  apply(receiver, self, args) {
-    return new $Trigger(...args);
-  }
+  /* c8 ignore start */apply(receiver, self, args) {
+    throw "'Trigger' is abstract.";
+  } /* c8 ignore stop */
 });
 module.exports = exports = Trigger;
 Object.defineProperty(Trigger.prototype, "state", {
@@ -84,13 +87,13 @@ Trigger.prototype.stop = async function () {
   const self = this;
   {
     if (!_core.dogma.includes([TriggerState.nonStarted, TriggerState.stopped], this.state)) {
+      this._state = _core.dogma.enumGet(this._state, "stopped");
       try {
         0, await this.triggerImpl.stop();
       } finally {
         if (this.callback) {
           this.callback();
         }
-        this._state = _core.dogma.enumGet(this._state, "stopped");
       }
     }
   }
@@ -101,28 +104,27 @@ Trigger.prototype.handle = async function (e) {
   _core.dogma.expect("e", e, _core.dogma.intf("inline", {
     call: {
       optional: false,
-      type: JobCall
+      type: CallReq
     },
     last: {
       optional: true,
       type: _core.bool
     }
   }));
+  let {
+    call,
+    last
+  } = e;
   {
-    if (_core.dogma.enumEq(this._state, "running")) {
-      _core.dogma.raise(TypeError("Trigger still processing an event."));
+    if (_core.dogma.enumEq(this.state, "stopped")) {
+      _core.dogma.raise(TypeError("Trigger is stopped."));
     }
     this._state = _core.dogma.enumGet(this._state, "running");
-    if (e.call.jobName == "__exit__") {
-      e = {
-        ["last"]: true
-      };
-    } else {
-      0, await this.engine.run(e.call.jobName, e.call.args);
-    }
-    if (e.last === true) {
+    if (call.jobName == "__exit__" || last) {
+      this.stream.end();
       0, await this.stop();
     } else {
+      this.stream.appendCallReq(call);
       this._state = _core.dogma.enumGet(this._state, "started");
     }
   }

@@ -1,0 +1,8 @@
+/**
+ * Run options.
+ */
+export intf RunOpts
+  /**
+   * What to do on error.
+   */
+  onError: ("carryOn" | "finish")

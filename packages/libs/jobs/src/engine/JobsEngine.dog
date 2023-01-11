@@ -1,0 +1,8 @@
+use (
+  {CompositeEngine} = alias://core
+)
+
+/**
+ * An engine for running several jobs with one or multiple runners.
+ */
+export struct JobsEngine: CompositeEngine

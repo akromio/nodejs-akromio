@@ -1,0 +1,45 @@
+use (
+  alias://expected
+  {monitor, interceptor, sim, method} = alias://doubles
+  {GlobalDataset} = alias://dataset
+  alias://range
+  
+  CompositeEngine
+  ../Runner
+  ../../plugins/PluginParser
+  ../../ops/Ops
+)
+
+suite(__filename, proc()
+  suite("run()", proc()
+    test("when run, the runners must run the requests while stream not ended", async proc()
+      # (1) act
+      const (
+        dataset = GlobalDataset(name = "global")
+        pluginParser = PluginParser()
+        onError ="carryOn"
+        indexes = range(20)
+        callReqs = [for each i in indexes do map(jobName = $"job-name#${i}")]
+        log = sim.stream.writable()
+        ops = sim(Ops, getOp = method.invokes(fn(req) = req end))
+        runner1 = monitor(interceptor(Runner(id = "runner1", log), run = method.sleep("100ms", "one")), method = "run")
+        runner2 = monitor(interceptor(Runner(id = "runner2", log), run = method.sleep("100ms", "two")), method = "run")
+        runners = [runner1, runner2]
+        stream = sim.stream.readable(data = callReqs, objectMode = true)
+        engine = CompositeEngine(dataset=, ops, pluginParser, stream, runners, onError)
+        out = await(engine.run())
+      )
+
+      # (2) assessment
+      expected(out).toHaveLen(2)
+
+      const run1 = monitor.log(runner1, clear = true)
+      expected(run1.calls).greaterThan(5)
+
+      const run2 = monitor.log(runner2, clear = true)
+      expected(run2.calls).greaterThan(5)
+
+      expected(run1.calls + run2.calls).equalTo(len(indexes))
+    end)
+  end)
+end)

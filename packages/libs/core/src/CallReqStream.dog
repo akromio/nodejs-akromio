@@ -1,0 +1,44 @@
+use (
+  {Readable as ReadableStream} = dep://stream
+  CallReq
+)
+
+/**
+ * A stream for exchanging call requests.
+ */
+@factory
+export struct CallReqStream: ReadableStream
+  /**
+   * Functions to call when data needed.
+   * These can be used for adding new requests to the stream
+   * from their data sources.
+   *
+   * Declaration/prototype: proc(size).
+   */
+  pub const dataRecollectors: func[] = []
+
+  @factory
+  pvt fn create(props := {}) = new(props{*, objectMode = true})
+
+  /**
+   * Appends a new call [req]uest to the stream.
+   */
+  pub fn appendCallReq(req: CallReq) -> self
+    self.push(req)
+  
+  /**
+   * Appends a new data recollector function.
+   */
+  pub fn appendDataRecollector(recollector: func) -> self
+    self.dataRecollectors.push(recollector)
+
+  /**
+   * Indicates the end of the stream.
+   */
+  pub fn 'end'() -> self
+    self.push(nil)
+
+  @override
+  pub proc _read(size)
+    for each gather in self.dataRecollectors do
+      peval(gather(size))

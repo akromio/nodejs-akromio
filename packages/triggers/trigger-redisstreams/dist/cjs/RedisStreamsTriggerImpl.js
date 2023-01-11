@@ -29,11 +29,6 @@ const $RedisStreamsTriggerImpl = class RedisStreamsTriggerImpl {
       writable: false,
       enumerable: true
     });
-    Object.defineProperty(this, 'timer', {
-      value: null,
-      writable: true,
-      enumerable: false
-    });
     /* c8 ignore start */
     if (_['times'] != null) (0, _core.expect)('times', _['times'], _core.num); /* c8 ignore stop */
     Object.defineProperty(this, 'times', {
@@ -73,13 +68,6 @@ RedisStreamsTriggerImpl.prototype.start = function (handler) {
   _core.dogma.expect("handler", handler, _core.func);
   {
     this.redis.connect();
-    const callback = () => {
-      {
-        if (!(_core.dogma.is(this.times, _core.num) && this.fired > this.times)) {
-          this.fire();
-        }
-      }
-    };
     _core.dogma.update(this, {
       name: "handler",
       visib: ".",
@@ -91,8 +79,6 @@ RedisStreamsTriggerImpl.prototype.start = function (handler) {
       assign: "=",
       value: 0
     });
-    setImmediate(callback);
-    this.timer = setInterval(callback, 333);
   }
   return this;
 };
@@ -100,14 +86,14 @@ RedisStreamsTriggerImpl.prototype.stop = function () {
   const self = this;
   {
     this.handler = null;
-    clearInterval(this.timer);
-    this.timer = null;
     this.redis.disconnect();
   }
   return this;
 };
-RedisStreamsTriggerImpl.prototype.fire = async function () {
+RedisStreamsTriggerImpl.prototype.gather = async function (size) {
   const self = this;
+  let got = 0; /* c8 ignore next */
+  _core.dogma.expect("size", size, _core.num);
   {
     const {
       redis,
@@ -115,18 +101,26 @@ RedisStreamsTriggerImpl.prototype.fire = async function () {
       group,
       consumer
     } = this;
-    const resp = (0, await redis.sendCommand(["XREADGROUP", "GROUP", group, consumer, "COUNT", "1", "BLOCK", "150", "NOACK", "STREAMS", stream, ">"]));
-    if (resp) {
-      this.fired += 1;
-      const msg = _core.json.decode(_core.dogma.getItem(_core.dogma.getItem(_core.dogma.getItem(_core.dogma.getItem(_core.dogma.getItem(resp, 0), 1), 0), 1), 1));
-      const call = {
-        ["jobName"]: msg.job,
-        ["args"]: msg.args
-      };
-      0, await this.handler({
-        'last': _core.dogma.is(this.times, _core.num) && this.fired >= this.times,
-        'call': call
-      });
+    const resp = (0, await redis.sendCommand(["XREADGROUP", "GROUP", group, consumer, "COUNT", (0, _core.text)(size), "BLOCK", "1000", "NOACK", "STREAMS", stream, ">"]));
+    if ((0, _core.len)(resp) > 0) {
+      for (const item of _core.dogma.getItem(_core.dogma.getItem(resp, 0), 1)) {
+        const [, data] = _core.dogma.getArrayToUnpack(item, 2);
+        const value = _core.json.decode(_core.dogma.getItem(data, 1));
+        const call = {
+          ["jobName"]: value.job,
+          ["args"]: value.args
+        };
+        const e = {
+          ["last"]: _core.dogma.is(this.times, _core.num) && (this.fired += 1) >= this.times,
+          ["call"]: call
+        };
+        0, await this.handler(e);
+        got += 1;
+        if (e.last) {
+          break;
+        }
+      }
     }
   }
+  return got;
 };

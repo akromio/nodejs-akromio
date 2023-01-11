@@ -1,0 +1,18 @@
+use (
+  alias://expected
+  index
+)
+
+suite(__filename, proc()
+  test("when imported, range function must be exported", proc()
+    expected(index).toBeFn()
+  end)
+
+  test("when called with a length, list must be returned", proc()
+    # (1) act
+    const out = index(5)
+
+    # (2) assessment
+    expected(out).equalTo([0, 1, 2, 3, 4])
+  end)
+end)

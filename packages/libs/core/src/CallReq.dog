@@ -1,0 +1,13 @@
+/**
+ * A request for running a call.
+ */
+export intf CallReq
+  /**
+   * Job name to run.
+   */
+  jobName: text
+
+  /**
+   * Arguments to run with.
+   */
+  args?: any

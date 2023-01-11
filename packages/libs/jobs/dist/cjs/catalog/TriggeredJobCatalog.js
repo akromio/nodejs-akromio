@@ -14,6 +14,12 @@ const $TriggeredJobCatalog = class TriggeredJobCatalog extends JobCatalog {
       writable: false,
       enumerable: true
     });
+    (0, _core.expect)('parallelism', _['parallelism'], _core.num);
+    Object.defineProperty(this, 'parallelism', {
+      value: (0, _core.coalesce)(_['parallelism'], null),
+      writable: false,
+      enumerable: true
+    });
     /* c8 ignore start */
     if (this._pvt_b9f1888574f01bbb45d3c4fa8e5e60e7___init__ instanceof Function) this._pvt_b9f1888574f01bbb45d3c4fa8e5e60e7___init__(_); /* c8 ignore stop */
     /* c8 ignore start */

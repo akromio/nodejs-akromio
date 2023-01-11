@@ -9,6 +9,10 @@ const TriggerImpl = _core.dogma.intf('TriggerImpl', {
   stop: {
     optional: false,
     type: _core.func
+  },
+  gather: {
+    optional: true,
+    type: _core.func
   }
 });
 module.exports = exports = TriggerImpl;

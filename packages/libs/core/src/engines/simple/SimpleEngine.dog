@@ -1,0 +1,43 @@
+use (
+  ../{Engine, Runner, RunOpts}
+  ../../CallReq
+  ../../ops/Op
+)
+
+/**
+ * An engine that can only run one thing.
+ */
+export struct SimpleEngine: Engine
+  /**
+   * Runner for running its call requests.
+   */
+  @hidden
+  pub const runner: Runner
+
+  /**
+   * Runs the given call [req]uest.
+   *
+   * An error is raised if the request operation name unexists in the catalog.
+   *
+   * An error is raised if already running something.
+   */
+  @async
+  pub fn run(req: CallReq, opts?: RunOpts): Result
+    # (1) get the operation from its catalog
+    const op = self.getOpOf(req)
+    
+    # (2) set options to use
+    opts ?= {}
+    opts.onError ?= self.onError
+
+    # (3) run the operation
+    return self.runOp(op, req.args, opts{*, dataset = self.dataset})
+  
+  /**
+   * Runs an operation using one of its runners.
+   */
+  @hidden
+  pub async fn runOp(op: Op, args?: any, opts: map) -> result: Result
+    const {runner} = self
+    result = await(runner.run(op, args, opts))
+    runner.log.push(json.encode({type = "end"}))

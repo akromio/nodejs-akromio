@@ -1,24 +1,27 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const redis = _core.dogma.use(require("redis"));
 const {
   Duplex
 } = _core.dogma.use(require("stream"));
 const {
+  CallReqStream,
   Runner,
   Ops,
   PluginLoader,
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
 const {
-  Trigger
+  PushTrigger,
+  PullTrigger
 } = _core.dogma.use(require("@akromio/trigger"));
 const {
   TriggeredJobCatalogParser
 } = _core.dogma.use(require("@akromio/jobs"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
-const redis = _core.dogma.use(require("redis"));
 const redisStreamsTriggerImpl = _core.dogma.use(require("@akromio/trigger-redisstreams"));
+const range = _core.dogma.use(require("@akromio/range"));
 const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
   baseOptions
@@ -123,31 +126,24 @@ TriggerCommand.prototype.handle = async function (argv) {
         read() {},
         write() {}
       });
+      const stream = CallReqStream();
       const engine = (0, await this.createEngine({
         ["dataset"]: catalog.dataset,
         ["onError"]: catalog.onError || onError,
-        ["runner"]: Runner({
+        ["runners"]: range(catalog.parallelism).map(i => Runner({
+          'name': `runner#${i}`,
           'log': log
-        }),
+        })),
+        ["stream"]: stream,
         ["pluginParser"]: pluginParser,
         ["ops"]: ops
       }, registries.getRegistry(decl.registryName)));
-      reporters = this.createReporters(reporters, log).connect();
+      reporters = this.createReporters([], log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
-      const trigger = createTrigger(triggerName, catalog, engine, args);
+      const trigger = createTrigger(triggerName, catalog, stream, args);
       let code = 0;
-      trigger.start(async result => {
-        {
-          try {
-            if (result) {
-              code = 1;
-            }
-          } finally {
-            0, await catalog.finalize();
-            _core.ps.exit(code);
-          }
-        }
-      });
+      trigger.start(_core.dogma.nop());
+      0, await engine.run();
     } finally {
       await _core.dogma.pawait(() => registries.disconnect());
       _core.dogma.peval(() => {
@@ -156,7 +152,7 @@ TriggerCommand.prototype.handle = async function (argv) {
     }
   }
 };
-function createTrigger(name, cat, engine, jobArgs) {
+function createTrigger(name, cat, stream, jobArgs) {
   let trigger;
   {
     var _name, _dogma$getItem;
@@ -164,14 +160,18 @@ function createTrigger(name, cat, engine, jobArgs) {
       _core.dogma.raise(TypeError(`trigger name expected.`));
     }
     let decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
-    let TriggerImpl;
     {
       var _decl$impl;
       const i = (_decl$impl = decl.impl) !== null && _decl$impl !== void 0 ? _decl$impl : name;
       switch (i) {
         case "interval":
           {
-            TriggerImpl = intervalTriggerImpl.impl;
+            const TriggerImpl = intervalTriggerImpl.impl;
+            trigger = PushTrigger({
+              'name': name,
+              'stream': stream,
+              'triggerImpl': TriggerImpl(decl)
+            });
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -179,7 +179,7 @@ function createTrigger(name, cat, engine, jobArgs) {
           {
             var _decl$host, _decl$port;
             const opts = Object.assign({}, {
-              ["name"]: decl.group.consumer,
+              ["name"]: `${decl.group}#${decl.consumer}`,
               ["socket"]: {
                 ["host"]: (_decl$host = decl.host) !== null && _decl$host !== void 0 ? _decl$host : "localhost",
                 ["port"]: (_decl$port = decl.port) !== null && _decl$port !== void 0 ? _decl$port : 6379
@@ -189,10 +189,15 @@ function createTrigger(name, cat, engine, jobArgs) {
             } : {}, decl.password ? {
               ["password"]: decl.password
             } : {});
-            TriggerImpl = redisStreamsTriggerImpl.impl;
+            const TriggerImpl = redisStreamsTriggerImpl.impl;
             decl = _core.dogma.clone(decl, {
               "redis": redis.createClient(opts)
             }, {}, [], []);
+            trigger = PullTrigger({
+              'name': name,
+              'stream': stream,
+              'triggerImpl': TriggerImpl(decl)
+            });
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -202,11 +207,6 @@ function createTrigger(name, cat, engine, jobArgs) {
           }
       }
     }
-    trigger = Trigger({
-      'name': name,
-      'engine': engine,
-      'triggerImpl': TriggerImpl(decl)
-    });
   }
   return trigger;
 }

@@ -4,6 +4,8 @@ var _core = require("@dogmalang/core");
 const {
   Dataset
 } = _core.dogma.use(require("@akromio/dataset"));
+const RunOpts = _core.dogma.use(require("./RunOpts"));
+const CallReq = _core.dogma.use(require("../CallReq"));
 const Ops = _core.dogma.use(require("../ops/Ops"));
 const NotFoundError = _core.dogma.use(require("../errors/NotFoundError"));
 const PluginParser = _core.dogma.use(require("../plugins/PluginParser"));
@@ -51,6 +53,15 @@ const Engine = new Proxy($Engine, {
   } /* c8 ignore stop */
 });
 module.exports = exports = Engine;
+Engine.prototype.getOpOf = function (req) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("req", req, CallReq);
+  {
+    return this.ops.getOp(req.jobName, {
+      'raiseIfNotFound': true
+    });
+  }
+};
 Engine.prototype.getBuiltInPresets = function () {
   const self = this;
   {
@@ -71,30 +82,3 @@ Engine.prototype.loadBuiltInPlugins = async function () {
   }
   return this;
 };
-Engine.prototype.run = function (opName, args, opts) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("opName", opName, _core.text); /* c8 ignore next */
-  if (args != null) _core.dogma.expect("args", args, _core.any); /* c8 ignore next */
-  if (opts != null) _core.dogma.expect("opts", opts, RunOpts);
-  {
-    var _opts, _opts$onError;
-    const op = this.ops.getOp(opName, {
-      'raiseIfNotFound': true
-    });
-    opts = (_opts = opts) !== null && _opts !== void 0 ? _opts : {};
-    opts.onError = (_opts$onError = opts.onError) !== null && _opts$onError !== void 0 ? _opts$onError : this.onError;
-    return this.runOp(op, args, _core.dogma.clone(opts, {
-      "dataset": this.dataset
-    }, {}, [], []));
-  }
-};
-/* c8 ignore start */
-Engine.prototype.runOp = function () {
-  (0, _core.abstract)();
-}; /* c8 ignore stop */
-const RunOpts = _core.dogma.intf('RunOpts', {
-  onError: {
-    optional: false,
-    type: ["carryOn", "finish"]
-  }
-});

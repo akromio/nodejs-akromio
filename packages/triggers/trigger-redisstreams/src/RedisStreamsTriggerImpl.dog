@@ -24,12 +24,6 @@ export struct RedisStreamsTriggerImpl
   pub const consumer: text
 
   /**
-   * Timer object.
-   */
-  @hidden @strict
-  pub var timer = nil
-
-  /**
    * Number of times the trigger must be fired.
    *
    * If unset, infinite.
@@ -61,54 +55,44 @@ export struct RedisStreamsTriggerImpl
     # (1) pre: connect to Redis instance
     self.redis.connect()
 
-    # (2) set timers
-    const callback = proc()
-      if not (self.times is num and self.fired > self.times) then
-        self.fire()
-    end
-
+    # (2) initialize
     self.{handler, fired = 0}
-
-    setImmediate(callback)
-    self.timer = setInterval(callback, 333)
   
   /**
    * Stops de trigger.
    */
   pub fn stop() -> self
     self.handler = nil
-    clearInterval(self.timer)
-    self.timer = nil
     self.redis.disconnect()
   
   /**
-   * Handles a timer event.
+   * Gathers a new batch of data.
    */
-  @hidden
-  pub async proc fire()
+  pub async fn gather(size: num) -> got: num
     # (1) read message
     const (
       {redis, stream, group, consumer} = self
       resp = await(redis.sendCommand([
         "XREADGROUP"
         "GROUP", group, consumer
-        "COUNT", "1"
-        "BLOCK", "150"
+        "COUNT", text(size)
+        "BLOCK", "1000"
         "NOACK"
         "STREAMS", stream, ">"
       ]))
     )
 
-    # (2) handle stream event
-    if resp then
-      self.fired += 1
+    # (2) handle stream events
+    if len(resp) > 0 then
+      # [0] = stream name; [1] = list of items/events
+      for each item in resp[0][1] do
+        const (
+          [_, data] = item              # [0] = ts; [1] = data[]
+          value = json.decode(data[1])  # [0] = "req"; [1] = "value"
+          call = {jobName = value.job, args = value.args}
+          e = {last = self.times is num and (self.fired += 1) >= self.times, call}
+        )
 
-      const (
-        msg = json.decode(resp[0][1][0][1][1])
-        call = {jobName = msg.job, args = msg.args}
-      )
-
-      await(self.handler(
-        last = self.times is num and self.fired >= self.times
-        call
-      ))
+        await(self.handler(e))
+        got += 1
+        if e.last then break

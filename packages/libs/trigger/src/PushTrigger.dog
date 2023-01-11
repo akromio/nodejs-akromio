@@ -1,0 +1,8 @@
+use (
+  Trigger
+)
+
+/**
+ * A trigger to push events automatically when these are fired.
+ */
+export struct PushTrigger: Trigger

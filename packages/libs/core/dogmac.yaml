@@ -7,3 +7,6 @@ uses:
     
   expected:
     js: "@akromio/expected"
+  
+  range:
+    js: "@akromio/range"

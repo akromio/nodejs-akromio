@@ -1,0 +1,26 @@
+use (
+  alias://expected
+  {CallReqStream} = alias://core
+
+  PushTrigger
+)
+
+# Trigger implementation for the tests.
+struct TriggerImpl
+  pub proc start(handler: func)
+  pub proc stop()
+
+suite(__filename, proc()
+  suite("constructor", proc()
+    test("when instantiated, new instance must be returned", proc()
+      # (1) act
+      const (
+        triggerImpl = TriggerImpl()
+        out = PushTrigger(name = "push", stream = CallReqStream(), triggerImpl)
+      )
+
+      # (2) assessment
+      expected(out).toBe(PushTrigger)
+    end)
+  end)
+end)

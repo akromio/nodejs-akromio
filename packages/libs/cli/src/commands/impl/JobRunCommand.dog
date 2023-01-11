@@ -104,7 +104,7 @@ export struct JobRunCommand: JobRunCommandBase
           console.error("Catalog doesn't contain default job name.")
           code = 2
         else
-          if [ok, value] ::= pawait(engine.run(jobName)); not ok then
+          if [ok, value] ::= pawait(engine.run({jobName})); not ok then
             code = 1
             if value then printf(value)
       finally

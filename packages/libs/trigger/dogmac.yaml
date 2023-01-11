@@ -1,4 +1,7 @@
 uses:
+  core:
+    js: "@akromio/core"
+  
   doubles:
     js: "@akromio/doubles"
     

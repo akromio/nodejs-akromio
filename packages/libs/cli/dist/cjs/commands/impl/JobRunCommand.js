@@ -125,7 +125,9 @@ JobRunCommand.prototype.handle = async function (argv) {
           code = 2;
         } else {
           {
-            const [ok, value] = await _core.dogma.pawait(() => engine.run(jobName));
+            const [ok, value] = await _core.dogma.pawait(() => engine.run({
+              ["jobName"]: jobName
+            }));
             if (!ok) {
               code = 1;
               if (value) {

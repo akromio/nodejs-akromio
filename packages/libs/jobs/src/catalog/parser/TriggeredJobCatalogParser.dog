@@ -1,4 +1,5 @@
 use (
+  dep://os
   {Dataset} = alias://dataset
 
   ../TriggeredJobCatalog
@@ -14,14 +15,15 @@ export struct TriggeredJobCatalogParser: JobCatalogParser
 
   @override @hidden
   pub async fn parseSpecialization(decl: map, opts: JobCatalogParseOpts) -> decl
-    # (1) parse triggers
+    # (1) parse specializations
     const (
       {dataset} = decl
       triggers = self.parseTriggers(decl.on, dataset)
+      parallelism = self.parseParallelism(decl.parallelism, dataset)
     )
-  
+
     # (2) parse base
-    decl = super.parseSpecialization(decl.{triggers}, opts)
+    decl = super.parseSpecialization(decl.{triggers, parallelism}, opts)
 
   /**
    * Parses the trigger declarations,
@@ -32,3 +34,9 @@ export struct TriggeredJobCatalogParser: JobCatalogParser
   pub fn parseTriggers(decl: map[], ds: Dataset) -> triggers: map
     for each trgDecl in ds.eval(decl) do
       triggers[trgDecl.trigger] = trgDecl
+
+  /**
+   * Parses the parallelism value.
+   */
+  @hidden
+  pub fn parseParallelism(decl?, ds: Dataset) = ds.eval(decl ?? len(os.cpus()) * 2)

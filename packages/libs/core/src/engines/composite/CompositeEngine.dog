@@ -1,0 +1,39 @@
+use (
+  {Readable} = dep://stream
+  ../{Engine, Runner}
+)
+
+/**
+ * A engine composed of several runners for running its
+ * job call requests.
+ */
+export struct CompositeEngine: Engine
+  /**
+   * Stream where the call requests must be let for its run
+   * by this engine and its runners.
+   */
+  pub const stream: Readable
+
+  /**
+   * Runners to use.
+   */
+  @hidden
+  pub const runners: Runner[]
+
+  /**
+   * Starts to run the call requests received from the stream,
+   * until this is closed.
+   */
+  @async
+  pub fn run() = Promise.all([for each runner in self.runners do self.startRunner(runner)])
+  
+  /**
+   * Starts the given [runner] to run call requests.
+   */
+  @hidden
+  pub async proc startRunner(runner: Runner)
+    const {stream, dataset, onError} = self
+
+    await for each req in stream do
+      if op ::= self.getOpOf(req) then
+        pawait(runner.run(op, req.args, dataset=, onError))

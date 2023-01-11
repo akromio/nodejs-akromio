@@ -1,11 +1,12 @@
 use (
+  dep://redis
   {Duplex} = dep://stream
-  {Runner, Ops, PluginLoader, PluginParser} = alias://core
-  {Trigger} = alias://trigger
+  {CallReqStream, Runner, Ops, PluginLoader, PluginParser} = alias://core
+  {PushTrigger, PullTrigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
-  dep://redis
   alias://redisStreamsTriggerImpl
+  alias://range
 
   ../JobRunCommandBase
 )
@@ -49,7 +50,7 @@ export struct TriggerCommand: JobRunCommandBase
    */
   @hidden
   pub fn createCatalogParser(opts: map) = TriggeredJobCatalogParser(opts)
-
+  
   @override @hidden
   pub async proc handle(
     argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters, summaryReporters}
@@ -87,11 +88,13 @@ export struct TriggerCommand: JobRunCommandBase
       # (7) create engine
       const (
         log = native("new Duplex({emitClose: true, read() {}, write() {}})")
+        stream = CallReqStream()
         engine = await(self.createEngine(
           {
             dataset = catalog.dataset
             onError = catalog.onError or onError
-            runner = Runner(log=)
+            runners = [for i in range(catalog.parallelism) do Runner(name = $"runner#${i}", log)]
+            stream
             pluginParser
             ops
           }
@@ -99,23 +102,17 @@ export struct TriggerCommand: JobRunCommandBase
           registries.getRegistry(decl.registryName)
         ))
       )
-      
-      reporters = self.createReporters(reporters, log).connect()
+      reporters = self.createReporters([], log).connect()
       ops.appendOps(...values(catalog.jobs))
 
       # (8) create and run trigger
       var (
-        trigger ::= createTrigger(triggerName, catalog, engine, args)
+        trigger ::= createTrigger(triggerName, catalog, stream, args)
         code = 0
       )
       
-      trigger.start(async proc(result?)
-        do
-          if result then code = 1
-        finally
-          await(catalog.finalize())
-          ps.exit(code)
-      end)
+      trigger.start(nop)
+      await(engine.run())
     finally
       pawait(registries.disconnect())
       peval(reporters.disconnect())
@@ -124,24 +121,22 @@ export struct TriggerCommand: JobRunCommandBase
  * Creates a trigger with the given data.
  */
 @noParamCheck
-fn createTrigger(name, cat, engine, jobArgs?) -> trigger
+fn createTrigger(name, cat, stream, jobArgs?) -> trigger
   # (1) pre: set name if unset
   if not (name ?= cat.defaultTriggerName) then
     throw(TypeError($"trigger name expected."))
 
-  # (2) get the trigger implementation
-  var (
-    decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
-    TriggerImpl
-  )
+  # (2) create trigger
+  var decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
 
   with i ::= decl.impl ?? name do
     if "interval" then
-      TriggerImpl = intervalTriggerImpl.impl
+      const TriggerImpl = intervalTriggerImpl.impl
+      trigger = PushTrigger(name=, stream, triggerImpl = TriggerImpl(decl))
 
     if "redisstreams" then
       const opts = {
-        name = decl.group.consumer
+        name = $"${decl.group}#${decl.consumer}"
         socket =
           host = decl.host ?? "localhost"
           port = decl.port ?? 6379
@@ -149,14 +144,8 @@ fn createTrigger(name, cat, engine, jobArgs?) -> trigger
         if decl.password then password = decl.password
       }
 
-      TriggerImpl = redisStreamsTriggerImpl.impl
+      const TriggerImpl = redisStreamsTriggerImpl.impl
       decl = decl{*, redis = redis.createClient(opts)}
+      trigger = PullTrigger(name=, stream, triggerImpl = TriggerImpl(decl))
     
     else throw(TypeError($"Invalid trigger implementation: ${i}."))
-
-  # (3) create trigger
-  trigger = Trigger(
-    name=,
-    engine
-    triggerImpl = TriggerImpl(decl)
-  )

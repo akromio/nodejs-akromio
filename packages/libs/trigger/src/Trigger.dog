@@ -1,7 +1,6 @@
 use (
-  JobCall
-  TriggerImpl
-  TriggerState
+  {CallReq, CallReqStream} = alias://core
+  TriggerImpl, TriggerState
 )
 
 /**
@@ -11,6 +10,7 @@ use (
  * @remarks
  * This is a wrapper for the real triggers that are imported.
  */
+@abstract
 export struct Trigger
   /**
    * The trigger name.
@@ -18,29 +18,30 @@ export struct Trigger
   pub const name: text
 
   /**
-   * The engine to request the execution of the job.
+   * Stream where this trigger must let the job call requests.
    */
-  pub const engine
+  pub const stream: CallReqStream
 
   /**
-   * The function to call when finished.
+   * Function to call when finished.
    */
   pub var callback?: func
 
   /**
-   * The current state.
+   * Current state.
    */
   @hidden @strict
   pub var _state = TriggerState.nonStarted
 
   /**
-   * The current state.
+   * Current state.
    */
   pub fn state = self._state
 
   /**
-   * The trigger implementation.
+   * Trigger implementation.
    */
+  @hidden
   pub const triggerImpl: TriggerImpl
 
   /**
@@ -61,36 +62,31 @@ export struct Trigger
    */
   pub async fn stop() -> self
     if self.state not in [TriggerState.nonStarted, TriggerState.stopped] then
+      self._state =~ stopped
+
       do
         await(self.triggerImpl.stop())
       finally
         if self.callback then self.callback()
-        self._state =~ stopped
   
   /**
    * Handles a given event.
    *
-   * If the handler returns {finished = true}, the trigger stop method
-   * is called.
-   *
-   * @remarks
-   * Right now, only one event can be handled at the same time.
+   * If the handler returns {finished = true}, the stop method
+   * is called and the stream is set as ended.
    */
   @hidden
-  pub async proc handle(e: {call: JobCall, last?: bool})
+  pub async proc handle(e:> {call: CallReq, last?: bool})
     # (1) pre
-    if self._state ==~ running then
-      throw(TypeError("Trigger still processing an event."))
+    if self.state ==~ stopped then
+      throw(TypeError("Trigger is stopped."))
 
     # (2) process event
     self._state =~ running
 
-    if e.call.jobName == "__exit__" then
-      e = {last = true}
-    else
-      await(self.engine.run(e.call.jobName, e.call.args))
-
-    if e.last === true then
+    if call.jobName == "__exit__" or last then
+      self.stream.end()
       await(self.stop())
     else
+      self.stream.appendCallReq(call)
       self._state =~ started

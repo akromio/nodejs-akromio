@@ -35,6 +35,9 @@
     "array-shuffle": "^2.0.0",
     "uuid": "^9.0.0"
   },
+  "devDependencies": {
+    "@akromio/range": "^0.17.2"
+  },
   "scripts": {
     "lint": "dogmac check src tests",
     "build": "npm run build/src",

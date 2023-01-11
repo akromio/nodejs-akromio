@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const os = _core.dogma.use(require("os"));
 const {
   Dataset
 } = _core.dogma.use(require("@akromio/dataset"));
@@ -43,11 +44,17 @@ TriggeredJobCatalogParser.prototype.parseSpecialization = async function (decl, 
       dataset
     } = decl;
     const triggers = this.parseTriggers(decl.on, dataset);
+    const parallelism = this.parseParallelism(decl.parallelism, dataset);
     decl = _core.dogma.super(this, "parseSpecialization")(_core.dogma.update(decl, {
       name: "triggers",
       visib: ".",
       assign: "=",
       value: triggers
+    }, {
+      name: "parallelism",
+      visib: ".",
+      assign: "=",
+      value: parallelism
     }), opts);
   }
   return decl;
@@ -68,4 +75,11 @@ TriggeredJobCatalogParser.prototype.parseTriggers = function (decl, ds) {
     }
   }
   return triggers;
+};
+TriggeredJobCatalogParser.prototype.parseParallelism = function (decl, ds) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("ds", ds, Dataset);
+  {
+    return ds.eval(decl !== null && decl !== void 0 ? decl : (0, _core.len)(os.cpus()) * 2);
+  }
 };

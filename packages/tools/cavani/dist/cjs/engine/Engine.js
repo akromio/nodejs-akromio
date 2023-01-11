@@ -2,10 +2,10 @@
 
 var _core = require("@dogmalang/core");
 const {
-  JobEngine
+  JobsEngine
 } = _core.dogma.use(require("@akromio/jobs"));
 const preset = _core.dogma.use(require("@akromio/preset-cavani"));
-const $Engine = class Engine extends JobEngine {
+const $Engine = class Engine extends JobsEngine {
   constructor(_) {
     super(_);
     /* c8 ignore start */
