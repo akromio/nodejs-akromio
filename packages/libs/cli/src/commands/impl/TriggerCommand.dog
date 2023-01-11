@@ -1,7 +1,7 @@
 use (
   {Duplex} = dep://stream
   {CallReqStream, Runner, Ops, PluginLoader, PluginParser} = alias://core
-  {Trigger} = alias://trigger
+  {PushTrigger, PullTrigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
   dep://redis
@@ -135,15 +135,13 @@ fn createTrigger(name, cat, stream, jobArgs?) -> trigger
   if not (name ?= cat.defaultTriggerName) then
     throw(TypeError($"trigger name expected."))
 
-  # (2) get the trigger implementation
-  var (
-    decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
-    TriggerImpl
-  )
+  # (2) create trigger
+  var decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
 
   with i ::= decl.impl ?? name do
     if "interval" then
-      TriggerImpl = intervalTriggerImpl.impl
+      const TriggerImpl = intervalTriggerImpl.impl
+      trigger = PushTrigger(name=, stream, triggerImpl = TriggerImpl(decl))
 
     if "redisstreams" then
       const opts = {
@@ -155,14 +153,8 @@ fn createTrigger(name, cat, stream, jobArgs?) -> trigger
         if decl.password then password = decl.password
       }
 
-      TriggerImpl = redisStreamsTriggerImpl.impl
+      const TriggerImpl = redisStreamsTriggerImpl.impl
       decl = decl{*, redis = redis.createClient(opts)}
+      trigger = PullTrigger(name=, stream, triggerImpl = TriggerImpl(decl))
     
     else throw(TypeError($"Invalid trigger implementation: ${i}."))
-
-  # (3) create trigger
-  trigger = Trigger(
-    name=,
-    stream
-    triggerImpl = TriggerImpl(decl)
-  )

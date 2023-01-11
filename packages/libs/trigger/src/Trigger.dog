@@ -10,6 +10,7 @@ use (
  * @remarks
  * This is a wrapper for the real triggers that are imported.
  */
+@abstract
 export struct Trigger
   /**
    * The trigger name.
@@ -22,24 +23,25 @@ export struct Trigger
   pub const stream: CallReqStream
 
   /**
-   * The function to call when finished.
+   * Function to call when finished.
    */
   pub var callback?: func
 
   /**
-   * The current state.
+   * Current state.
    */
   @hidden @strict
   pub var _state = TriggerState.nonStarted
 
   /**
-   * The current state.
+   * Current state.
    */
   pub fn state = self._state
 
   /**
-   * The trigger implementation.
+   * Trigger implementation.
    */
+  @hidden
   pub const triggerImpl: TriggerImpl
 
   /**
@@ -86,5 +88,5 @@ export struct Trigger
       self.stream.end()
       await(self.stop())
     else
-      self.stream.append(call)
+      self.stream.appendCallReq(call)
       self._state =~ started

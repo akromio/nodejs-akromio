@@ -1,0 +1,15 @@
+use (
+  Trigger
+)
+
+/**
+ * A trigger to add events when the system requests it, on-demand.
+ */
+export struct PullTrigger: Trigger
+  @post
+  pvt proc post()
+    # (1) pre
+    expect(self.triggerImpl.gather, func)
+
+    # (2) add data recollector to stream
+    self.stream.appendDataRecollector(bind(self.triggerImpl, "gather"))

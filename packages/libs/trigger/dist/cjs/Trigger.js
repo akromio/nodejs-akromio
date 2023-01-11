@@ -39,7 +39,7 @@ const $Trigger = class Trigger {
     Object.defineProperty(this, 'triggerImpl', {
       value: (0, _core.coalesce)(_['triggerImpl'], null),
       writable: false,
-      enumerable: true
+      enumerable: false
     });
     /* c8 ignore start */
     if (this._pvt_c3fa7541f85378fcfdd731681a632004___init__ instanceof Function) this._pvt_c3fa7541f85378fcfdd731681a632004___init__(_); /* c8 ignore stop */
@@ -51,9 +51,9 @@ const $Trigger = class Trigger {
 };
 
 const Trigger = new Proxy($Trigger, {
-  apply(receiver, self, args) {
-    return new $Trigger(...args);
-  }
+  /* c8 ignore start */apply(receiver, self, args) {
+    throw "'Trigger' is abstract.";
+  } /* c8 ignore stop */
 });
 module.exports = exports = Trigger;
 Object.defineProperty(Trigger.prototype, "state", {
@@ -124,7 +124,7 @@ Trigger.prototype.handle = async function (e) {
       this.stream.end();
       0, await this.stop();
     } else {
-      this.stream.append(call);
+      this.stream.appendCallReq(call);
       this._state = _core.dogma.enumGet(this._state, "started");
     }
   }

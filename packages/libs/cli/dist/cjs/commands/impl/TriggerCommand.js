@@ -12,7 +12,8 @@ const {
   PluginParser
 } = _core.dogma.use(require("@akromio/core"));
 const {
-  Trigger
+  PushTrigger,
+  PullTrigger
 } = _core.dogma.use(require("@akromio/trigger"));
 const {
   TriggeredJobCatalogParser
@@ -178,14 +179,18 @@ function createTrigger(name, cat, stream, jobArgs) {
       _core.dogma.raise(TypeError(`trigger name expected.`));
     }
     let decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
-    let TriggerImpl;
     {
       var _decl$impl;
       const i = (_decl$impl = decl.impl) !== null && _decl$impl !== void 0 ? _decl$impl : name;
       switch (i) {
         case "interval":
           {
-            TriggerImpl = intervalTriggerImpl.impl;
+            const TriggerImpl = intervalTriggerImpl.impl;
+            trigger = PushTrigger({
+              'name': name,
+              'stream': stream,
+              'triggerImpl': TriggerImpl(decl)
+            });
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -203,10 +208,15 @@ function createTrigger(name, cat, stream, jobArgs) {
             } : {}, decl.password ? {
               ["password"]: decl.password
             } : {});
-            TriggerImpl = redisStreamsTriggerImpl.impl;
+            const TriggerImpl = redisStreamsTriggerImpl.impl;
             decl = _core.dogma.clone(decl, {
               "redis": redis.createClient(opts)
             }, {}, [], []);
+            trigger = PullTrigger({
+              'name': name,
+              'stream': stream,
+              'triggerImpl': TriggerImpl(decl)
+            });
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -216,11 +226,6 @@ function createTrigger(name, cat, stream, jobArgs) {
           }
       }
     }
-    trigger = Trigger({
-      'name': name,
-      'stream': stream,
-      'triggerImpl': TriggerImpl(decl)
-    });
   }
   return trigger;
 }

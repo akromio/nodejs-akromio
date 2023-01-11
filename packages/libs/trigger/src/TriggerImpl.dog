@@ -11,3 +11,8 @@ export intf TriggerImpl
    * Stops the trigger.
    */
   stop: func
+
+  /**
+   * Gathers new data when need, for example, if pull trigger.
+   */
+  gather?: func

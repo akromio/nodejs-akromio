@@ -9,8 +9,27 @@ const {
 const {
   CallReqStream
 } = _core.dogma.use(require("@akromio/core"));
-const Trigger = _core.dogma.use(require("./Trigger"));
+const TriggerBase = _core.dogma.use(require("./Trigger"));
 const TriggerState = _core.dogma.use(require("./TriggerState"));
+const $Trigger = class Trigger extends TriggerBase {
+  constructor(_) {
+    super(_);
+    /* c8 ignore start */
+    if (_ == null) _ = {};
+    /* c8 ignore stop */ /* c8 ignore start */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___init__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___init__(_); /* c8 ignore stop */
+    /* c8 ignore start */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___post__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___post__(); /* c8 ignore stop */
+    /* c8 ignore start */
+    if (this._pvt_13e200b5f20602815c1003cc0390c086___validate__ instanceof Function) this._pvt_13e200b5f20602815c1003cc0390c086___validate__(); /* c8 ignore stop */
+  }
+};
+
+const Trigger = new Proxy($Trigger, {
+  apply(receiver, self, args) {
+    return new $Trigger(...args);
+  }
+});
 const $TriggerImpl = class TriggerImpl {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -187,7 +206,7 @@ suite(__filename, () => {
               'method': "stop"
             });
             const stream = monitor(CallReqStream(), {
-              'method': "append"
+              'method': "appendCallReq"
             });
             const trigger = (0, await Trigger({
               'name': name,
@@ -201,11 +220,11 @@ suite(__filename, () => {
             };
             0, await triggerImpl.fireEvent(e);
             expected(trigger.state).equalTo(TriggerState.started);
-            const append = monitor.log(stream, {
+            const appendCallReq = monitor.log(stream, {
               'clear': true
             });
-            expected(append.calls).equalTo(1);
-            expected(append.calledWith([call])).equalTo(1);
+            expected(appendCallReq.calls).equalTo(1);
+            expected(appendCallReq.calledWith([call])).equalTo(1);
             const stop = monitor.log(triggerImpl, {
               'clear': true
             });

@@ -3,9 +3,14 @@ use (
   {monitor, interceptor} = alias://doubles
   {CallReqStream} = alias://core
 
-  Trigger, TriggerState
+  TriggerBase = Trigger
+  TriggerState
 )
 
+# Trigger type for the tests.
+struct Trigger: TriggerBase
+
+# Trigger implementation for the tests.
 struct TriggerImpl
   pub var handler?: func
   pub proc start(handler: func) self.{handler}
@@ -123,7 +128,7 @@ suite(__filename, proc()
       # (1) act
       const (
         triggerImpl = monitor(TriggerImpl(), method = "stop")
-        stream = monitor(CallReqStream(), method = "append")
+        stream = monitor(CallReqStream(), method = "appendCallReq")
         trigger = await(Trigger(name=, stream, triggerImpl).start())
         e = {ts = timestamp(), call, last = false}
       )
@@ -133,9 +138,9 @@ suite(__filename, proc()
       # (2) assessment
       expected(trigger.state).equalTo(TriggerState.started)
 
-      const append = monitor.log(stream, clear = true)
-      expected(append.calls).equalTo(1)
-      expected(append.calledWith([call])).equalTo(1)
+      const appendCallReq = monitor.log(stream, clear = true)
+      expected(appendCallReq.calls).equalTo(1)
+      expected(appendCallReq.calledWith([call])).equalTo(1)
 
       const stop = monitor.log(triggerImpl, clear = true)
       expected(stop.calls).equalTo(0)
