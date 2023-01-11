@@ -11,6 +11,18 @@ const $CallReqStream = class CallReqStream extends ReadableStream {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
+    if (_['dataRecollectors'] != null) (0, _core.expect)('dataRecollectors', _['dataRecollectors'], _core.dogma.TypeDef({
+      name: 'inline',
+      types: [_core.func],
+      min: 0,
+      max: null
+    })); /* c8 ignore stop */
+    Object.defineProperty(this, 'dataRecollectors', {
+      value: (0, _core.coalesce)(_['dataRecollectors'], []),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (this._pvt_9c1772ebc121c20f46b4c18056996dfb___init__ instanceof Function) this._pvt_9c1772ebc121c20f46b4c18056996dfb___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_9c1772ebc121c20f46b4c18056996dfb___post__ instanceof Function) this._pvt_9c1772ebc121c20f46b4c18056996dfb___post__(); /* c8 ignore stop */
@@ -35,11 +47,19 @@ module.exports = exports = CallReqStream;
       }, {}, [], []));
     }
   };
-  CallReqStream.prototype.append = function (req) {
+  CallReqStream.prototype.appendCallReq = function (req) {
     const self = this; /* c8 ignore next */
     _core.dogma.expect("req", req, CallReq);
     {
       this.push(req);
+    }
+    return this;
+  };
+  CallReqStream.prototype.appendDataRecollector = function (recollector) {
+    const self = this; /* c8 ignore next */
+    _core.dogma.expect("recollector", recollector, _core.func);
+    {
+      this.dataRecollectors.push(recollector);
     }
     return this;
   };
@@ -50,10 +70,15 @@ module.exports = exports = CallReqStream;
     }
     return this;
   };
-  CallReqStream.prototype._read = function () {
-    const self = this;
+  CallReqStream.prototype._read = function (size) {
+    const self = this; /* c8 ignore next */
+    _core.dogma.expect("size", size);
     {
-      _core.dogma.nop();
+      for (const gather of this.dataRecollectors) {
+        _core.dogma.peval(() => {
+          return gather(size);
+        });
+      }
     }
   };
 }
