@@ -102,7 +102,6 @@ RedisStreamsTriggerImpl.prototype.gather = async function (size) {
     } = this;
     const resp = (0, await redis.sendCommand(["XREADGROUP", "GROUP", group, consumer, "COUNT", (0, _core.text)(size), "BLOCK", "1000", "NOACK", "STREAMS", stream, ">"]));
     if ((0, _core.len)(resp) > 0) {
-      this.fired += 1;
       for (const item of _core.dogma.getItem(_core.dogma.getItem(resp, 0), 1)) {
         const [, data] = _core.dogma.getArrayToUnpack(item, 2);
         const value = _core.json.decode(_core.dogma.getItem(data, 1));
@@ -110,10 +109,14 @@ RedisStreamsTriggerImpl.prototype.gather = async function (size) {
           ["jobName"]: value.job,
           ["args"]: value.args
         };
-        0, await this.handler({
-          'last': _core.dogma.is(this.times, _core.num) && this.fired >= this.times,
-          'call': call
-        });
+        const e = {
+          ["last"]: _core.dogma.is(this.times, _core.num) && (this.fired += 1) >= this.times,
+          ["call"]: call
+        };
+        0, await this.handler(e);
+        if (e.last) {
+          break;
+        }
       }
     }
   }

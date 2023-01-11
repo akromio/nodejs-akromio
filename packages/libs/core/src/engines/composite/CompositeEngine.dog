@@ -36,4 +36,4 @@ export struct CompositeEngine: Engine
 
     await for each req in stream do
       if op ::= self.getOpOf(req) then
-        await(runner.run(op, req.args, dataset=, onError))
+        pawait(runner.run(op, req.args, dataset=, onError))

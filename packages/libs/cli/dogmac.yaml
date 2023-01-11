@@ -11,6 +11,8 @@ uses:
     js: "@akromio/inquirer"
   jobs:
     js: "@akromio/jobs"
+  range:
+    js: "@akromio/range"
   registry:
     js: "@akromio/registry"
   reporter:

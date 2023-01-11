@@ -1,11 +1,12 @@
 use (
+  dep://redis
   {Duplex} = dep://stream
   {CallReqStream, Runner, Ops, PluginLoader, PluginParser} = alias://core
   {PushTrigger, PullTrigger} = alias://trigger
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
-  dep://redis
   alias://redisStreamsTriggerImpl
+  alias://range
 
   ../JobRunCommandBase
 )
@@ -50,10 +51,6 @@ export struct TriggerCommand: JobRunCommandBase
   @hidden
   pub fn createCatalogParser(opts: map) = TriggeredJobCatalogParser(opts)
   
-  @override @hidden
-  pub fn createReporters(reporterNames: list, log) -> reporters: Reporters
-    return []
-
   @override @hidden
   pub async proc handle(
     argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters, summaryReporters}
@@ -105,8 +102,7 @@ export struct TriggerCommand: JobRunCommandBase
           registries.getRegistry(decl.registryName)
         ))
       )
-      
-      reporters = self.createReporters(reporters, log).connect()
+      reporters = self.createReporters([], log).connect()
       ops.appendOps(...values(catalog.jobs))
 
       # (8) create and run trigger
@@ -115,13 +111,8 @@ export struct TriggerCommand: JobRunCommandBase
         code = 0
       )
       
-      trigger.start(async proc(result?)
-        do
-          if result then code = 1
-        finally
-          await(catalog.finalize())
-          ps.exit(code)
-      end)
+      trigger.start(nop)
+      await(engine.run())
     finally
       pawait(registries.disconnect())
       peval(reporters.disconnect())
@@ -145,7 +136,7 @@ fn createTrigger(name, cat, stream, jobArgs?) -> trigger
 
     if "redisstreams" then
       const opts = {
-        name = decl.group.consumer
+        name = $"${decl.group}#${decl.consumer}"
         socket =
           host = decl.host ?? "localhost"
           port = decl.port ?? 6379

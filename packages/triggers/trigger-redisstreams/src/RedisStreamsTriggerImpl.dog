@@ -55,7 +55,7 @@ export struct RedisStreamsTriggerImpl
     # (1) pre: connect to Redis instance
     self.redis.connect()
 
-    # (2) initiate
+    # (2) initialize
     self.{handler, fired = 0}
   
   /**
@@ -84,17 +84,14 @@ export struct RedisStreamsTriggerImpl
 
     # (2) handle stream events
     if len(resp) > 0 then
-      self.fired += 1
-
       # [0] = stream name; [1] = list of items/events
       for each item in resp[0][1] do
         const (
           [_, data] = item              # [0] = ts; [1] = data[]
           value = json.decode(data[1])  # [0] = "req"; [1] = "value"
           call = {jobName = value.job, args = value.args}
+          e = {last = self.times is num and (self.fired += 1) >= self.times, call}
         )
 
-        await(self.handler(
-          last = self.times is num and self.fired >= self.times
-          call
-        ))
+        await(self.handler(e))
+        if e.last then break

@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const redis = _core.dogma.use(require("redis"));
 const {
   Duplex
 } = _core.dogma.use(require("stream"));
@@ -19,8 +20,8 @@ const {
   TriggeredJobCatalogParser
 } = _core.dogma.use(require("@akromio/jobs"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
-const redis = _core.dogma.use(require("redis"));
 const redisStreamsTriggerImpl = _core.dogma.use(require("@akromio/trigger-redisstreams"));
+const range = _core.dogma.use(require("@akromio/range"));
 const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
   baseOptions
@@ -93,16 +94,6 @@ TriggerCommand.prototype.createCatalogParser = function (opts) {
     return TriggeredJobCatalogParser(opts);
   }
 };
-TriggerCommand.prototype.createReporters = function (reporterNames, log) {
-  const self = this;
-  let reporters; /* c8 ignore next */
-  _core.dogma.expect("reporterNames", reporterNames, _core.list); /* c8 ignore next */
-  _core.dogma.expect("log", log);
-  {
-    return [];
-  }
-  return reporters;
-};
 TriggerCommand.prototype.handle = async function (argv) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("argv", argv, _core.map);
@@ -147,22 +138,12 @@ TriggerCommand.prototype.handle = async function (argv) {
         ["pluginParser"]: pluginParser,
         ["ops"]: ops
       }, registries.getRegistry(decl.registryName)));
-      reporters = this.createReporters(reporters, log).connect();
+      reporters = this.createReporters([], log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
       const trigger = createTrigger(triggerName, catalog, stream, args);
       let code = 0;
-      trigger.start(async result => {
-        {
-          try {
-            if (result) {
-              code = 1;
-            }
-          } finally {
-            0, await catalog.finalize();
-            _core.ps.exit(code);
-          }
-        }
-      });
+      trigger.start(_core.dogma.nop());
+      0, await engine.run();
     } finally {
       await _core.dogma.pawait(() => registries.disconnect());
       _core.dogma.peval(() => {
@@ -198,7 +179,7 @@ function createTrigger(name, cat, stream, jobArgs) {
           {
             var _decl$host, _decl$port;
             const opts = Object.assign({}, {
-              ["name"]: decl.group.consumer,
+              ["name"]: `${decl.group}#${decl.consumer}`,
               ["socket"]: {
                 ["host"]: (_decl$host = decl.host) !== null && _decl$host !== void 0 ? _decl$host : "localhost",
                 ["port"]: (_decl$port = decl.port) !== null && _decl$port !== void 0 ? _decl$port : 6379

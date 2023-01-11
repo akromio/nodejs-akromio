@@ -63,10 +63,10 @@ CompositeEngine.prototype.startRunner = async function (runner) {
       {
         const op = this.getOpOf(req);
         if (op) {
-          0, await runner.run(op, req.args, {
+          await _core.dogma.pawait(() => runner.run(op, req.args, {
             'dataset': dataset,
             'onError': onError
-          });
+          }));
         }
       }
     }
