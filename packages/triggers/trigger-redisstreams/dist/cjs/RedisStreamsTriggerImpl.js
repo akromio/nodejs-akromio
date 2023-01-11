@@ -91,7 +91,8 @@ RedisStreamsTriggerImpl.prototype.stop = function () {
   return this;
 };
 RedisStreamsTriggerImpl.prototype.gather = async function (size) {
-  const self = this; /* c8 ignore next */
+  const self = this;
+  let got = 0; /* c8 ignore next */
   _core.dogma.expect("size", size, _core.num);
   {
     const {
@@ -114,10 +115,12 @@ RedisStreamsTriggerImpl.prototype.gather = async function (size) {
           ["call"]: call
         };
         0, await this.handler(e);
+        got += 1;
         if (e.last) {
           break;
         }
       }
     }
   }
+  return got;
 };

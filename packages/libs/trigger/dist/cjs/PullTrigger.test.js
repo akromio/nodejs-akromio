@@ -3,6 +3,11 @@
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
 const {
+  monitor,
+  interceptor,
+  method
+} = _core.dogma.use(require("@akromio/doubles"));
+const {
   CallReqStream
 } = _core.dogma.use(require("@akromio/core"));
 const PullTrigger = _core.dogma.use(require("./PullTrigger"));
@@ -34,7 +39,9 @@ TriggerImpl.prototype.stop = function () {
 };
 TriggerImpl.prototype.gather = function () {
   const self = this;
-  {}
+  {
+    return 0;
+  }
 };
 suite(__filename, () => {
   {
@@ -49,6 +56,57 @@ suite(__filename, () => {
               'triggerImpl': triggerImpl
             });
             expected(out).toBe(PullTrigger);
+          }
+        });
+      }
+    });
+    suite("gather()", () => {
+      {
+        test("when available data, no reattempt must be performed", async () => {
+          {
+            const triggerImpl = interceptor(TriggerImpl(), {
+              'gather': method.returns(5)
+            });
+            const trigger = monitor(PullTrigger({
+              'name': "pull",
+              'stream': CallReqStream(),
+              'triggerImpl': triggerImpl,
+              'retryTimeout': 250
+            }), {
+              'method': "gather"
+            });
+            const out = trigger.gather(5);
+            0, await (0, _core.sleep)("500ms");
+            const gather = monitor.log(trigger, {
+              'clear': true
+            });
+            expected(gather.calls).equalTo(1);
+          }
+        });
+        test("when unavailable data, a reattempt must be performed", async () => {
+          {
+            const triggerImpl = interceptor(TriggerImpl(), {
+              'gather': method([{
+                ["i"]: 0,
+                ["returns"]: 0
+              }, {
+                ["returns"]: 1
+              }])
+            });
+            const trigger = monitor(PullTrigger({
+              'name': "pull",
+              'stream': CallReqStream(),
+              'triggerImpl': triggerImpl,
+              'retryTimeout': 250
+            }), {
+              'method': "gather"
+            });
+            const out = trigger.gather(5);
+            0, await (0, _core.sleep)("600ms");
+            const gather = monitor.log(trigger, {
+              'clear': true
+            });
+            expected(gather.calls).equalTo(2);
           }
         });
       }

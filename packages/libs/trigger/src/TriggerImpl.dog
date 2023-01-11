@@ -14,5 +14,7 @@ export intf TriggerImpl
 
   /**
    * Gathers new data when need, for example, if pull trigger.
+   *
+   * Declaration/prototype: fn(size: num) -> got: num.
    */
   gather?: func

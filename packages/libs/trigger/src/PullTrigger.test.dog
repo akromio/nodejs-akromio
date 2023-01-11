@@ -1,5 +1,6 @@
 use (
   alias://expected
+  {monitor, interceptor, method} = alias://doubles
   {CallReqStream} = alias://core
 
   PullTrigger
@@ -9,7 +10,7 @@ use (
 struct TriggerImpl
   pub proc start(handler: func)
   pub proc stop()
-  pub proc gather()
+  pub fn gather() = 0
 
 suite(__filename, proc()
   suite("constructor", proc()
@@ -22,6 +23,38 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out).toBe(PullTrigger)
+    end)
+  end)
+
+  suite("gather()", proc()
+    test("when available data, no reattempt must be performed", async proc()
+      # (1) act
+      const (
+        triggerImpl = interceptor(TriggerImpl(), gather = method.returns(5))
+        trigger = monitor(PullTrigger(name = "pull", stream = CallReqStream(), triggerImpl, retryTimeout = 250), method = "gather")
+        out = trigger.gather(5)
+      )
+
+      await(sleep("500ms"))
+
+      # (2) assessment
+      const gather = monitor.log(trigger, clear = true)
+      expected(gather.calls).equalTo(1)
+    end)
+
+    test("when unavailable data, a reattempt must be performed", async proc()
+      # (1) act
+      const (
+        triggerImpl = interceptor(TriggerImpl(), gather = method([{i = 0, returns = 0}, {returns = 1}]))
+        trigger = monitor(PullTrigger(name = "pull", stream = CallReqStream(), triggerImpl, retryTimeout = 250), method = "gather")
+        out = trigger.gather(5)
+      )
+
+      await(sleep("600ms"))
+
+      # (2) assessment
+      const gather = monitor.log(trigger, clear = true)
+      expected(gather.calls).equalTo(2)
     end)
   end)
 end)

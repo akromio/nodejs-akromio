@@ -72,7 +72,7 @@ suite(__filename, () => {
     });
     suite("gather()", () => {
       {
-        test("when called and unavailable data, no handler call muyst be performed", async () => {
+        test("when called and unavailable data, no handler call must be performed", async () => {
           {
             const stream = "cavani";
             const handler = monitor(method.resolves());
@@ -88,7 +88,7 @@ suite(__filename, () => {
               'consumer': consumer
             });
             const out = (0, await trigger.gather(5));
-            expected(out).toBeNil();
+            expected(out).equalTo(0);
             const hlog = monitor.log(handler, {
               'clear': true
             });
@@ -119,7 +119,7 @@ suite(__filename, () => {
               'consumer': consumer
             });
             const out = (0, await trigger.gather(5));
-            expected(out).toBeNil();
+            expected(out).equalTo(1);
             const hlog = monitor.log(handler, {
               'clear': true
             });
@@ -158,7 +158,7 @@ suite(__filename, () => {
               'consumer': consumer
             });
             const out = (0, await trigger.gather(5));
-            expected(out).toBeNil();
+            expected(out).equalTo(1);
             const hlog = monitor.log(handler, {
               'clear': true
             });

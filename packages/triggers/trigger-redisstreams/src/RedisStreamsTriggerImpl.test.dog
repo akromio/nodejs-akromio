@@ -49,7 +49,7 @@ suite(__filename, proc()
   end)
 
   suite("gather()", proc()
-    test("when called and unavailable data, no handler call muyst be performed", async proc()
+    test("when called and unavailable data, no handler call must be performed", async proc()
       # (1) act
       const (
         stream = "cavani"
@@ -60,7 +60,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toBeNil()
+      expected(out).equalTo(0)
 
       const hlog = monitor.log(handler, clear = true)
       expected(hlog.calls).equalTo(0)
@@ -84,7 +84,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toBeNil()
+      expected(out).equalTo(1)
 
       const hlog = monitor.log(handler, clear = true)
       expected(hlog.calls).equalTo(1)
@@ -109,7 +109,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).toBeNil()
+      expected(out).equalTo(1)
 
       const hlog = monitor.log(handler, clear = true)
       expected(hlog.calls).equalTo(1)

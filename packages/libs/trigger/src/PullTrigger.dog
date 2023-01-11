@@ -6,10 +6,29 @@ use (
  * A trigger to add events when the system requests it, on-demand.
  */
 export struct PullTrigger: Trigger
+  /**
+   * Sets the timeout, in milliseconds, for a new retry when a gather not received data.
+   */
+  @hidden
+  pub const retryTimeout = 2500
+
   @post
   pvt proc post()
     # (1) pre
     expect(self.triggerImpl.gather, func)
 
     # (2) add data recollector to stream
-    self.stream.appendDataRecollector(bind(self.triggerImpl, "gather"))
+    self.stream.appendDataRecollector(bind(self, "gather"))
+
+  /**
+   * Gathers data from the data source.
+   *
+   * @dev
+   * When not received data, a new reattempt is performed after a random timeout
+   * between 0 and retryTimeout.
+   */
+  @hidden
+  pub async proc gather(size: num)
+    if got ::= await(self.triggerImpl.gather(size)); got <= 0 then
+      const timeout = Math.ceil(Math.random() * self.retryTimeout)
+      setTimeout(proc() self.gather(size) end, timeout)
