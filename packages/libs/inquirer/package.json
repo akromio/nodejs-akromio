@@ -1,6 +1,6 @@
 {
   "name": "@akromio/inquirer",
-  "version": "0.17.2",
+  "version": "0.18.0",
   "description": "Inquirer library for Akromio.",
   "author": {
     "name": "Sia Codelabs",

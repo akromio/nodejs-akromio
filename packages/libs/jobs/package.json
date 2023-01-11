@@ -1,6 +1,6 @@
 {
   "name": "@akromio/jobs",
-  "version": "0.17.2",
+  "version": "0.18.0",
   "description": "Jobs library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
@@ -30,9 +30,9 @@
     "npm": ">= 8"
   },
   "dependencies": {
-    "@akromio/catalog": "^0.17.2",
-    "@akromio/core": "^0.17.2",
-    "@akromio/dataset": "^0.17.2",
+    "@akromio/catalog": "^0.18.0",
+    "@akromio/core": "^0.18.0",
+    "@akromio/dataset": "^0.18.0",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "yaml": "^2.1.3"
   },
