@@ -1,0 +1,165 @@
+use (
+  alias://expected
+  {monitor, sim, fun} = alias://doubles
+  ConsoleReporter
+)
+
+suite(__filename, proc()
+  const (
+    log = sim.stream.readable()
+    id = "my-id"
+    title = "my title"
+  )
+
+  suite("_handleOpStart()", proc()
+    test("when simple, echo must be called", proc()
+      # (1) act
+      const (
+        echo = monitor(fun.returns())
+        print = monitor(fun.returns())
+        config = {echo, print}
+        reporter = ConsoleReporter(log=, config).start()
+        e = {type = "opStart", opType = "simple", title}
+      )
+
+      reporter.handleEvent(e)
+
+      # (2) assessment
+      const elog = monitor.log(echo, clear = true)
+      expected(elog.calls).equalTo(1)
+      expected(elog.call.args).equalTo(["- my title"])
+
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(0)
+    end)
+
+    test("when composite, print must be called", proc()
+      # (1) act
+      const (
+        echo = monitor(fun.returns())
+        print = monitor(fun.returns())
+        config = {echo, print}
+        reporter = ConsoleReporter(log=, config).start()
+        e = {type = "opStart", opType = "composite", title}
+      )
+
+      reporter.handleEvent(e)
+
+      # (2) assessment
+      const elog = monitor.log(echo, clear = true)
+      expected(elog.calls).equalTo(0)
+
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(1)
+      expected(plog.call.args).first.toStartWith(">").toInclude("my title")
+    end)
+  end)
+
+  suite("_handleOpEnd()", proc()
+    test("when simple, print must be called", proc()
+      # (1) act
+      const (
+        echo = monitor(fun.returns())
+        print = monitor(fun.returns())
+        config = {echo, print}
+        reporter = ConsoleReporter(log=, config).start()
+        startEvent = {id, type = "opStart", opType = "simple", title}
+        endEvent = {id, type = "opEnd", opType = "simple", result = {kind = "ok", duration = 12}}
+      )
+
+      reporter.handleEvent(startEvent).handleEvent(endEvent)
+
+      # (2) assessment
+      const elog = monitor.log(echo, clear = true)
+      expected(elog.calls).equalTo(1) # start event
+
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(1)
+      expected(plog.call.args).first.toStartWith(" ").toInclude("ok").toInclude("12 ms")
+    end)
+
+    test("when composite, nothing to do", proc()
+      # (1) act
+      const (
+        echo = monitor(fun.returns())
+        print = monitor(fun.returns())
+        config = {echo, print}
+        reporter = ConsoleReporter(log=, config).start()
+        startEvent = {id, type = "opStart", opType = "composite", title}
+        endEvent = {id, type = "opEnd", opType = "composite", result = {}}
+      )
+
+      reporter.handleEvent(startEvent).handleEvent(endEvent)
+
+      # (2) assessment
+      const elog = monitor.log(echo, clear = true)
+      expected(elog.calls).equalTo(0)
+
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(1) # start event
+    end)
+  end)
+
+  suite("_handleOpLog()", proc()
+    test("when logged, log content must be shown", proc()
+      # (1) arrange
+      const (
+        echo = monitor(fun.returns())
+        print = monitor(fun.returns())
+        config = {echo, print}
+        content = "my log content"
+        opType = "simple"
+        startEvent = {id, type = "opStart", opType, title}
+        logEvent = {id, type = "opLog", opType, content}
+        endEvent = {id, type = "opEnd", opType, result = {kind = "ok", duration = 12}}
+
+        reporter = ConsoleReporter(log=, config).start()
+      )
+
+      # (2) act
+      reporter.handleEvent(startEvent).handleEvent(logEvent).handleEvent(endEvent)
+
+      # (3) assessment
+      const elog = monitor.log(echo, clear = true)
+      expected(elog.calls).equalTo(2)
+      expected(elog.firstCall.args).first.toInclude($"- ${title}")
+      expected(elog.secondCall.args).first.toInclude("↳")
+
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(3)
+      expected(plog.firstCall.args).first.toInclude("⬎")
+      expected(plog.secondCall.args).first.toInclude(content)
+      expected(plog.thirdCall.args).first.toInclude("ok").toInclude("12 ms")
+    end)
+
+    test("when log content ends with eol, echo must be used instead print", proc()
+      # (1) arrange
+      const (
+        echo = monitor(fun.returns())
+        print = monitor(fun.returns())
+        config = {echo, print}
+        content = "my log content\n"
+        opType = "simple"
+        startEvent = {id, type = "opStart", opType, title}
+        logEvent = {id, type = "opLog", opType, content}
+        endEvent = {id, type = "opEnd", opType, result = {kind = "failed", duration = 1234567}}
+
+        reporter = ConsoleReporter(log=, config).start()
+      )
+
+      # (2) act
+      reporter.handleEvent(startEvent).handleEvent(logEvent).handleEvent(endEvent)
+
+      # (3) assessment
+      const elog = monitor.log(echo, clear = true)
+      expected(elog.calls).equalTo(3)
+      expected(elog.firstCall.args).first.toInclude($"- ${title}")
+      expected(elog.secondCall.args).first.toInclude(content[0, -2])  # eol removed
+
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(2)
+      expected(plog.firstCall.args).first.toInclude("⬎")
+      expected(plog.secondCall.args).first.toInclude("failed").toInclude("20 m, 34.567 s")
+    end)
+  end)
+end)

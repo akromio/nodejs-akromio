@@ -2,6 +2,7 @@ pub use (
   Reporter
   ReporterStatus
   Reporters
+  
   impl/console/ConsoleReporter
   impl/console/ConsoleSummaryReporter
 )

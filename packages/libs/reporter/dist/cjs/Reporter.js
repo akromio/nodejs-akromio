@@ -54,6 +54,7 @@ Reporter.prototype.start = function () {
       }
     });
   }
+  return this;
 };
 Reporter.prototype.handleEvent = function (e) {
   const self = this; /* c8 ignore next */
@@ -93,6 +94,7 @@ Reporter.prototype.handleEvent = function (e) {
       }
     }
   }
+  return this;
 };
 Reporter.prototype.handleOpStart = function (e) {
   const self = this; /* c8 ignore next */
@@ -152,5 +154,12 @@ Reporter.prototype.handleEnd = function (e) {
       _core.dogma.raise(Error("Call stack should be empty when end reached."));
     }
     this._handleEnd(e);
+  }
+};
+Reporter.prototype._handleEnd = function (e) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("e", e);
+  {
+    _core.dogma.nop();
   }
 };

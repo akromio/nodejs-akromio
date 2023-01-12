@@ -4,9 +4,10 @@ var _core = require("@dogmalang/core");
 const $Reporters = class Reporters {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */
+    /* c8 ignore stop */ /* c8 ignore start */
+    if (_['reporters'] != null) (0, _core.expect)('reporters', _['reporters'], _core.list); /* c8 ignore stop */
     Object.defineProperty(this, 'reporters', {
-      value: [],
+      value: (0, _core.coalesce)(_['reporters'], []),
       writable: false,
       enumerable: true
     });

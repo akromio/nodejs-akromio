@@ -1,0 +1,65 @@
+use (
+  alias://expected
+  {sim, method, monitor} = alias://doubles
+
+  Reporters, Reporter
+)
+
+suite(__filename, proc()
+  suite("append()", proc()
+    test("when called, the reporter must be added to the list", proc()
+      # (1) act
+      const (
+        reporter = sim(Reporter, {})
+        reporters = Reporters()
+        out = reporters.append(reporter)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(reporters)
+      expected(reporters.reporters).equalTo([reporter])
+    end)
+  end)
+
+  suite("connect()", proc()
+    test("when called, start() of the reporters must be called", proc()
+      # (1) act
+      const (
+        reporter1 = monitor(sim(Reporter, start = method.returns()))
+        reporter2 = monitor(sim(Reporter, start = method.returns()))
+        reporters = Reporters().append(reporter1).append(reporter2)
+        out = reporters.connect()
+      )
+
+      # (2) assessment
+      expected(out).sameAs(reporters)
+
+      const start1 = monitor.log(reporter1, clear = true)
+      expected(start1.calls).equalTo(1)
+
+      const start2 = monitor.log(reporter2, clear = true)
+      expected(start2.calls).equalTo(1)
+    end)
+  end)
+
+  suite("disconnect()", proc()
+    test("when called, stop() of the reporters must be called", proc()
+      # (1) act
+      const (
+        reporter1 = monitor(sim(Reporter, stop = method.returns()))
+        reporter2 = monitor(sim(Reporter, stop = method.returns()))
+        reporters = Reporters().append(reporter1).append(reporter2)
+        out = reporters.disconnect()
+      )
+
+      # (2) assessment
+      expected(out).sameAs(reporters)
+
+      const stop1 = monitor.log(reporter1, clear = true)
+      expected(stop1.calls).equalTo(1)
+
+      const stop2 = monitor.log(reporter2, clear = true)
+      expected(stop2.calls).equalTo(1)
+    end)
+  end)
+end)
