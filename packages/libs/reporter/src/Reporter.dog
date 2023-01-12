@@ -63,6 +63,13 @@ export struct Reporter
     self._handleOpStart(e{*, level = len(self.callStack) - 1})
   
   /**
+   * Method to override by the reporters for handling an op start event.
+   */
+  @hidden
+  pub proc _handleOpStart(e)
+    nop
+  
+  /**
    * Processes an op end event consumed from the log stream.
    */
   @hidden

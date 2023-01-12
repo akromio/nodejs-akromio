@@ -26,10 +26,6 @@ const Reporter = new Proxy($Reporter, {
     return new $Reporter(...args);
   }
 });
-Reporter.prototype._handleOpStart = function () {
-  const self = this;
-  {}
-};
 suite(__filename, () => {
   {
     const log = sim.stream.readable();

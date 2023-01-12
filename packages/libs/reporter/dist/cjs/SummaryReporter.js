@@ -33,13 +33,6 @@ const SummaryReporter = new Proxy($SummaryReporter, {
   } /* c8 ignore stop */
 });
 module.exports = exports = SummaryReporter;
-SummaryReporter.prototype._handleOpStart = function (e) {
-  const self = this; /* c8 ignore next */
-  _core.dogma.expect("e", e);
-  {
-    _core.dogma.nop();
-  }
-};
 SummaryReporter.prototype._handleOpEnd = function (e) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("e", e);

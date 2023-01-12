@@ -106,6 +106,13 @@ Reporter.prototype.handleOpStart = function (e) {
     }, {}, [], []));
   }
 };
+Reporter.prototype._handleOpStart = function (e) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("e", e);
+  {
+    _core.dogma.nop();
+  }
+};
 Reporter.prototype.handleOpEnd = function (e) {
   const self = this; /* c8 ignore next */
   _core.dogma.expect("e", e);

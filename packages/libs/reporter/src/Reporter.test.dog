@@ -7,8 +7,6 @@ use (
 
 # Reporter to test.
 struct Reporter: ReporterBase
-  @override
-  pub proc _handleOpStart()
 
 suite(__filename, proc()
   const (
