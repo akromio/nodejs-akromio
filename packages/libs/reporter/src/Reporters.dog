@@ -5,8 +5,7 @@ export struct Reporters
   /**
    * The reporters.
    */
-  @strict
-  pub const reporters = []
+  pub const reporters := []
 
   /**
    * Appends a reporter to this collection.

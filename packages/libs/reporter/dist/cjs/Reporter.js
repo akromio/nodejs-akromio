@@ -54,6 +54,7 @@ Reporter.prototype.start = function () {
       }
     });
   }
+  return this;
 };
 Reporter.prototype.handleEvent = function (e) {
   const self = this; /* c8 ignore next */
@@ -88,11 +89,12 @@ Reporter.prototype.handleEvent = function (e) {
         /* c8 ignore stop */ /*c8 ignore next*/
         default:
           {
-            (0, _core.print)(e);
+            _core.dogma.raise(Error(`Unknown event: ${(0, _core.fmt)(e)}.`));
           }
       }
     }
   }
+  return this;
 };
 Reporter.prototype.handleOpStart = function (e) {
   const self = this; /* c8 ignore next */
@@ -102,6 +104,13 @@ Reporter.prototype.handleOpStart = function (e) {
     this._handleOpStart(_core.dogma.clone(e, {
       "level": (0, _core.len)(this.callStack) - 1
     }, {}, [], []));
+  }
+};
+Reporter.prototype._handleOpStart = function (e) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("e", e);
+  {
+    _core.dogma.nop();
   }
 };
 Reporter.prototype.handleOpEnd = function (e) {
@@ -152,5 +161,12 @@ Reporter.prototype.handleEnd = function (e) {
       _core.dogma.raise(Error("Call stack should be empty when end reached."));
     }
     this._handleEnd(e);
+  }
+};
+Reporter.prototype._handleEnd = function (e) {
+  const self = this; /* c8 ignore next */
+  _core.dogma.expect("e", e);
+  {
+    _core.dogma.nop();
   }
 };

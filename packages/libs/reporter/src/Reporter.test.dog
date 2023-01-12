@@ -1,0 +1,130 @@
+use (
+  alias://expected
+  {monitor, sim} = alias://doubles
+
+  ReporterBase = Reporter
+)
+
+# Reporter to test.
+struct Reporter: ReporterBase
+
+suite(__filename, proc()
+  const (
+    log = sim.stream.readable()
+    id = "my-id"
+    title = "my title"
+  )
+
+  suite("start()", proc()
+    test("when already started, error must be raised", proc()
+      # (1) act
+      const (
+        reporter = Reporter(log=)
+        out = peval(reporter.start().start())
+      )
+
+      # (2) assessment
+      expected(out)\
+        .first.equalTo(false)\
+        .second.equalTo(Error("Status expected to be initialized. Got: started."))
+    end)
+  end)
+
+  suite("stream", proc()
+    test("when new available event, handleEvent() must be called", async proc()
+      # (1) act
+      const (
+        e = {id, type = "end"}
+        reporter = monitor(Reporter(log = sim.stream.readable(data = [json.encode(e)])), method = "handleEvent")
+      )
+
+      reporter.start()
+      await(sleep("100ms"))
+
+      # (2) assessment
+      const handleEvent = monitor.log(reporter, clear = true)
+      expected(handleEvent.calls).equalTo(1)
+      expected(handleEvent.call.args).first.equalTo(e)
+    end)
+  end)
+
+  suite("handleEvent()", proc()
+    test("when unknown event, internal error must be raised", proc()
+      # (1) act
+      const (
+        reporter = Reporter(log=)
+        out = peval(reporter.handleEvent({}))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .first.equalTo(false)\
+        .second.equalTo(Error("Unknown event: {}."))
+    end)
+  end)
+
+  suite("handleEnd()", proc()
+    test("when called w/ empty stack, _handleEnd() must be called", proc()
+      # (1) act
+      const (
+        reporter = monitor(Reporter(log=), method = "_handleEnd")
+        e = {id, type = "end"}
+      )
+
+      reporter.handleEvent(e)
+
+      # (2) assessment
+      const _handleEnd = monitor.log(reporter, clear = true)
+      expected(_handleEnd.calls).equalTo(1)
+    end)
+
+    test("when called w/ non-empty stack, internal error must be raised", proc()
+      # (1) act
+      const (
+        reporter = Reporter(log=)
+        opStartEvent = {id, type ="opStart", kind = "composite"}
+        endEvent = {id, type = "end"}
+        out = peval(reporter.handleEvent(opStartEvent).handleEvent(endEvent))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .first.equalTo(false)\
+        .second.equalTo(Error("Call stack should be empty when end reached."))
+    end)
+  end)
+
+  suite("handleOpLog()", proc()
+    test("when called, _handleOpLog() must be called", proc()
+      # (1) act
+      const (
+        reporter = monitor(Reporter(log=), method = "_handleOpLog")
+        content = "my log content"
+        startEvent = {id, type = "opStart", kind = "simple", title}
+        logEvent = {id, type = "opLog", content}
+      )
+
+      reporter.handleEvent(startEvent).handleEvent(logEvent)
+
+      # (2) assessment
+      const _handleOpLog = monitor.log(reporter, clear = true)
+      expected(_handleOpLog.calls).equalTo(1)
+    end)
+  end)
+
+  suite("checkCallStack()", proc()
+    test("when top is different from new, internal error must be raised", proc()
+      # (1) act
+      const (
+        reporter = monitor(Reporter(log=), method = "_handleEnd")
+        e = {id, type = "opStart", kind = "composite"}
+        out = peval(reporter.handleEvent(e).checkCallStack("another-id"))
+      )
+
+      # (2) assessment
+      expected(out)\
+        .first.equalTo(false)\
+        .second.equalTo(Error("Call id expected: my-id. Got: another-id."))
+    end)
+  end)
+end)

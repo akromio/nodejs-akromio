@@ -1,0 +1,36 @@
+use (
+  alias://expected
+  {sim} = alias://doubles
+
+  SummaryReporterBase = SummaryReporter
+)
+
+# Summary reporter to test.
+struct SummaryReporter: SummaryReporterBase
+
+suite(__filename, proc()
+  const (
+    id = "my-id"
+    log = sim.stream.readable()
+  )
+
+  suite("_handleOpEnd", proc()
+    test("when called, counters must be updated", proc()
+      # (1) act
+      const (
+        okStartEvent = {id, type = "opStart", opType = "simple"}
+        okEndEvent = {id, type = "opEnd", opType = "simple", result = {kind = "ok"}}
+        failedStartEvent = {id, type = "opStart", opType = "simple"}
+        failedEndEvent = {id, type = "opEnd", opType = "simple", result = {kind = "failed"}}
+        reporter = SummaryReporter(log=)
+      )
+
+      reporter\
+        .handleEvent(okStartEvent).handleEvent(okEndEvent)\
+        .handleEvent(failedStartEvent).handleEvent(failedEndEvent)
+
+      # (2) assessment
+      expected(reporter).toHave(ok = 1, failed = 1)
+    end)
+  end)
+end)

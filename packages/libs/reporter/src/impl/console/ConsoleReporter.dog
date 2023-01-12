@@ -12,7 +12,6 @@ const fmtDuration = durationFmt.humanizer({
     short =
       m = fn() = "m" end
       s = fn() = "s" end
-      ms = fn() = "ms" end
 })
 
 /**
@@ -26,12 +25,12 @@ export struct ConsoleReporter: Reporter
   pub const config = merge(config, _.config)
 
   /**
-   * The echo function to use.
+   * Echo function to use.
    */
   pub fn echo = self.config.echo
   
   /**
-   * The print function to use.
+   * Print function to use.
    */
   pub fn print = self.config.print
 
@@ -74,10 +73,6 @@ export struct ConsoleReporter: Reporter
 
     self.logged = false
       
-  @override @hidden
-  pub proc _handleEnd()
-    nop
-  
   @override @hidden
   pub proc _handleOpLog(e)
     var (

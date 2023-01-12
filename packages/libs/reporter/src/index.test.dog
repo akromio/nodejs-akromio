@@ -1,11 +1,11 @@
 use (
   alias://expected
-  pkg = ~
+  index
 )
 
 suite(__filename, proc()
   test("when imported, its api must be exported", proc()
-    expected(pkg).toHave(
+    expected(index).toHave(
       "Reporter"
       "ConsoleReporter"
       "ConsoleSummaryReporter"

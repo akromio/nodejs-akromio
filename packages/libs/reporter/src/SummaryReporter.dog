@@ -20,10 +20,6 @@ export struct SummaryReporter: Reporter
   pub var failed = 0
 
   @override @hidden
-  pub proc _handleOpStart(e)
-    nop
-  
-  @override @hidden
   pub proc _handleOpEnd(e)
     if e.opType == "simple" then
       with e.result.kind do

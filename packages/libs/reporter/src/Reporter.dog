@@ -29,7 +29,7 @@ export struct Reporter
   /**
    * Starts to consume.
    */
-  pub fn start()
+  pub fn start() -> self
     # (1) pre
     if self.status !=~ initialized then
       throw(Error($"Status expected to be initialized. Got: ${self.status}."))
@@ -45,14 +45,14 @@ export struct Reporter
    * Processes an event consumed from the log stream.
    */
   @hidden
-  pub proc handleEvent(e: map)
+  pub fn handleEvent(e: map) -> self
     #!cov ignore else
     with e.type do
       if "opStart" then self.handleOpStart(e)
       if "opEnd" then self.handleOpEnd(e)
       if "opLog" then self.handleOpLog(e)
       if "end" then self.handleEnd(e)
-      else print(e)
+      else throw(Error($"Unknown event: ${fmt(e)}."))
 
   /**
    * Processes an op start event consumed from the log stream.
@@ -61,6 +61,13 @@ export struct Reporter
   pub proc handleOpStart(e)
     self.callStack.push(e)
     self._handleOpStart(e{*, level = len(self.callStack) - 1})
+  
+  /**
+   * Method to override by the reporters for handling an op start event.
+   */
+  @hidden
+  pub proc _handleOpStart(e)
+    nop
   
   /**
    * Processes an op end event consumed from the log stream.
@@ -82,6 +89,9 @@ export struct Reporter
     self.checkCallStack(e.id)
     self._handleOpLog(e{*, level = len(self.callStack)})
   
+  /**
+   * Method to override by the reporters for handling a log event.
+   */
   @hidden
   pub proc _handleOpLog(e)
     nop
@@ -106,3 +116,10 @@ export struct Reporter
 
     # (2) handle event
     self._handleEnd(e)
+
+  /**
+   * Method to override by the reporters for handling an end event.
+   */
+  @hidden
+  pub proc _handleEnd(e)
+    nop

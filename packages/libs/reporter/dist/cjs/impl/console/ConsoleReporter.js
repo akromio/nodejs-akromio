@@ -19,11 +19,6 @@ const fmtDuration = durationFmt.humanizer({
         {
           return "s";
         }
-      },
-      ["ms"]: () => {
-        {
-          return "ms";
-        }
       }
     }
   }
@@ -124,12 +119,6 @@ ConsoleReporter.prototype._handleOpEnd = function (e) {
       print(` ${self.getResultText(result.kind)} (${getDurationText(result.duration)})`);
     }
     this.logged = false;
-  }
-};
-ConsoleReporter.prototype._handleEnd = function () {
-  const self = this;
-  {
-    _core.dogma.nop();
   }
 };
 ConsoleReporter.prototype._handleOpLog = function (e) {

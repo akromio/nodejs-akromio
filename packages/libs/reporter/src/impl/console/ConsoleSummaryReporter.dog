@@ -14,11 +14,15 @@ export struct ConsoleSummaryReporter: SummaryReporter
   @strict
   pub const config = merge(config, _.config)
 
+  /**
+   * Print function to use.
+   */
+  pub fn print = self.config.print
+
   @override @hidden
   pub proc _handleEnd()
-    const {config} = self
+    const {config, print, ok, failed} = self
 
-    print()
-    print("Summary:")
-    print(" -", config.ok.color("ok"), self.ok)
-    print(" -", config.failed.color("failed"), self.failed)
+    print("\nSummary:")
+    print($" - ${config.ok.color('ok')} ${ok}")
+    print($" - ${config.failed.color('failed')} ${failed}")
