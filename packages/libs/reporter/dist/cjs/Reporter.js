@@ -89,7 +89,7 @@ Reporter.prototype.handleEvent = function (e) {
         /* c8 ignore stop */ /*c8 ignore next*/
         default:
           {
-            (0, _core.print)(e);
+            _core.dogma.raise(Error(`Unknown event: ${(0, _core.fmt)(e)}.`));
           }
       }
     }

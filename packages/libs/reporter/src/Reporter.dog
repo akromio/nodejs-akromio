@@ -52,7 +52,7 @@ export struct Reporter
       if "opEnd" then self.handleOpEnd(e)
       if "opLog" then self.handleOpLog(e)
       if "end" then self.handleEnd(e)
-      else print(e)
+      else throw(Error($"Unknown event: ${fmt(e)}."))
 
   /**
    * Processes an op start event consumed from the log stream.
