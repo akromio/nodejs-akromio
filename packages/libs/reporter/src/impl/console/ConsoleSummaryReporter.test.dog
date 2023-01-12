@@ -1,0 +1,40 @@
+use (
+  alias://expected
+  {monitor, sim, fun} = alias://doubles
+
+  ConsoleSummaryReporter
+)
+
+suite(__filename, proc()
+  const (
+    id = "my-id"
+    log = sim.stream.readable()
+  )
+
+  suite("_handleEnd", proc()
+    test("when called, summary must be printed", proc()
+      # (1) act
+      const (
+        okStartEvent = {id, type = "opStart", opType = "simple"}
+        okEndEvent = {id, type = "opEnd", opType = "simple", result = {kind = "ok"}}
+        failedStartEvent = {id, type = "opStart", opType = "simple"}
+        failedEndEvent = {id, type = "opEnd", opType = "simple", result = {kind = "failed"}}
+        endEvent = {id, type = "end"}
+        print = monitor(fun.returns())
+        reporter = ConsoleSummaryReporter(log=, config = {print})
+      )
+
+      reporter\
+        .handleEvent(okStartEvent).handleEvent(okEndEvent)\
+        .handleEvent(failedStartEvent).handleEvent(failedEndEvent)\
+        .handleEvent(endEvent)
+
+      # (2) assessment
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(3)
+      expected(plog.firstCall.args).first.equalTo("\nSummary:")
+      expected(plog.secondCall.args).first.toInclude("ok").toInclude("1")
+      expected(plog.thirdCall.args).first.toInclude("failed").toInclude("1")
+    end)
+  end)
+end)

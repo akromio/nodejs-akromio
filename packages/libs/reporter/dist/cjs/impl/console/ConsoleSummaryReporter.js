@@ -30,15 +30,26 @@ const ConsoleSummaryReporter = new Proxy($ConsoleSummaryReporter, {
   }
 });
 module.exports = exports = ConsoleSummaryReporter;
+Object.defineProperty(ConsoleSummaryReporter.prototype, "print", {
+  enum: true,
+  get: function () {
+    const self = this;
+    {
+      return this.config.print;
+    }
+  }
+});
 ConsoleSummaryReporter.prototype._handleEnd = function () {
   const self = this;
   {
     const {
-      config
+      config,
+      print,
+      ok,
+      failed
     } = this;
-    (0, _core.print)();
-    (0, _core.print)("Summary:");
-    (0, _core.print)(" -", config.ok.color("ok"), this.ok);
-    (0, _core.print)(" -", config.failed.color("failed"), this.failed);
+    print("\nSummary:");
+    print(` - ${config.ok.color('ok')} ${ok}`);
+    print(` - ${config.failed.color('failed')} ${failed}`);
   }
 };
