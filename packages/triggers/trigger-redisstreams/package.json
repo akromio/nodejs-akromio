@@ -1,6 +1,6 @@
 {
   "name": "@akromio/trigger-redisstreams",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Trigger implementation reading messages from a Redis Streams stream.",
   "author": {
     "name": "Sia Codelabs",

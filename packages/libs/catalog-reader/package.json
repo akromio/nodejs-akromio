@@ -1,6 +1,6 @@
 {
   "name": "@akromio/catalog-reader",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Catalog reader core library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
@@ -30,7 +30,7 @@
     "npm": ">= 8"
   },
   "dependencies": {
-    "@akromio/registry": "^0.18.0",
+    "@akromio/registry": "^0.18.1",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "yaml": "^2.1.3"
   },

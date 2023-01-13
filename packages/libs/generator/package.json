@@ -1,6 +1,6 @@
 {
   "name": "@akromio/generator",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Run-request generator library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
