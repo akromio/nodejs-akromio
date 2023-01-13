@@ -9,7 +9,10 @@ use (
 )
 
 suite(__filename, proc()
-  const globalDataset = GlobalDataset(name = "global")
+  const (
+    globalDataset = GlobalDataset(name = "global")
+    runnerName = "runner#0"
+  )
 
   suite("_performSteps()", proc()
     test("when a conditional step returning false, this must not be run", async proc()
@@ -27,7 +30,7 @@ suite(__filename, proc()
 
         log = native("new stream.Duplex()")
         ctx = Context(log = nop)
-        call = Call(op = {}, title = "Conditional steps", dataset, onError = "finish", log, ctx)
+        call = Call(op = {}, title = "Conditional steps", runnerName, dataset, onError = "finish", log, ctx)
 
         steps = [
           {
@@ -72,7 +75,7 @@ suite(__filename, proc()
 
         log = native("new stream.Duplex()")
         ctx = Context(log = nop)
-        call = Call(op = {}, title = "Conditional steps", dataset, onError = "finish", log, ctx)
+        call = Call(op = {}, title = "Conditional steps", runnerName, dataset, onError = "finish", log, ctx)
 
         steps = [
           {

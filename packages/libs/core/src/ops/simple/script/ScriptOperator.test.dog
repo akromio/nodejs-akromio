@@ -2,13 +2,17 @@ use (
   alias://expected
   {simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
-  {Script, ScriptOperator, Result} = ~
+
+  Script
+  ScriptOperator
+  ../../Result
 )
 
 suite(__filename, proc()
   const (
     dataset = GlobalDataset(name = "global").setDatumValue("x", 123)
     log = simulator.stream.duplex()
+    runnerName = "runner#0"
   )
 
   suite("performWork()", proc()
@@ -19,7 +23,7 @@ suite(__filename, proc()
           code = "params.join(':')"
           operator = ScriptOperator()
           script = Script(name = "test", title = "the title", code, operator, params = [1, 2, 3, 4])
-          out = await(script.runWith(undefined, dataset=, log))
+          out = await(script.runWith(undefined, dataset=, runnerName, log))
         )
 
         # (2) assessment
@@ -41,7 +45,7 @@ suite(__filename, proc()
           code = "params.join(':')"
           operator = ScriptOperator()
           script = Script(name = "test", title = "the title", code, operator, params = [1, 2, 3, 4])
-          out = await(script.runWith([12, 34], dataset=, log))
+          out = await(script.runWith([12, 34], dataset=, runnerName, log))
         )
 
         # (2) assessment
@@ -69,7 +73,7 @@ suite(__filename, proc()
           """
           operator = ScriptOperator()
           script = Script(name = "test", kind = "async", code, operator)
-          out = await(script.runWith(undefined, dataset=, log))
+          out = await(script.runWith(undefined, dataset=, runnerName, log))
         )
 
         # (2) assessment

@@ -52,6 +52,7 @@ CompositeOperator.prototype.createCall = function (op, args, opts) {
       'parent': opts.dataset
     });
     call = Call({
+      'runnerName': opts.runnerName,
       'onError': opts.onError || op.onError,
       'dataset': dataset,
       'op': op,
@@ -125,6 +126,7 @@ CompositeOperator.prototype.performStep = function (step, call) {
   {
     return step.op.runWith(step.args, {
       'parentCall': call,
+      'runnerName': call.runnerName,
       'title': step.title,
       'dataset': call.dataset,
       'log': call.log,

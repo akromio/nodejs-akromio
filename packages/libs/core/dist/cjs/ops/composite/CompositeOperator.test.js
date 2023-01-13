@@ -17,6 +17,7 @@ suite(__filename, () => {
     const globalDataset = GlobalDataset({
       'name': "global"
     });
+    const runnerName = "runner#0";
     suite("_performSteps()", () => {
       {
         test("when a conditional step returning false, this must not be run", async () => {
@@ -61,6 +62,7 @@ suite(__filename, () => {
             const call = Call({
               'op': {},
               'title': "Conditional steps",
+              'runnerName': runnerName,
               'dataset': dataset,
               'onError': "finish",
               'log': log,
@@ -146,6 +148,7 @@ suite(__filename, () => {
             const call = Call({
               'op': {},
               'title': "Conditional steps",
+              'runnerName': runnerName,
               'dataset': dataset,
               'onError': "finish",
               'log': log,

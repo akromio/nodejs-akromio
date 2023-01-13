@@ -2,14 +2,20 @@ use (
   {Writable} = dep://stream
   {v4 as uuid} = dep://uuid
   {Dataset} = alias://dataset
+
   Op
   Context
 )
 
 /**
- * The specific data of a call/run.
+ * Specific data of a call run.
  */
 export struct Call
+  /**
+   * Name of the origin runner.
+   */
+  pub const runnerName: text
+
   /**
    * The call identifier.
    */

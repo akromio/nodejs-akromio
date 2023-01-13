@@ -18,6 +18,7 @@ suite(__filename, () => {
       'name': "local"
     });
     const log = simulator.stream.duplex();
+    const runnerName = "runner#0";
     suite("perform()", () => {
       {
         teardown(() => {
@@ -46,7 +47,8 @@ suite(__filename, () => {
             });
             const out = (0, await op.runWith(undefined, {
               'dataset': dataset,
-              'log': log
+              'log': log,
+              'runnerName': runnerName
             }));
             const emitOpLog = monitor.log(operator);
             expected(emitOpLog.calls).equalTo(1);
@@ -67,6 +69,7 @@ suite(__filename, () => {
             const out = (0, await op.runWith(undefined, {
               'dataset': dataset,
               'log': log,
+              'runnerName': runnerName,
               'resultLog': true
             }));
             expected(monitor.log(operator).calls).equalTo(1);

@@ -5,9 +5,7 @@ const expected = _core.dogma.use(require("@akromio/expected"));
 const {
   v4: uuid
 } = _core.dogma.use(require("uuid"));
-const {
-  Result
-} = _core.dogma.use(require("../../.."));
+const Result = _core.dogma.use(require("./Result"));
 suite(__filename, () => {
   {
     suite("returned", () => {

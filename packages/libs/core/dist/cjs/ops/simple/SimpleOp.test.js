@@ -6,20 +6,18 @@ const {
   simulator,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  SimpleOp
-} = _core.dogma.use(require("../../../.."));
+const SimpleOp = _core.dogma.use(require("./SimpleOp"));
 const $TestOp = class TestOp extends SimpleOp {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_ee999766a6910c1f0896c77b86945330___init__ instanceof Function) this._pvt_ee999766a6910c1f0896c77b86945330___init__(_); /* c8 ignore stop */
+    if (this._pvt_56c404d3763b97778c47720236380339___init__ instanceof Function) this._pvt_56c404d3763b97778c47720236380339___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_ee999766a6910c1f0896c77b86945330___post__ instanceof Function) this._pvt_ee999766a6910c1f0896c77b86945330___post__(); /* c8 ignore stop */
+    if (this._pvt_56c404d3763b97778c47720236380339___post__ instanceof Function) this._pvt_56c404d3763b97778c47720236380339___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_ee999766a6910c1f0896c77b86945330___validate__ instanceof Function) this._pvt_ee999766a6910c1f0896c77b86945330___validate__(); /* c8 ignore stop */
+    if (this._pvt_56c404d3763b97778c47720236380339___validate__ instanceof Function) this._pvt_56c404d3763b97778c47720236380339___validate__(); /* c8 ignore stop */
   }
 };
 

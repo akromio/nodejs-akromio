@@ -21,6 +21,7 @@ suite(__filename, () => {
       'name': "global"
     });
     const log = simulator.stream.duplex();
+    const runnerName = "runner#1";
     suite("performWorks()", () => {
       {
         const $TestCo = class TestCo extends DynamicCo {
@@ -83,6 +84,7 @@ suite(__filename, () => {
             });
             const out = (0, await co.run({
               'dataset': globalDataset,
+              'runnerName': runnerName,
               'log': log
             }));
             expected(out).toBe("Result").toHave({

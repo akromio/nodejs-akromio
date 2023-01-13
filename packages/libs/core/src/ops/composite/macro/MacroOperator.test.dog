@@ -12,6 +12,7 @@ suite(__filename, proc()
   const (
     globalDataset = GlobalDataset(name = "global")
     log = simulator.stream.duplex()
+    runnerName = "runner#0"
   )
 
   suite("non-loop", proc()
@@ -58,7 +59,7 @@ suite(__filename, proc()
         const (
           localDataset = LocalDataset(name = "local", parent = globalDataset).setDatumValue("condition", true)
           macro = TestMacro(name = "macro", operator = MacroOperator())
-          out = await(macro.run(dataset = localDataset, log))
+          out = await(macro.run(dataset = localDataset, log, runnerName))
         )
 
         # (2) assessment
@@ -77,7 +78,7 @@ suite(__filename, proc()
         # (1) act
         const (
           macro = TestMacro(name = "macro", operator = MacroOperator())
-          out = await(macro.run(dataset = globalDataset, log))
+          out = await(macro.run(dataset = globalDataset, log, runnerName))
         )
 
         # (2) assessment
@@ -115,7 +116,7 @@ suite(__filename, proc()
         # (1) act
         const (
           macro = TestMacro(name = "macro", operator = MacroOperator())
-          out = await(macro.run(dataset = globalDataset, log))
+          out = await(macro.run(dataset = globalDataset, log, runnerName))
         )
 
         # (2) assessment
@@ -174,7 +175,7 @@ suite(__filename, proc()
         # (1) act
         const (
           loop = TestMacro(name = "loop", operator = MacroOperator())
-          out = await(loop.run(dataset = globalDataset, log))
+          out = await(loop.run(dataset = globalDataset, log, runnerName))
         )
 
         # (2) assessment
@@ -225,7 +226,7 @@ suite(__filename, proc()
         # (1) act
         const (
           loop = TestMacro(name = "loop", operator = MacroOperator())
-          out = await(loop.run(dataset = globalDataset, log))
+          out = await(loop.run(dataset = globalDataset, log, runnerName))
         )
 
         # (2) assessment

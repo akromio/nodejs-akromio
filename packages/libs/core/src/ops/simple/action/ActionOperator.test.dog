@@ -2,13 +2,16 @@ use (
   alias://expected
   {simulator} = alias://doubles
   {GlobalDataset} = alias://dataset
-  {StaticAction, ActionOperator} = ~
+
+  StaticAction
+  ActionOperator
 )
 
 suite(__filename, proc()
   const (
     dataset = GlobalDataset(name = "global").setDatumValue("x", 123)
     log = simulator.stream.duplex()
+    runnerName = "runner#0"
   )
 
   suite("performWork()", proc()
@@ -18,7 +21,7 @@ suite(__filename, proc()
         fun = fn() = "ciao!" end
         operator = ActionOperator()
         action = StaticAction(name = "test", title = "the title", fun, operator)
-        out = await(action.runWith("$(x)", dataset=, log))
+        out = await(action.runWith("$(x)", dataset=, runnerName, log))
       )
 
       # (2) assessment

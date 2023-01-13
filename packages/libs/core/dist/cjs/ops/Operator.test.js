@@ -8,22 +8,20 @@ const {
   field,
   method
 } = _core.dogma.use(require("@akromio/doubles"));
-const {
-  Call,
-  SimpleOp
-} = _core.dogma.use(require("../../.."));
-const OperatorBase = _core.dogma.use(require("../../../dist/cjs/ops/Operator"));
+const OperatorBase = _core.dogma.use(require("./Operator"));
+const Call = _core.dogma.use(require("./Call"));
+const SimpleOp = _core.dogma.use(require("./simple/SimpleOp"));
 const $Operator = class Operator extends OperatorBase {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_48df69c260d445e77106255aed97a2b0___init__ instanceof Function) this._pvt_48df69c260d445e77106255aed97a2b0___init__(_); /* c8 ignore stop */
+    if (this._pvt_997091994919063ccfd36c08e7da193c___init__ instanceof Function) this._pvt_997091994919063ccfd36c08e7da193c___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_48df69c260d445e77106255aed97a2b0___post__ instanceof Function) this._pvt_48df69c260d445e77106255aed97a2b0___post__(); /* c8 ignore stop */
+    if (this._pvt_997091994919063ccfd36c08e7da193c___post__ instanceof Function) this._pvt_997091994919063ccfd36c08e7da193c___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_48df69c260d445e77106255aed97a2b0___validate__ instanceof Function) this._pvt_48df69c260d445e77106255aed97a2b0___validate__(); /* c8 ignore stop */
+    if (this._pvt_997091994919063ccfd36c08e7da193c___validate__ instanceof Function) this._pvt_997091994919063ccfd36c08e7da193c___validate__(); /* c8 ignore stop */
   }
 };
 

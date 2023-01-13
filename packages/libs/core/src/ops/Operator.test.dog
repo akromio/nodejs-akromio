@@ -1,8 +1,10 @@
 use (
   alias://expected
   {monitor, simulator, field, method} = alias://doubles
-  {Call, SimpleOp} = ~
-  OperatorBase = ~/dist/cjs/ops/Operator
+
+  OperatorBase = Operator
+  Call
+  simple/SimpleOp
 )
 
 # The operator type to use with the tests.

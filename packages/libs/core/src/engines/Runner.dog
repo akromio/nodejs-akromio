@@ -25,5 +25,5 @@ export struct Runner
   @async
   pub fn run(op: Op, args?: any, opts #[: RunnerRunOpts]): Result = op.runWith(
     args,
-    opts{*, log = self.log}
+    opts{*, log = self.log, runnerName = self.name}
   )

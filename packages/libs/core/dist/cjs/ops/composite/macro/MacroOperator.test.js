@@ -20,6 +20,7 @@ suite(__filename, () => {
       'name': "global"
     });
     const log = simulator.stream.duplex();
+    const runnerName = "runner#0";
     suite("non-loop", () => {
       {
         suite("performWorks()", () => {
@@ -118,7 +119,8 @@ suite(__filename, () => {
                 });
                 const out = (0, await macro.run({
                   'dataset': localDataset,
-                  'log': log
+                  'log': log,
+                  'runnerName': runnerName
                 }));
                 expected(out).toBe("Result").toHave({
                   'title': "macro",
@@ -148,7 +150,8 @@ suite(__filename, () => {
                 });
                 const out = (0, await macro.run({
                   'dataset': globalDataset,
-                  'log': log
+                  'log': log,
+                  'runnerName': runnerName
                 }));
                 expected(out).toBe("Result").toHave({
                   'title': "macro",
@@ -230,7 +233,8 @@ suite(__filename, () => {
                 });
                 const out = (0, await macro.run({
                   'dataset': globalDataset,
-                  'log': log
+                  'log': log,
+                  'runnerName': runnerName
                 }));
                 expected(out).toBe("Result").toHave({
                   'title': "macro",
@@ -363,7 +367,8 @@ suite(__filename, () => {
                 });
                 const out = (0, await loop.run({
                   'dataset': globalDataset,
-                  'log': log
+                  'log': log,
+                  'runnerName': runnerName
                 }));
                 expected(out).toBe("Result").toHave({
                   'title': "loop",
@@ -478,7 +483,8 @@ suite(__filename, () => {
                 });
                 const out = (0, await loop.run({
                   'dataset': globalDataset,
-                  'log': log
+                  'log': log,
+                  'runnerName': runnerName
                 }));
                 expected(out).toBe("Result").toHave({
                   'title': "loop",

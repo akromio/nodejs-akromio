@@ -15,7 +15,14 @@ const Context = _core.dogma.use(require("./Context"));
 const $Call = class Call {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
+    /* c8 ignore stop */
+    (0, _core.expect)('runnerName', _['runnerName'], _core.text);
+    Object.defineProperty(this, 'runnerName', {
+      value: (0, _core.coalesce)(_['runnerName'], null),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (_['id'] != null) (0, _core.expect)('id', _['id'], _core.text); /* c8 ignore stop */
     Object.defineProperty(this, 'id', {
       value: (0, _core.coalesce)(_['id'], uuid()),

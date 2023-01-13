@@ -9,7 +9,7 @@ use (
 @abstract
 export struct Op: Activity
   /**
-   * The operator to use to run the operation when called.
+   * Operator to use to run the operation when called.
    */
   pub const operator
 
