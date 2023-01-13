@@ -44,7 +44,7 @@ export struct TriggerCommand: JobRunCommandBase
 
     reporter = {
       type = "array"
-      alias = ["p", "reporters"]
+      alias = ["p", "reporters", "reporterNames"]
       choices = ["none", "log"]
       desc = "A reporter to notify the run events."
       default = ["log"]
@@ -59,11 +59,12 @@ export struct TriggerCommand: JobRunCommandBase
   
   @override @hidden
   pub async proc handle(
-    argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters}
+    argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporterNames}
   )
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
-
+    
+    const reporters = []
     do
       # (2) create the ops to use
       const ops = Ops()
@@ -93,13 +94,18 @@ export struct TriggerCommand: JobRunCommandBase
 
       # (7) create engine
       const (
-        log = native("new Duplex({emitClose: true, read() {}, write() {}})")
         stream = CallReqStream()
         engine = await(self.createEngine(
           {
             dataset = catalog.dataset
             onError = catalog.onError or onError
-            runners = [for i in range(catalog.parallelism) do Runner(name = $"runner#${i}", log)]
+            runners = [
+              for i in range(catalog.parallelism) do
+                Runner(
+                  name = $"runner#${i}"
+                  log = native("new Duplex({emitClose: true, read() {}, write() {}})")
+                )
+            ]
             stream
             pluginParser
             ops
@@ -108,7 +114,10 @@ export struct TriggerCommand: JobRunCommandBase
           registries.getRegistry(decl.registryName)
         ))
       )
-      reporters = self.createReporters(reporters, log).connect()
+
+      for each runner in engine.runners do
+        reporters.push(self.createReporters(reporterNames, runner.log).connect())
+
       ops.appendOps(...values(catalog.jobs))
 
       # (8) create and run trigger
@@ -121,7 +130,7 @@ export struct TriggerCommand: JobRunCommandBase
       await(engine.run())
     finally
       pawait(registries.disconnect())
-      peval(reporters.disconnect())
+      for each reporter in reporters do peval(reporter.disconnect())
 
 /**
  * Creates a trigger with the given data.
