@@ -44,7 +44,8 @@ Runner.prototype.run = function (op, args, opts) {
   _core.dogma.expect("opts", opts);
   {
     return op.runWith(args, _core.dogma.clone(opts, {
-      "log": this.log
+      "log": this.log,
+      "runnerName": this.name
     }, {}, [], []));
   }
 };

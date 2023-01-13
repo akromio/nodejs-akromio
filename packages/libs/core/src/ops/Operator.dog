@@ -37,6 +37,7 @@ export struct Operator
   @hidden
   pub fn emitOpStart(call: Call) -> e
     e = {
+      runnerName = call.runnerName
       type = "opStart"
       opType = getOpTypeOf(call.op)
       id = call.id
@@ -53,9 +54,11 @@ export struct Operator
   @hidden
   pub fn emitOpEnd(call: Call, result) -> e
     e = {
+      runnerName = call.runnerName
       type = "opEnd"
       opType = getOpTypeOf(call.op)
       id = call.id
+      title = call.title
       ts = timestamp()
       result = {
         kind = result.kind
@@ -83,6 +86,7 @@ export struct Operator
 
     # (2) emit event
     e = {
+      runnerName = call.runnerName
       type = "opLog"
       opType = getOpTypeOf(call.op)
       id = call.id

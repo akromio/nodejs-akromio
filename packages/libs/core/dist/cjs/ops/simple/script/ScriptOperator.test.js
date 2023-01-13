@@ -8,17 +8,16 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  Script,
-  ScriptOperator,
-  Result
-} = _core.dogma.use(require("../../../../.."));
+const Script = _core.dogma.use(require("./Script"));
+const ScriptOperator = _core.dogma.use(require("./ScriptOperator"));
+const Result = _core.dogma.use(require("../../Result"));
 suite(__filename, () => {
   {
     const dataset = GlobalDataset({
       'name': "global"
     }).setDatumValue("x", 123);
     const log = simulator.stream.duplex();
+    const runnerName = "runner#0";
     suite("performWork()", () => {
       {
         suite("sync code", () => {
@@ -36,6 +35,7 @@ suite(__filename, () => {
                 });
                 const out = (0, await script.runWith(undefined, {
                   'dataset': dataset,
+                  'runnerName': runnerName,
                   'log': log
                 }));
                 expected(out).toBe(Result).toHave({
@@ -59,6 +59,7 @@ suite(__filename, () => {
                 });
                 const out = (0, await script.runWith([12, 34], {
                   'dataset': dataset,
+                  'runnerName': runnerName,
                   'log': log
                 }));
                 expected(out).toBe(Result).toHave({
@@ -85,6 +86,7 @@ suite(__filename, () => {
                 });
                 const out = (0, await script.runWith(undefined, {
                   'dataset': dataset,
+                  'runnerName': runnerName,
                   'log': log
                 }));
                 expected(out).toBe(Result).toHave({

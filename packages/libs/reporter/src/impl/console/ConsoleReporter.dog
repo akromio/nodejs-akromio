@@ -1,25 +1,18 @@
 use (
   dep://lodash.merge
   alias://indent
-  durationFmt = alias://fmtDuration
+  
   config
+  {fmtDuration} = ../duration
   ../../Reporter
 )
-
-const fmtDuration = durationFmt.humanizer({
-  language = "short"
-  languages =
-    short =
-      m = fn() = "m" end
-      s = fn() = "s" end
-})
 
 /**
  * A reporter to notify using the console.
  */
 export struct ConsoleReporter: Reporter
   /**
-   * The reporter configuration to use.
+   * Reporter configuration to use.
    */
   @strict
   pub const config = merge(config, _.config)

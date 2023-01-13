@@ -1,6 +1,6 @@
 use (
   {PluginLoader} = alias://core
-  {ConsoleReporter, Reporters} = alias://reporter
+  {Reporters, ConsoleReporter, LogReporter} = alias://reporter
   {JobCatalogParser} = alias://jobs
 
   RunCommandBase
@@ -91,6 +91,7 @@ export struct JobRunCommandBase: RunCommandBase
       #!cov ignore else
       with reporterName do
         if "console" then reporters.append(ConsoleReporter(log=))
+        if "log" then reporters.append(LogReporter(log=))
   
   /**
    * Creates and returns the engine to use.

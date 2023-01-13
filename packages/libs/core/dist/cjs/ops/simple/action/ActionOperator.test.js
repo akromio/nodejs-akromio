@@ -8,16 +8,15 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  StaticAction,
-  ActionOperator
-} = _core.dogma.use(require("../../../../.."));
+const StaticAction = _core.dogma.use(require("./StaticAction"));
+const ActionOperator = _core.dogma.use(require("./ActionOperator"));
 suite(__filename, () => {
   {
     const dataset = GlobalDataset({
       'name': "global"
     }).setDatumValue("x", 123);
     const log = simulator.stream.duplex();
+    const runnerName = "runner#0";
     suite("performWork()", () => {
       {
         test("when called, fun must be called and its return must be returned into Result.value", async () => {
@@ -36,6 +35,7 @@ suite(__filename, () => {
             });
             const out = (0, await action.runWith("$(x)", {
               'dataset': dataset,
+              'runnerName': runnerName,
               'log': log
             }));
             expected(out).toBe("Result").toHave({

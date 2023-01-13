@@ -1,6 +1,9 @@
 use (
   alias://expected
-  {Ops, SimpleOp, Plugin} = ~
+
+  Ops
+  simple/SimpleOp
+  ../plugins/Plugin
 )
 
 struct TestOp: SimpleOp

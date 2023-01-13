@@ -66,8 +66,13 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
         ["registryAndCatalogName"]: baseOptions.registryAndCatalogName,
         ["arg"]: baseOptions.arg,
         ["onError"]: baseOptions.onError,
-        ["reporter"]: baseOptions.reporter,
-        ["summaryReporter"]: baseOptions.summaryReporter
+        ["reporter"]: {
+          ["type"]: "array",
+          ["alias"]: ["p", "reporters", "reporterNames"],
+          ["choices"]: ["none", "log"],
+          ["desc"]: "A reporter to notify the run events.",
+          ["default"]: ["log"]
+        }
       }),
       writable: false,
       enumerable: true
@@ -103,11 +108,11 @@ TriggerCommand.prototype.handle = async function (argv) {
     registryAndCatalogName,
     onError,
     args,
-    reporters,
-    summaryReporters
+    reporterNames
   } = argv;
   {
     const registries = (0, await this.createRegistries(argv).connect());
+    const reporters = [];
     try {
       const ops = Ops();
       if (registryAndCatalogName) {
@@ -121,24 +126,25 @@ TriggerCommand.prototype.handle = async function (argv) {
       const globalDataset = (0, await this.createGlobalDataset(decl, args));
       const pluginParser = PluginParser();
       const catalog = (0, await this.createCatalog(decl, pluginParser, globalDataset, ops));
-      const log = new Duplex({
-        emitClose: true,
-        read() {},
-        write() {}
-      });
       const stream = CallReqStream();
       const engine = (0, await this.createEngine({
         ["dataset"]: catalog.dataset,
         ["onError"]: catalog.onError || onError,
         ["runners"]: range(catalog.parallelism).map(i => Runner({
           'name': `runner#${i}`,
-          'log': log
+          'log': new Duplex({
+            emitClose: true,
+            read() {},
+            write() {}
+          })
         })),
         ["stream"]: stream,
         ["pluginParser"]: pluginParser,
         ["ops"]: ops
       }, registries.getRegistry(decl.registryName)));
-      reporters = this.createReporters([], log).connect();
+      for (const runner of engine.runners) {
+        reporters.push(this.createReporters(reporterNames, runner.log).connect());
+      }
       ops.appendOps(...(0, _core.values)(catalog.jobs));
       const trigger = createTrigger(triggerName, catalog, stream, args);
       let code = 0;
@@ -146,9 +152,11 @@ TriggerCommand.prototype.handle = async function (argv) {
       0, await engine.run();
     } finally {
       await _core.dogma.pawait(() => registries.disconnect());
-      _core.dogma.peval(() => {
-        return reporters.disconnect();
-      });
+      for (const reporter of reporters) {
+        _core.dogma.peval(() => {
+          return reporter.disconnect();
+        });
+      }
     }
   }
 };

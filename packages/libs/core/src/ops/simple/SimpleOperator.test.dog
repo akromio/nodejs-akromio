@@ -11,6 +11,7 @@ suite(__filename, proc()
   const (
     dataset = GlobalDataset(name = "local")
     log = simulator.stream.duplex()
+    runnerName = "runner#0"
   )
 
   suite("perform()", proc()
@@ -24,7 +25,7 @@ suite(__filename, proc()
         operator = monitor(ActionOperator(), methods = ["emitOpLog"])
         fun = proc(ctx => {log}) log("hello!") end
         op = StaticAction(name = "test", operator, fun)
-        out = await(op.runWith(undefined, dataset=, log))
+        out = await(op.runWith(undefined, dataset=, log, runnerName))
       )
 
       # (2) assessment
@@ -39,7 +40,7 @@ suite(__filename, proc()
         operator = monitor(ActionOperator(), methods = ["emitOpLog"])
         fun = nop
         op = StaticAction(name = "test", operator, fun)
-        out = await(op.runWith(undefined, dataset=, log, resultLog = true))
+        out = await(op.runWith(undefined, dataset=, log, runnerName, resultLog = true))
       )
 
       # (2) assessment

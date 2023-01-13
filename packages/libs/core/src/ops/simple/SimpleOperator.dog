@@ -18,6 +18,7 @@ export struct SimpleOperator: Operator
 
     # (2) create call
     call = Call(
+      runnerName = opts.runnerName
       onError = opts.onError or "carryOn"
       dataset = opts.dataset
       op

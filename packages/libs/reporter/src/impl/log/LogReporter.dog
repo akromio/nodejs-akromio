@@ -1,0 +1,64 @@
+use (
+  dep://lodash.merge
+
+  config
+  {fmtDuration} = ../duration
+  ../../Reporter
+)
+
+/**
+ * A reporter for logging the action results performed.
+ */
+export struct LogReporter: Reporter
+  /**
+   * Nesting level to show.
+   */
+  pub const nestingLevel = _.nestingLevel ?? config.nestingLevel
+
+  /**
+   * Reporter configuration to use.
+   */
+  @strict
+  pub const config = merge(config, _.config)
+
+  /**
+   * Print function to use.
+   */
+  pub fn print = self.config.print
+  
+  /**
+   * Format patterns to use.
+   */
+  pub fn format = self.config.format
+  
+  @override @hidden
+  pub proc _handleOpStart(e)
+    # (1) pre
+    if e.level > self.nestingLevel then return
+
+    # (2) build log message
+    const log = self.format.start\
+      .replace("$(ts)", e.ts)\
+      .replace("$(runner)", e.runnerName)\
+      .replace("$(id)", e.id)\
+      .replace("$(title)", e.title)
+
+    # (3) print log message
+    self.print(log)
+  
+  @override @hidden
+  pub proc _handleOpEnd(e)
+    # (1) pre
+    if e.level > self.nestingLevel then return
+
+    # (2) build log message
+    const log = self.format.end\
+      .replace("$(ts)", e.ts)\
+      .replace("$(runner)", e.runnerName)\
+      .replace("$(id)", e.id)\
+      .replace("$(title)", e.title)\
+      .replace("$(result)", e.result.kind.toUpperCase())\
+      .replace("$(duration)", fmtDuration(e.result.duration).replace(" ", ""))
+
+    # (3) print log message
+    self.print(log)

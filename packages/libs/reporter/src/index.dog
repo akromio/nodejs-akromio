@@ -5,4 +5,5 @@ pub use (
   
   impl/console/ConsoleReporter
   impl/console/ConsoleSummaryReporter
+  impl/log/LogReporter
 )

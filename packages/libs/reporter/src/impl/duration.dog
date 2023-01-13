@@ -1,0 +1,14 @@
+use (
+  duration = alias://fmtDuration
+)
+
+/**
+ * Returns a duration humanized a our short format.
+ */
+pub const fmtDuration = duration.humanizer({
+  language = "short"
+  languages =
+    short =
+      m = fn() = "m" end
+      s = fn() = "s" end
+})

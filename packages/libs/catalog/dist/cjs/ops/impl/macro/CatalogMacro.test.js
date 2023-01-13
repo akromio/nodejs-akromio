@@ -29,6 +29,7 @@ suite(__filename, () => {
     });
     const onError = "carryOn";
     const title = "testing";
+    const runnerName = "runner#0";
     suite("isLoop()", () => {
       {
         test("when forEach set, true must be returned", () => {
@@ -103,7 +104,8 @@ suite(__filename, () => {
               'onError': onError,
               'title': title,
               'log': log,
-              'ctx': ctx
+              'ctx': ctx,
+              'runnerName': runnerName
             });
             const out = macro.getSteps(call);
             expected(out).toBeList().toHaveLen(9);
@@ -181,7 +183,8 @@ suite(__filename, () => {
               'onError': onError,
               'title': title,
               'log': log,
-              'ctx': ctx
+              'ctx': ctx,
+              'runnerName': runnerName
             });
             const out = macro.getInitializerSteps(call);
             expected(out).toHaveLen(1);
@@ -213,7 +216,8 @@ suite(__filename, () => {
               'onError': onError,
               'title': title,
               'log': log,
-              'ctx': ctx
+              'ctx': ctx,
+              'runnerName': runnerName
             });
             const out = macro.getFinalizerSteps(call);
             expected(out).toHaveLen(1);
@@ -247,7 +251,8 @@ suite(__filename, () => {
               'onError': onError,
               'title': title,
               'log': log,
-              'ctx': ctx
+              'ctx': ctx,
+              'runnerName': runnerName
             });
             const out = loop.getLoopCollection(call);
             expected(out).toBeMap().toHave({

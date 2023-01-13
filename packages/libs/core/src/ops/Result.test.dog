@@ -1,7 +1,8 @@
 use (
   alias://expected
   {v4 as uuid} = dep://uuid
-  {Result} = ~
+
+  Result
 )
 
 suite(__filename, proc()

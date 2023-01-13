@@ -36,6 +36,7 @@ export struct CompositeOperator: Operator
 
     # (3) create call
     call = Call(
+      runnerName = opts.runnerName
       onError = opts.onError or op.onError
       dataset
       op
@@ -114,6 +115,7 @@ export struct CompositeOperator: Operator
   pub fn performStep(step: Step, call: Call): Result = step.op.runWith(
     step.args
     parentCall = call
+    runnerName = call.runnerName
     title = step.title
     dataset = call.dataset
     log = call.log

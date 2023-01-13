@@ -36,6 +36,7 @@ SimpleOperator.prototype.createCall = function (op, args, opts) {
     const params = op.buildParams(args, opts.dataset);
     const title = op.buildTitle(params);
     call = Call({
+      'runnerName': opts.runnerName,
       'onError': opts.onError || "carryOn",
       'dataset': opts.dataset,
       'op': op,

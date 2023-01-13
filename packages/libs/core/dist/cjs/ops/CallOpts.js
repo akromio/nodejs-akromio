@@ -9,6 +9,10 @@ const {
 } = _core.dogma.use(require("@akromio/dataset"));
 const Call = _core.dogma.use(require("./Call"));
 const CallOpts = _core.dogma.intf('CallOpts', {
+  runnerName: {
+    optional: false,
+    type: _core.text
+  },
   parentCall: {
     optional: true,
     type: Call

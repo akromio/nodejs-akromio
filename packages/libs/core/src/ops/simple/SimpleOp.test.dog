@@ -1,7 +1,8 @@
 use (
   alias://expected
   {simulator, method} = alias://doubles
-  {SimpleOp} = ~
+
+  SimpleOp
 )
 
 struct TestOp: SimpleOp

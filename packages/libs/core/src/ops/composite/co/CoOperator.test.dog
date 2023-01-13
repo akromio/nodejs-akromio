@@ -12,33 +12,34 @@ suite(__filename, proc()
   const (
     globalDataset = GlobalDataset(name = "global")
     log = simulator.stream.duplex()
+    runnerName = "runner#1"
   )
 
   suite("performWorks()", proc()
     struct TestCo: DynamicCo
-        @override
-        pub fn getSteps() = [
-          {
-            title = "1st step"
-            op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
-            args = 123
-            onError = "carryOn"
-          }
+      @override
+      pub fn getSteps() = [
+        {
+          title = "1st step"
+          op = StaticAction(name = "1st", fun = fn() = "action #1" end, operator = ActionOperator())
+          args = 123
+          onError = "carryOn"
+        }
 
-          {
-            title = "2nd step"
-            op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
-            args = 321
-            resultVarName = "2nd"
-            onError = "carryOn"
-          }
-        ]
+        {
+          title = "2nd step"
+          op = StaticAction(name = "2nd", fun = fn() = "action #2" end, operator = ActionOperator())
+          args = 321
+          resultVarName = "2nd"
+          onError = "carryOn"
+        }
+      ]
 
     test("when called and everything is alright, a result for every step must be returned as value", async proc()
       # (1) act
       const (
         co = TestCo(name = "co", operator = CoOperator())
-        out = await(co.run(dataset = globalDataset, log))
+        out = await(co.run(dataset = globalDataset, runnerName, log))
       )
 
       # (2) assessment

@@ -3,26 +3,11 @@
 var _core = require("@dogmalang/core");
 const merge = _core.dogma.use(require("lodash.merge"));
 const indent = _core.dogma.use(require("indent-string"));
-const durationFmt = _core.dogma.use(require("humanize-duration"));
 const config = _core.dogma.use(require("./config"));
+const {
+  fmtDuration
+} = _core.dogma.use(require("../duration"));
 const Reporter = _core.dogma.use(require("../../Reporter"));
-const fmtDuration = durationFmt.humanizer({
-  ["language"]: "short",
-  ["languages"]: {
-    ["short"]: {
-      ["m"]: () => {
-        {
-          return "m";
-        }
-      },
-      ["s"]: () => {
-        {
-          return "s";
-        }
-      }
-    }
-  }
-});
 const $ConsoleReporter = class ConsoleReporter extends Reporter {
   constructor(_) {
     super(_);

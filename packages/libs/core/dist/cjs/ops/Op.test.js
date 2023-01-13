@@ -10,20 +10,18 @@ const {
 const {
   GlobalDataset
 } = _core.dogma.use(require("@akromio/dataset"));
-const {
-  Op
-} = _core.dogma.use(require("../../.."));
+const Op = _core.dogma.use(require("./Op"));
 const $TestOp = class TestOp extends Op {
   constructor(_) {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (this._pvt_acc91881e46f457b64ed8e24fc5dc9c1___init__ instanceof Function) this._pvt_acc91881e46f457b64ed8e24fc5dc9c1___init__(_); /* c8 ignore stop */
+    if (this._pvt_fa558386cdc164f101a65214f9f4a951___init__ instanceof Function) this._pvt_fa558386cdc164f101a65214f9f4a951___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_acc91881e46f457b64ed8e24fc5dc9c1___post__ instanceof Function) this._pvt_acc91881e46f457b64ed8e24fc5dc9c1___post__(); /* c8 ignore stop */
+    if (this._pvt_fa558386cdc164f101a65214f9f4a951___post__ instanceof Function) this._pvt_fa558386cdc164f101a65214f9f4a951___post__(); /* c8 ignore stop */
     /* c8 ignore start */
-    if (this._pvt_acc91881e46f457b64ed8e24fc5dc9c1___validate__ instanceof Function) this._pvt_acc91881e46f457b64ed8e24fc5dc9c1___validate__(); /* c8 ignore stop */
+    if (this._pvt_fa558386cdc164f101a65214f9f4a951___validate__ instanceof Function) this._pvt_fa558386cdc164f101a65214f9f4a951___validate__(); /* c8 ignore stop */
   }
 };
 
@@ -38,6 +36,7 @@ suite(__filename, () => {
       'name': "global"
     });
     const logStream = simulator.stream.duplex();
+    const runnerName = "runner#0";
     suite("runWith()", () => {
       {
         test("when called, operator must run the action and return its returned value", () => {
@@ -56,16 +55,15 @@ suite(__filename, () => {
             const opts = {
               ["title"]: "the title",
               ["dataset"]: globalDataset,
-              ["log"]: logStream
+              ["log"]: logStream,
+              ["runnerName"]: runnerName
             };
             const out = op.runWith(123, opts);
-            const log = monitor.log(operator);
-            try {
-              expected(log).toHaveLen(1);
-              expected(log.calledWith([op, 123, opts])).equalTo(1);
-            } finally {
-              monitor.clearAll();
-            }
+            const log = monitor.log(operator, {
+              'clear': true
+            });
+            expected(log).toHaveLen(1);
+            expected(log.calledWith([op, 123, opts])).equalTo(1);
           }
         });
       }
@@ -88,16 +86,15 @@ suite(__filename, () => {
             const opts = {
               ["title"]: "the title",
               ["dataset"]: globalDataset,
-              ["log"]: logStream
+              ["log"]: logStream,
+              ["runnerName"]: runnerName
             };
             const out = op.run(opts);
-            const log = monitor.log(operator);
-            try {
-              expected(log).toHaveLen(1);
-              expected(log.calledWith([op, null, opts])).equalTo(1);
-            } finally {
-              monitor.clearAll();
-            }
+            const log = monitor.log(operator, {
+              'clear': true
+            });
+            expected(log).toHaveLen(1);
+            expected(log.calledWith([op, null, opts])).equalTo(1);
           }
         });
       }

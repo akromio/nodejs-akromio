@@ -5,8 +5,9 @@ const {
   PluginLoader
 } = _core.dogma.use(require("@akromio/core"));
 const {
+  Reporters,
   ConsoleReporter,
-  Reporters
+  LogReporter
 } = _core.dogma.use(require("@akromio/reporter"));
 const {
   JobCatalogParser
@@ -112,6 +113,14 @@ JobRunCommandBase.prototype.createReporters = function (reporterNames, log) {
           case "console":
             {
               reporters.append(ConsoleReporter({
+                'log': log
+              }));
+            } /* c8 ignore start */
+            break;
+          /* c8 ignore stop */
+          case "log":
+            {
+              reporters.append(LogReporter({
                 'log': log
               }));
             } /* c8 ignore start */

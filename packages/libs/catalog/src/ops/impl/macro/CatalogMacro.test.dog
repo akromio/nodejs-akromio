@@ -15,6 +15,7 @@ suite(__filename, proc()
     ctx = Context(log = nop)
     onError = "carryOn"
     title = "testing"
+    runnerName = "runner#0"
   )
 
   suite("isLoop()", proc()
@@ -65,7 +66,7 @@ suite(__filename, proc()
           {sudo = "docker ps"}
         ]
         macro = CatalogMacro(name = "test", steps, ops, operator)
-        call = Call(op = macro, dataset, onError, title, log, ctx)
+        call = Call(op = macro, dataset, onError, title, log, ctx, runnerName)
         out = macro.getSteps(call)
       )
 
@@ -133,7 +134,7 @@ suite(__filename, proc()
         cpOp = Action(name = "cp", fun = nop, operator = ActionOperator())
         ops = Ops().appendOp(cpOp)
         macro = CatalogMacro(name = "test", initializers = ["cp"], steps = [], ops, operator)
-        call = Call(op = macro, dataset, onError, title, log, ctx)
+        call = Call(op = macro, dataset, onError, title, log, ctx, runnerName)
         out = macro.getInitializerSteps(call)
       )
 
@@ -150,7 +151,7 @@ suite(__filename, proc()
         cpOp = Action(name = "cp", fun = nop, operator = ActionOperator())
         ops = Ops().appendOp(cpOp)
         macro = CatalogMacro(name = "test", finalizers = ["cp"], steps = [], ops, operator)
-        call = Call(op = macro, dataset, onError, title, log, ctx)
+        call = Call(op = macro, dataset, onError, title, log, ctx, runnerName)
         out = macro.getFinalizerSteps(call)
       )
 
@@ -169,7 +170,7 @@ suite(__filename, proc()
         forEach = ["list", "file1", "file2"]
         steps = []
         loop = CatalogMacro(name = "test", forEach, steps, ops, operator)
-        call = Call(op = loop, dataset, onError, title, log, ctx)
+        call = Call(op = loop, dataset, onError, title, log, ctx, runnerName)
         out = loop.getLoopCollection(call)
       )
 
