@@ -1,0 +1,89 @@
+use (
+  alias://expected
+  {monitor, sim, fun} = alias://doubles
+  LogReporter
+)
+
+suite(__filename, proc()
+  const (
+    log = sim.stream.readable()
+    ts = timestamp().toISOString()
+    id = "my-id"
+    title = "my title"
+    runner = {name = "runner#1"}
+  )
+
+  suite("_handleOpStart()", proc()
+    test("when e.level > nestingLevel, nothing to do", proc()
+      # (1) act
+      const (
+        print = monitor(fun.returns())
+        config = {print}
+        reporter = LogReporter(log=, config).start()
+        e = {id, ts, level = 100, runner, type = "opStart", opType = "simple", title}
+      )
+
+      reporter._handleOpStart(e)
+
+      # (2) assessment
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(0)
+    end)
+
+    test("when e.level <= nestingLevel, log must be performed", proc()
+      # (1) act
+      const (
+        print = monitor(fun.returns())
+        config = {print}
+        reporter = LogReporter(log=, config).start()
+        e = {id, ts, runner, type = "opStart", opType = "simple", title}
+      )
+
+      reporter.handleEvent(e)
+
+      # (2) assessment
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(1)
+      expected(plog.call.args).first.equalTo($"[${ts}] [${runner.name}] [${id}] '${title}'")
+    end)
+  end)
+
+  suite("_handleOpEnd()", proc()
+    const result = {kind = "ok", duration = 1234}
+
+    test("when e.level > nestingLevel, nothing to do", proc()
+      # (1) act
+      const (
+        print = monitor(fun.returns())
+        config = {print}
+        reporter = LogReporter(log=, config).start()
+        e = {id, ts, level = 100, runner, type = "opEnd", opType = "simple", title, result}
+      )
+
+      reporter._handleOpEnd(e)
+
+      # (2) assessment
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(0)
+    end)
+
+    test("when e.level <= nestingLevel, log must be performed", proc()
+      # (1) act
+      const (
+        print = monitor(fun.returns())
+        config = {print}
+        reporter = LogReporter(log=, config).start()
+        startEvent = {id, ts, runner, type = "opStart", opType = "simple", title}
+        endEvent = {id, ts, runner, type = "opEnd", opType = "simple", title, result}
+      )
+
+      reporter.handleEvent(startEvent).handleEvent(endEvent)
+
+      # (2) assessment
+      const plog = monitor.log(print, clear = true)
+      expected(plog.calls).equalTo(2)
+      # firstCall is start event
+      expected(plog.secondCall.args).first.equalTo($"[${ts}] [${runner.name}] [${id}] OK 1.234s")
+    end)
+  end)
+end)

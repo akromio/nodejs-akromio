@@ -41,8 +41,14 @@ export struct TriggerCommand: JobRunCommandBase
     {registryAndCatalogName} = baseOptions
     {arg} = baseOptions
     {onError} = baseOptions
-    {reporter} = baseOptions
-    {summaryReporter} = baseOptions
+
+    reporter = {
+      type = "array"
+      alias = ["p", "reporters"]
+      choices = ["none", "log"]
+      desc = "A reporter to notify the run events."
+      default = ["log"]
+    }
   }
 
   /**
@@ -53,7 +59,7 @@ export struct TriggerCommand: JobRunCommandBase
   
   @override @hidden
   pub async proc handle(
-    argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters, summaryReporters}
+    argv=> {triggerName, catalogName, registryAndCatalogName, onError, args, reporters}
   )
     # (1) create the registry instances to use
     const registries = await(self.createRegistries(argv).connect())
@@ -102,7 +108,7 @@ export struct TriggerCommand: JobRunCommandBase
           registries.getRegistry(decl.registryName)
         ))
       )
-      reporters = self.createReporters([], log).connect()
+      reporters = self.createReporters(reporters, log).connect()
       ops.appendOps(...values(catalog.jobs))
 
       # (8) create and run trigger

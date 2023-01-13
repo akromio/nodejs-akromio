@@ -1,0 +1,9 @@
+/**
+ * Default configuration to use with the log reporters.
+ */
+export {
+  print = print
+  format =
+    start = "[$(ts)] [$(runner)] [$(id)] '$(title)'"
+    end = "[$(ts)] [$(runner)] [$(id)] $(result) $(duration)"
+}

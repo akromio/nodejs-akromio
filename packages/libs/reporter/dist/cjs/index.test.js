@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, its api must be exported", () => {
       {
-        expected(index).toHave("Reporter", "ConsoleReporter", "ConsoleSummaryReporter");
+        expected(index).toHave("Reporter", "ConsoleReporter", "ConsoleSummaryReporter", "LogReporter");
       }
     });
   }

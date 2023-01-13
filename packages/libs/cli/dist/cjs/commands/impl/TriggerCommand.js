@@ -66,8 +66,13 @@ const $TriggerCommand = class TriggerCommand extends JobRunCommandBase {
         ["registryAndCatalogName"]: baseOptions.registryAndCatalogName,
         ["arg"]: baseOptions.arg,
         ["onError"]: baseOptions.onError,
-        ["reporter"]: baseOptions.reporter,
-        ["summaryReporter"]: baseOptions.summaryReporter
+        ["reporter"]: {
+          ["type"]: "array",
+          ["alias"]: ["p", "reporters"],
+          ["choices"]: ["none", "log"],
+          ["desc"]: "A reporter to notify the run events.",
+          ["default"]: ["log"]
+        }
       }),
       writable: false,
       enumerable: true
@@ -103,8 +108,7 @@ TriggerCommand.prototype.handle = async function (argv) {
     registryAndCatalogName,
     onError,
     args,
-    reporters,
-    summaryReporters
+    reporters
   } = argv;
   {
     const registries = (0, await this.createRegistries(argv).connect());
@@ -138,7 +142,7 @@ TriggerCommand.prototype.handle = async function (argv) {
         ["pluginParser"]: pluginParser,
         ["ops"]: ops
       }, registries.getRegistry(decl.registryName)));
-      reporters = this.createReporters([], log).connect();
+      reporters = this.createReporters(reporters, log).connect();
       ops.appendOps(...(0, _core.values)(catalog.jobs));
       const trigger = createTrigger(triggerName, catalog, stream, args);
       let code = 0;
