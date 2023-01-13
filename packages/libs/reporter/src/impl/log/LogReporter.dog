@@ -13,7 +13,7 @@ export struct LogReporter: Reporter
   /**
    * Nesting level to show.
    */
-  pub const nestingLevel := 1
+  pub const nestingLevel = _.nestingLevel ?? config.nestingLevel
 
   /**
    * Reporter configuration to use.
@@ -39,7 +39,7 @@ export struct LogReporter: Reporter
     # (2) build log message
     const log = self.format.start\
       .replace("$(ts)", e.ts)\
-      .replace("$(runner)", e.runner.name)\
+      .replace("$(runner)", e.runnerName)\
       .replace("$(id)", e.id)\
       .replace("$(title)", e.title)
 
@@ -54,7 +54,7 @@ export struct LogReporter: Reporter
     # (2) build log message
     const log = self.format.end\
       .replace("$(ts)", e.ts)\
-      .replace("$(runner)", e.runner.name)\
+      .replace("$(runner)", e.runnerName)\
       .replace("$(id)", e.id)\
       .replace("$(title)", e.title)\
       .replace("$(result)", e.result.kind.toUpperCase())\

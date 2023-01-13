@@ -14,9 +14,7 @@ suite(__filename, () => {
     const ts = (0, _core.timestamp)().toISOString();
     const id = "my-id";
     const title = "my title";
-    const runner = {
-      ["name"]: "runner#1"
-    };
+    const runnerName = "runner#1";
     suite("_handleOpStart()", () => {
       {
         test("when e.level > nestingLevel, nothing to do", () => {
@@ -27,13 +25,14 @@ suite(__filename, () => {
             };
             const reporter = LogReporter({
               'log': log,
+              'nestingLevel': 0,
               'config': config
             }).start();
             const e = {
               ["id"]: id,
               ["ts"]: ts,
               ["level"]: 100,
-              ["runner"]: runner,
+              ["runnerName"]: runnerName,
               ["type"]: "opStart",
               ["opType"]: "simple",
               ["title"]: title
@@ -58,7 +57,7 @@ suite(__filename, () => {
             const e = {
               ["id"]: id,
               ["ts"]: ts,
-              ["runner"]: runner,
+              ["runnerName"]: runnerName,
               ["type"]: "opStart",
               ["opType"]: "simple",
               ["title"]: title
@@ -68,7 +67,7 @@ suite(__filename, () => {
               'clear': true
             });
             expected(plog.calls).equalTo(1);
-            expected(plog.call.args).first.equalTo(`[${ts}] [${runner.name}] [${id}] '${title}'`);
+            expected(plog.call.args).first.equalTo(`[${ts}] [${runnerName}] [${id}] '${title}'`);
           }
         });
       }
@@ -93,7 +92,7 @@ suite(__filename, () => {
               ["id"]: id,
               ["ts"]: ts,
               ["level"]: 100,
-              ["runner"]: runner,
+              ["runnerName"]: runnerName,
               ["type"]: "opEnd",
               ["opType"]: "simple",
               ["title"]: title,
@@ -119,7 +118,7 @@ suite(__filename, () => {
             const startEvent = {
               ["id"]: id,
               ["ts"]: ts,
-              ["runner"]: runner,
+              ["runnerName"]: runnerName,
               ["type"]: "opStart",
               ["opType"]: "simple",
               ["title"]: title
@@ -127,7 +126,7 @@ suite(__filename, () => {
             const endEvent = {
               ["id"]: id,
               ["ts"]: ts,
-              ["runner"]: runner,
+              ["runnerName"]: runnerName,
               ["type"]: "opEnd",
               ["opType"]: "simple",
               ["title"]: title,
@@ -138,7 +137,7 @@ suite(__filename, () => {
               'clear': true
             });
             expected(plog.calls).equalTo(2);
-            expected(plog.secondCall.args).first.equalTo(`[${ts}] [${runner.name}] [${id}] OK 1.234s`);
+            expected(plog.secondCall.args).first.equalTo(`[${ts}] [${runnerName}] [${id}] '${title}' OK 1.234s`);
           }
         });
       }

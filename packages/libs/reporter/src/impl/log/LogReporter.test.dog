@@ -10,7 +10,7 @@ suite(__filename, proc()
     ts = timestamp().toISOString()
     id = "my-id"
     title = "my title"
-    runner = {name = "runner#1"}
+    runnerName = "runner#1"
   )
 
   suite("_handleOpStart()", proc()
@@ -19,8 +19,8 @@ suite(__filename, proc()
       const (
         print = monitor(fun.returns())
         config = {print}
-        reporter = LogReporter(log=, config).start()
-        e = {id, ts, level = 100, runner, type = "opStart", opType = "simple", title}
+        reporter = LogReporter(log=, nestingLevel = 0, config).start()
+        e = {id, ts, level = 100, runnerName, type = "opStart", opType = "simple", title}
       )
 
       reporter._handleOpStart(e)
@@ -36,7 +36,7 @@ suite(__filename, proc()
         print = monitor(fun.returns())
         config = {print}
         reporter = LogReporter(log=, config).start()
-        e = {id, ts, runner, type = "opStart", opType = "simple", title}
+        e = {id, ts, runnerName, type = "opStart", opType = "simple", title}
       )
 
       reporter.handleEvent(e)
@@ -44,7 +44,7 @@ suite(__filename, proc()
       # (2) assessment
       const plog = monitor.log(print, clear = true)
       expected(plog.calls).equalTo(1)
-      expected(plog.call.args).first.equalTo($"[${ts}] [${runner.name}] [${id}] '${title}'")
+      expected(plog.call.args).first.equalTo($"[${ts}] [${runnerName}] [${id}] '${title}'")
     end)
   end)
 
@@ -57,7 +57,7 @@ suite(__filename, proc()
         print = monitor(fun.returns())
         config = {print}
         reporter = LogReporter(log=, config).start()
-        e = {id, ts, level = 100, runner, type = "opEnd", opType = "simple", title, result}
+        e = {id, ts, level = 100, runnerName, type = "opEnd", opType = "simple", title, result}
       )
 
       reporter._handleOpEnd(e)
@@ -73,8 +73,8 @@ suite(__filename, proc()
         print = monitor(fun.returns())
         config = {print}
         reporter = LogReporter(log=, config).start()
-        startEvent = {id, ts, runner, type = "opStart", opType = "simple", title}
-        endEvent = {id, ts, runner, type = "opEnd", opType = "simple", title, result}
+        startEvent = {id, ts, runnerName, type = "opStart", opType = "simple", title}
+        endEvent = {id, ts, runnerName, type = "opEnd", opType = "simple", title, result}
       )
 
       reporter.handleEvent(startEvent).handleEvent(endEvent)
@@ -83,7 +83,7 @@ suite(__filename, proc()
       const plog = monitor.log(print, clear = true)
       expected(plog.calls).equalTo(2)
       # firstCall is start event
-      expected(plog.secondCall.args).first.equalTo($"[${ts}] [${runner.name}] [${id}] OK 1.234s")
+      expected(plog.secondCall.args).first.equalTo($"[${ts}] [${runnerName}] [${id}] '${title}' OK 1.234s")
     end)
   end)
 end)

@@ -50,6 +50,7 @@ Operator.prototype.emitOpStart = function (call) {
   _core.dogma.expect("call", call, Call);
   {
     e = {
+      ["runnerName"]: call.runnerName,
       ["type"]: "opStart",
       ["opType"]: getOpTypeOf(call.op),
       ["id"]: call.id,
@@ -67,9 +68,11 @@ Operator.prototype.emitOpEnd = function (call, result) {
   _core.dogma.expect("result", result);
   {
     e = {
+      ["runnerName"]: call.runnerName,
       ["type"]: "opEnd",
       ["opType"]: getOpTypeOf(call.op),
       ["id"]: call.id,
+      ["title"]: call.title,
       ["ts"]: (0, _core.timestamp)(),
       ["result"]: Object.assign({}, {
         ["kind"]: result.kind,
@@ -104,6 +107,7 @@ Operator.prototype.emitOpLog = function (call, content) {
       }
     }
     e = {
+      ["runnerName"]: call.runnerName,
       ["type"]: "opLog",
       ["opType"]: getOpTypeOf(call.op),
       ["id"]: call.id,

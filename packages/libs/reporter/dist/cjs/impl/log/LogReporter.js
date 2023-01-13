@@ -9,13 +9,13 @@ const {
 const Reporter = _core.dogma.use(require("../../Reporter"));
 const $LogReporter = class LogReporter extends Reporter {
   constructor(_) {
+    var _$nestingLevel;
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
-    if (_['nestingLevel'] != null) (0, _core.expect)('nestingLevel', _['nestingLevel'], _core.num); /* c8 ignore stop */
+    /* c8 ignore stop */
     Object.defineProperty(this, 'nestingLevel', {
-      value: (0, _core.coalesce)(_['nestingLevel'], 1),
+      value: (0, _core.coalesce)(_['nestingLevel'], (_$nestingLevel = _.nestingLevel) !== null && _$nestingLevel !== void 0 ? _$nestingLevel : config.nestingLevel),
       writable: false,
       enumerable: true
     });
@@ -64,7 +64,7 @@ LogReporter.prototype._handleOpStart = function (e) {
     if (e.level > this.nestingLevel) {
       return;
     }
-    const log = this.format.start.replace("$(ts)", e.ts).replace("$(runner)", e.runner.name).replace("$(id)", e.id).replace("$(title)", e.title);
+    const log = this.format.start.replace("$(ts)", e.ts).replace("$(runner)", e.runnerName).replace("$(id)", e.id).replace("$(title)", e.title);
     this.print(log);
   }
 };
@@ -75,7 +75,7 @@ LogReporter.prototype._handleOpEnd = function (e) {
     if (e.level > this.nestingLevel) {
       return;
     }
-    const log = this.format.end.replace("$(ts)", e.ts).replace("$(runner)", e.runner.name).replace("$(id)", e.id).replace("$(title)", e.title).replace("$(result)", e.result.kind.toUpperCase()).replace("$(duration)", fmtDuration(e.result.duration).replace(" ", ""));
+    const log = this.format.end.replace("$(ts)", e.ts).replace("$(runner)", e.runnerName).replace("$(id)", e.id).replace("$(title)", e.title).replace("$(result)", e.result.kind.toUpperCase()).replace("$(duration)", fmtDuration(e.result.duration).replace(" ", ""));
     this.print(log);
   }
 };
