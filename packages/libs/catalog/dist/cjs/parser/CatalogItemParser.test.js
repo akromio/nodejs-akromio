@@ -10,7 +10,13 @@ const $CatalogItem = class CatalogItem extends CatalogItemBase {
     super(_);
     /* c8 ignore start */
     if (_ == null) _ = {};
-    /* c8 ignore stop */ /* c8 ignore start */
+    /* c8 ignore stop */
+    Object.defineProperty(this, 'dataset', {
+      value: (0, _core.coalesce)(_['dataset'], null),
+      writable: false,
+      enumerable: true
+    });
+    /* c8 ignore start */
     if (this._pvt_8ab00b20cff63ad569160857bdbc3f35___init__ instanceof Function) this._pvt_8ab00b20cff63ad569160857bdbc3f35___init__(_); /* c8 ignore stop */
     /* c8 ignore start */
     if (this._pvt_8ab00b20cff63ad569160857bdbc3f35___post__ instanceof Function) this._pvt_8ab00b20cff63ad569160857bdbc3f35___post__(); /* c8 ignore stop */
@@ -82,7 +88,7 @@ suite(__filename, () => {
     });
     suite("parseGroup()", () => {
       {
-        test("when group, the items must have the group name as tag", () => {
+        test("when group w/o dataset, its items must have the group name as tag", () => {
           {
             const macro = {
               ["macro"]: "test",
@@ -97,6 +103,37 @@ suite(__filename, () => {
             expected(out.test).toBe(CatalogItem).toHave({
               'name': "test",
               'tags': ["grp"]
+            });
+          }
+        });
+        test("group w/ dataset, its items must have the group name as tag and the dataset", () => {
+          {
+            const macro1 = {
+              ["macro"]: "macro1",
+              ["tags"]: [],
+              ["steps"]: []
+            };
+            const macro2 = {
+              ["macro"]: "macro2",
+              ["dataset"]: ["job"],
+              ["tags"]: [],
+              ["steps"]: []
+            };
+            const decl = {
+              ["group"]: "grp",
+              ["dataset"]: ["group"],
+              ["jobs"]: [macro1, macro2]
+            };
+            const out = parser.parse(decl, parseOpts);
+            expected(out.macro1).toBe(CatalogItem).toHave({
+              'name': "macro1",
+              'tags': ["grp"],
+              'dataset': ["group"]
+            });
+            expected(out.macro2).toBe(CatalogItem).toHave({
+              'name': "macro2",
+              'tags': ["grp"],
+              'dataset': ["group", "job"]
             });
           }
         });

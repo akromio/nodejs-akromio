@@ -47,6 +47,7 @@ export struct CatalogItemParser
 
     # (2) parse the items
     for each item := decl[self.itemName + "s"] do
+      if ds ::= decl.dataset then item = item{*, dataset = ds.concat(item.dataset ?? [])}
       item = self.parseItem(item, opts)
       item.tags.push(tag)
       items.push(item)

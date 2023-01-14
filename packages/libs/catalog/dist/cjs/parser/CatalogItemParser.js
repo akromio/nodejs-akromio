@@ -49,6 +49,15 @@ CatalogItemParser.prototype.parseGroup = function (decl, opts) {
   {
     const tag = decl.group;
     for (let item of _core.dogma.getItem(decl, this.itemName + "s")) {
+      {
+        const ds = decl.dataset;
+        if (ds) {
+          var _item$dataset;
+          item = _core.dogma.clone(item, {
+            "dataset": ds.concat((_item$dataset = item.dataset) !== null && _item$dataset !== void 0 ? _item$dataset : [])
+          }, {}, [], []);
+        }
+      }
       item = this.parseItem(item, opts);
       item.tags.push(tag);
       items.push(item);

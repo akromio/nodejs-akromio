@@ -8,6 +8,7 @@ use (
 
 # Test catalog item to use.
 struct CatalogItem: CatalogItemBase
+  pub const dataset?
 
 # Test ìtem parser to use.
 struct CatalogItemParser: CatalogItemParserBase
@@ -37,7 +38,7 @@ suite(__filename, proc()
   end)
 
   suite("parseGroup()", proc()
-    test("when group, the items must have the group name as tag", proc()
+    test("when group w/o dataset, its items must have the group name as tag", proc()
       # (1) act
       const (
         macro = {macro = "test", tags = [], steps = []}
@@ -47,6 +48,29 @@ suite(__filename, proc()
 
       # (2) assessment
       expected(out.test).toBe(CatalogItem).toHave(name = "test", tags = ["grp"])
+    end)
+
+    test("group w/ dataset, its items must have the group name as tag and the dataset", proc()
+      # (1) act
+      const (
+        macro1 = {macro = "macro1", tags = [], steps = []}
+        macro2 = {macro = "macro2", dataset = ["job"], tags = [], steps = []}
+        decl = {group = "grp", dataset = ["group"], jobs = [macro1, macro2]}
+        out = parser.parse(decl, parseOpts)
+      )
+
+      # (2) assessment
+      expected(out.macro1).toBe(CatalogItem).toHave(
+        name = "macro1"
+        tags = ["grp"]
+        dataset = ["group"]
+      )
+
+      expected(out.macro2).toBe(CatalogItem).toHave(
+        name = "macro2"
+        tags = ["grp"]
+        dataset = ["group", "job"]
+      )
     end)
   end)
 end)
