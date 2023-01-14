@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-select",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "description": "Plugin for selecting fields from an object on Akromio.",
   "author": {
     "name": "Sia Codelabs",

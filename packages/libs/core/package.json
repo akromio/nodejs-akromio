@@ -1,6 +1,6 @@
 {
   "name": "@akromio/core",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "description": "Core library for Akromio.",
   "author": {
     "name": "Sia Codelabs",
@@ -30,13 +30,13 @@
     "npm": ">= 8"
   },
   "dependencies": {
-    "@akromio/dataset": "^0.18.1",
+    "@akromio/dataset": "^0.18.2",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "array-shuffle": "^2.0.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@akromio/range": "^0.18.1"
+    "@akromio/range": "^0.18.2"
   },
   "scripts": {
     "lint": "dogmac check src tests",
