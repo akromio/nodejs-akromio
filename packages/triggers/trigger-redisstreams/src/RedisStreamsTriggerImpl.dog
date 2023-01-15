@@ -1,5 +1,9 @@
 /**
  * A trigger implementation to fire an event read from a Redis Stream stream.
+ *
+ *
+ * This is a pull trigger due to the consumer must query the next data
+ * to handle explicitly.
  */
 export struct RedisStreamsTriggerImpl
   /**
@@ -46,10 +50,6 @@ export struct RedisStreamsTriggerImpl
 
   /**
    * Starts the trigger.
-   *
-   * @dev
-   * Right now, the stream is queried every 333ms.
-   * If no message waiting, wait for the next interval.
    */
   pub fn start(handler: func) -> self
     # (1) pre: connect to Redis instance

@@ -1,0 +1,37 @@
+use (
+  alias://expected
+  {sim, monitor, method} = alias://doubles
+
+  RedisPubSubDistributor
+)
+
+suite(__filename, proc()
+  suite("deliver()", proc()
+    test("when called, redis.publish() must be called", async proc()
+      # (1) act
+      const (
+        ts = timestamp().valueOf()
+        assignTs = ts
+        req = {ts, assignTs, job = "job1", assignee = "cavani1"}
+        redis = monitor(
+          sim(
+            connect = method.resolves()
+            publish = method.resolves()
+            disconnect = method.resolves()
+          )
+          method = "publish"
+        )
+        input = sim.stream.readable(objectMode = true)
+        distributor = RedisPubSubDistributor(input=, redis)
+      )
+
+      await(distributor.start())
+      await(distributor.deliver(req))
+
+      # (2) assessment
+      const dlog = monitor.log(redis, clear = true)
+      expected(dlog.calls).equalTo(1)
+      expected(dlog.firstCall.args).equalTo([req.assignee, json.encode(req)])
+    end)
+  end)
+end)

@@ -106,7 +106,6 @@ export struct JobRunCommand: JobRunCommandBase
         else
           if [ok, value] ::= pawait(engine.run({jobName})); not ok then
             code = 1
-            if value then printf(value)
       finally
         await(catalog.finalize())
     finally

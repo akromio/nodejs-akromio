@@ -6,7 +6,7 @@ use (
   {Stage, ConstStage, ExitStage, IncStage, SleepStage} = alias://stages
   {ConstStarter, ExitStarter, IncStarter, SleepStarter, BlankSheetStream} = alias://generator
   {RandomAssigner, Ring, RunReqStream} = alias://generator
-  {Distributors, ConsoleDistributor, RedisStreamsDistributor} = alias://generator
+  {Distributors, ConsoleDistributor, RedisPubSubDistributor, RedisStreamsDistributor} = alias://generator
   {ConstDatum} = alias://dataset
 
   _StageCommand
@@ -305,6 +305,7 @@ fn createDistributor(
     distributor = ConsoleDistributor(props)
   else
     with i ::= botnet.impl do
+      if "redispubsub" then distributor = createRedisPubSubDistributor(props, botnet, opts)
       if "redisstreams" then distributor = createRedisStreamsDistributor(props, botnet, opts)
       else throw(TypeError($"Unknown botnet impl: ${i}."))
     
@@ -329,3 +330,18 @@ fn createRedisStreamsDistributor(props, botnet, opts:> {name: text}) -> distribu
   }
 
   distributor = RedisStreamsDistributor(props{*, redis = redis.createClient(opts)})
+
+/**
+ * Creates a Redis Pub/Sub distributor.
+ */
+fn createRedisPubSubDistributor(props, botnet, opts:> {name: text}) -> distributor: RedisPubSubDistributor
+  const opts = {
+    name
+    socket =
+      host = botnet.host ?? "localhost"
+      port = botnet.port ?? 6379
+    if botnet.username then username = botnet.username
+    if botnet.password then password = botnet.password
+  }
+
+  distributor = RedisPubSubDistributor(props{*, redis = redis.createClient(opts)})

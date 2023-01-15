@@ -6,6 +6,7 @@ use (
   {TriggeredJobCatalogParser} = alias://jobs
   alias://intervalTriggerImpl
   alias://redisStreamsTriggerImpl
+  alias://redisPubSubTriggerImpl
   alias://range
 
   ../JobRunCommandBase
@@ -142,25 +143,51 @@ fn createTrigger(name, cat, stream, jobArgs?) -> trigger
     throw(TypeError($"trigger name expected."))
 
   # (2) create trigger
-  var decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
+  var (
+    Trigger     # trigger type to use for creating the final trigger: push or pull
+    TriggerImpl # trigger impl type to use for creating the final trigger
+    decl = cat.triggers[name] ?? throw(TypeError($"Trigger not found: ${name}."))
+  )
 
+  # determine Trigger and TriggerImpl to use
   with i ::= decl.impl ?? name do
     if "interval" then
-      const TriggerImpl = intervalTriggerImpl.impl
-      trigger = PushTrigger(name=, stream, triggerImpl = TriggerImpl(decl))
+      TriggerImpl = intervalTriggerImpl.impl
+      Trigger = PushTrigger
+    
+    if "redispubsub" then
+      const (
+        opts = {
+          name = $"${decl.group}#${decl.consumer}"
+          socket =
+            host = decl.host ?? "localhost"
+            port = decl.port ?? 6379
+          if decl.username then username = decl.username
+          if decl.password then password = decl.password
+        }
+      )
+
+      decl = decl{*, redis = redis.createClient(opts)}
+      TriggerImpl = redisPubSubTriggerImpl.impl
+      Trigger = PushTrigger
 
     if "redisstreams" then
-      const opts = {
-        name = $"${decl.group}#${decl.consumer}"
-        socket =
-          host = decl.host ?? "localhost"
-          port = decl.port ?? 6379
-        if decl.username then username = decl.username
-        if decl.password then password = decl.password
-      }
+      const (
+        opts = {
+          name = $"${decl.group}#${decl.consumer}"
+          socket =
+            host = decl.host ?? "localhost"
+            port = decl.port ?? 6379
+          if decl.username then username = decl.username
+          if decl.password then password = decl.password
+        }
+      )
 
-      const TriggerImpl = redisStreamsTriggerImpl.impl
       decl = decl{*, redis = redis.createClient(opts)}
-      trigger = PullTrigger(name=, stream, triggerImpl = TriggerImpl(decl))
+      TriggerImpl = redisStreamsTriggerImpl.impl
+      Trigger = PullTrigger
     
     else throw(TypeError($"Invalid trigger implementation: ${i}."))
+
+  # create trigger instance
+  trigger = Trigger(name=, stream, triggerImpl = TriggerImpl(decl))

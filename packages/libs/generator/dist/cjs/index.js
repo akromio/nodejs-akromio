@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RandomAssigner = exports.IncStarter = exports.ExitStarter = exports.Distributors = exports.DistributorBase = exports.Distributor = exports.ConstStarter = exports.ConsoleDistributor = exports.BlankSheetStream = exports.Assigner = void 0;
+exports.StarterState = exports.Starter = exports.SleepStarter = exports.RunReqStream = exports.RunReq = exports.Ring = exports.RedisStreamsDistributor = exports.RedisPubSubDistributor = exports.RandomAssigner = exports.IncStarter = exports.ExitStarter = exports.Distributors = exports.DistributorBase = exports.Distributor = exports.ConstStarter = exports.ConsoleDistributor = exports.BlankSheetStream = exports.Assigner = void 0;
 var _core = require("@dogmalang/core");
 const BlankSheetStream = _core.dogma.use(require("./starters/BlankSheetStream"));
 exports.BlankSheetStream = BlankSheetStream;
@@ -37,5 +37,7 @@ const DistributorBase = _core.dogma.use(require("./distributors/impl/Distributor
 exports.DistributorBase = DistributorBase;
 const ConsoleDistributor = _core.dogma.use(require("./distributors/impl/console/ConsoleDistributor"));
 exports.ConsoleDistributor = ConsoleDistributor;
-const RedisStreamsDistributor = _core.dogma.use(require("./distributors/impl/redis/RedisStreamsDistributor"));
+const RedisStreamsDistributor = _core.dogma.use(require("./distributors/impl/redisstreams/RedisStreamsDistributor"));
 exports.RedisStreamsDistributor = RedisStreamsDistributor;
+const RedisPubSubDistributor = _core.dogma.use(require("./distributors/impl/redispubsub/RedisPubSubDistributor"));
+exports.RedisPubSubDistributor = RedisPubSubDistributor;

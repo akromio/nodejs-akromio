@@ -124,7 +124,6 @@ EnvCommand.prototype.buildRows = function (pattern) {
     };
     pattern = (0, _core.re)(`${pattern}`.replace("*", ".*"));
     rows = [["Variable", "Value", "Desc."]];
-    (0, _core.printf)(pattern);
     for (const name of (0, _core.keys)(vars).sort()) {
       {
         const prefixedName = prefix + name;

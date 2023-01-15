@@ -130,9 +130,6 @@ JobRunCommand.prototype.handle = async function (argv) {
             }));
             if (!ok) {
               code = 1;
-              if (value) {
-                (0, _core.printf)(value);
-              }
             }
           }
         }

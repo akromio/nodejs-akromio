@@ -1,0 +1,28 @@
+use (
+  ../DistributorBase
+  ../../../assigners/RunReq
+)
+
+/**
+ * A distributor to deliver run requests to Redis Pub/Sub channels.
+ */
+export struct RedisPubSubDistributor: DistributorBase
+  /**
+   * Redis client to use.
+   */
+  pub const redis
+
+  @hidden @async
+  pub fn connect() = self.redis.connect()
+  
+  /**
+   * @dev
+   * We perform a sleep for the Redis internal queue to be flushed.
+   */
+  @hidden
+  pub async proc disconnect()
+    await(sleep("100ms"))
+    pawait(self.redis.disconnect())
+
+  @override @hidden @async
+  pub fn deliver(req: RunReq) = self.redis.publish(req.assignee, json.encode(req))

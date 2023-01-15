@@ -21,6 +21,7 @@ suite(__filename, proc()
       "DistributorBase"
       "Distributors"
       "ConsoleDistributor"
+      "RedisPubSubDistributor"
       "RedisStreamsDistributor"
     ])
   end)

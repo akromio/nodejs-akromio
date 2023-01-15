@@ -15,6 +15,7 @@
     "lcov",
     "luxon",
     "mocharc",
+    "redispubsub",
     "redisstreams"
   ]
 }
