@@ -7,7 +7,9 @@ suite(__filename, () => {
   {
     test("when imported, api must be exported", () => {
       {
-        expected(index).toHave(["StarterState", "Starter", "ConstStarter", "ExitStarter", "IncStarter", "SleepStarter", "Assigner", "RandomAssigner", "Ring", "Distributor", "DistributorBase", "Distributors", "ConsoleDistributor", "RedisPubSubDistributor", "RedisStreamsDistributor"]);
+        expected(index).toHave({
+          'name': "redispubsub"
+        }).member("desc").toBeText().member("impl").toBeCallable();
       }
     });
   }

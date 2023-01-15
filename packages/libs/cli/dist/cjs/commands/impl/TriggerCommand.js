@@ -21,6 +21,7 @@ const {
 } = _core.dogma.use(require("@akromio/jobs"));
 const intervalTriggerImpl = _core.dogma.use(require("@akromio/trigger-interval"));
 const redisStreamsTriggerImpl = _core.dogma.use(require("@akromio/trigger-redisstreams"));
+const redisPubSubTriggerImpl = _core.dogma.use(require("@akromio/trigger-redispubsub"));
 const range = _core.dogma.use(require("@akromio/range"));
 const JobRunCommandBase = _core.dogma.use(require("../JobRunCommandBase"));
 const {
@@ -167,6 +168,8 @@ function createTrigger(name, cat, stream, jobArgs) {
     if (!(name = (_name = name) !== null && _name !== void 0 ? _name : cat.defaultTriggerName)) {
       _core.dogma.raise(TypeError(`trigger name expected.`));
     }
+    let Trigger;
+    let TriggerImpl;
     let decl = (_dogma$getItem = _core.dogma.getItem(cat.triggers, name)) !== null && _dogma$getItem !== void 0 ? _dogma$getItem : _core.dogma.raise(TypeError(`Trigger not found: ${name}.`));
     {
       var _decl$impl;
@@ -174,16 +177,12 @@ function createTrigger(name, cat, stream, jobArgs) {
       switch (i) {
         case "interval":
           {
-            const TriggerImpl = intervalTriggerImpl.impl;
-            trigger = PushTrigger({
-              'name': name,
-              'stream': stream,
-              'triggerImpl': TriggerImpl(decl)
-            });
+            TriggerImpl = intervalTriggerImpl.impl;
+            Trigger = PushTrigger;
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
-        case "redisstreams":
+        case "redispubsub":
           {
             var _decl$host, _decl$port;
             const opts = Object.assign({}, {
@@ -197,15 +196,33 @@ function createTrigger(name, cat, stream, jobArgs) {
             } : {}, decl.password ? {
               ["password"]: decl.password
             } : {});
-            const TriggerImpl = redisStreamsTriggerImpl.impl;
             decl = _core.dogma.clone(decl, {
               "redis": redis.createClient(opts)
             }, {}, [], []);
-            trigger = PullTrigger({
-              'name': name,
-              'stream': stream,
-              'triggerImpl': TriggerImpl(decl)
-            });
+            TriggerImpl = redisPubSubTriggerImpl.impl;
+            Trigger = PushTrigger;
+          } /* c8 ignore start */
+          break;
+        /* c8 ignore stop */
+        case "redisstreams":
+          {
+            var _decl$host2, _decl$port2;
+            const opts = Object.assign({}, {
+              ["name"]: `${decl.group}#${decl.consumer}`,
+              ["socket"]: {
+                ["host"]: (_decl$host2 = decl.host) !== null && _decl$host2 !== void 0 ? _decl$host2 : "localhost",
+                ["port"]: (_decl$port2 = decl.port) !== null && _decl$port2 !== void 0 ? _decl$port2 : 6379
+              }
+            }, decl.username ? {
+              ["username"]: decl.username
+            } : {}, decl.password ? {
+              ["password"]: decl.password
+            } : {});
+            decl = _core.dogma.clone(decl, {
+              "redis": redis.createClient(opts)
+            }, {}, [], []);
+            TriggerImpl = redisStreamsTriggerImpl.impl;
+            Trigger = PullTrigger;
           } /* c8 ignore start */
           break;
         /* c8 ignore stop */
@@ -215,6 +232,11 @@ function createTrigger(name, cat, stream, jobArgs) {
           }
       }
     }
+    trigger = Trigger({
+      'name': name,
+      'stream': stream,
+      'triggerImpl': TriggerImpl(decl)
+    });
   }
   return trigger;
 }

@@ -1,0 +1,9 @@
+use (
+  RedisPubSubTriggerImpl
+)
+
+export {
+  name = "redispubsub"
+  desc = "Trigger for firing an event reading from a Redis Pub/Sub channel."
+  impl = RedisPubSubTriggerImpl
+}

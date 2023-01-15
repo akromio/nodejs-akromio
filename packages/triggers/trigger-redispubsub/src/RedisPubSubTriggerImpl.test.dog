@@ -1,0 +1,75 @@
+use (
+  alias://expected
+  {monitor, sim, fun, method} = alias://doubles
+
+  RedisPubSubTriggerImpl
+)
+
+suite(__filename, proc()
+  const channel ="cavani"
+
+  suite("start()", proc()
+    test("when called, redis.connect() and redis.subscribe() must be called", async proc()
+      # (1) act
+      const (
+        handler = nop
+        redis = monitor(sim(connect = method.resolves(), subscribe = method.resolves()))
+        trigger = RedisPubSubTriggerImpl(redis=, channel)
+        out = trigger.start(handler)
+      )
+
+      await(sleep("100ms"))
+
+      # (2) assessment
+      expected(out).sameAs(trigger).toHave(fired = 0, handler)
+      
+      const rlog = monitor.log(redis, clear = true)
+      expected(rlog.calls).equalTo(2)
+      expected(rlog.firstCall.args).equalTo([]) # connect()
+      expected(rlog.secondCall.args).first.equalTo(channel).second.toBeFn() # subscribe
+    end)
+  end)
+
+  suite("publish", proc()
+    test("when new message received, handler must be called", async proc()
+      # (1) act
+      var (
+        subHandler
+        redis ::= sim(
+          connect = method.resolves()
+          subscribe = method.invokes(proc(ch, hdlr)
+            subHandler = monitor(hdlr)
+          end)
+        )
+        trigger ::= RedisPubSubTriggerImpl(redis=, channel)
+        call ::= {jobName = "job-name"}
+      )
+
+      trigger.start(nop)
+      await(sleep("100ms"))
+      subHandler(json.encode(call))
+
+      # (2) assessment
+      const shlog = monitor.log(subHandler, clear = true)
+      expected(shlog.calls).equalTo(1)
+      expected(shlog.call.args).first.equalTo(json.encode(call))
+    end)
+  end)
+
+  suite("stop()", proc()
+    test("when called, redis.disconnect() must be called and instante niled", proc()
+      # (1) act
+      const (
+        redis = monitor(sim(disconnect = method.returns()), method = "disconnect")
+        trigger = RedisPubSubTriggerImpl(redis=, channel)
+        out = trigger.stop()
+      )
+
+      # (2) assessment
+      expected(out).sameAs(trigger).toHave(handler = nil)
+      
+      const disconnect = monitor.log(redis, clear = true)
+      expected(disconnect.calls).equalTo(1)
+    end)
+  end)
+end)

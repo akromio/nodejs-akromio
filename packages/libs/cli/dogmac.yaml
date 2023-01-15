@@ -23,3 +23,5 @@ uses:
     js: "@akromio/trigger-interval"
   redisStreamsTriggerImpl:
     js: "@akromio/trigger-redisstreams"
+  redisPubSubTriggerImpl:
+    js: "@akromio/trigger-redispubsub"

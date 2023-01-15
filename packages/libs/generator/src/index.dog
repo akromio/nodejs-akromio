@@ -18,5 +18,6 @@ pub use (
   distributors/Distributors
   distributors/impl/DistributorBase
   distributors/impl/console/ConsoleDistributor
-  distributors/impl/redis/RedisStreamsDistributor
+  distributors/impl/redisstreams/RedisStreamsDistributor
+  distributors/impl/redispubsub/RedisPubSubDistributor
 )

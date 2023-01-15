@@ -31,6 +31,7 @@ const {
 const {
   Distributors,
   ConsoleDistributor,
+  RedisPubSubDistributor,
   RedisStreamsDistributor
 } = _core.dogma.use(require("@akromio/generator"));
 const {
@@ -482,6 +483,12 @@ function createDistributor(assignerOutput, botnet, opts) {
       {
         const i = botnet.impl;
         switch (i) {
+          case "redispubsub":
+            {
+              distributor = createRedisPubSubDistributor(props, botnet, opts);
+            } /* c8 ignore start */
+            break;
+          /* c8 ignore stop */
           case "redisstreams":
             {
               distributor = createRedisStreamsDistributor(props, botnet, opts);
@@ -533,6 +540,38 @@ function createRedisStreamsDistributor(props, botnet, opts) {
       ["password"]: botnet.password
     } : {});
     distributor = RedisStreamsDistributor(_core.dogma.clone(props, {
+      "redis": redis.createClient(opts)
+    }, {}, [], []));
+  }
+  return distributor;
+}
+function createRedisPubSubDistributor(props, botnet, opts) {
+  let distributor; /* c8 ignore next */
+  _core.dogma.expect("props", props); /* c8 ignore next */
+  _core.dogma.expect("botnet", botnet); /* c8 ignore next */
+  _core.dogma.expect("opts", opts, _core.dogma.intf("inline", {
+    name: {
+      optional: false,
+      type: _core.text
+    }
+  }));
+  let {
+    name
+  } = opts;
+  {
+    var _botnet$host2, _botnet$port2;
+    const opts = Object.assign({}, {
+      ["name"]: name,
+      ["socket"]: {
+        ["host"]: (_botnet$host2 = botnet.host) !== null && _botnet$host2 !== void 0 ? _botnet$host2 : "localhost",
+        ["port"]: (_botnet$port2 = botnet.port) !== null && _botnet$port2 !== void 0 ? _botnet$port2 : 6379
+      }
+    }, botnet.username ? {
+      ["username"]: botnet.username
+    } : {}, botnet.password ? {
+      ["password"]: botnet.password
+    } : {});
+    distributor = RedisPubSubDistributor(_core.dogma.clone(props, {
       "redis": redis.createClient(opts)
     }, {}, [], []));
   }

@@ -1,0 +1,68 @@
+/**
+ * A trigger implementation to fire an event got from a Redis Pub/Sub channel.
+ *
+ * This is a push trigger due to Redis sends the events when these are fired.
+ */
+export struct RedisStreamsTriggerImpl
+  /**
+   * Redis client to use for querying the stream.
+   */
+  @hidden
+  pub const redis
+
+  /**
+   * Redis Pub/Sub channel name.
+   */
+  pub const channel: text
+
+  /**
+   * Number of times the trigger must be fired.
+   *
+   * If unset, infinite.
+   */
+  pub const times?: num
+
+  /**
+   * Number of times fired up to now.
+   */
+  @hidden @strict
+  pub var fired = 0
+
+  /**
+   * Handler to call when event fired.
+   *
+   * Prototype: proc(e: {ts: timestamp, payload: map}).
+   */
+  @hidden
+  pub var handler?: func
+
+  /**
+   * Starts the trigger.
+   *
+   * @dev
+   * Right now, the stream is queried every 333ms.
+   * If no message waiting, wait for the next interval.
+   */
+  pub fn start(handler: func) -> self
+    # (1) pre: connect to Redis instance and subscribe to channel
+    self.redis.connect().then(proc()
+      self.redis.subscribe(self.channel, proc(msg)
+        const (
+          call = json.decode(msg)
+          e = {call = call{*, jobName = call.job}}
+        )
+        
+        self.handler(e{*, jobName = e.call.job})
+      end)
+    end)
+
+    # (2) initialize
+    self.{handler, fired = 0}
+  
+  /**
+   * Stops de trigger.
+   */
+  pub fn stop() -> self
+    self.handler = nil
+    self.redis.disconnect()
+  
