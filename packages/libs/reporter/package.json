@@ -32,7 +32,7 @@
   "dependencies": {
     "@dogmalang/core": "^1.0.0-rc18.0",
     "chalk": "^4.1.2",
-    "humanize-duration": "^3.27.3",
+    "humanize-duration": "^3.28.0",
     "indent-string": "^4.0.0",
     "lodash.merge": "^4.6.2"
   },
