@@ -1,8 +1,6 @@
 name: release-docker
 
 on:
-  workflow_dispatch:
-  
   workflow_run:
     workflows: [release-npm]
     types: [completed]
@@ -10,6 +8,7 @@ on:
 jobs:
   docker-hub:
     name: Publish images on Docker Hub
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     strategy:
