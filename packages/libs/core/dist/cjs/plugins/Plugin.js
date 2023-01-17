@@ -25,7 +25,14 @@ const $Plugin = class Plugin extends Activity {
     });
     Object.defineProperty(this, 'state', {
       value: (0, _core.coalesce)(_['state'], null),
-      writable: false,
+      writable: true,
+      enumerable: false
+    });
+    /* c8 ignore start */
+    if (_['initialized'] != null) (0, _core.expect)('initialized', _['initialized'], _core.bool); /* c8 ignore stop */
+    Object.defineProperty(this, 'initialized', {
+      value: (0, _core.coalesce)(_['initialized'], false),
+      writable: true,
       enumerable: false
     });
     /* c8 ignore start */

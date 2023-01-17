@@ -135,8 +135,8 @@ suite(__filename, proc()
         pluginLoader = sim(
           PluginLoader
           loadPlugin = method([
-            {args = ["pi-without-ini"], returns = piWoi}
-            {args = ["pi-with-ini"], returns = piWini}
+            {args = ["@akromio/pi-woi"], returns = piWoi}
+            {args = ["@akromio/pi-wi"], returns = piWini}
           ])
         )
 
@@ -147,8 +147,8 @@ suite(__filename, proc()
           catalogDecl{
             *
             plugins = [
-              {plugin = "woi", impl = "pi-without-ini"}
-              {plugin = "wi", impl = "pi-with-ini"}
+              {plugin = "woi"}
+              {plugin = "wi"}
             ]
           }
           catalog = catalogOpt
@@ -170,7 +170,7 @@ suite(__filename, proc()
 
       expected(out.plugins).toBe(Plugins).toHaveLen(2)\
         .get("items.woi").toBe(Plugin).toHave(name = "woi", state = nil)\
-        .get("items.wi").toBe(Plugin).toHave(name = "wi", state = "value")
+        .get("items.wi").toBe(Plugin).toHave(name = "wi", state = nil)
     end)
   end)
 
@@ -188,8 +188,8 @@ suite(__filename, proc()
         pluginLoader = sim(
           PluginLoader
           loadPlugin = method([
-            {args = ["pi-without-ini"], returns = piWoi}
-            {args = ["pi-with-ini"], returns = piWini}
+            {args = ["@akromio/pi-woi"], returns = piWoi}
+            {args = ["@akromio/pi-wi"], returns = piWini}
           ])
         )
 
@@ -205,7 +205,7 @@ suite(__filename, proc()
       # (2) assessment
       expected(out).toBe(Plugins).toHaveLen(2)
       expected(out.getPlugin("woi")).toHave(name = "woi", state = nil)
-      expected(out.getPlugin("WI")).toHave(name = "WI", state = "value")
+      expected(out.getPlugin("WI")).toHave(name = "WI", state = nil)
     end)
 
     test("when preset, its plugins must be loaded, parsed and returned", async proc()

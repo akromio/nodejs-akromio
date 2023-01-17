@@ -8,6 +8,7 @@ suite(__filename, proc()
     expected(index).toHave([
       "Action"
       "ActionOperator"
+      "buildPluginName"
       "Call"
       "CallReq"
       "CallReqStream"

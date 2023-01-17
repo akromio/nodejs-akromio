@@ -1,0 +1,13 @@
+/**
+ * Builds and returns a plugin name froma given [name],
+ * keeping in mind the following:
+ *
+ * - The name must be scoped.
+ * - If no scope given and name doesn't start with pi-, @akromio/pi- prefixed.
+ * - If no scope given and name starts with pi-, @akromio/ prefixed.
+ */
+
+export fn buildPluginName(name: text) -> name
+  if not name.startsWith("@") then
+    if not name.startsWith("pi-") then name = "pi-" + name
+    name = "@akromio/" + name

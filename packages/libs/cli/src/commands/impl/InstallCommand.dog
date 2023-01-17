@@ -1,7 +1,7 @@
 use (
   dep://util
   cp = dep://child_process
-  {Ops, PluginParser, PluginLoader} = alias://core
+  {Ops, buildPluginName, PluginParser, PluginLoader} = alias://core
   ../CatalogCommandBase
 )
 
@@ -75,11 +75,7 @@ export struct InstallCommand: CatalogCommandBase
 
       for each pi in decl.plugins ?? [] do
         # determine plugin name
-        var name = pi.impl ?? pi.plugin
-
-        if not name.startsWith("@") then
-          if not name.startsWith("pi-") then name = "pi-" + name
-          name = "@akromio/" + name
+        const name = buildPluginName(pi.impl ?? pi.plugin)
 
         # install if not accessible
         do

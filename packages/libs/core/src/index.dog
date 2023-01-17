@@ -10,6 +10,7 @@ pub use (
   ops/Call
   ops/Context
 
+  plugins/buildPluginName
   plugins/Plugin
   plugins/Plugins
   plugins/PluginParser

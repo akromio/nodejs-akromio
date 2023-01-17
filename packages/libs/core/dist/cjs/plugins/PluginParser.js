@@ -32,18 +32,36 @@ PluginParser.prototype.parsePlugin = async function (decl, iniArgs) {
     const name = decl.plugin;
     const initializer = decl.ini;
     const finalizer = decl.fin;
-    const state = initializer ? (0, await initializer(iniArgs)) : null;
     plugin = Plugin(_core.dogma.clone(decl, {
       "name": name,
-      "state": state,
       "finalizer": finalizer
     }, {}, ["ops"], []));
     for (const [name, opDecl] of Object.entries(decl.ops)) {
       {
-        plugin.appendOp(StaticAction(_core.dogma.clone(opDecl, {
-          "name": name,
-          "operator": actionOperator
-        }, {}, [], [])));
+        if (initializer) {
+          const fun = async (...args) => {
+            {
+              if (!plugin.initialized) {
+                plugin.state = (0, await initializer(iniArgs));
+                plugin.initialized = true;
+              }
+              return opDecl.fun(_core.dogma.clone(_core.dogma.getItem(args, 0), {
+                "state": plugin.state
+              }, {}, [], []), ..._core.dogma.getSlice(args, 1, -1));
+            }
+          };
+          plugin.state = {};
+          plugin.appendOp(StaticAction(_core.dogma.clone(opDecl, {
+            "fun": fun,
+            "name": name,
+            "operator": actionOperator
+          }, {}, [], [])));
+        } else {
+          plugin.appendOp(StaticAction(_core.dogma.clone(opDecl, {
+            "name": name,
+            "operator": actionOperator
+          }, {}, [], [])));
+        }
       }
     }
   }
