@@ -1,7 +1,9 @@
 use (
   alias://expected
   {monitor} = alias://doubles
-  {PluginParser, Plugin, Action} = ~
+
+  PluginParser, Plugin
+  ../ops/simple/action/Action
 )
 
 suite(__filename, proc()
@@ -36,14 +38,13 @@ suite(__filename, proc()
       expected(out.ops.ops).members("one", "two").toBe(Action)
     end)
 
-    test("when declaration.ini exists, the plugin instance state must be performed", async proc()
+    test("when declaration.ini exists, op funs must be wrapped w/ initializer", async proc()
       # (1) act
       const (
-        ini = monitor(nop)
         decl = {
           plugin = "test"
           defaultOpName = "two"
-          ini
+          ini = nop
           ops =
             one = {fun = nop}
             two = {fun = nop}
@@ -60,7 +61,7 @@ suite(__filename, proc()
       )
 
       expected(out.ops.ops).members("one", "two").toBe(Action)
-      expected(monitor.log(ini).calls).equalTo(1)
+      expected(out.ops.ops.one.fun).toBeFn().notSameAs(decl.ops.one.fun)
     end)
   end)
 end)

@@ -9,6 +9,7 @@ const {
   CatalogParser
 } = _core.dogma.use(require("@akromio/catalog"));
 const {
+  buildPluginName,
   Plugin,
   Plugins,
   PluginParser,
@@ -113,7 +114,7 @@ JobCatalogParser.prototype.parsePlugins = async function (decl) {
         }
       } else if (_core.dogma.includes(def, "plugin")) {
         var _def$name;
-        const piDecl = loader.loadPlugin(def.impl);
+        const piDecl = loader.loadPlugin(buildPluginName(def.plugin));
         const name = (_def$name = def.name) !== null && _def$name !== void 0 ? _def$name : def.plugin;
         plugins.appendPlugin((0, await parser.parsePlugin(_core.dogma.clone(piDecl, {
           "plugin": name

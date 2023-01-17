@@ -147,10 +147,10 @@ suite(__filename, () => {
             };
             const pluginLoader = sim(PluginLoader, {
               'loadPlugin': method([{
-                ["args"]: ["pi-without-ini"],
+                ["args"]: ["@akromio/pi-woi"],
                 ["returns"]: piWoi
               }, {
-                ["args"]: ["pi-with-ini"],
+                ["args"]: ["@akromio/pi-wi"],
                 ["returns"]: piWini
               }])
             });
@@ -163,11 +163,9 @@ suite(__filename, () => {
             });
             const out = (0, await parser.parse(_core.dogma.clone(catalogDecl, {
               "plugins": [{
-                ["plugin"]: "woi",
-                ["impl"]: "pi-without-ini"
+                ["plugin"]: "woi"
               }, {
-                ["plugin"]: "wi",
-                ["impl"]: "pi-with-ini"
+                ["plugin"]: "wi"
               }]
             }, {}, [], []), {
               'catalog': catalogOpt,
@@ -187,7 +185,7 @@ suite(__filename, () => {
               'state': null
             }).get("items.wi").toBe(Plugin).toHave({
               'name': "wi",
-              'state': "value"
+              'state': null
             });
           }
         });
@@ -220,10 +218,10 @@ suite(__filename, () => {
             }];
             const pluginLoader = sim(PluginLoader, {
               'loadPlugin': method([{
-                ["args"]: ["pi-without-ini"],
+                ["args"]: ["@akromio/pi-woi"],
                 ["returns"]: piWoi
               }, {
-                ["args"]: ["pi-with-ini"],
+                ["args"]: ["@akromio/pi-wi"],
                 ["returns"]: piWini
               }])
             });
@@ -244,7 +242,7 @@ suite(__filename, () => {
             });
             expected(out.getPlugin("WI")).toHave({
               'name': "WI",
-              'state': "value"
+              'state': null
             });
           }
         });

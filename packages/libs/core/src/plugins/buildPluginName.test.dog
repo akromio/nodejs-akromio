@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  buildPluginName
+)
+
+suite(__filename, proc()
+  test("when scope set, nothin to do", proc()
+    # (1) act
+    const out = buildPluginName("@akromio/pi-redis")
+
+    # (2) assessment
+    expected(out).equalTo("@akromio/pi-redis")
+  end)
+
+  test("when name not starts w/ pi, @akromio/pi-name must be returned", proc()
+    # (1) act
+    const out = buildPluginName("redis")
+
+    # (2) assessment
+    expected(out).equalTo("@akromio/pi-redis")
+  end)
+end)

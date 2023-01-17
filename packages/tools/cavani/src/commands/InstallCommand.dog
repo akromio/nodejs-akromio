@@ -1,0 +1,9 @@
+use (
+  {InstallCommand as InstallCommandBase} = alias://cli
+  _JobCommand
+)
+
+/**
+ * The install command.
+ */
+export struct InstallCommand: InstallCommandBase:: _JobCommand

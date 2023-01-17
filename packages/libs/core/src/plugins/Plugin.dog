@@ -37,7 +37,13 @@ export struct Plugin: Activity
    * into the context.
    */
   @hidden
-  pub const state?
+  pub var state?
+
+  /**
+   * If stateful plugin, indicate if the plugin has been initialized.
+   */
+  @hidden
+  pub var initialized := false
 
   /**
    * The function to run when the plugin must be finished.

@@ -3,6 +3,9 @@ use (
   ../ops/simple/action/{StaticAction, ActionOperator}
 )
 
+/**
+ * Action operator to use with the plugin operations.
+ */
 const actionOperator = ActionOperator()
 
 /**
@@ -18,14 +21,25 @@ export struct PluginParser
       name = decl.plugin
       initializer = decl.ini
       finalizer = decl.fin
-      state = if initializer then await(initializer(iniArgs)) end
     )
 
-    plugin = Plugin(decl{*, -ops, name, state, finalizer})
+    plugin = Plugin(decl{*, -ops, name, finalizer})
 
     # (2) add its operations
     for each name, opDecl in decl.ops do
-      plugin.appendOp(StaticAction(opDecl{*, name, operator = actionOperator}))
+      if initializer then
+        const fun = async fn(...args)
+          if not plugin.initialized then
+            plugin.state = await(initializer(iniArgs))
+            plugin.initialized = true
+          
+          return opDecl.fun(args[0]{*, state = plugin.state}, ...args[1, -1])
+        end
+
+        plugin.state = {}
+        plugin.appendOp(StaticAction(opDecl{*, fun, name, operator = actionOperator}))
+      else
+        plugin.appendOp(StaticAction(opDecl{*, name, operator = actionOperator}))
   
   /**
    * Parses a preset declaration, returning its corresponding plugin

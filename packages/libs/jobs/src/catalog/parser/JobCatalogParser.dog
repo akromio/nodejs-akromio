@@ -1,7 +1,7 @@
 use (
   {Dataset} = alias://dataset
   {Ops, CatalogParser} = alias://catalog
-  {Plugin, Plugins, PluginParser, PluginLoader} = alias://core
+  {buildPluginName, Plugin, Plugins, PluginParser, PluginLoader} = alias://core
 
   ../JobCatalog
   JobParser, JobCatalogParseOpts
@@ -71,7 +71,7 @@ export struct JobCatalogParser: CatalogParser
           plugins.appendPlugin(plugin)
       else if "plugin" in def then
         # get plugin declaration
-        const piDecl = loader.loadPlugin(def.impl)
+        const piDecl = loader.loadPlugin(buildPluginName(def.plugin))
 
         # create new plugin instance
         const name = def.name ?? def.plugin
