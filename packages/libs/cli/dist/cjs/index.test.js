@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, api must be exported", () => {
       {
-        expected(index).members("createCommands", "table", "CatalogCommand", "DatasetCommand", "DescCommand", "EncodeCommand", "EnvCommand", "RegistryCommandBase", "RunCommand", "ShowCommand", "TriggerCommand").toBeCallable();
+        expected(index).members("createCommands", "table", "CatalogCommand", "DatasetCommand", "DescCommand", "EncodeCommand", "EnvCommand", "InstallCommand", "RegistryCommandBase", "RunCommand", "ShowCommand", "TriggerCommand").toBeCallable();
       }
     });
   }

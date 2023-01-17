@@ -13,6 +13,7 @@ suite(__filename, proc()
       "DescCommand"
       "EncodeCommand"
       "EnvCommand"
+      "InstallCommand"
       "RegistryCommandBase"
       "RunCommand"
       "ShowCommand"

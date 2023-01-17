@@ -1,0 +1,92 @@
+use (
+  dep://util
+  cp = dep://child_process
+  {Ops, PluginParser, PluginLoader} = alias://core
+  ../CatalogCommandBase
+)
+
+const exec = util.promisify(cp.exec)
+
+/**
+ * Options defined in the super types.
+ */
+const {baseOptions} = CatalogCommandBase
+
+/**
+ * A command for installing the plugins and the presets used
+ * in a job catalog.
+ */
+@abstract
+export struct InstallCommand: CatalogCommandBase
+  /**
+   * Common options for the catalog commands.
+   */
+  @hidden
+  pub static const baseOptions = baseOptions
+
+  @override
+  pub const name = ["install", "i"]
+
+  @override
+  pub const desc = "Install the plugins used for a given job catalog."
+
+  @override
+  pub const positionals = {}
+
+  @override
+  pub const options = {
+    {registries} = baseOptions
+    {catalogName} = baseOptions
+    {registryAndCatalogName} = baseOptions
+    {arg} = baseOptions
+  }
+  
+  @override @hidden
+  pub async proc handle(argv=> {catalogName, registryAndCatalogName, args})
+    # (1) create the registry instances to use
+    const registries = await(self.createRegistries(argv).connect())
+
+    do
+      # (2) create the ops to use
+      const ops = Ops()
+
+      # (3) determine the catalogName
+      if registryAndCatalogName then
+        catalogName = registryAndCatalogName.split("://")[1]
+
+      # (4) get the catalog decl
+      const decl = await(self.readCatalogDecl(
+        (catalogName = self.buildCatalogPath(catalogName))
+        registries
+      ))
+
+      if not decl then
+        print($"Job catalog '${catalogName}' not found in '${registries.registryNames}'.")
+        ps.exit(1)
+      
+      # (5) create global dataset
+      const globalDataset = await(self.createGlobalDataset(decl, args))
+
+      # (6) install plugins not available
+      const (
+        parser = PluginParser()
+        loader = PluginLoader(paths = $KRM_NODE_PATH.split(":"))
+      )
+
+      for each pi in decl.plugins ?? [] do
+        # determine plugin name
+        var name = pi.impl ?? pi.plugin
+
+        if not name.startsWith("@") then
+          if not name.startsWith("pi-") then name = "pi-" + name
+          name = "@akromio/" + name
+
+        # install if not accessible
+        do
+          if not ops.getOp(name) then loader.loadPlugin(name)
+        catch e
+          if e like("Cannot find module") then
+            print($"Installing ${name}...")
+            await(exec($"npm i ${name}"))
+    finally
+      pawait(registries.disconnect())

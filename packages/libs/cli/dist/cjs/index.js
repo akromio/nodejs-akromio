@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.tableOpts = exports.table = exports.handleErrors = exports.createCommands = exports.TriggerCommand = exports.SysCommand = exports.ShowCommand = exports.RunCommand = exports.RegistryCommandBase = exports.RegistryCommand = exports.QuestionsCommand = exports.JobRunCommand = exports.EnvCommand = exports.EncodeCommand = exports.DescCommand = exports.DatasetCommand = exports.Command = exports.CatalogCommand = void 0;
+exports.tableOpts = exports.table = exports.handleErrors = exports.createCommands = exports.TriggerCommand = exports.SysCommand = exports.ShowCommand = exports.RunCommand = exports.RegistryCommandBase = exports.RegistryCommand = exports.QuestionsCommand = exports.JobRunCommand = exports.InstallCommand = exports.EnvCommand = exports.EncodeCommand = exports.DescCommand = exports.DatasetCommand = exports.Command = exports.CatalogCommand = void 0;
 var _core = require("@dogmalang/core");
 const {
   table,
@@ -25,6 +25,8 @@ const EncodeCommand = _core.dogma.use(require("./commands/impl/EncodeCommand"));
 exports.EncodeCommand = EncodeCommand;
 const EnvCommand = _core.dogma.use(require("./commands/impl/EnvCommand"));
 exports.EnvCommand = EnvCommand;
+const InstallCommand = _core.dogma.use(require("./commands/impl/InstallCommand"));
+exports.InstallCommand = InstallCommand;
 const JobRunCommand = _core.dogma.use(require("./commands/impl/JobRunCommand"));
 exports.JobRunCommand = JobRunCommand;
 const QuestionsCommand = _core.dogma.use(require("./commands/impl/QuestionsCommand"));

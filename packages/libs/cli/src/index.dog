@@ -10,6 +10,7 @@ pub use (
   commands/impl/DescCommand
   commands/impl/EncodeCommand
   commands/impl/EnvCommand
+  commands/impl/InstallCommand
   commands/impl/JobRunCommand
   commands/impl/QuestionsCommand
   commands/impl/RegistryCommand
