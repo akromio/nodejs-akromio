@@ -1,7 +1,7 @@
 use (
   {Dataset} = alias://dataset
   {Ops, CatalogParser} = alias://catalog
-  {buildPluginName, Plugin, Plugins, PluginParser, PluginLoader} = alias://core
+  {buildPluginPackageName, Plugin, Plugins, PluginParser, PluginLoader} = alias://core
 
   ../JobCatalog
   JobParser, JobCatalogParseOpts
@@ -71,10 +71,10 @@ export struct JobCatalogParser: CatalogParser
           plugins.appendPlugin(plugin)
       else if "plugin" in def then
         # get plugin declaration
-        const piDecl = loader.loadPlugin(buildPluginName(def.plugin))
+        const piDecl = loader.loadPlugin(buildPluginPackageName(def.impl ?? def.plugin))
 
         # create new plugin instance
-        const name = def.name ?? def.plugin
+        const name = def.plugin
         plugins.appendPlugin(await(parser.parsePlugin(piDecl{*, plugin = name}, def.ini)))
       else
         throw(TypeError($"Unknown plugin declaration: ${fmt(def)}."))

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.buildPluginName = exports.StaticAction = exports.SimpleOperator = exports.SimpleOp = exports.SimpleEngine = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CompositeEngine = exports.CoOperator = exports.CallReqStream = exports.CallReq = exports.Call = exports.ActionOperator = exports.Action = void 0;
+exports.buildPluginPackageName = exports.StaticAction = exports.SimpleOperator = exports.SimpleOp = exports.SimpleEngine = exports.ScriptOperator = exports.Script = exports.Runner = exports.Result = exports.Plugins = exports.PluginParser = exports.PluginLoader = exports.Plugin = exports.Ops = exports.Op = exports.NotFoundError = exports.MacroOperator = exports.Engine = exports.DynamicMacro = exports.DynamicCo = exports.Context = exports.CompositeOperator = exports.CompositeOp = exports.CompositeEngine = exports.CoOperator = exports.CallReqStream = exports.CallReq = exports.Call = exports.ActionOperator = exports.Action = void 0;
 var _core = require("@dogmalang/core");
 const CallReq = _core.dogma.use(require("./CallReq"));
 exports.CallReq = CallReq;
@@ -21,8 +21,8 @@ const Call = _core.dogma.use(require("./ops/Call"));
 exports.Call = Call;
 const Context = _core.dogma.use(require("./ops/Context"));
 exports.Context = Context;
-const buildPluginName = _core.dogma.use(require("./plugins/buildPluginName"));
-exports.buildPluginName = buildPluginName;
+const buildPluginPackageName = _core.dogma.use(require("./plugins/buildPluginPackageName"));
+exports.buildPluginPackageName = buildPluginPackageName;
 const Plugin = _core.dogma.use(require("./plugins/Plugin"));
 exports.Plugin = Plugin;
 const Plugins = _core.dogma.use(require("./plugins/Plugins"));

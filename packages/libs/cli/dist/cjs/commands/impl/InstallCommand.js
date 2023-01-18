@@ -5,7 +5,7 @@ const util = _core.dogma.use(require("util"));
 const cp = _core.dogma.use(require("child_process"));
 const {
   Ops,
-  buildPluginName,
+  buildPluginPackageName,
   PluginParser,
   PluginLoader
 } = _core.dogma.use(require("@akromio/core"));
@@ -92,7 +92,7 @@ InstallCommand.prototype.handle = async function (argv) {
       });
       for (const pi of (_decl$plugins = decl.plugins) !== null && _decl$plugins !== void 0 ? _decl$plugins : []) {
         var _decl$plugins, _pi$impl;
-        const name = buildPluginName((_pi$impl = pi.impl) !== null && _pi$impl !== void 0 ? _pi$impl : pi.plugin);
+        const name = buildPluginPackageName((_pi$impl = pi.impl) !== null && _pi$impl !== void 0 ? _pi$impl : pi.plugin);
         try {
           if (!ops.getOp(name)) {
             loader.loadPlugin(name);
