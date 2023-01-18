@@ -1,7 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
-function buildPluginName(name) {
+function buildPluginPackageName(name) {
   /* c8 ignore next */_core.dogma.expect("name", name, _core.text);
   {
     if (!name.startsWith("@")) {
@@ -13,4 +13,4 @@ function buildPluginName(name) {
   }
   return name;
 }
-module.exports = exports = buildPluginName;
+module.exports = exports = buildPluginPackageName;

@@ -212,16 +212,15 @@ suite(__filename, () => {
               ["plugin"]: "woi",
               ["impl"]: "pi-without-ini"
             }, {
-              ["plugin"]: "wi",
-              ["name"]: "WI",
+              ["plugin"]: "WI",
               ["impl"]: "pi-with-ini"
             }];
             const pluginLoader = sim(PluginLoader, {
               'loadPlugin': method([{
-                ["args"]: ["@akromio/pi-woi"],
+                ["args"]: ["@akromio/pi-without-ini"],
                 ["returns"]: piWoi
               }, {
-                ["args"]: ["@akromio/pi-wi"],
+                ["args"]: ["@akromio/pi-with-ini"],
                 ["returns"]: piWini
               }])
             });

@@ -182,14 +182,14 @@ suite(__filename, proc()
         piWini = {name = "pi-with-ini", ops = {}, ini = fn() = "value" end}
         plugins = [
           {plugin = "woi", impl = "pi-without-ini"}
-          {plugin = "wi", name = "WI", impl = "pi-with-ini"}
+          {plugin = "WI", impl = "pi-with-ini"}
         ]
 
         pluginLoader = sim(
           PluginLoader
           loadPlugin = method([
-            {args = ["@akromio/pi-woi"], returns = piWoi}
-            {args = ["@akromio/pi-wi"], returns = piWini}
+            {args = ["@akromio/pi-without-ini"], returns = piWoi}
+            {args = ["@akromio/pi-with-ini"], returns = piWini}
           ])
         )
 

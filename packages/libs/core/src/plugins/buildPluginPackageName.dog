@@ -1,5 +1,5 @@
 /**
- * Builds and returns a plugin name froma given [name],
+ * Builds and returns the name of a plugin package from a given [name],
  * keeping in mind the following:
  *
  * - The name must be scoped.
@@ -7,7 +7,7 @@
  * - If no scope given and name starts with pi-, @akromio/ prefixed.
  */
 
-export fn buildPluginName(name: text) -> name
+export fn buildPluginPackageName(name: text) -> name
   if not name.startsWith("@") then
     if not name.startsWith("pi-") then name = "pi-" + name
     name = "@akromio/" + name

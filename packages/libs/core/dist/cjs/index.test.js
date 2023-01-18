@@ -7,7 +7,7 @@ suite(__filename, () => {
   {
     test("when imported, its api must be exported", () => {
       {
-        expected(index).toHave(["Action", "ActionOperator", "buildPluginName", "Call", "CallReq", "CallReqStream", "CompositeEngine", "CompositeOp", "CompositeOperator", "Context", "CoOperator", "DynamicCo", "DynamicMacro", "MacroOperator", "NotFoundError", "Ops", "Plugin", "Plugins", "PluginLoader", "PluginParser", "Result", "Runner", "Script", "ScriptOperator", "SimpleEngine", "SimpleOp", "SimpleOperator", "StaticAction"]);
+        expected(index).toHave(["Action", "ActionOperator", "buildPluginPackageName", "Call", "CallReq", "CallReqStream", "CompositeEngine", "CompositeOp", "CompositeOperator", "Context", "CoOperator", "DynamicCo", "DynamicMacro", "MacroOperator", "NotFoundError", "Ops", "Plugin", "Plugins", "PluginLoader", "PluginParser", "Result", "Runner", "Script", "ScriptOperator", "SimpleEngine", "SimpleOp", "SimpleOperator", "StaticAction"]);
       }
     });
   }
