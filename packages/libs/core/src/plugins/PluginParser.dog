@@ -9,6 +9,20 @@ use (
 const actionOperator = ActionOperator()
 
 /**
+ * Function to wrap the operation functions for ensuring the
+ * execution of the initialization on stateful plugins.
+ */
+fn wrapOpFunWithIni(plugin: Plugin, ini: func, iniArgs?, fun: func) = async fn(...args)
+  # (1) initialization if for the first time
+  if not plugin.initialized then
+    plugin.state = await(ini(iniArgs))
+    plugin.initialized = true
+  
+  # (2) run op function returning it result
+  return fun(args[0]{*, state = plugin.state}, ...args[1, -1])
+end
+
+/**
  * A parser for parsing plugin declarations.
  */
 export struct PluginParser
@@ -28,13 +42,7 @@ export struct PluginParser
     # (2) add its operations
     for each name, opDecl in decl.ops do
       if initializer then
-        const fun = async fn(...args)
-          if not plugin.initialized then
-            plugin.state = await(initializer(iniArgs))
-            plugin.initialized = true
-          
-          return opDecl.fun(args[0]{*, state = plugin.state}, ...args[1, -1])
-        end
+        const fun = wrapOpFunWithIni(plugin, initializer, iniArgs, opDecl.fun)
 
         plugin.state = {}
         plugin.appendOp(StaticAction(opDecl{*, fun, name, operator = actionOperator}))

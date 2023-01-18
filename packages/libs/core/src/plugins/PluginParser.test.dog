@@ -64,4 +64,35 @@ suite(__filename, proc()
       expected(out.ops.ops.one.fun).toBeFn().notSameAs(decl.ops.one.fun)
     end)
   end)
+
+  suite("stateful plugin", proc()
+    test("when op called for the first time, initialization must be performed", async proc()
+      # (1) act
+      const (
+        state = {x = 1, y = 2}
+        value = "value"
+
+        decl = {
+          plugin = "test"
+          defaultOpName = "two"
+          ini = fn() = state end
+          ops =
+            one = {fun = fn() = value end}
+            two = {fun = nop}
+        }
+        
+        plugin = await(parser.parsePlugin(decl, ["arg1", "arg2"]))
+      )
+
+      # (2) assessment
+      const (
+        op = plugin.ops.ops.one
+        out = await(op.fun({}))
+      )
+
+      expected(out).equalTo(value)
+      expected(plugin.initialized).equalTo(true)
+      expected(plugin.state).equalTo(state)
+    end)
+  end)
 end)
