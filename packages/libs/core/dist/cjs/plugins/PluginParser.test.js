@@ -68,5 +68,45 @@ suite(__filename, () => {
         });
       }
     });
+    suite("stateful plugin", () => {
+      {
+        test("when op called for the first time, initialization must be performed", async () => {
+          {
+            const state = {
+              ["x"]: 1,
+              ["y"]: 2
+            };
+            const value = "value";
+            const decl = {
+              ["plugin"]: "test",
+              ["defaultOpName"]: "two",
+              ["ini"]: () => {
+                {
+                  return state;
+                }
+              },
+              ["ops"]: {
+                ["one"]: {
+                  ["fun"]: () => {
+                    {
+                      return value;
+                    }
+                  }
+                },
+                ["two"]: {
+                  ["fun"]: _core.dogma.nop()
+                }
+              }
+            };
+            const plugin = (0, await parser.parsePlugin(decl, ["arg1", "arg2"]));
+            const op = plugin.ops.ops.one;
+            const out = (0, await op.fun({}));
+            expected(out).equalTo(value);
+            expected(plugin.initialized).equalTo(true);
+            expected(plugin.state).equalTo(state);
+          }
+        });
+      }
+    });
   }
 });

@@ -5,6 +5,24 @@ const Plugin = _core.dogma.use(require("./Plugin"));
 const StaticAction = _core.dogma.use(require("../ops/simple/action/StaticAction"));
 const ActionOperator = _core.dogma.use(require("../ops/simple/action/ActionOperator"));
 const actionOperator = ActionOperator();
+function wrapOpFunWithIni(plugin, ini, iniArgs, fun) {
+  /* c8 ignore next */_core.dogma.expect("plugin", plugin, Plugin); /* c8 ignore next */
+  _core.dogma.expect("ini", ini, _core.func); /* c8 ignore next */
+  _core.dogma.expect("fun", fun, _core.func);
+  {
+    return async (...args) => {
+      {
+        if (!plugin.initialized) {
+          plugin.state = (0, await ini(iniArgs));
+          plugin.initialized = true;
+        }
+        return fun(_core.dogma.clone(_core.dogma.getItem(args, 0), {
+          "state": plugin.state
+        }, {}, [], []), ..._core.dogma.getSlice(args, 1, -1));
+      }
+    };
+  }
+}
 const $PluginParser = class PluginParser {
   constructor(_) {
     /* c8 ignore start */if (_ == null) _ = {};
@@ -39,17 +57,7 @@ PluginParser.prototype.parsePlugin = async function (decl, iniArgs) {
     for (const [name, opDecl] of Object.entries(decl.ops)) {
       {
         if (initializer) {
-          const fun = async (...args) => {
-            {
-              if (!plugin.initialized) {
-                plugin.state = (0, await initializer(iniArgs));
-                plugin.initialized = true;
-              }
-              return opDecl.fun(_core.dogma.clone(_core.dogma.getItem(args, 0), {
-                "state": plugin.state
-              }, {}, [], []), ..._core.dogma.getSlice(args, 1, -1));
-            }
-          };
+          const fun = wrapOpFunWithIni(plugin, initializer, iniArgs, opDecl.fun);
           plugin.state = {};
           plugin.appendOp(StaticAction(_core.dogma.clone(opDecl, {
             "fun": fun,
