@@ -1,6 +1,6 @@
 {
   "name": "@akromio/trigger-redispubsub",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "description": "Trigger implementation reading messages from a Redis Pub/Sub channel.",
   "author": {
     "name": "Sia Codelabs",

@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-text",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "description": "Plugin for working with text on Akromio.",
   "author": {
     "name": "Sia Codelabs",
