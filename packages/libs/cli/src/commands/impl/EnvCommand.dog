@@ -87,7 +87,7 @@ export struct EnvCommand: Command
     )
 
     # (2) build rows
-    pattern = re(pattern.replace("*", ".*"), "g")
+    pattern = re(pattern.replace(re("\\*", "g"), ".*"))
     rows = [["Variable", "Value", "Desc."]]
 
     for each name in keys(vars).sort() do
