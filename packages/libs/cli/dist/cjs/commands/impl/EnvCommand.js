@@ -122,7 +122,7 @@ EnvCommand.prototype.buildRows = function (pattern) {
       ...commonVars,
       ...specializationVars
     };
-    pattern = (0, _core.re)(`${pattern}`.replace("*", ".*"));
+    pattern = (0, _core.re)(pattern.replace("*", ".*"), "g");
     rows = [["Variable", "Value", "Desc."]];
     for (const name of (0, _core.keys)(vars).sort()) {
       {
