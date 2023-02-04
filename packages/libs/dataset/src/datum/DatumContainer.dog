@@ -7,5 +7,16 @@ use (
  */
 @abstract
 export struct DatumContainer: Datum
+  /**
+   * Value to merge to the given value.
+   */
+  @hidden
+  pub const merge?: map
+
+  @post
+  pvt proc post()
+    if merge ::= self.merge then
+      self.value = self.value{*, ...merge}
+
   @override
   pub fn getValue() = self.value

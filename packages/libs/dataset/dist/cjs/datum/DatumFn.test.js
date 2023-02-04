@@ -39,7 +39,7 @@ suite(__filename, () => {
             const out = _core.dogma.peval(() => {
               return datum.setValue(321);
             });
-            expected(out).it(0).equalTo(false).it(1).toBe(DatumError).like("The datum 'f' is not updatable.");
+            expected(out).it(0).equalTo(false).it(1).toBe(DatumError).like("Datum 'f' is not updatable.");
           }
         });
       }

@@ -4,6 +4,16 @@ use (
 )
 
 suite(__filename, proc()
+  suite("post", proc()
+    test("when merge exists, this must be merged to the value", proc()
+      # (1) act
+      const out = ConstDatum(name = "c", merge = {y = 2}, value = {x = 1, z = 3})
+
+      # (2) assessment
+      expected(out.getValue()).equalTo(x = 1, y = 2, z = 3)
+    end)
+  end)
+
   suite("setValue()", proc()
     test("when setValue called, error must be raised", proc()
       # (1) act
@@ -15,7 +25,7 @@ suite(__filename, proc()
       # (2) assessment
       expected(out)\
         .it(0).equalTo(false)\
-        .it(1).toBe(DatumError).like("The datum 'c' is not updatable.")
+        .it(1).toBe(DatumError).like("Datum 'c' is not updatable.")
     end)
   end)
 end)

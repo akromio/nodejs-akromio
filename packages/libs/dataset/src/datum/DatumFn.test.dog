@@ -29,7 +29,7 @@ suite(__filename, proc()
       # (2) assessment
       expected(out)\
         .it(0).equalTo(false)\
-        .it(1).toBe(DatumError).like("The datum 'f' is not updatable.")
+        .it(1).toBe(DatumError).like("Datum 'f' is not updatable.")
     end)
   end)
 end)

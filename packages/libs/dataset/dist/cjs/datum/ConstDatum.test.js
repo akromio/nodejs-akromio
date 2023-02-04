@@ -6,6 +6,29 @@ const ConstDatum = _core.dogma.use(require("./ConstDatum"));
 const DatumError = _core.dogma.use(require("./DatumError"));
 suite(__filename, () => {
   {
+    suite("post", () => {
+      {
+        test("when merge exists, this must be merged to the value", () => {
+          {
+            const out = ConstDatum({
+              'name': "c",
+              'merge': {
+                ["y"]: 2
+              },
+              'value': {
+                ["x"]: 1,
+                ["z"]: 3
+              }
+            });
+            expected(out.getValue()).equalTo({
+              'x': 1,
+              'y': 2,
+              'z': 3
+            });
+          }
+        });
+      }
+    });
     suite("setValue()", () => {
       {
         test("when setValue called, error must be raised", () => {
@@ -17,7 +40,7 @@ suite(__filename, () => {
             const out = _core.dogma.peval(() => {
               return datum.setValue(321);
             });
-            expected(out).it(0).equalTo(false).it(1).toBe(DatumError).like("The datum 'c' is not updatable.");
+            expected(out).it(0).equalTo(false).it(1).toBe(DatumError).like("Datum 'c' is not updatable.");
           }
         });
       }
