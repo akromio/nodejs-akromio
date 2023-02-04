@@ -30,11 +30,11 @@ suite(__filename, () => {
               ["encoding"]: "utf8"
             };
             const out = buildParams([content, path, opts]);
-            expected(out).equalTo({
-              'path': path,
+            expected(out).toHave({
               'content': content,
               'opts': opts
             });
+            expected.path(out.path).equalTo(path);
           }
         });
         test("when map, the same map must be returned", () => {

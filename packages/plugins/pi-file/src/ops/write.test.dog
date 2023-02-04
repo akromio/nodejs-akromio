@@ -32,7 +32,8 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).equalTo(path=, content, opts)
+      expected(out).toHave(content=, opts)
+      expected.path(out.path).equalTo(path)
     end)
 
     test("when map, the same map must be returned", proc()
