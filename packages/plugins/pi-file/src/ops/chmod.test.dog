@@ -2,10 +2,9 @@ use (
   alias://expected
   fs = dep://fs/promises
   {monitor} = alias://doubles
-  pi = ~
+  
+  op = chmod
 )
-
-const op = pi.ops.chmod
 
 suite(__filename, proc()
   const (

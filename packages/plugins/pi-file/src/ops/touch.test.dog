@@ -2,48 +2,50 @@ use (
   alias://expected
   fs = dep://fs/promises
   {monitor} = alias://doubles
-  pi = ~
+  
+  op = touch
 )
-
-const op = pi.ops.write
 
 suite(__filename, proc()
   const (
+    buildParams = op.parameterizer
     path = "/my/file.txt"
-    content = "my content"
+    atime = timestamp()
+    mtime = timestamp()
   )
 
   suite("buildParams()", proc()
-    const buildParams = op.parameterizer
-
-    test("when [content, path], {path, content, opts = {}} must be returned", proc()
+    test("when [path, map], {path, atime, mtime} must be returned", proc()
       # (1) act
-      const out = buildParams([content, path])
+      const (
+        times = {atime, mtime}
+        out = buildParams([path, times])
+      )
 
       # (2) assessment
       expected(out).equalTo(
         path=,
-        content
-        opts = {}
+        atime
+        mtime
       )
     end)
 
-    test("when [content, path, opts], {path, content, opts} must be returned", proc()
+    test("when [path, atime, mtime], {path, atime, mtime} must be returned", proc()
       # (1) act
-      const (
-        opts = {encoding = "utf8"}
-        out = buildParams([content, path, opts])
-      )
+      const out = buildParams([path, atime, mtime])
 
       # (2) assessment
-      expected(out).equalTo(path=, content, opts)
+      expected(out).equalTo(
+        path=,
+        atime
+        mtime
+      )
     end)
 
     test("when map, the same map must be returned", proc()
       # (1) act
       const (
-        opts = {encoding = "utf8"}
-        args = {path, content, opts}
+        args = {path, atime, mtime}
         out = buildParams(args)
       )
 
@@ -58,12 +60,12 @@ suite(__filename, proc()
     test("when called, a title must be returned", proc()
       # (1) act
       const (
-        params = {path, content}
+        params = {path, atime, mtime}
         out = buildTitle(params)
       )
 
       # (2) assessment
-      expected(out).equalTo($"file: write content to '${path}'")
+      expected(out).equalTo($"file: changes the timestamps of '${path}'")
     end)
   end)
 
@@ -72,24 +74,21 @@ suite(__filename, proc()
 
     test("when called, the file must be written", async proc()
       # (1) act
-      const originalWriteFile = fs.writeFile
-      fs.writeFile = monitor(nop)
+      const originalUtimes = fs.utimes
+      fs.utimes = monitor(nop)
 
-      const (
-        opts = {encoding = "utf8"}
-        out = pawait(handler(params = {path, content, opts}))
-      )
+      const out = pawait(handler(params = {path, atime, mtime}))
 
       # (2) assessment
       do
-        const log = monitor.log(fs.writeFile)
+        const log = monitor.log(fs.utimes)
 
         expected(out).it(0).equalTo(true)
         expected(log).toHaveLen(1)
-        expected(log.calledWith([path, content, opts])).equalTo(1)
+        expected(log.calledWith([path, atime, mtime])).equalTo(1)
       finally
         monitor.clearAll()
-        fs.writeFile = originalWriteFile
+        fs.utimes = originalUtimes
     end)
   end)
 end)

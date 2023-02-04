@@ -2,10 +2,9 @@ use (
   alias://expected
   fs = dep://fs/promises
   {monitor} = alias://doubles
-  pi = ~
+  
+  op = chown
 )
-
-const op = pi.ops.chown
 
 suite(__filename, proc()
   const (

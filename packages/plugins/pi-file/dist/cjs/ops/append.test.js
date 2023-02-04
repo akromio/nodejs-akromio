@@ -6,29 +6,46 @@ const fs = _core.dogma.use(require("fs/promises"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.chmod;
+const op = _core.dogma.use(require("./append"));
 suite(__filename, () => {
   {
     const path = "/my/file.txt";
-    const mode = "0o400";
+    const content = "my content";
     suite("buildParams()", () => {
       {
         const buildParams = op.parameterizer;
-        test("when [mode, path], {path, mode} must be returned", () => {
+        test("when [content, path], {path, content, opts = {}} must be returned", () => {
           {
-            const out = buildParams([mode, path]);
+            const out = buildParams([content, path]);
             expected(out).equalTo({
               'path': path,
-              'mode': mode
+              'content': content,
+              'opts': {}
+            });
+          }
+        });
+        test("when [content, path, opts], {path, content, opts} must be returned", () => {
+          {
+            const opts = {
+              ["encoding"]: "utf8"
+            };
+            const out = buildParams([content, path, opts]);
+            expected(out).equalTo({
+              'path': path,
+              'content': content,
+              'opts': opts
             });
           }
         });
         test("when map, the same map must be returned", () => {
           {
+            const opts = {
+              ["encoding"]: "utf8"
+            };
             const args = {
               ["path"]: path,
-              ["mode"]: mode
+              ["content"]: content,
+              ["opts"]: opts
             };
             const out = buildParams(args);
             expected(out).sameAs(args);
@@ -43,10 +60,10 @@ suite(__filename, () => {
           {
             const params = {
               ["path"]: path,
-              ["mode"]: mode
+              ["content"]: content
             };
             const out = buildTitle(params);
-            expected(out).equalTo(`file: changes permissions of '${path}' to '${mode}'`);
+            expected(out).equalTo(`file: append content to '${path}'`);
           }
         });
       }
@@ -54,24 +71,28 @@ suite(__filename, () => {
     suite("handler()", () => {
       {
         const handler = op.fun;
-        test("when called, the permissions must be changed", async () => {
+        test("when called, the file must be written", async () => {
           {
-            const originalChmod = fs.chmod;
-            fs.chmod = monitor(_core.dogma.nop());
+            const originalAppendFile = fs.appendFile;
+            fs.appendFile = monitor(_core.dogma.nop());
+            const opts = {
+              ["encoding"]: "utf8"
+            };
             const out = await _core.dogma.pawait(() => handler({
               'params': {
                 ["path"]: path,
-                ["mode"]: mode
+                ["content"]: content,
+                ["opts"]: opts
               }
             }));
             try {
-              const log = monitor.log(fs.chmod);
+              const log = monitor.log(fs.appendFile);
               expected(out).it(0).equalTo(true);
               expected(log).toHaveLen(1);
-              expected(log.calledWith([path, mode])).equalTo(1);
+              expected(log.calledWith([path, content, opts])).equalTo(1);
             } finally {
               monitor.clearAll();
-              fs.chmod = originalChmod;
+              fs.appendFile = originalAppendFile;
             }
           }
         });

@@ -6,47 +6,45 @@ const fs = _core.dogma.use(require("fs/promises"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.write;
+const op = _core.dogma.use(require("./touch"));
 suite(__filename, () => {
   {
+    const buildParams = op.parameterizer;
     const path = "/my/file.txt";
-    const content = "my content";
+    const atime = (0, _core.timestamp)();
+    const mtime = (0, _core.timestamp)();
     suite("buildParams()", () => {
       {
-        const buildParams = op.parameterizer;
-        test("when [content, path], {path, content, opts = {}} must be returned", () => {
+        test("when [path, map], {path, atime, mtime} must be returned", () => {
           {
-            const out = buildParams([content, path]);
+            const times = {
+              ["atime"]: atime,
+              ["mtime"]: mtime
+            };
+            const out = buildParams([path, times]);
             expected(out).equalTo({
               'path': path,
-              'content': content,
-              'opts': {}
+              'atime': atime,
+              'mtime': mtime
             });
           }
         });
-        test("when [content, path, opts], {path, content, opts} must be returned", () => {
+        test("when [path, atime, mtime], {path, atime, mtime} must be returned", () => {
           {
-            const opts = {
-              ["encoding"]: "utf8"
-            };
-            const out = buildParams([content, path, opts]);
+            const out = buildParams([path, atime, mtime]);
             expected(out).equalTo({
               'path': path,
-              'content': content,
-              'opts': opts
+              'atime': atime,
+              'mtime': mtime
             });
           }
         });
         test("when map, the same map must be returned", () => {
           {
-            const opts = {
-              ["encoding"]: "utf8"
-            };
             const args = {
               ["path"]: path,
-              ["content"]: content,
-              ["opts"]: opts
+              ["atime"]: atime,
+              ["mtime"]: mtime
             };
             const out = buildParams(args);
             expected(out).sameAs(args);
@@ -61,10 +59,11 @@ suite(__filename, () => {
           {
             const params = {
               ["path"]: path,
-              ["content"]: content
+              ["atime"]: atime,
+              ["mtime"]: mtime
             };
             const out = buildTitle(params);
-            expected(out).equalTo(`file: write content to '${path}'`);
+            expected(out).equalTo(`file: changes the timestamps of '${path}'`);
           }
         });
       }
@@ -74,26 +73,23 @@ suite(__filename, () => {
         const handler = op.fun;
         test("when called, the file must be written", async () => {
           {
-            const originalWriteFile = fs.writeFile;
-            fs.writeFile = monitor(_core.dogma.nop());
-            const opts = {
-              ["encoding"]: "utf8"
-            };
+            const originalUtimes = fs.utimes;
+            fs.utimes = monitor(_core.dogma.nop());
             const out = await _core.dogma.pawait(() => handler({
               'params': {
                 ["path"]: path,
-                ["content"]: content,
-                ["opts"]: opts
+                ["atime"]: atime,
+                ["mtime"]: mtime
               }
             }));
             try {
-              const log = monitor.log(fs.writeFile);
+              const log = monitor.log(fs.utimes);
               expected(out).it(0).equalTo(true);
               expected(log).toHaveLen(1);
-              expected(log.calledWith([path, content, opts])).equalTo(1);
+              expected(log.calledWith([path, atime, mtime])).equalTo(1);
             } finally {
               monitor.clearAll();
-              fs.writeFile = originalWriteFile;
+              fs.utimes = originalUtimes;
             }
           }
         });

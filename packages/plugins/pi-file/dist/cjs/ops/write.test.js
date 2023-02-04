@@ -6,32 +6,46 @@ const fs = _core.dogma.use(require("fs/promises"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.chown;
+const op = _core.dogma.use(require("./write"));
 suite(__filename, () => {
   {
     const path = "/my/file.txt";
-    const uid = "1234";
-    const gid = "4567";
+    const content = "my content";
     suite("buildParams()", () => {
       {
         const buildParams = op.parameterizer;
-        test("when [uid:gid, path], {path, mode} must be returned", () => {
+        test("when [content, path], {path, content, opts = {}} must be returned", () => {
           {
-            const out = buildParams([`${uid}:${gid}`, path]);
+            const out = buildParams([content, path]);
+            expected(out).toHave({
+              'content': content,
+              'opts': {}
+            });
+            expected.path(out.path).equalTo(path);
+          }
+        });
+        test("when [content, path, opts], {path, content, opts} must be returned", () => {
+          {
+            const opts = {
+              ["encoding"]: "utf8"
+            };
+            const out = buildParams([content, path, opts]);
             expected(out).equalTo({
               'path': path,
-              'uid': uid,
-              'gid': gid
+              'content': content,
+              'opts': opts
             });
           }
         });
         test("when map, the same map must be returned", () => {
           {
+            const opts = {
+              ["encoding"]: "utf8"
+            };
             const args = {
               ["path"]: path,
-              ["uid"]: uid,
-              ["gid"]: gid
+              ["content"]: content,
+              ["opts"]: opts
             };
             const out = buildParams(args);
             expected(out).sameAs(args);
@@ -46,11 +60,10 @@ suite(__filename, () => {
           {
             const params = {
               ["path"]: path,
-              ["uid"]: uid,
-              ["gid"]: gid
+              ["content"]: content
             };
             const out = buildTitle(params);
-            expected(out).equalTo(`file: changes ownership of '${path}' to '${uid}:${gid}'`);
+            expected(out).equalTo(`file: write content to '${path}'`);
           }
         });
       }
@@ -58,25 +71,28 @@ suite(__filename, () => {
     suite("handler()", () => {
       {
         const handler = op.fun;
-        test("when called, the ownership must be changed", async () => {
+        test("when called, the file must be written", async () => {
           {
-            const originalChown = fs.chown;
-            fs.chown = monitor(_core.dogma.nop());
+            const originalWriteFile = fs.writeFile;
+            fs.writeFile = monitor(_core.dogma.nop());
+            const opts = {
+              ["encoding"]: "utf8"
+            };
             const out = await _core.dogma.pawait(() => handler({
               'params': {
                 ["path"]: path,
-                ["uid"]: uid,
-                ["gid"]: gid
+                ["content"]: content,
+                ["opts"]: opts
               }
             }));
             try {
-              const log = monitor.log(fs.chown);
+              const log = monitor.log(fs.writeFile);
               expected(out).it(0).equalTo(true);
               expected(log).toHaveLen(1);
-              expected(log.calledWith([path, uid, gid])).equalTo(1);
+              expected(log.calledWith([path, content, opts])).equalTo(1);
             } finally {
               monitor.clearAll();
-              fs.chown = originalChown;
+              fs.writeFile = originalWriteFile;
             }
           }
         });

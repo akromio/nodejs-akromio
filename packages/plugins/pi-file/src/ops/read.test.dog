@@ -1,9 +1,7 @@
 use (
   alias://expected
-  pi = ~
+  op = read
 )
-
-const op = pi.ops.read
 
 suite(__filename, proc()
   const (

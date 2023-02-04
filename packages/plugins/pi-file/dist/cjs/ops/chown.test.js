@@ -6,37 +6,22 @@ const fs = _core.dogma.use(require("fs/promises"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.touch;
+const op = _core.dogma.use(require("./chown"));
 suite(__filename, () => {
   {
-    const buildParams = op.parameterizer;
     const path = "/my/file.txt";
-    const atime = (0, _core.timestamp)();
-    const mtime = (0, _core.timestamp)();
+    const uid = "1234";
+    const gid = "4567";
     suite("buildParams()", () => {
       {
-        test("when [path, map], {path, atime, mtime} must be returned", () => {
+        const buildParams = op.parameterizer;
+        test("when [uid:gid, path], {path, mode} must be returned", () => {
           {
-            const times = {
-              ["atime"]: atime,
-              ["mtime"]: mtime
-            };
-            const out = buildParams([path, times]);
+            const out = buildParams([`${uid}:${gid}`, path]);
             expected(out).equalTo({
               'path': path,
-              'atime': atime,
-              'mtime': mtime
-            });
-          }
-        });
-        test("when [path, atime, mtime], {path, atime, mtime} must be returned", () => {
-          {
-            const out = buildParams([path, atime, mtime]);
-            expected(out).equalTo({
-              'path': path,
-              'atime': atime,
-              'mtime': mtime
+              'uid': uid,
+              'gid': gid
             });
           }
         });
@@ -44,8 +29,8 @@ suite(__filename, () => {
           {
             const args = {
               ["path"]: path,
-              ["atime"]: atime,
-              ["mtime"]: mtime
+              ["uid"]: uid,
+              ["gid"]: gid
             };
             const out = buildParams(args);
             expected(out).sameAs(args);
@@ -60,11 +45,11 @@ suite(__filename, () => {
           {
             const params = {
               ["path"]: path,
-              ["atime"]: atime,
-              ["mtime"]: mtime
+              ["uid"]: uid,
+              ["gid"]: gid
             };
             const out = buildTitle(params);
-            expected(out).equalTo(`file: changes the timestamps of '${path}'`);
+            expected(out).equalTo(`file: changes ownership of '${path}' to '${uid}:${gid}'`);
           }
         });
       }
@@ -72,25 +57,25 @@ suite(__filename, () => {
     suite("handler()", () => {
       {
         const handler = op.fun;
-        test("when called, the file must be written", async () => {
+        test("when called, the ownership must be changed", async () => {
           {
-            const originalUtimes = fs.utimes;
-            fs.utimes = monitor(_core.dogma.nop());
+            const originalChown = fs.chown;
+            fs.chown = monitor(_core.dogma.nop());
             const out = await _core.dogma.pawait(() => handler({
               'params': {
                 ["path"]: path,
-                ["atime"]: atime,
-                ["mtime"]: mtime
+                ["uid"]: uid,
+                ["gid"]: gid
               }
             }));
             try {
-              const log = monitor.log(fs.utimes);
+              const log = monitor.log(fs.chown);
               expected(out).it(0).equalTo(true);
               expected(log).toHaveLen(1);
-              expected(log.calledWith([path, atime, mtime])).equalTo(1);
+              expected(log.calledWith([path, uid, gid])).equalTo(1);
             } finally {
               monitor.clearAll();
-              fs.utimes = originalUtimes;
+              fs.chown = originalChown;
             }
           }
         });

@@ -1,0 +1,6 @@
+use (
+  alias://expected
+  plugin = alias://expectedpath
+)
+
+expected.plugin(plugin)

@@ -2,10 +2,9 @@ use (
   alias://expected
   fs = dep://fs/promises
   {monitor} = alias://doubles
-  pi = ~
+  
+  op = write
 )
-
-const op = pi.ops.append
 
 suite(__filename, proc()
   const (
@@ -21,11 +20,8 @@ suite(__filename, proc()
       const out = buildParams([content, path])
 
       # (2) assessment
-      expected(out).equalTo(
-        path=,
-        content
-        opts = {}
-      )
+      expected(out).toHave(content=, opts = {})
+      expected.path(out.path).equalTo(path)
     end)
 
     test("when [content, path, opts], {path, content, opts} must be returned", proc()
@@ -63,7 +59,7 @@ suite(__filename, proc()
       )
 
       # (2) assessment
-      expected(out).equalTo($"file: append content to '${path}'")
+      expected(out).equalTo($"file: write content to '${path}'")
     end)
   end)
 
@@ -72,8 +68,8 @@ suite(__filename, proc()
 
     test("when called, the file must be written", async proc()
       # (1) act
-      const originalAppendFile = fs.appendFile
-      fs.appendFile = monitor(nop)
+      const originalWriteFile = fs.writeFile
+      fs.writeFile = monitor(nop)
 
       const (
         opts = {encoding = "utf8"}
@@ -82,14 +78,14 @@ suite(__filename, proc()
 
       # (2) assessment
       do
-        const log = monitor.log(fs.appendFile)
+        const log = monitor.log(fs.writeFile)
 
         expected(out).it(0).equalTo(true)
         expected(log).toHaveLen(1)
         expected(log.calledWith([path, content, opts])).equalTo(1)
       finally
         monitor.clearAll()
-        fs.appendFile = originalAppendFile
+        fs.writeFile = originalWriteFile
     end)
   end)
 end)
