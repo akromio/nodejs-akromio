@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const path = _core.dogma.use(require("path"));
 const fs = _core.dogma.use(require("fs/promises"));
 module.exports = exports = {
   ["desc"]: "Writes the content of a file.",
@@ -22,6 +23,7 @@ function buildParams(args) {
     } else {
       params = args;
     }
+    params.path = path.normalize(params.path);
   }
   return params;
 }

@@ -1,4 +1,5 @@
 use (
+  dep://path
   fs = dep://fs/promises
 )
 
@@ -13,6 +14,7 @@ export {
  * Builds the parameters from the arguments.
  */
 fn buildParams(args) -> params: map
+  # (1) build
   if args is list then
     params = {
       content = args[0]
@@ -21,6 +23,9 @@ fn buildParams(args) -> params: map
     }
   else
     params = args
+  
+  # (2) normalize
+  params.path = path.normalize(params.path)
 
 /**
  * Builds the title from the parameters.
