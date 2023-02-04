@@ -1,6 +1,7 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const path = _core.dogma.use(require("path"));
 const fs = _core.dogma.use(require("fs-extra"));
 module.exports = exports = {
   ["desc"]: "Ensures that a directory exists, creating it if needed.",
@@ -34,6 +35,7 @@ function buildParams(args) {
         }
       }
     }
+    params.path = path.normalize(params.path);
   }
   return params;
 }

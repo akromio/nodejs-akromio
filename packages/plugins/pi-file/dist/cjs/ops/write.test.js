@@ -6,8 +6,7 @@ const fs = _core.dogma.use(require("fs/promises"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.write;
+const op = _core.dogma.use(require("./write"));
 suite(__filename, () => {
   {
     const path = "/my/file.txt";
@@ -18,11 +17,11 @@ suite(__filename, () => {
         test("when [content, path], {path, content, opts = {}} must be returned", () => {
           {
             const out = buildParams([content, path]);
-            expected(out).equalTo({
-              'path': path,
+            expected(out).toHave({
               'content': content,
               'opts': {}
             });
+            expected.path(out.path).equalTo(path);
           }
         });
         test("when [content, path, opts], {path, content, opts} must be returned", () => {
@@ -31,11 +30,11 @@ suite(__filename, () => {
               ["encoding"]: "utf8"
             };
             const out = buildParams([content, path, opts]);
-            expected(out).equalTo({
-              'path': path,
+            expected(out).toHave({
               'content': content,
               'opts': opts
             });
+            expected.path(out.path).equalTo(path);
           }
         });
         test("when map, the same map must be returned", () => {

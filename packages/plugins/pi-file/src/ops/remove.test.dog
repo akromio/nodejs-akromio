@@ -1,14 +1,14 @@
 use (
+  fs = dep://fs/promises
   alias://expected
-  pi = ~
+  {monitor} = alias://doubles
+  
+  op = remove
 )
-
-const op = pi.ops.isReadable
 
 suite(__filename, proc()
   const (
     path = "/my/file.txt"
-    content = "my content"
   )
 
   suite("buildParams()", proc()
@@ -19,22 +19,18 @@ suite(__filename, proc()
       const out = buildParams(path)
 
       # (2) assessment
-      expected(out).equalTo(
-        path=,
-      )
+      expected(out).equalTo(path=)
     end)
 
     test("when [path], {path} must be returned", proc()
       # (1) act
-      const (
-        out = buildParams([path])
-      )
+      const out = buildParams([path])
 
       # (2) assessment
       expected(out).equalTo(path=)
     end)
 
-    test("when map, the same map must be returned", proc()
+    test("when map, that map must be returned", proc()
       # (1) act
       const (
         args = {path}
@@ -51,33 +47,33 @@ suite(__filename, proc()
 
     test("when called, a title must be returned", proc()
       # (1) act
-      const (
-        params = {path}
-        out = buildTitle(params)
-      )
+      const out = buildTitle({path})
 
       # (2) assessment
-      expected(out).equalTo($"file: check whether '${path}' is readable")
+      expected(out).equalTo($"file: remove '${path}'")
     end)
   end)
 
   suite("handler()", proc()
     const handler = op.fun
 
-    test("when readable, true must be returned", async proc()
+    test("when existing, the file must be removed", async proc()
       # (1) act
-      const out = await(handler(params = {path = __filename}))
+      const originalUnlink = fs.unlink
+      fs.unlink = monitor(nop)
+
+      const out = pawait(handler(params = {path}))
 
       # (2) assessment
-      expected(out).equalTo(true)
-    end)
+      do
+        const log = monitor.log(fs.unlink)
 
-    test("when not readable, false must be returned", async proc()
-      # (1) act
-      const out = await(handler(params = {path = "unknown.txt"}))
-
-      # (2) assessment
-      expected(out).equalTo(false)
+        expected(out).it(0).equalTo(true)
+        expected(log).toHaveLen(1)
+        expected(log.calledWith([path])).equalTo(1)
+      finally
+        monitor.clearAll()
+        fs.unlink = originalUnlink
     end)
   end)
 end)

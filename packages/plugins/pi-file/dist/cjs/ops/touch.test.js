@@ -6,21 +6,36 @@ const fs = _core.dogma.use(require("fs/promises"));
 const {
   monitor
 } = _core.dogma.use(require("@akromio/doubles"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.chmod;
+const op = _core.dogma.use(require("./touch"));
 suite(__filename, () => {
   {
+    const buildParams = op.parameterizer;
     const path = "/my/file.txt";
-    const mode = "0o400";
+    const atime = (0, _core.timestamp)();
+    const mtime = (0, _core.timestamp)();
     suite("buildParams()", () => {
       {
-        const buildParams = op.parameterizer;
-        test("when [mode, path], {path, mode} must be returned", () => {
+        test("when [path, map], {path, atime, mtime} must be returned", () => {
           {
-            const out = buildParams([mode, path]);
+            const times = {
+              ["atime"]: atime,
+              ["mtime"]: mtime
+            };
+            const out = buildParams([path, times]);
             expected(out).equalTo({
               'path': path,
-              'mode': mode
+              'atime': atime,
+              'mtime': mtime
+            });
+          }
+        });
+        test("when [path, atime, mtime], {path, atime, mtime} must be returned", () => {
+          {
+            const out = buildParams([path, atime, mtime]);
+            expected(out).equalTo({
+              'path': path,
+              'atime': atime,
+              'mtime': mtime
             });
           }
         });
@@ -28,7 +43,8 @@ suite(__filename, () => {
           {
             const args = {
               ["path"]: path,
-              ["mode"]: mode
+              ["atime"]: atime,
+              ["mtime"]: mtime
             };
             const out = buildParams(args);
             expected(out).sameAs(args);
@@ -43,10 +59,11 @@ suite(__filename, () => {
           {
             const params = {
               ["path"]: path,
-              ["mode"]: mode
+              ["atime"]: atime,
+              ["mtime"]: mtime
             };
             const out = buildTitle(params);
-            expected(out).equalTo(`file: changes permissions of '${path}' to '${mode}'`);
+            expected(out).equalTo(`file: changes the timestamps of '${path}'`);
           }
         });
       }
@@ -54,24 +71,25 @@ suite(__filename, () => {
     suite("handler()", () => {
       {
         const handler = op.fun;
-        test("when called, the permissions must be changed", async () => {
+        test("when called, the file must be written", async () => {
           {
-            const originalChmod = fs.chmod;
-            fs.chmod = monitor(_core.dogma.nop());
+            const originalUtimes = fs.utimes;
+            fs.utimes = monitor(_core.dogma.nop());
             const out = await _core.dogma.pawait(() => handler({
               'params': {
                 ["path"]: path,
-                ["mode"]: mode
+                ["atime"]: atime,
+                ["mtime"]: mtime
               }
             }));
             try {
-              const log = monitor.log(fs.chmod);
+              const log = monitor.log(fs.utimes);
               expected(out).it(0).equalTo(true);
               expected(log).toHaveLen(1);
-              expected(log.calledWith([path, mode])).equalTo(1);
+              expected(log.calledWith([path, atime, mtime])).equalTo(1);
             } finally {
               monitor.clearAll();
-              fs.chmod = originalChmod;
+              fs.utimes = originalUtimes;
             }
           }
         });

@@ -1,13 +1,15 @@
 "use strict";
 
 var _core = require("@dogmalang/core");
+const fs = _core.dogma.use(require("fs/promises"));
 const expected = _core.dogma.use(require("@akromio/expected"));
-const pi = _core.dogma.use(require("../../.."));
-const op = pi.ops.isReadable;
+const {
+  monitor
+} = _core.dogma.use(require("@akromio/doubles"));
+const op = _core.dogma.use(require("./remove"));
 suite(__filename, () => {
   {
     const path = "/my/file.txt";
-    const content = "my content";
     suite("buildParams()", () => {
       {
         const buildParams = op.parameterizer;
@@ -27,7 +29,7 @@ suite(__filename, () => {
             });
           }
         });
-        test("when map, the same map must be returned", () => {
+        test("when map, that map must be returned", () => {
           {
             const args = {
               ["path"]: path
@@ -43,11 +45,10 @@ suite(__filename, () => {
         const buildTitle = op.title;
         test("when called, a title must be returned", () => {
           {
-            const params = {
+            const out = buildTitle({
               ["path"]: path
-            };
-            const out = buildTitle(params);
-            expected(out).equalTo(`file: check whether '${path}' is readable`);
+            });
+            expected(out).equalTo(`file: remove '${path}'`);
           }
         });
       }
@@ -55,24 +56,24 @@ suite(__filename, () => {
     suite("handler()", () => {
       {
         const handler = op.fun;
-        test("when readable, true must be returned", async () => {
+        test("when existing, the file must be removed", async () => {
           {
-            const out = (0, await handler({
+            const originalUnlink = fs.unlink;
+            fs.unlink = monitor(_core.dogma.nop());
+            const out = await _core.dogma.pawait(() => handler({
               'params': {
-                ["path"]: __filename
+                ["path"]: path
               }
             }));
-            expected(out).equalTo(true);
-          }
-        });
-        test("when not readable, false must be returned", async () => {
-          {
-            const out = (0, await handler({
-              'params': {
-                ["path"]: "unknown.txt"
-              }
-            }));
-            expected(out).equalTo(false);
+            try {
+              const log = monitor.log(fs.unlink);
+              expected(out).it(0).equalTo(true);
+              expected(log).toHaveLen(1);
+              expected(log.calledWith([path])).equalTo(1);
+            } finally {
+              monitor.clearAll();
+              fs.unlink = originalUnlink;
+            }
           }
         });
       }
