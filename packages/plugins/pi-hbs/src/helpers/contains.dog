@@ -1,0 +1,4 @@
+/**
+ * Checks whether a list contains an item or a text contains a subtext.
+ */
+export fn join(...args) = args[1] in args[0]

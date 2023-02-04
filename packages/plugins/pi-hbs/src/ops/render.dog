@@ -13,6 +13,7 @@ export {
  * The built-in helpers.
  */
 const helpers = [
+  "contains"
   "eq"
   "isDefined"
   "isEmpty"

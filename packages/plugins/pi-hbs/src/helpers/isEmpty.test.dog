@@ -1,6 +1,6 @@
 use (
   alias://expected
-  ~/dist/cjs/helpers/isEmpty
+  isEmpty
 )
 
 suite(__filename, proc()

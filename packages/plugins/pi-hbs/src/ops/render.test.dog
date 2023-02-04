@@ -1,9 +1,7 @@
 use (
   alias://expected
-  pi = ~
+  op = render
 )
-
-const op = pi.ops.render
 
 suite(__filename, proc()
   const (

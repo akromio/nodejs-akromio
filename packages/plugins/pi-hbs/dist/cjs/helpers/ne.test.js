@@ -2,18 +2,18 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const isEmpty = _core.dogma.use(require("../../../dist/cjs/helpers/isEmpty"));
+const ne = _core.dogma.use(require("./ne"));
 suite(__filename, () => {
   {
-    test("when empty, true must be returned", () => {
+    test("when not equal, true must be returned", () => {
       {
-        const out = isEmpty("");
+        const out = ne("a", "b");
         expected(out).equalTo(true);
       }
     });
-    test("when not empty, false must be returned", () => {
+    test("when equal, false must be returned", () => {
       {
-        const out = isEmpty("123");
+        const out = ne("a", "a");
         expected(out).equalTo(false);
       }
     });

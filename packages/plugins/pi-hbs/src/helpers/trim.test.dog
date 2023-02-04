@@ -1,6 +1,6 @@
 use (
   alias://expected
-  ~/dist/cjs/helpers/trim
+  trim
 )
 
 suite(__filename, proc()
