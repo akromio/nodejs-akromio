@@ -11,12 +11,20 @@ export struct DatumContainer: Datum
    * Value to merge to the given value.
    */
   @hidden
-  pub const merge?: map
+  pub const merge?: (map | list)
 
   @post
   pvt proc post()
     if merge ::= self.merge then
-      self.value = self.value{*, ...merge}
+      const {value} = self
+
+      if merge is list then
+        if value is not list then
+          throw(TypeError($"Datum '${self.name}' expected to be list for merging new items."))
+        
+        self.value = value.concat(merge)
+      else
+        self.value = value{*, ...merge}
 
   @override
   pub fn getValue() = self.value
