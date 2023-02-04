@@ -8,7 +8,7 @@ suite(__filename, () => {
   {
     suite("post", () => {
       {
-        test("when merge is map, this must be merged to the value", () => {
+        test("when merge, this must be merged to the value", () => {
           {
             const out = ConstDatum({
               'name': "c",
@@ -27,26 +27,24 @@ suite(__filename, () => {
             });
           }
         });
-        test("when merge is list, this must be concatenated to the value", () => {
+        test("when append, this must be concatenated to the value", () => {
           {
             const out = ConstDatum({
               'name': "c",
-              'merge': [3, 4],
+              'append': [3, 4],
               'value': [1, 2]
             });
             expected(out.getValue([1, 2, 3, 4]));
           }
         });
-        test("when merge is list and value doesn't, error must be raised", () => {
+        test("when prepend, value must be concatenated to this", () => {
           {
-            const out = _core.dogma.peval(() => {
-              return ConstDatum({
-                'name': "c",
-                'merge': [3, 4],
-                'value': {}
-              });
+            const out = ConstDatum({
+              'name': "c",
+              'prepend': [3, 4],
+              'value': [1, 2]
             });
-            expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Datum 'c' expected to be list for merging new items."));
+            expected(out.getValue([3, 4, 1, 2]));
           }
         });
       }

@@ -5,7 +5,7 @@ use (
 
 suite(__filename, proc()
   suite("post", proc()
-    test("when merge is map, this must be merged to the value", proc()
+    test("when merge, this must be merged to the value", proc()
       # (1) act
       const out = ConstDatum(name = "c", merge = {y = 2}, value = {x = 1, z = 3})
 
@@ -13,20 +13,20 @@ suite(__filename, proc()
       expected(out.getValue()).equalTo(x = 1, y = 2, z = 3)
     end)
 
-    test("when merge is list, this must be concatenated to the value", proc()
+    test("when append, this must be concatenated to the value", proc()
       # (1) act
-      const out = ConstDatum(name = "c", merge = [3, 4], value = [1, 2])
+      const out = ConstDatum(name = "c", append = [3, 4], value = [1, 2])
 
       # (2) assessment
       expected(out.getValue([1, 2, 3, 4]))
     end)
 
-    test("when merge is list and value doesn't, error must be raised", proc()
+    test("when prepend, value must be concatenated to this", proc()
       # (1) act
-      const out = peval(ConstDatum(name = "c", merge = [3, 4], value = {}))
+      const out = ConstDatum(name = "c", prepend = [3, 4], value = [1, 2])
 
       # (2) assessment
-      expected(out).it(0).equalTo(false).it(1).equalTo(TypeError("Datum 'c' expected to be list for merging new items."))
+      expected(out.getValue([3, 4, 1, 2]))
     end)
   end)
 

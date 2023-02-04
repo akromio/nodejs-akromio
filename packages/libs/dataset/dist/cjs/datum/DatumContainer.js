@@ -8,7 +8,21 @@ const $DatumContainer = class DatumContainer extends Datum {
     /* c8 ignore start */
     if (_ == null) _ = {};
     /* c8 ignore stop */ /* c8 ignore start */
-    if (_['merge'] != null) (0, _core.expect)('merge', _['merge'], [_core.map, _core.list]); /* c8 ignore stop */
+    if (_['prepend'] != null) (0, _core.expect)('prepend', _['prepend'], _core.list); /* c8 ignore stop */
+    Object.defineProperty(this, 'prepend', {
+      value: (0, _core.coalesce)(_['prepend'], null),
+      writable: false,
+      enumerable: false
+    });
+    /* c8 ignore start */
+    if (_['append'] != null) (0, _core.expect)('append', _['append'], _core.list); /* c8 ignore stop */
+    Object.defineProperty(this, 'append', {
+      value: (0, _core.coalesce)(_['append'], null),
+      writable: false,
+      enumerable: false
+    });
+    /* c8 ignore start */
+    if (_['merge'] != null) (0, _core.expect)('merge', _['merge'], _core.map); /* c8 ignore stop */
     Object.defineProperty(this, 'merge', {
       value: (0, _core.coalesce)(_['merge'], null),
       writable: false,
@@ -32,19 +46,35 @@ module.exports = exports = DatumContainer;
 DatumContainer.prototype._pvt_7d9434ddf072357483ef0e4e8237feb3_post = function () {
   const self = this;
   {
+    let {
+      value
+    } = this;
     {
-      const merge = this.merge;
-      if (merge) {
-        const {
-          value
-        } = this;
-        if (_core.dogma.is(merge, _core.list)) {
-          if (_core.dogma.isNot(value, _core.list)) {
-            _core.dogma.raise(TypeError(`Datum '${self.name}' expected to be list for merging new items.`));
+      const _ = value;
+      if (_core.dogma.is(_, _core.list)) {
+        {
+          {
+            const prepend = this.prepend;
+            if (prepend) {
+              value = prepend.concat(value);
+            }
           }
-          this.value = value.concat(merge);
-        } else {
-          this.value = _core.dogma.clone(value, {}, {}, [], [merge]);
+          {
+            const append = this.append;
+            if (append) {
+              value = value.concat(append);
+            }
+          }
+          this.value = value;
+        }
+      } else if (_core.dogma.is(_, _core.map)) {
+        {
+          {
+            const merge = this.merge;
+            if (merge) {
+              this.value = _core.dogma.clone(value, {}, {}, [], [merge]);
+            }
+          }
         }
       }
     }
