@@ -2,18 +2,18 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const eq = _core.dogma.use(require("../../../dist/cjs/helpers/eq"));
+const isFalsey = _core.dogma.use(require("./isFalsey"));
 suite(__filename, () => {
   {
-    test("when equal, true must be returned", () => {
+    test("when no, true must be returned", () => {
       {
-        const out = eq("a", "a");
+        const out = isFalsey("no");
         expected(out).equalTo(true);
       }
     });
-    test("when not equal, false must be returned", () => {
+    test("when truthy, false must be returned", () => {
       {
-        const out = eq("a", "b");
+        const out = isFalsey(true);
         expected(out).equalTo(false);
       }
     });

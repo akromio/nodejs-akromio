@@ -1,6 +1,6 @@
 use (
   alias://expected
-  ~/dist/cjs/helpers/join
+  join
 )
 
 suite(__filename, proc()

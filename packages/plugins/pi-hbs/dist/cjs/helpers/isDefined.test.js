@@ -2,7 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const isDefined = _core.dogma.use(require("../../../dist/cjs/helpers/isDefined"));
+const isDefined = _core.dogma.use(require("./isDefined"));
 suite(__filename, () => {
   {
     test("when defined, true must be returned", () => {

@@ -1,0 +1,22 @@
+use (
+  alias://expected
+  contains
+)
+
+suite(__filename, proc()
+  test("when contained, true must be returned", proc()
+    # (1) act
+    const out = contains(["a", "b", "c"], "b")
+
+    # (2) assessment
+    expected(out).equalTo(true)
+  end)
+
+  test("when not contained, false must be returned", proc()
+    # (1) act
+    const out = contains(["a", "b", "c"], "z")
+
+    # (2) assessment
+    expected(out).equalTo(false)
+  end)
+end)

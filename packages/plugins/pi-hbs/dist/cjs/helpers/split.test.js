@@ -2,7 +2,7 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const split = _core.dogma.use(require("../../../dist/cjs/helpers/split"));
+const split = _core.dogma.use(require("./split"));
 suite(__filename, () => {
   {
     test("when text with separator, [...] must be returned", () => {

@@ -1,20 +1,20 @@
 use (
   alias://expected
-  ~/dist/cjs/helpers/isFalsey
+  isTruthy
 )
 
 suite(__filename, proc()
-  test("when no, true must be returned", proc()
+  test("when yes, true must be returned", proc()
     # (1) act
-    const out = isFalsey("no")
+    const out = isTruthy("yes")
 
     # (2) assessment
     expected(out).equalTo(true)
   end)
 
-  test("when truthy, false must be returned", proc()
+  test("when falsey, false must be returned", proc()
     # (1) act
-    const out = isFalsey(true)
+    const out = isTruthy("123")
 
     # (2) assessment
     expected(out).equalTo(false)

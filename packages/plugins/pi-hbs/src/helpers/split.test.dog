@@ -1,6 +1,6 @@
 use (
   alias://expected
-  ~/dist/cjs/helpers/split
+  split
 )
 
 suite(__filename, proc()

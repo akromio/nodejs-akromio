@@ -8,7 +8,7 @@ module.exports = exports = {
   ["title"]: "hbs: render template",
   ["fun"]: handler
 };
-const helpers = ["eq", "isDefined", "isEmpty", "isFalsey", "isTruthy", "join", "ne", "split", "trim"];
+const helpers = ["contains", "eq", "isDefined", "isEmpty", "isFalsey", "isTruthy", "join", "ne", "split", "trim"];
 function buildParams(args) {
   let params = {};
   {
