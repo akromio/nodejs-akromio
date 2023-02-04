@@ -7,5 +7,41 @@ use (
  */
 @abstract
 export struct DatumContainer: Datum
+  /**
+   * Items to prepend to the given value.
+   */
+  @hidden
+  pub const prepend?: list
+
+  /**
+   * Items to append to the given value.
+   */
+  @hidden
+  pub const append?: list
+
+  /**
+   * Value to merge to the given value.
+   */
+  @hidden
+  pub const merge?: map
+
+  @post
+  pvt proc post()
+    var {value} = self
+
+    with type(value) do
+      if list then
+        if prepend ::= self.prepend then
+          value = prepend.concat(value)
+
+        if append ::= self.append then
+          value = value.concat(append)
+        
+        self.value = value
+      
+      if map then
+        if merge ::= self.merge then
+          self.value = value{*, ...merge}
+
   @override
   pub fn getValue() = self.value

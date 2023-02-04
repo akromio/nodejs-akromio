@@ -60,7 +60,7 @@ export struct Datum
   pub fn setValue(value?) -> self
     # (1) pre
     if not self.isUpdatable() then
-      throw(DatumError($"The datum '${self.name}' is not updatable."))
+      throw(DatumError($"Datum '${self.name}' is not updatable."))
     
     # (2) set value
     self.setValueWithoutUpdatableCheck(value)
@@ -83,4 +83,3 @@ export struct Datum
    * Checks whether the datum has a given tag.
    */
   pub fn hasTag(tag) = self.tags.includes(tag)
-    

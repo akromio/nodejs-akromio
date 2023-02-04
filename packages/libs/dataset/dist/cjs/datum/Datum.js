@@ -81,7 +81,7 @@ Datum.prototype.setValue = function (value) {
   const self = this;
   {
     if (!this.isUpdatable()) {
-      _core.dogma.raise(DatumError(`The datum '${self.name}' is not updatable.`));
+      _core.dogma.raise(DatumError(`Datum '${self.name}' is not updatable.`));
     }
     this.setValueWithoutUpdatableCheck(value);
   }
