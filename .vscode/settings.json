@@ -16,6 +16,7 @@
     "luxon",
     "mocharc",
     "redispubsub",
-    "redisstreams"
+    "redisstreams",
+    "siakro"
   ]
 }
