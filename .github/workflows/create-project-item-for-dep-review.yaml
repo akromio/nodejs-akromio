@@ -1,0 +1,38 @@
+on:
+  workflow_dispatch:
+    
+  schedule:
+    - cron: 0 1 * * MON
+
+env:
+  username: akromio
+  projectNumber: 1
+  assignee: siakro
+  statusOption: Todo
+  priorityOption: Critical
+  complexityOption: XS
+  originOption: IT
+
+jobs:
+  create-project-item:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node
+        with:
+          node-version: 18
+      
+      - name: determine bimester to set
+        run: |
+          # (1) determine year and bimester
+          year=$(node -p 'new Date().getFullYear()')
+          bimester=$(node -p 'Math.ceil(new Date().getMonth() * 0.5)')
+
+          # (2) export env variable
+          echo "bimester=$year/B$bimester" >> $GITHUB_ENV
+      
+      - name: create project item
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./.github/scripts/create-dep-pr-review-item.sh $username $projectNumber $assignee $statusOption $originOption $bimester $priorityOption $complexityOption 
