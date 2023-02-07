@@ -40,6 +40,6 @@ jobs:
       
       - name: create project item
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN }}
         run: |
           ./.github/scripts/create-dep-pr-review-item.sh $username $projectNumber $assignee $statusOption $originOption $bimester $priorityOption $complexityOption 
