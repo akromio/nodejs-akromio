@@ -17,6 +17,7 @@ env:
 
 permissions:
   contents: read
+  id-token: write
   repository-projects: write
 
 jobs:
