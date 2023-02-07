@@ -15,7 +15,8 @@ env:
   complexityOption: XS
   originOption: IT
 
-permissions: write-all
+permissions:
+  contents: read
 
 jobs:
   create-project-item:
