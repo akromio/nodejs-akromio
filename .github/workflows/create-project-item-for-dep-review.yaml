@@ -15,6 +15,10 @@ env:
   complexityOption: XS
   originOption: IT
 
+permissions:
+  contents: read
+  repository-projects: write
+
 jobs:
   create-project-item:
     runs-on: ubuntu-latest
