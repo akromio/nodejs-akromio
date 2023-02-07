@@ -15,10 +15,7 @@ env:
   complexityOption: XS
   originOption: IT
 
-permissions:
-  contents: read
-  id-token: write
-  repository-projects: write
+permissions: write-all
 
 jobs:
   create-project-item:
