@@ -1,3 +1,5 @@
+name: create-project-item-for-dep-review
+
 on:
   workflow_dispatch:
     
