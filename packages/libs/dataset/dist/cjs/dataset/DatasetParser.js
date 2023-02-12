@@ -93,6 +93,8 @@ DatasetParser.prototype.parseDatumDecl = function (decl, ds) {
         'dataType': decl.dataType
       }));
     }
+    const prepend = ds.eval(decl.prepend);
+    const append = ds.eval(decl.append);
     let value = ds.eval(decl.value);
     if (value == null && _core.dogma.includes(decl, "defaultValue")) {
       value = decl.defaultValue;
@@ -107,7 +109,9 @@ DatasetParser.prototype.parseDatumDecl = function (decl, ds) {
     }
     datum = Datum(_core.dogma.clone(decl, {
       "name": name,
+      "prepend": prepend,
       "value": value,
+      "append": append,
       "constraints": constraints
     }, {}, [], []));
   }
