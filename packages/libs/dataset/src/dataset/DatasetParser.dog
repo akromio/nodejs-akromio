@@ -73,11 +73,17 @@ export struct DatasetParser
       constraints.appendConstraint(DataTypeConstraint(dataType = decl.dataType))
     
     # (3) parse value because it can contain an expression to evaluate
-    var value = ds.eval(decl.value)
-    if value == nil and "defaultValue" in decl then value = decl.defaultValue
+    var (
+      prepend ::= ds.eval(decl.prepend)
+      append ::= ds.eval(decl.append)
+      value = ds.eval(decl.value)
+    )
+
+    if value == nil and "defaultValue" in decl then
+      value = decl.defaultValue
     
     if [ok, err] ::= peval(constraints.validateValue(value)); not ok then
       throw(TypeError($"Error on datum '${name}': ${err.message}"))
     
     # (4) create and add datum to datatset
-    datum = Datum(decl{*, name, value, constraints})
+    datum = Datum(decl{*, name, prepend, value, append, constraints})
