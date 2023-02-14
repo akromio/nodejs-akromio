@@ -22,12 +22,12 @@ const ConditionalExpEval = new Proxy($ConditionalExpEval, {
 module.exports = exports = ConditionalExpEval;
 ConditionalExpEval.prototype.eval = function (exp, ctx) {
   const self = this;
-  let result; /* c8 ignore next */
+  let result = false; /* c8 ignore next */
   _core.dogma.expect("exp", exp, _core.text); /* c8 ignore next */
   _core.dogma.expect("ctx", ctx, _core.map);
   {
     const script = new vm.Script(exp);
-    result = script.runInNewContext(ctx);
+    result = (0, _core.bool)(script.runInNewContext(ctx));
   }
   return result;
 };
