@@ -1,11 +1,11 @@
 use (
   alias://expected
-  pkg = ~
+  index
 )
 
 suite(__filename, proc()
   test("when imported, api must be exported", proc()
-    expected(pkg).toHave(
+    expected(index).toHave(
       plugin = "text"
       tags = ["built-in"]
       defaultOpName = "concat"
