@@ -2,8 +2,8 @@
   "check-coverage": true,
   "sourceMap": true,
   "reporter": ["lcov", "text"],
-  "statements": 63,
+  "statements": 100,
   "branches": 100,
-  "functions": 50,
-  "lines": 63
+  "functions": 100,
+  "lines": 100
 }

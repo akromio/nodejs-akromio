@@ -2,11 +2,9 @@
 
 var _core = require("@dogmalang/core");
 const expected = _core.dogma.use(require("@akromio/expected"));
-const pi = _core.dogma.use(require("../../.."));
+const op = _core.dogma.use(require("./includes"));
 suite(__filename, () => {
   {
-    const op = pi.ops.includes;
-    const buildParams = op.parameterizer;
     const handler = op.fun;
     suite("handler()", () => {
       {

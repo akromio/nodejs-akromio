@@ -1,12 +1,10 @@
 use (
   alias://expected
-  pi = ~
+  op = concat
 )
-
 
 suite(__filename, proc()
   const (
-    op = pi.ops.concat
     buildParams = op.parameterizer
     handler = op.fun
   )

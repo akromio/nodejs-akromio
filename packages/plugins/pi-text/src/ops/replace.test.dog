@@ -1,0 +1,81 @@
+use (
+  alias://expected
+  op = replace
+)
+
+suite(__filename, proc()
+  const (
+    buildParams = op.parameterizer
+    buildTitle = op.title
+    handler = op.fun
+  )
+
+  const (
+    str = "onetwothree"
+    substr = "two"
+    newSubstr = "2"
+  )
+
+  suite("buildParams()", proc()
+    test("when args is list, {str, substr, newSubstr} must be returned", proc()
+      # (1) act
+      const (
+        args = [str, substr, newSubstr]
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(str=, substr, newSubstr)
+    end)
+
+    test("when args is map, args must be returned", proc()
+      # (1) act
+      const (
+        args = {str, substr, newSubstr}
+        out = buildParams(args)
+      )
+
+      # (2) assessment
+      expected(out).sameAs(args)
+    end)
+  end)
+
+  suite("buildTitle()", proc()
+    test("when called, title must be returned", proc()
+      # (1) act
+      const (
+        params = {str, substr, newSubstr}
+        out = buildTitle(params)
+      )
+
+      # (2) assessment
+      expected(out).equalTo($"text: replace '${substr}' by '${newSubstr}'")
+    end)
+  end)
+
+  suite("handler()", proc()
+    test("when included, substr must be replaced and new text returned", proc()
+      # (1) act
+      const (
+        params = {str, substr, newSubstr}
+        ctx = {params}
+        out = handler(ctx)
+      )
+
+      # (2) assessment
+      expected(out).equalTo("one2three")
+    end)
+
+    test("when not included, str must be returned", proc()
+      # (1) act
+      const (
+        params = {str, substr = "four", newSubstr = "4"}
+        ctx = {params}
+        out = handler(ctx)
+      )
+
+      # (2) assessment
+      expected(out).equalTo(str)
+    end)
+  end)
+end)
