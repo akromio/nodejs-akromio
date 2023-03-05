@@ -45,7 +45,7 @@
     "@akromio/trigger-redispubsub": "^0.21.0",
     "@akromio/trigger-redisstreams": "^0.21.0",
     "@dogmalang/core": "^1.0.0-rc18.0",
-    "luxon": "^3.1.1",
+    "luxon": "^3.3.0",
     "redis": "^4.6.3",
     "table": "^6.8.1",
     "term-size": "^2.2.1",
