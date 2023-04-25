@@ -34,7 +34,7 @@
     "@akromio/dataset": "^0.21.0",
     "@dogmalang/core": "^1.0.0-rc18.0",
     "ms": "^2.1.3",
-    "yaml": "^2.1.3"
+    "yaml": "^2.2.2"
   },
   "scripts": {
     "lint": "dogmac check src",
