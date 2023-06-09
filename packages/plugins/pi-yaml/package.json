@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@dogmalang/core": "^1.0.0-rc18.0",
-    "yaml": "^2.1.3"
+    "yaml": "^2.3.1"
   },
   "scripts": {
     "lint": "dogmac check src tests",
