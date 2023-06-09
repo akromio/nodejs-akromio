@@ -22,4 +22,5 @@ updates:
       - dependency-name: humanize-string
       - dependency-name: indent-string
       - dependency-name: inquirer
+      - dependency-name: open
       - dependency-name: term-size
