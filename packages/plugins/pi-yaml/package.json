@@ -1,6 +1,6 @@
 {
   "name": "@akromio/pi-yaml",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "description": "Plugin for encoding/decoding YAML on Akromio.",
   "author": {
     "name": "Sia Codelabs",
