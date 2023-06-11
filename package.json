@@ -15,7 +15,7 @@
   "devDependencies": {
     "@akromio/doubles": "^0.7.2",
     "@akromio/expected": "^0.7.0",
-    "@akromio/expected-fs": "^0.7.0",
+    "@akromio/expected-fs": "^0.7.1",
     "@akromio/expected-path": "^0.7.1",
     "@babel/cli": "^7.21.0",
     "@babel/core": "^7.22.5",
