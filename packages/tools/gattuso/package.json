@@ -47,7 +47,7 @@
     "@akromio/registry": "^0.21.1",
     "@akromio/reporter": "^0.21.1",
     "@dogmalang/core": "^1.0.0-rc18.0",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "yargs": "^17.7.1"
   },
   "scripts": {
